@@ -6,6 +6,9 @@ set -euo pipefail
 
 LUMEN_DATA="${LUMEN_DATA:-/root/autodl-tmp/lumen}"
 ENV_NAME="${ENV_NAME:-lumen}"
+# Space-separated ModelScope ids; default Qwen only (data disk is 50 GB — add Llama when needed).
+MODELS="${MODELS:-Qwen/Qwen3-8B}"
+export PATH="/root/miniconda3/bin:$PATH"   # AutoDL: conda is not on the non-interactive PATH
 DO_MODELS=0; DO_DATA=0
 for a in "$@"; do case "$a" in --models) DO_MODELS=1;; --data) DO_DATA=1;; esac; done
 
@@ -46,7 +49,7 @@ PY
 
 # ---- models (ModelScope is fast inside mainland China) ----
 if [ "$DO_MODELS" = 1 ]; then
-  for m in "Qwen/Qwen3-8B" "LLM-Research/Meta-Llama-3.1-8B-Instruct"; do
+  for m in $MODELS; do
     tgt="$LUMEN_DATA/models/$(basename "$m")"
     [ -f "$tgt/config.json" ] || modelscope download --model "$m" --local_dir "$tgt"
   done

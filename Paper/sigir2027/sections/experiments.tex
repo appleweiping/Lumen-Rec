@@ -1,0 +1,44 @@
+\section{Experiments}
+\label{sec:exp}
+
+\subsection{Setup}
+\paragraph{Datasets.} Rated panels (label $\ge4$ vs $\le2$): MovieLens-1M and Amazon Reviews 2023 Toys, Beauty and
+Video Games; users with at least 3 likes and 3 dislikes among their last 20 rated items; user-level
+train/validation/test split (80/10/10). Next-item panels: the frozen same-candidate protocol of our earlier study
+(Sports, Toys, Home, Tools; 10k users; 1 positive + 100 popularity-sampled negatives), on which eight official
+LLM-enhanced baselines are already evaluated. \DATANEEDED{Table~\ref{tab:data}: statistics.}
+
+\paragraph{Backbones and regimes.} Qwen3-8B and Llama-3.1-8B-Instruct (thinking disabled), zero-shot and LoRA
+fine-tuned (rank 16, one epoch, three seeds).
+
+\paragraph{Compared methods.} (i) Single-prompt confidence: token \py{}~\citep{bao2023tallrec,zhang2023collm},
+verbalized probability, self-consistency; (ii) item-prior subtraction: content-free contextual
+calibration~\citep{zhao2021calibrate}, no-history PMI, batch calibration~\citep{zhou2024batch}, user-swap prior;
+(iii) trained calibration: temperature scaling~\citep{guo2017calibration}, Brier fine-tuning~\citep{li2025conftuner};
+and an equal-compute two-prompt paraphrase ensemble as the placebo for \method{}.
+
+\paragraph{Metrics.} UAUC (primary), AUC, ECE and Brier after validation temperature scaling, tail-item UAUC;
+NDCG@10/HR@10/MRR on next-item panels; head share of top-10 recommendations. Significance: paired user-bootstrap
+95\% CI; for fine-tuned models, mean $\pm$ s.d. over 3 seeds and a gain larger than twice the seed s.d.
+
+\begin{table}[t]
+\caption{Dataset statistics. \DATANEEDED{fill from panel .meta.json files}}
+\label{tab:data}
+\centering\small
+\begin{tabular}{lrrrr}\toprule
+Dataset & Users & Items & Pairs & Like rate\\\midrule
+\multicolumn{5}{c}{\DATANEEDED{rows}}\\\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Main Results}
+\DATANEEDED{Table: UAUC / ECE / tail UAUC for all methods $\times$ 4 datasets $\times$ 2 backbones, zero-shot and
+fine-tuned; best in bold, CI-significant gains marked.}
+
+\subsection{Next-Item Ranking against Official Baselines}
+\DATANEEDED{Table: NDCG@10 / HR@10 of raw \py{}, \method{}, C-CRP verbalized, and the 8 official baselines on
+Sports/Toys/Home/Tools; head share of top-10 (Q3, static exposure).}
+
+\subsection{Ablations and Analysis}
+\DATANEEDED{like-only vs dislike-only vs mirrored; paraphrase-set size at equal compute; history length;
+mirror tuning vs standard SFT; \method{} on verbalized confidence.}

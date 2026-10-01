@@ -1,0 +1,11 @@
+% Abstract — written last, from verified results only. Planned shape (not a claim):
+Large language models are increasingly used as recommenders that answer ``Would this user like this item?''
+with a \emph{Yes} or \emph{No}, and the probability of \emph{Yes} is used as both a ranking score and a
+confidence. We ask what that confidence actually measures. \DATANEEDED{one-sentence observation result:
+calibration of token-level \py{} against rated labels on 4 datasets $\times$ 2 backbones; share of confident
+errors; popularity dependence of confidence level and of the confidence-matched calibration gap}.
+\DATANEEDED{mechanism sentence: item-level acquiescence term, its popularity link, causal pseudonym evidence}.
+We propose \method{}, which asks the mirrored question and scores the difference, cancelling the item-level
+term while keeping the user-specific evidence, and \emph{mirror tuning}, which preserves the cancellation under
+fine-tuning. \DATANEEDED{main result sentence with UAUC / tail calibration gains vs equal-compute ensembles and
+item-prior subtraction, and next-item ranking vs 8 official baselines}.

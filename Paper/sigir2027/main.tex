@@ -1,0 +1,57 @@
+% SIGIR 2027 full paper (9 pages incl. appendix, references unlimited; double-anonymous).
+% Results are filled ONLY from committed result files; every unfilled slot is \DATANEEDED{...}.
+\documentclass[sigconf,review,anonymous,natbib=true]{acmart}
+
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{subcaption}
+
+\newcommand{\DATANEEDED}[1]{\textcolor{red}{\textbf{[DATA NEEDED: #1]}}}
+\newcommand{\method}{\textsc{Mirror}}
+\newcommand{\py}{P(\texttt{Yes})}
+
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\acmConference[SIGIR '27]{The 50th International ACM SIGIR Conference on Research and Development in Information Retrieval}{July 18--24, 2027}{San Jose, CA, USA}
+
+\begin{document}
+
+\title{Yes Because It Knows the Item, or Because It Knows the User?\\
+Decomposing the Confidence of LLM Recommenders}
+
+\author{Anonymous Author(s)}
+\affiliation{\institution{Anonymous Institution}\country{Anonymous}}
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+<concept><concept_id>10002951.10003317.10003347.10003350</concept_id>
+<concept_desc>Information systems~Recommender systems</concept_desc><concept_significance>500</concept_significance></concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Information systems~Recommender systems}
+\keywords{LLM-based recommendation, uncertainty, calibration, popularity bias}
+
+\maketitle
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/preliminaries}
+\input{sections/observation}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/conclusion}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

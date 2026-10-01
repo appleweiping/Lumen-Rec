@@ -1,0 +1,30 @@
+\section{What Does the Yes/No Confidence Measure?}
+\label{sec:observation}
+
+We first characterise token-level \py{} of zero-shot and fine-tuned LLM recommenders on rated panels
+(Table~\ref{tab:data}), answering Q1--Q5. Each analysis reports a paired user-bootstrap 95\% CI.
+
+\paragraph{RQ1 (Q1, Q2, Q4): Is the model sure when it is right, and is it wrong because it is unsure?}
+\DATANEEDED{reliability diagrams of token \py{} vs verbalized confidence vs rated labels (ECE, Brier, AUC, UAUC);
+error anatomy: fraction of correct-but-unsure ($|\hat p-0.5|<\tau$, correct) and confidently-wrong
+($|\hat p-0.5|\ge\tau$, wrong) predictions; AUROC of confidence for correctness.}
+
+\paragraph{RQ2 (Q5): Are popular items endorsed more confidently---and is it warranted?}
+Following the proximity-bias analysis of \citet{xiong2023proximity}, we separate the \emph{level} of confidence
+from the \emph{calibration gap at matched confidence} across item-popularity deciles.
+\DATANEEDED{confidence level by popularity decile; matched-confidence bias index head vs tail; spread of the
+within-user-centred item term $a(i)$ (SD across items) and Spearman correlation of $a(i)$, valence $v(i)$ and the
+user-marginalised prior $\pi(i)$ with log-popularity.}
+
+\paragraph{RQ3: Is the item term familiarity? A pseudonym knockout.}
+We replace every brand name in history and candidate text with a consistent invented pseudonym, and, as a
+placebo, with another real brand of matched popularity (Appendix~\ref{app:pseudonym}).
+\DATANEEDED{$\Delta\ell$ (real $-$ pseudonym) by popularity decile with head$-$tail CI; placebo $\Delta$; change of
+the matched-confidence bias index; tail UAUC.}
+
+\paragraph{RQ4 (Q2, Q4 validity): Are ``confident errors'' errors?}
+Logged negatives may be unexposed positives. On KuaiRec's fully observed matrix~\citep{gao2022kuairec} we compare
+calibration under logged (missing-as-negative) and fully observed labels for the same pairs.
+\DATANEEDED{share of top-decile logged false positives that are true positives; exposure gap ECE(logged)$-$ECE(full) with CI.}
+
+\paragraph{Summary.} \DATANEEDED{one paragraph tying RQ1--RQ4 to the decomposition $\ell = a(i) + e(u,i)$.}

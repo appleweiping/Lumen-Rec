@@ -1,0 +1,43 @@
+\section{Introduction}
+\label{sec:intro}
+
+Recommenders built on large language models (LLMs) routinely reduce recommendation to a binary
+judgment---``Would this user like this item? Answer Yes or No''---and read the probability of \emph{Yes} as the
+recommendation score~\citep{bao2023tallrec,zhang2023collm}. The same number is then implicitly treated as the
+model's \emph{confidence}: a high \py{} is taken to mean that the model is sure the user will like the item.
+Whether that reading is justified has, to our knowledge, never been tested against labels that ask the same
+question. Prior work quantifies the uncertainty of list-wise LLM recommenders~\citep{kweon2025uqrec}, shapes
+training rewards with confidence~\citep{fan2026ugr}, or audits verbalized confidence of zero-shot models against
+catalog membership~\citep{ravikumar2026hallucinating}; none asks \emph{what the yes/no confidence of a
+personalised LLM recommender is made of}.
+
+We study six questions that practitioners ask of such a system:
+(Q1) when the model is right, is it sure? (Q2) when it is wrong, is that because it was unsure---or is it
+confidently wrong? (Q3) does acting on high confidence over-expose popular items? (Q4) how well does the
+yes/no confidence track ground truth? (Q5) are popular items systematically more confidently endorsed than niche
+ones, and is that endorsement \emph{warranted}? (Q6) can confidence identify noisy training data?
+
+\paragraph{Key observation.} \DATANEEDED{Pilot-1/B3 result: a(i) spread, popularity link, share of confident
+errors explained by the item term; pseudonym knockout}. Our central hypothesis is that \py{} decomposes into an
+\emph{item term}---a willingness to say \emph{Yes} to an item regardless of who asks, which tracks how familiar
+or popular the item is---and a \emph{personal-evidence term}. Only the latter is a recommendation signal.
+Crucially, the item term is not removed by within-user calibration: any monotone recalibration of \py{} leaves a
+user's ranking unchanged~\citep{kweon2022obtaining}, whereas an item-dependent offset reorders it.
+
+\paragraph{Method.} \method{} asks the mirrored question (``Would this user \emph{dislike} this item?'') and
+scores the difference of the two log-odds. The item term enters both answers with the same sign and cancels;
+user-specific evidence enters with opposite signs and is doubled. The two-prompt symmetrization estimator itself
+is not new~\citep{burns2023ccs}; our contribution is to show that in \emph{personalised} recommendation the
+artifact it removes is item-specific and popularity-graded, that removing it changes rankings in a way that
+equal-compute prompt ensembles and item-prior subtraction do not~\citep{zhao2021calibrate,holtzman2021surface},
+and that mirror tuning keeps the benefit after fine-tuning.
+
+\paragraph{Contributions.}
+(1) The first calibration study of token-level yes/no confidence of LLM recommenders against rated labels that
+match the question, answering Q1--Q5 on \DATANEEDED{4 datasets $\times$ 2 backbones}, with a validity check
+against fully observed feedback~\citep{gao2022kuairec}.
+(2) Evidence that the confidence contains an item-level, popularity-graded acquiescence term, including a
+causal pseudonym-knockout test with a real-brand placebo.
+(3) \method{} and mirror tuning, with \DATANEEDED{main gains}.
+(4) A characterised set of what does \emph{not} work (within-user recalibration, uncertainty-weighted pruning),
+reported with multi-seed controls (Appendix).

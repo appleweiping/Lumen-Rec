@@ -1,0 +1,33 @@
+\section{Preliminaries}
+\label{sec:prelim}
+
+\paragraph{Yes/no LLM recommender.} For user $u$ with history $H_u$ and candidate item $i$, a prompt
+$x_q(u,i)$ asks question $q$ (e.g., $q=\textsf{like}$: ``Would this user like the candidate item?''). The
+recommender's confidence is the log-odds of the answer token restricted to $\{\texttt{Yes},\texttt{No}\}$:
+\begin{equation}
+  \ell_q(u,i) = \log P(\texttt{Yes}\mid x_q(u,i)) - \log P(\texttt{No}\mid x_q(u,i)), \qquad
+  \hat p_q(u,i) = \sigma(\ell_q(u,i)).
+\end{equation}
+Candidates are ranked by $\ell_{\textsf{like}}$ (equivalently $\hat p$).
+
+\paragraph{Labels that match the question.} On explicit-feedback data we label a pair $y=1$ if the user's rating
+is $\ge 4$ and $y=0$ if it is $\le 2$ (3-star ratings are dropped), so that $\hat p_{\textsf{like}}$ and $y$
+refer to the same event. Calibration against a single held-out next item among many sampled negatives
+(base rate $1/101$) conflates ``would like'' with ``chose next'' and is not used for calibration claims.
+
+\paragraph{Why within-user calibration cannot fix ranking.}
+\begin{proposition}\label{prop:monotone}
+Let $g:\mathbb{R}\to\mathbb{R}$ be strictly increasing and applied to all candidates of a user. Then the within-user
+ranking, UAUC and every ranking metric are unchanged. If instead $\ell'(u,i) = \ell(u,i) - b(i)$ for an item-dependent
+offset $b$, the within-user ranking changes whenever $b$ is not constant on the user's candidate set.
+\end{proposition}
+The proof is immediate; it explains our earlier negative result that uncertainty-adjusted reranking and
+popularity-aware post-hoc recalibration did not improve same-candidate ranking, and it identifies the only
+admissible lever: an \emph{item-dependent} correction.
+
+\paragraph{Decomposition.} We posit $\ell_{\textsf{like}}(u,i) = a(i) + e(u,i) + \epsilon$ and
+$\ell_{\textsf{dislike}}(u,i) = a(i) - e(u,i) + \epsilon'$, where $a(i)$ is an item-level acquiescence term (the
+willingness to answer \emph{Yes} about item $i$ regardless of the question's polarity) and $e(u,i)$ is personal
+evidence. Then $a = \tfrac12(\ell_{\textsf{like}}+\ell_{\textsf{dislike}})$ and
+$e = \tfrac12(\ell_{\textsf{like}}-\ell_{\textsf{dislike}})$ are identified per pair; the global component of $a$
+is rank-inert by Proposition~\ref{prop:monotone}, so only its \emph{across-item} variation matters.

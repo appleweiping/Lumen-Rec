@@ -1,0 +1,27 @@
+\section{\method{}: Scoring the Personal Evidence}
+\label{sec:method}
+
+\paragraph{Mirrored scoring.} For each user--candidate pair we ask both questions and score
+\begin{equation}
+  s_{\method}(u,i) \;=\; \ell_{\textsf{like}}(u,i) - \ell_{\textsf{dislike}}(u,i) \;=\; 2\,\hat e(u,i).
+\end{equation}
+Under the decomposition of Section~\ref{sec:prelim} the item term $a(i)$ cancels exactly, so by
+Proposition~\ref{prop:monotone} \method{} reorders a user's candidates whenever $a(i)$ varies across them. Both
+prompts share the history-and-candidate prefix, so with prefix caching the extra cost is one additional
+single-token decode per pair. A calibrated probability for serving decisions is obtained by temperature-scaling
+$s_{\method}$ on validation users.
+
+\paragraph{Why not subtract an item prior?} Alternatives estimate $a(i)$ from \emph{other} inputs---a content-free
+prompt~\citep{zhao2021calibrate}, the answer prior~\citep{holtzman2021surface}, the same question without history,
+or the average over other users' histories---and subtract it. These estimate the prior of \emph{Yes for item $i$},
+which mixes acquiescence with genuine item quality (an item most users like is not an artifact). The mirrored
+question isolates the polarity-invariant part only. Whether this distinction matters is an empirical question we
+test directly (Section~\ref{sec:exp}).
+
+\paragraph{Mirror tuning.} Standard yes/no fine-tuning~\citep{bao2023tallrec} trains only the \textsf{like}
+question, so nothing constrains the item term. Mirror tuning adds, for each training pair $(u,i,y)$, the mirrored
+example with the \textsf{dislike} question and label $1-y$; the loss is cross-entropy on the single answer token,
+a proper scoring rule on \py{}. \DATANEEDED{if mirror tuning is retained after M3: one sentence on why it keeps
+$a(i)$ small, supported by the measured SD of $a(i)$ before/after.}
+
+\paragraph{Complexity.} \DATANEEDED{measured throughput: prompts/s for single vs mirrored scoring with prefix caching.}

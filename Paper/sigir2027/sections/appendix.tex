@@ -1,0 +1,20 @@
+\section{Pseudonym Knockout Protocol}
+\label{app:pseudonym}
+Brands come from the Amazon \texttt{store} field. Each brand string is replaced, case-insensitively and
+consistently within an example (history and candidates), either by a deterministic invented name (hash-seeded
+syllables) or, as a placebo, by another real brand from the same brand-popularity tercile (fixed derangement).
+Only candidates whose own title contains their brand string are analysed. Code: \texttt{src/confrec/pseudonymize.py}.
+
+\section{What Did Not Work}
+\label{app:negative}
+\DATANEEDED{within-user monotone recalibration (rank-inert by Proposition~\ref{prop:monotone}); popularity-aware
+post-hoc recalibration; uncertainty-weighted pruning vs matched random pruning over $\ge5$ seeds (Q6); LLM$\to$CF
+deferral, whose apparent oracle headroom is largely a max-of-two-rankers artifact.}
+
+\section{Confidence-Based Pruning of Noisy Training Data (Q6)}
+\DATANEEDED{detection AUROC of rating--review contradictions by raw entropy, $|\hat e|$, evidence; fine-tuning with
+pruned data vs matched random pruning, $\ge5$ seeds.}
+
+\section{Reproducibility}
+Prompts, panel builders, scorers and analysis scripts are released (anonymised link
+\DATANEEDED{anonymous.4open.science URL}); all numbers in this paper are produced by the committed scripts.

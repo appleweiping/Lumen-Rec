@@ -253,3 +253,10 @@ docs.zip
 !/docs/milestones/**
 !/docs/archive/
 !/docs/archive/**
+
+# SIGIR 2027 line (branch sigir2027): keep the SIGIR docs and paper tracked
+!/docs/sigir/
+!/docs/sigir/**
+!Paper/sigir2027/
+!Paper/sigir2027/**
+

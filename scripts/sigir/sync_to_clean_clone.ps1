@@ -28,10 +28,20 @@ foreach ($g in $globs) {
 }
 
 Set-Location $Dst
+# Native git writes progress/warnings to stderr; judge success by exit code, not by stderr.
+$ErrorActionPreference = "Continue"
 if ((git branch --show-current) -ne "sigir2027") { throw "clean clone is not on branch sigir2027" }
-git add -A -- docs/sigir idea-stage src/confrec scripts/sigir Paper/sigir2027 outputs/confrec_pilot RESEARCH_BRIEF.md refine-logs tests CLAUDE.md
+git add -A -- docs/sigir idea-stage src/confrec scripts/sigir Paper/sigir2027 outputs/confrec_pilot RESEARCH_BRIEF.md refine-logs tests CLAUDE.md .gitignore 2>$null
+if ($LASTEXITCODE -ne 0) { throw "git add failed ($LASTEXITCODE)" }
 $staged = git diff --cached --name-only
 if (-not $staged) { Write-Output "nothing to commit"; exit 0 }
 git commit -q -m "$Message" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+if ($LASTEXITCODE -ne 0) { throw "git commit failed ($LASTEXITCODE)" }
 git log --oneline -1
-if (-not $NoPush) { git push -u origin sigir2027 2>&1 | Select-Object -Last 3 }
+if (-not $NoPush) {
+  git push -q -u origin sigir2027 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "git push failed ($LASTEXITCODE)" }
+  $remote = (git ls-remote origin refs/heads/sigir2027) -split "\s+" | Select-Object -First 1
+  if ($remote -ne (git rev-parse HEAD)) { throw "remote sigir2027 ($remote) != local HEAD" }
+  Write-Output "pushed and verified: $remote"
+}

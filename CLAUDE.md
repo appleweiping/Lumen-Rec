@@ -4,6 +4,20 @@ Read `AGENTS.md` first. It is the authoritative operating contract for this repo
 
 This is the Uncertainty project: Actionable Uncertainty for LLM-based Recommendation.
 
+## ACTIVE LINE (2026-10-01): SIGIR 2027 — uncertainty-aware LLM4Rec (branch `sigir2027`)
+
+- **Server:** `ssh lumen-gpu` (SeetaCloud `connect.westc.seetacloud.com:45105`, key auth only; never store
+  passwords). Data/models under `/root/autodl-tmp/lumen`. Old `pony-rec-gpu` is gone; regenerate data with
+  `scripts/sigir/{bootstrap_server.sh,slim_amazon2023.py,rebuild_panels.sh}` (panels verified against
+  `docs/sigir/panel_refs/`). Server checkout: `git clone -b sigir2027 https://github.com/appleweiping/Lumen-Rec.git`.
+- **ARIS state (executor + reviewer = Claude Opus; all verdicts same-family / provisional):** `RESEARCH_BRIEF.md`
+  → `idea-stage/IDEA_REPORT.md` (selected A1 MIRROR, conditional on Pilot 1; fallback B9/A9) → pilots
+  `scripts/sigir/run_pilot1_mirror.sh`, `run_pilot2_3.sh` (pre-registered rules in `idea-stage/triage_verdict.md`
+  §3) → `refine-logs/EXPERIMENT_PLAN.md`. Evidence log: `docs/sigir/PILOT_LOG.md`. Paper: `Paper/sigir2027/`.
+- **Code:** `src/confrec/`; tests `tests/test_confrec_*.py`.
+- **Sync:** the working folder `D:\Research\Lumen` has a damaged `.git`; SIGIR work is mirrored into the clean clone
+  `D:\Research\_lumen_fresh` (branch `sigir2027`) with `scripts/sigir/sync_to_clean_clone.ps1` and pushed from there.
+
 ## Continuity Rule
 
 Use `agentmemory` for shared recall, but do not depend on it as the only durable

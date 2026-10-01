@@ -1,0 +1,883 @@
+% references.bib -- SIGIR 2027 paper: uncertainty / confidence in LLM-based recommenders
+% Built 2026-10-01. Every entry was fetched (not written from memory) from CrossRef
+% (api.crossref.org/works/<doi>/transform/application/x-bibtex), arXiv (arxiv.org/bibtex/<id>),
+% or the venue's own BibTeX export (PMLR, NeurIPS/ICLR proceedings, TMLR). DBLP was unreachable
+% (Anubis bot challenge; not bypassed). Only formatting was normalized: citation keys, typographic
+% quotes/dashes, & escaping, month macros, https DOI urls, brace-protected title acronyms, and
+% dropped clutter fields (abstract, pdf, editor, issn, isbn, collection). See CITATION_MAP.md.
+% Peer-reviewed versions are used whenever a DOI or venue BibTeX exists; arXiv misc entries otherwise.
+% No [VERIFY] entries: every requested paper resolved to a fetched record (see CITATION_MAP.md).
+
+% ==================== Closest competitors ====================
+
+@inproceedings{kweon2025uqrec,
+  author = {Kweon, Wonbin and Jang, Sanghwan and Kang, SeongKu and Yu, Hwanjo},
+  title = {Uncertainty Quantification and Decomposition for {LLM-based} Recommendation},
+  booktitle = {Proceedings of the ACM on Web Conference 2025},
+  series = {WWW '25},
+  pages = {4889--4901},
+  year = {2025},
+  month = apr,
+  publisher = {ACM},
+  doi = {10.1145/3696410.3714601},
+  url = {https://doi.org/10.1145/3696410.3714601}
+}
+
+@inproceedings{fan2026ugr,
+  author = {Fan, Chenxiao and Gao, Chongming and Gong, Yaxin and Liu, Haoyan and Feng, Fuli and He, Xiangnan},
+  title = {Uncertainty-aware Generative Recommendation},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  pages = {1015--1026},
+  year = {2026},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3770855.3817975},
+  url = {https://doi.org/10.1145/3770855.3817975}
+}
+
+@misc{yan2026evirank,
+  author = {Meng Yan and Cai Xv and Xujing Wang and Ziyu Guan and Wei Zhao},
+  title = {{EviRank:} Evidence-Based Confidence Estimation for {LLM-Based} Ranking},
+  year = {2026},
+  url = {https://arxiv.org/abs/2606.04727},
+  eprint = {2606.04727},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.IR}
+}
+
+@misc{ravikumar2026hallucinating,
+  author = {Srijith Ravikumar},
+  title = {Do {LLM} Recommenders Know When They're Hallucinating? Auditing Confidence Calibration in Catalog Faithfulness},
+  year = {2026},
+  url = {https://arxiv.org/abs/2608.10008},
+  eprint = {2608.10008},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.IR},
+  note = {Accepted at CIKM 2026 (short paper), per arXiv comments; cite v2 or later}
+}
+
+@inproceedings{lee2026knowsa,
+  author = {Lee, Jaehyun and Jang, Sanghwan and Kang, SeongKu and Yu, Hwanjo},
+  title = {Filling the Gaps: Selective Knowledge Augmentation for {LLM} Recommenders},
+  booktitle = {Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages = {891--901},
+  year = {2026},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3805712.3809656},
+  url = {https://doi.org/10.1145/3805712.3809656}
+}
+
+@misc{zhou2026routerec,
+  author = {Kaiji Zhou and Vladimir Kalmykov and Yue Feng},
+  title = {{RouteRec:} Strict Evaluation of Recommender-Agent Selection and Aggregation},
+  year = {2026},
+  url = {https://arxiv.org/abs/2607.09908},
+  eprint = {2607.09908},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL},
+  note = {AgentSearch 2026 Workshop, co-located with SIGIR 2026, per arXiv comments}
+}
+
+% ==================== Hooi group (calibration / confidence) ====================
+
+@inproceedings{xiong2024llmuncertainty,
+  author = {Xiong, Miao and Hu, Zhiyuan and Lu, Xinyang and Li, Yifei and Fu, Jie and He, Junxian and Hooi, Bryan},
+  title = {Can {LLMs} Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in {LLMs}},
+  booktitle = {International Conference on Learning Representations},
+  pages = {23650--23678},
+  year = {2024},
+  url = {https://proceedings.iclr.cc/paper_files/paper/2024/file/6733cf15e10e2cd1d59af033c3bb8507-Paper-Conference.pdf}
+}
+
+@inproceedings{xiong2023procal,
+  author = {Xiong, Miao and Deng, Ailin and Koh, Pang Wei and Wu, Jiaying and Li, Shen and Xu, Jianqing and Hooi, Bryan},
+  title = {Proximity-Informed Calibration for Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems 36},
+  series = {NeurIPS 2023},
+  pages = {68511--68538},
+  year = {2023},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/075280-2996},
+  url = {https://doi.org/10.52202/075280-2996}
+}
+
+@inproceedings{li2025conftuner,
+  author = {Li, Yibo and Xiong, Miao and Wu, Jiaying and Hooi, Bryan},
+  title = {{ConfTuner:} Training Large Language Models to Express Their Confidence Verbally},
+  booktitle = {Advances in Neural Information Processing Systems 38},
+  series = {NeurIPS 2025},
+  pages = {59517--59546},
+  year = {2025},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/085713-1783},
+  url = {https://doi.org/10.52202/085713-1783}
+}
+
+@article{xiong2022neighboragg,
+  author = {Miao Xiong and Shen Li and Wenjie Feng and Ailin Deng and Jihai Zhang and Bryan Hooi},
+  title = {Birds of a Feather Trust Together: Knowing When to Trust a Classifier via Adaptive Neighborhood Aggregation},
+  journal = {Transactions on Machine Learning Research},
+  year = {2022},
+  url = {https://openreview.net/forum?id=p5V8P2J61u}
+}
+
+@misc{wu2025unit,
+  author = {Tianyi Wu and Jingwei Ni and Bryan Hooi and Jiaheng Zhang and Elliott Ash and See-Kiong Ng and Mrinmaya Sachan and Markus Leippold},
+  title = {Balancing Truthfulness and Informativeness with Uncertainty-Aware Instruction Fine-Tuning},
+  year = {2025},
+  url = {https://arxiv.org/abs/2502.11962},
+  eprint = {2502.11962},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@misc{li2025mkj,
+  author = {Jiaxi Li and Yiwei Wang and Kai Zhang and Yujun Cai and Bryan Hooi and Nanyun Peng and Kai-Wei Chang and Jin Lu},
+  title = {Fact or Guesswork? Evaluating Large Language Models' Medical Knowledge with Structured One-Hop Judgments},
+  year = {2025},
+  url = {https://arxiv.org/abs/2502.14275},
+  eprint = {2502.14275},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+% ==================== LLM recommenders (yes/no + generative) ====================
+
+@inproceedings{bao2023tallrec,
+  author = {Bao, Keqin and Zhang, Jizhi and Zhang, Yang and Wang, Wenjie and Feng, Fuli and He, Xiangnan},
+  title = {{TALLRec:} An Effective and Efficient Tuning Framework to Align Large Language Model with Recommendation},
+  booktitle = {Proceedings of the 17th ACM Conference on Recommender Systems},
+  series = {RecSys '23},
+  pages = {1007--1014},
+  year = {2023},
+  month = sep,
+  publisher = {ACM},
+  doi = {10.1145/3604915.3608857},
+  url = {https://doi.org/10.1145/3604915.3608857}
+}
+
+@article{zhang2025collm,
+  author = {Zhang, Yang and Feng, Fuli and Zhang, Jizhi and Bao, Keqin and Wang, Qifan and He, Xiangnan},
+  title = {{CoLLM:} Integrating Collaborative Embeddings Into Large Language Models for Recommendation},
+  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  volume = {37},
+  number = {5},
+  pages = {2329--2340},
+  year = {2025},
+  month = may,
+  publisher = {Institute of Electrical and Electronics Engineers (IEEE)},
+  doi = {10.1109/TKDE.2025.3540912},
+  url = {https://doi.org/10.1109/TKDE.2025.3540912}
+}
+
+@inproceedings{zhang2024binllm,
+  author = {Zhang, Yang and Bao, Keqin and Yan, Ming and Wang, Wenjie and Feng, Fuli and He, Xiangnan},
+  title = {Text-like Encoding of Collaborative Information in Large Language Models for Recommendation},
+  booktitle = {Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages = {9181--9191},
+  year = {2024},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.acl-long.497},
+  url = {https://doi.org/10.18653/v1/2024.acl-long.497}
+}
+
+@inproceedings{liao2024llara,
+  author = {Liao, Jiayi and Li, Sihang and Yang, Zhengyi and Wu, Jiancan and Yuan, Yancheng and Wang, Xiang and He, Xiangnan},
+  title = {{LLaRA:} Large Language-Recommendation Assistant},
+  booktitle = {Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR 2024},
+  pages = {1785--1795},
+  year = {2024},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3626772.3657690},
+  url = {https://doi.org/10.1145/3626772.3657690}
+}
+
+@inproceedings{kim2024allmrec,
+  author = {Kim, Sein and Kang, Hongseok and Choi, Seungyoon and Kim, Donghyun and Yang, Minchul and Park, Chanyoung},
+  title = {Large Language Models meet Collaborative Filtering: An Efficient All-round {LLM-based} Recommender System},
+  booktitle = {Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  series = {KDD '24},
+  pages = {1395--1406},
+  year = {2024},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3637528.3671931},
+  url = {https://doi.org/10.1145/3637528.3671931}
+}
+
+@inproceedings{lin2024rella,
+  author = {Lin, Jianghao and Shan, Rong and Zhu, Chenxu and Du, Kounianhua and Chen, Bo and Quan, Shigang and Tang, Ruiming and Yu, Yong and Zhang, Weinan},
+  title = {{ReLLa:} Retrieval-enhanced Large Language Models for Lifelong Sequential Behavior Comprehension in Recommendation},
+  booktitle = {Proceedings of the ACM Web Conference 2024},
+  series = {WWW '24},
+  pages = {3497--3508},
+  year = {2024},
+  month = may,
+  publisher = {ACM},
+  doi = {10.1145/3589334.3645467},
+  url = {https://doi.org/10.1145/3589334.3645467}
+}
+
+@inproceedings{geng2022p5,
+  author = {Geng, Shijie and Liu, Shuchang and Fu, Zuohui and Ge, Yingqiang and Zhang, Yongfeng},
+  title = {Recommendation as Language Processing {(RLP):} A Unified Pretrain, Personalized Prompt \& Predict Paradigm {(P5)}},
+  booktitle = {Proceedings of the 16th ACM Conference on Recommender Systems},
+  series = {RecSys '22},
+  pages = {299--315},
+  year = {2022},
+  month = sep,
+  publisher = {ACM},
+  doi = {10.1145/3523227.3546767},
+  url = {https://doi.org/10.1145/3523227.3546767}
+}
+
+@article{bao2025bigrec,
+  author = {Bao, Keqin and Zhang, Jizhi and Wang, Wenjie and Zhang, Yang and Yang, Zhengyi and Luo, Yanchen and Chen, Chong and Feng, Fuli and Tian, Qi},
+  title = {A Bi-Step Grounding Paradigm for Large Language Models in Recommendation Systems},
+  journal = {ACM Transactions on Recommender Systems},
+  volume = {3},
+  number = {4},
+  pages = {1--27},
+  year = {2025},
+  month = apr,
+  publisher = {Association for Computing Machinery (ACM)},
+  doi = {10.1145/3716393},
+  url = {https://doi.org/10.1145/3716393}
+}
+
+@inproceedings{bao2024d3,
+  author = {Bao, Keqin and Zhang, Jizhi and Zhang, Yang and Huo, Xinyue and Chen, Chong and Feng, Fuli},
+  title = {Decoding Matters: Addressing Amplification Bias and Homogeneity Issue in Recommendations for Large Language Models},
+  booktitle = {Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing},
+  pages = {10540--10552},
+  year = {2024},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.emnlp-main.589},
+  url = {https://doi.org/10.18653/v1/2024.emnlp-main.589}
+}
+
+@inproceedings{chen2024sdpo,
+  author = {Chen, Yuxin and Tan, Junfei and Zhang, An and Yang, Zhengyi and Sheng, Leheng and Zhang, Enzhi and Wang, Xiang and Chua, Tat-Seng},
+  title = {On Softmax Direct Preference Optimization for Recommendation},
+  booktitle = {Advances in Neural Information Processing Systems 37},
+  series = {NeurIPS 2024},
+  pages = {27463--27489},
+  year = {2024},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/079017-0863},
+  url = {https://doi.org/10.52202/079017-0863}
+}
+
+@inproceedings{gao2025sprec,
+  author = {Gao, Chongming and Chen, Ruijun and Yuan, Shuai and Huang, Kexin and Yu, Yuanqing and He, Xiangnan},
+  title = {{SPRec:} Self-Play to Debias {LLM-based} Recommendation},
+  booktitle = {Proceedings of the ACM on Web Conference 2025},
+  series = {WWW '25},
+  pages = {5075--5084},
+  year = {2025},
+  month = apr,
+  publisher = {ACM},
+  doi = {10.1145/3696410.3714524},
+  url = {https://doi.org/10.1145/3696410.3714524}
+}
+
+@inproceedings{gao2025flower,
+  author = {Gao, Chongming and Gao, Mengyao and Fan, Chenxiao and Yuan, Shuai and Shi, Wentao and He, Xiangnan},
+  title = {Process-Supervised {LLM} Recommenders via Flow-guided Tuning},
+  booktitle = {Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR '25},
+  pages = {1934--1943},
+  year = {2025},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3726302.3729981},
+  url = {https://doi.org/10.1145/3726302.3729981}
+}
+
+@article{liao2026rosepo,
+  author = {Liao, Jiayi and He, Xiangnan and Xie, Ruobing and Wu, Jiancan and Yuan, Yancheng and Sun, Xingwu and Kang, Zhanhui and Duan, Jingru and Zang, Wenyu and Wang, Xiang},
+  title = {{RosePO:} Customized Preference Alignment in {LLM-Based} Recommendation},
+  journal = {ACM Transactions on Information Systems},
+  volume = {44},
+  number = {7},
+  pages = {1--25},
+  year = {2026},
+  month = sep,
+  publisher = {Association for Computing Machinery (ACM)},
+  doi = {10.1145/3833420},
+  url = {https://doi.org/10.1145/3833420}
+}
+
+@inproceedings{park2026capo,
+  author = {Park, Chung and Yun, Hyeongjun and Kim, Taesan and Hong, Junui and Hong, Dongjoon and Myong, Mira and Oh, Jihoon and Cho, MinCheol and Park, Kijung and Choi, Min and Seok, Jihwan and Choo, Jaegul},
+  title = {More Than What Was Chosen: {LLM-based} Explainable Recommendation Beyond Noisy User Preferences},
+  booktitle = {International Conference on Learning Representations},
+  pages = {24741--24764},
+  year = {2026},
+  url = {https://proceedings.iclr.cc/paper_files/paper/2026/file/2a581c3f0fcaf50b6f87eac048f18369-Paper-Conference.pdf}
+}
+
+% ==================== Prompt symmetrization / yes-no bias ====================
+
+@inproceedings{burns2023ccs,
+  author = {Collin Burns and Haotian Ye and Dan Klein and Jacob Steinhardt},
+  title = {Discovering Latent Knowledge in Language Models Without Supervision},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year = {2023},
+  url = {https://iclr.cc/virtual/2023/poster/11480},
+  eprint = {2212.03827},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@misc{huang2026yesno,
+  author = {Haonan Huang},
+  title = {The yes-no bias of large language models reflects answer order and wording, not shifts in moral judgment},
+  year = {2026},
+  url = {https://arxiv.org/abs/2607.05552},
+  eprint = {2607.05552},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@inproceedings{zhao2021calibrate,
+  author = {Zhao, Zihao and Wallace, Eric and Feng, Shi and Klein, Dan and Singh, Sameer},
+  title = {Calibrate Before Use: Improving Few-shot Performance of Language Models},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {139},
+  pages = {12697--12706},
+  year = {2021},
+  month = jul,
+  publisher = {PMLR},
+  url = {https://proceedings.mlr.press/v139/zhao21c.html}
+}
+
+@inproceedings{holtzman2021surface,
+  author = {Holtzman, Ari and West, Peter and Shwartz, Vered and Choi, Yejin and Zettlemoyer, Luke},
+  title = {Surface Form Competition: Why the Highest Probability Answer Isn't Always Right},
+  booktitle = {Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing},
+  pages = {7038--7051},
+  year = {2021},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.emnlp-main.564},
+  url = {https://doi.org/10.18653/v1/2021.emnlp-main.564}
+}
+
+@inproceedings{zhou2024batch,
+  author = {Zhou, Han and Wan, Xingchen and Proleev, Lev and Mincu, Diana and Chen, Jilin and Heller, Katherine and Roy, Subhrajit},
+  title = {Batch Calibration: Rethinking Calibration for In-Context Learning and Prompt Engineering},
+  booktitle = {International Conference on Learning Representations},
+  pages = {49--70},
+  year = {2024},
+  url = {https://proceedings.iclr.cc/paper_files/paper/2024/file/003e438cf04e3caf0a5c908495e484fe-Paper-Conference.pdf}
+}
+
+@inproceedings{braun2025acquiescence,
+  author = {Braun, Daniel},
+  title = {Acquiescence Bias in Large Language Models},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2025},
+  pages = {11341--11355},
+  year = {2025},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.findings-emnlp.607},
+  url = {https://doi.org/10.18653/v1/2025.findings-emnlp.607}
+}
+
+@inproceedings{zhang2025yesharder,
+  author = {Zhang, Ziheng and Zeng, Weixin and Tang, Jiuyang and Wang, Ji and Zhao, Xiang},
+  title = {Yes is Harder than No: A Behavioral Study of Framing Effects in Large Language Models Across Downstream Tasks},
+  booktitle = {Proceedings of the 34th ACM International Conference on Information and Knowledge Management},
+  series = {CIKM '25},
+  pages = {4304--4314},
+  year = {2025},
+  month = nov,
+  publisher = {ACM},
+  doi = {10.1145/3746252.3761350},
+  url = {https://doi.org/10.1145/3746252.3761350}
+}
+
+@inproceedings{liu2025repair,
+  author = {Liu, Yinhong and Guo, Zhijiang and Liang, Tianya and Shareghi, Ehsan and Vuli\'{c}, Ivan and Collier, Nigel},
+  title = {Aligning with Logic: Measuring, Evaluating and Improving Logical Preference Consistency in Large Language Models},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {267},
+  pages = {38518--38539},
+  year = {2025},
+  month = jul,
+  publisher = {PMLR},
+  url = {https://proceedings.mlr.press/v267/liu25u.html}
+}
+
+@misc{ahn2025prin,
+  author = {Jihyun Janice Ahn and Wenpeng Yin},
+  title = {Prompt-Reverse Inconsistency: {LLM} Self-Inconsistency Beyond Generative Randomness and Prompt Paraphrasing},
+  year = {2025},
+  url = {https://arxiv.org/abs/2504.01282},
+  eprint = {2504.01282},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL},
+  note = {Accepted at COLM 2025, per arXiv comments}
+}
+
+% ==================== Calibration & UQ fundamentals ====================
+
+@inproceedings{guo2017calibration,
+  author = {Chuan Guo and Geoff Pleiss and Yu Sun and Kilian Q. Weinberger},
+  title = {On Calibration of Modern Neural Networks},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {70},
+  pages = {1321--1330},
+  year = {2017},
+  month = aug,
+  publisher = {PMLR},
+  url = {https://proceedings.mlr.press/v70/guo17a.html}
+}
+
+@article{naeini2015ece,
+  author = {Pakdaman Naeini, Mahdi and Cooper, Gregory and Hauskrecht, Milos},
+  title = {Obtaining Well Calibrated Probabilities Using Bayesian Binning},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume = {29},
+  number = {1},
+  year = {2015},
+  month = feb,
+  publisher = {Association for the Advancement of Artificial Intelligence (AAAI)},
+  doi = {10.1609/aaai.v29i1.9602},
+  url = {https://doi.org/10.1609/aaai.v29i1.9602}
+}
+
+@misc{kadavath2022language,
+  author = {Saurav Kadavath and Tom Conerly and Amanda Askell and Tom Henighan and Dawn Drain and Ethan Perez and Nicholas Schiefer and Zac Hatfield-Dodds and Nova DasSarma and Eli Tran-Johnson and Scott Johnston and Sheer El-Showk and Andy Jones and Nelson Elhage and Tristan Hume and Anna Chen and Yuntao Bai and Sam Bowman and Stanislav Fort and Deep Ganguli and Danny Hernandez and Josh Jacobson and Jackson Kernion and Shauna Kravec and Liane Lovitt and Kamal Ndousse and Catherine Olsson and Sam Ringer and Dario Amodei and Tom Brown and Jack Clark and Nicholas Joseph and Ben Mann and Sam McCandlish and Chris Olah and Jared Kaplan},
+  title = {Language Models (Mostly) Know What They Know},
+  year = {2022},
+  url = {https://arxiv.org/abs/2207.05221},
+  eprint = {2207.05221},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@article{farquhar2024semantic,
+  author = {Farquhar, Sebastian and Kossen, Jannik and Kuhn, Lorenz and Gal, Yarin},
+  title = {Detecting hallucinations in large language models using semantic entropy},
+  journal = {Nature},
+  volume = {630},
+  number = {8017},
+  pages = {625--630},
+  year = {2024},
+  month = jun,
+  publisher = {Springer Science and Business Media LLC},
+  doi = {10.1038/s41586-024-07421-0},
+  url = {https://doi.org/10.1038/s41586-024-07421-0}
+}
+
+@inproceedings{geifman2017selective,
+  author = {Geifman, Yonatan and El-Yaniv, Ran},
+  title = {Selective Classification for Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume = {30},
+  year = {2017},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf}
+}
+
+% ==================== RecSys calibration / MNAR / popularity ====================
+
+@article{kweon2022calibrated,
+  author = {Kweon, Wonbin and Kang, SeongKu and Yu, Hwanjo},
+  title = {Obtaining Calibrated Probabilities with Personalized Ranking Models},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume = {36},
+  number = {4},
+  pages = {4083--4091},
+  year = {2022},
+  month = jun,
+  publisher = {Association for the Advancement of Artificial Intelligence (AAAI)},
+  doi = {10.1609/aaai.v36i4.20326},
+  url = {https://doi.org/10.1609/aaai.v36i4.20326}
+}
+
+@inproceedings{steck2018calibrated,
+  author = {Steck, Harald},
+  title = {Calibrated recommendations},
+  booktitle = {Proceedings of the 12th ACM Conference on Recommender Systems},
+  series = {RecSys '18},
+  pages = {154--162},
+  year = {2018},
+  month = sep,
+  publisher = {ACM},
+  doi = {10.1145/3240323.3240372},
+  url = {https://doi.org/10.1145/3240323.3240372}
+}
+
+@inproceedings{abdollahpouri2017controlling,
+  author = {Abdollahpouri, Himan and Burke, Robin and Mobasher, Bamshad},
+  title = {Controlling Popularity Bias in Learning-to-Rank Recommendation},
+  booktitle = {Proceedings of the Eleventh ACM Conference on Recommender Systems},
+  series = {RecSys '17},
+  pages = {42--46},
+  year = {2017},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3109859.3109912},
+  url = {https://doi.org/10.1145/3109859.3109912}
+}
+
+@inproceedings{wei2021macr,
+  author = {Wei, Tianxin and Feng, Fuli and Chen, Jiawei and Wu, Ziwei and Yi, Jinfeng and He, Xiangnan},
+  title = {Model-Agnostic Counterfactual Reasoning for Eliminating Popularity Bias in Recommender System},
+  booktitle = {Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery \& Data Mining},
+  series = {KDD '21},
+  pages = {1791--1800},
+  year = {2021},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3447548.3467289},
+  url = {https://doi.org/10.1145/3447548.3467289}
+}
+
+@inproceedings{zhang2021pda,
+  author = {Zhang, Yang and Feng, Fuli and He, Xiangnan and Wei, Tianxin and Song, Chonggang and Ling, Guohui and Zhang, Yongdong},
+  title = {Causal Intervention for Leveraging Popularity Bias in Recommendation},
+  booktitle = {Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR '21},
+  pages = {11--20},
+  year = {2021},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3404835.3462875},
+  url = {https://doi.org/10.1145/3404835.3462875}
+}
+
+@inproceedings{gao2022kuairec,
+  author = {Gao, Chongming and Li, Shijun and Lei, Wenqiang and Chen, Jiawei and Li, Biao and Jiang, Peng and He, Xiangnan and Mao, Jiaxin and Chua, Tat-Seng},
+  title = {{KuaiRec:} A Fully-observed Dataset and Insights for Evaluating Recommender Systems},
+  booktitle = {Proceedings of the 31st ACM International Conference on Information \& Knowledge Management},
+  series = {CIKM '22},
+  pages = {540--550},
+  year = {2022},
+  month = oct,
+  publisher = {ACM},
+  doi = {10.1145/3511808.3557220},
+  url = {https://doi.org/10.1145/3511808.3557220}
+}
+
+@inproceedings{schnabel2016treatments,
+  author = {Schnabel, Tobias and Swaminathan, Adith and Singh, Ashudeep and Chandak, Navin and Joachims, Thorsten},
+  title = {Recommendations as Treatments: Debiasing Learning and Evaluation},
+  booktitle = {Proceedings of The 33rd International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {48},
+  pages = {1670--1679},
+  year = {2016},
+  month = jun,
+  publisher = {PMLR},
+  address = {New York, New York, USA},
+  url = {https://proceedings.mlr.press/v48/schnabel16.html}
+}
+
+@inproceedings{marlin2009collaborative,
+  author = {Marlin, Benjamin M. and Zemel, Richard S.},
+  title = {Collaborative prediction and ranking with non-random missing data},
+  booktitle = {Proceedings of the third ACM conference on Recommender systems},
+  series = {RecSys '09},
+  pages = {5--12},
+  year = {2009},
+  month = oct,
+  publisher = {ACM},
+  doi = {10.1145/1639714.1639717},
+  url = {https://doi.org/10.1145/1639714.1639717}
+}
+
+@misc{chu2026incumbent,
+  author = {Xi Chu and Yupeng Hou},
+  title = {Incumbent Advantage: Brand Bias and Cognitive Manipulation Dynamics in {LLM} Recommendation Systems},
+  year = {2026},
+  url = {https://arxiv.org/abs/2606.17443},
+  eprint = {2606.17443},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AI}
+}
+
+@inproceedings{kamruzzaman2024brand,
+  author = {Kamruzzaman, Mahammed and Nguyen, Hieu Minh and Kim, Gene Louis},
+  title = {``Global is Good, Local is Bad?'': Understanding Brand Bias in {LLMs}},
+  booktitle = {Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing},
+  pages = {12695--12702},
+  year = {2024},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.emnlp-main.707},
+  url = {https://doi.org/10.18653/v1/2024.emnlp-main.707}
+}
+
+% ==================== Data selection / denoising ====================
+
+@inproceedings{lin2024dealrec,
+  author = {Lin, Xinyu and Wang, Wenjie and Li, Yongqi and Yang, Shuo and Feng, Fuli and Wei, Yinwei and Chua, Tat-Seng},
+  title = {Data-efficient Fine-tuning for {LLM-based} Recommendation},
+  booktitle = {Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR 2024},
+  pages = {365--374},
+  year = {2024},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3626772.3657807},
+  url = {https://doi.org/10.1145/3626772.3657807}
+}
+
+@inproceedings{mei2025goracs,
+  author = {Mei, Tiehua and Chen, Hengrui and Yu, Peng and Liang, Jiaqing and Yang, Deqing},
+  title = {{GORACS:} Group-level Optimal Transport-guided Coreset Selection for {LLM-based} Recommender Systems},
+  booktitle = {Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  series = {KDD '25},
+  pages = {2126--2137},
+  year = {2025},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3711896.3736985},
+  url = {https://doi.org/10.1145/3711896.3736985}
+}
+
+@inproceedings{wang2021tce,
+  author = {Wang, Wenjie and Feng, Fuli and He, Xiangnan and Nie, Liqiang and Chua, Tat-Seng},
+  title = {Denoising Implicit Feedback for Recommendation},
+  booktitle = {Proceedings of the 14th ACM International Conference on Web Search and Data Mining},
+  series = {WSDM '21},
+  pages = {373--381},
+  year = {2021},
+  month = mar,
+  publisher = {ACM},
+  doi = {10.1145/3437963.3441800},
+  url = {https://doi.org/10.1145/3437963.3441800}
+}
+
+% ==================== Feedback loops ====================
+
+@inproceedings{chaney2018feedback,
+  author = {Chaney, Allison J. B. and Stewart, Brandon M. and Engelhardt, Barbara E.},
+  title = {How algorithmic confounding in recommendation systems increases homogeneity and decreases utility},
+  booktitle = {Proceedings of the 12th ACM Conference on Recommender Systems},
+  series = {RecSys '18},
+  pages = {224--232},
+  year = {2018},
+  month = sep,
+  publisher = {ACM},
+  doi = {10.1145/3240323.3240370},
+  url = {https://doi.org/10.1145/3240323.3240370}
+}
+
+@inproceedings{mansoury2020feedback,
+  author = {Mansoury, Masoud and Abdollahpouri, Himan and Pechenizkiy, Mykola and Mobasher, Bamshad and Burke, Robin},
+  title = {Feedback Loop and Bias Amplification in Recommender Systems},
+  booktitle = {Proceedings of the 29th ACM International Conference on Information \& Knowledge Management},
+  series = {CIKM '20},
+  pages = {2145--2148},
+  year = {2020},
+  month = oct,
+  publisher = {ACM},
+  doi = {10.1145/3340531.3412152},
+  url = {https://doi.org/10.1145/3340531.3412152}
+}
+
+@inproceedings{zhang2024agent4rec,
+  author = {Zhang, An and Chen, Yuxin and Sheng, Leheng and Wang, Xiang and Chua, Tat-Seng},
+  title = {On Generative Agents in Recommendation},
+  booktitle = {Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR 2024},
+  pages = {1807--1817},
+  year = {2024},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3626772.3657844},
+  url = {https://doi.org/10.1145/3626772.3657844}
+}
+
+% ==================== Baselines (Lumen main table) ====================
+
+@inproceedings{wang2024elmrec,
+  author = {Wang, Xinfeng and Cui, Jin and Fukumoto, Fumiyo and Suzuki, Yoshimi},
+  title = {Enhancing High-order Interaction Awareness in {LLM-based} Recommender Model},
+  booktitle = {Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing},
+  pages = {11696--11711},
+  year = {2024},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.emnlp-main.653},
+  url = {https://doi.org/10.18653/v1/2024.emnlp-main.653}
+}
+
+@inproceedings{wang2025irllrec,
+  author = {Wang, Yu and Sang, Lei and Zhang, Yi and Zhang, Yiwen},
+  title = {Intent Representation Learning with Large Language Model for Recommendation},
+  booktitle = {Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR '25},
+  pages = {1870--1879},
+  year = {2025},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3726302.3730011},
+  url = {https://doi.org/10.1145/3726302.3730011}
+}
+
+@inproceedings{he2025llm2rec,
+  author = {He, Yingzhi and Liu, Xiaohao and Zhang, An and Ma, Yunshan and Chua, Tat-Seng},
+  title = {{LLM2Rec:} Large Language Models Are Powerful Embedding Models for Sequential Recommendation},
+  booktitle = {Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  series = {KDD '25},
+  pages = {896--907},
+  year = {2025},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3711896.3737029},
+  url = {https://doi.org/10.1145/3711896.3737029}
+}
+
+@article{liu2025llmemb,
+  author = {Liu, Qidong and Wu, Xian and Wang, Wanyu and Wang, Yejing and Zhu, Yuanshao and Zhao, Xiangyu and Tian, Feng and Zheng, Yefeng},
+  title = {{LLMEmb:} Large Language Model Can Be a Good Embedding Generator for Sequential Recommendation},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume = {39},
+  number = {11},
+  pages = {12183--12191},
+  year = {2025},
+  month = apr,
+  publisher = {Association for the Advancement of Artificial Intelligence (AAAI)},
+  doi = {10.1609/aaai.v39i11.33327},
+  url = {https://doi.org/10.1609/aaai.v39i11.33327}
+}
+
+@inproceedings{liu2024llmesr,
+  author = {Liu, Qidong and Wu, Xian and Wang, Yejing and Zhang, Zijian and Tian, Feng and Zheng, Yefeng and Zhao, Xiangyu},
+  title = {{LLM-ESR:} Large Language Models Enhancement for Long-tailed Sequential Recommendation},
+  booktitle = {Advances in Neural Information Processing Systems 37},
+  series = {NeurIPS 2024},
+  pages = {26701--26727},
+  year = {2024},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/079017-0839},
+  url = {https://doi.org/10.52202/079017-0839}
+}
+
+@inproceedings{zhang2026proex,
+  author = {Zhang, Yi and Zhang, Yiwen and Wang, Yu and Chen, Tong and Yin, Hongzhi},
+  title = {{ProEx:} A Unified Framework Leveraging Large Language Model with Profile Extrapolation for Recommendation},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.1},
+  pages = {1940--1951},
+  year = {2026},
+  month = apr,
+  publisher = {ACM},
+  doi = {10.1145/3770854.3780284},
+  url = {https://doi.org/10.1145/3770854.3780284}
+}
+
+@inproceedings{zhang2026promax,
+  author = {Zhang, Yi and Zhang, Yiwen and Zheng, Kai and Chen, Tong and Yin, Hongzhi},
+  title = {{ProMax:} Exploring the Potential of {LLM-derived} Profiles with Distribution Shaping for Recommender Systems},
+  booktitle = {Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages = {2431--2441},
+  year = {2026},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3805712.3809600},
+  url = {https://doi.org/10.1145/3805712.3809600}
+}
+
+@inproceedings{ren2024rlmrec,
+  author = {Ren, Xubin and Wei, Wei and Xia, Lianghao and Su, Lixin and Cheng, Suqi and Wang, Junfeng and Yin, Dawei and Huang, Chao},
+  title = {Representation Learning with Large Language Models for Recommendation},
+  booktitle = {Proceedings of the ACM Web Conference 2024},
+  series = {WWW '24},
+  pages = {3464--3475},
+  year = {2024},
+  month = may,
+  publisher = {ACM},
+  doi = {10.1145/3589334.3645458},
+  url = {https://doi.org/10.1145/3589334.3645458}
+}
+
+@inproceedings{kang2018sasrec,
+  author = {Kang, Wang-Cheng and McAuley, Julian},
+  title = {Self-Attentive Sequential Recommendation},
+  booktitle = {2018 IEEE International Conference on Data Mining (ICDM)},
+  pages = {197--206},
+  year = {2018},
+  month = nov,
+  publisher = {IEEE},
+  doi = {10.1109/ICDM.2018.00035},
+  url = {https://doi.org/10.1109/ICDM.2018.00035}
+}
+
+@inproceedings{hou2024llmrank,
+  author = {Hou, Yupeng and Zhang, Junjie and Lin, Zihan and Lu, Hongyu and Xie, Ruobing and McAuley, Julian and Zhao, Wayne Xin},
+  title = {Large Language Models are Zero-Shot Rankers for Recommender Systems},
+  booktitle = {Advances in Information Retrieval},
+  series = {Lecture Notes in Computer Science},
+  pages = {364--381},
+  year = {2024},
+  publisher = {Springer Nature Switzerland},
+  doi = {10.1007/978-3-031-56060-6_24},
+  url = {https://doi.org/10.1007/978-3-031-56060-6_24}
+}
+
+% ==================== Backbones & infrastructure ====================
+
+@misc{yang2025qwen3,
+  author = {An Yang and Anfeng Li and Baosong Yang and Beichen Zhang and Binyuan Hui and others},
+  title = {{Qwen3} Technical Report},
+  year = {2025},
+  url = {https://arxiv.org/abs/2505.09388},
+  eprint = {2505.09388},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@misc{grattafiori2024llama3,
+  author = {Aaron Grattafiori and Abhimanyu Dubey and Abhinav Jauhri and Abhinav Pandey and Abhishek Kadian and others},
+  title = {The Llama 3 Herd of Models},
+  year = {2024},
+  url = {https://arxiv.org/abs/2407.21783},
+  eprint = {2407.21783},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AI}
+}
+
+@inproceedings{kwon2023vllm,
+  author = {Kwon, Woosuk and Li, Zhuohan and Zhuang, Siyuan and Sheng, Ying and Zheng, Lianmin and Yu, Cody Hao and Gonzalez, Joseph and Zhang, Hao and Stoica, Ion},
+  title = {Efficient Memory Management for Large Language Model Serving with {PagedAttention}},
+  booktitle = {Proceedings of the 29th Symposium on Operating Systems Principles},
+  series = {SOSP '23},
+  pages = {611--626},
+  year = {2023},
+  month = oct,
+  publisher = {ACM},
+  doi = {10.1145/3600006.3613165},
+  url = {https://doi.org/10.1145/3600006.3613165}
+}
+
+@inproceedings{hu2022lora,
+  author = {Edward J. Hu and Yelong Shen and Phillip Wallis and Zeyuan Allen-Zhu and Yuanzhi Li and Shean Wang and Lu Wang and Weizhu Chen},
+  title = {{LoRA:} Low-Rank Adaptation of Large Language Models},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year = {2022},
+  url = {https://iclr.cc/virtual/2022/poster/6319},
+  eprint = {2106.09685},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@inproceedings{kweon2024perk,
+  title     = {Top-Personalized-{K} Recommendation},
+  author    = {Kweon, Wonbin and Kang, SeongKu and Jang, Sanghwan and Yu, Hwanjo},
+  booktitle = {Proceedings of the ACM Web Conference 2024},
+  series    = {WWW '24},
+  publisher = {ACM},
+  year      = {2024},
+  month     = may,
+  pages     = {3388--3399},
+  doi       = {10.1145/3589334.3645417},
+  url       = {https://doi.org/10.1145/3589334.3645417}
+}

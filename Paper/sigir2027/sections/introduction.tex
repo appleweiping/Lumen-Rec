@@ -3,7 +3,7 @@
 
 Recommenders built on large language models (LLMs) routinely reduce recommendation to a binary
 judgment---``Would this user like this item? Answer Yes or No''---and read the probability of \emph{Yes} as the
-recommendation score~\citep{bao2023tallrec,zhang2023collm}. The same number is then implicitly treated as the
+recommendation score~\citep{bao2023tallrec,zhang2025collm}. The same number is then implicitly treated as the
 model's \emph{confidence}: a high \py{} is taken to mean that the model is sure the user will like the item.
 Whether that reading is justified has, to our knowledge, never been tested against labels that ask the same
 question. Prior work quantifies the uncertainty of list-wise LLM recommenders~\citep{kweon2025uqrec}, shapes
@@ -22,7 +22,7 @@ errors explained by the item term; pseudonym knockout}. Our central hypothesis i
 \emph{item term}---a willingness to say \emph{Yes} to an item regardless of who asks, which tracks how familiar
 or popular the item is---and a \emph{personal-evidence term}. Only the latter is a recommendation signal.
 Crucially, the item term is not removed by within-user calibration: any monotone recalibration of \py{} leaves a
-user's ranking unchanged~\citep{kweon2022obtaining}, whereas an item-dependent offset reorders it.
+user's ranking unchanged~\citep{kweon2022calibrated}, whereas an item-dependent offset reorders it.
 
 \paragraph{Method.} \method{} asks the mirrored question (``Would this user \emph{dislike} this item?'') and
 scores the difference of the two log-odds. The item term enters both answers with the same sign and cancels;

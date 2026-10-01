@@ -38,24 +38,42 @@ ENDPOINT = os.environ.get("HF_ENDPOINT", "https://hf-mirror.com").rstrip("/")
 BASE = f"{ENDPOINT}/datasets/McAuley-Lab/Amazon-Reviews-2023/resolve/main/raw"
 
 
-def stream_slim(url: str, keys: tuple[str, ...], out_path: Path, retries: int = 5) -> int:
+def stream_slim(url: str, keys: tuple[str, ...], out_path: Path, retries: int = 20) -> int:
+    """Stream `url` line by line, keep `keys`, gzip to `out_path`. Resumable: on a broken connection it
+    re-requests from the byte offset of the last COMPLETE line (HTTP Range) and appends a new gzip member
+    (multi-member gzip is read transparently by gzip/pandas), so multi-GB files never restart from zero."""
     tmp = out_path.with_suffix(out_path.suffix + ".part")
+    if tmp.exists():
+        tmp.unlink()  # a .part from an older non-resumable run has unknown offset
+    offset, n = 0, 0
     for attempt in range(1, retries + 1):
-        n = 0
+        headers = {"Range": f"bytes={offset}-"} if offset else {}
         try:
-            with requests.get(url, stream=True, timeout=120) as r, gzip.open(tmp, "wt", encoding="utf-8") as f:
+            with requests.get(url, stream=True, timeout=120, headers=headers) as r, \
+                    gzip.open(tmp, "at", encoding="utf-8") as f:
                 r.raise_for_status()
-                for line in r.iter_lines(chunk_size=1 << 20):
-                    if not line:
-                        continue
-                    rec = json.loads(line)
+                if offset and r.status_code != 206:
+                    raise RuntimeError(f"server ignored Range (status {r.status_code}); cannot resume")
+                buf = b""
+                for chunk in r.iter_content(chunk_size=1 << 20):
+                    buf += chunk
+                    *lines, buf = buf.split(b"\n")
+                    for line in lines:
+                        offset += len(line) + 1
+                        if line.strip():
+                            rec = json.loads(line)
+                            f.write(json.dumps({k: rec.get(k) for k in keys}, ensure_ascii=False) + "\n")
+                            n += 1
+                if buf.strip():  # final line without trailing newline
+                    rec = json.loads(buf)
                     f.write(json.dumps({k: rec.get(k) for k in keys}, ensure_ascii=False) + "\n")
                     n += 1
+                    offset += len(buf)
             tmp.replace(out_path)
             return n
-        except Exception as exc:  # network hiccups on long streams: restart the file
-            print(f"[retry {attempt}/{retries}] {url}: {exc}", file=sys.stderr, flush=True)
-            time.sleep(10 * attempt)
+        except Exception as exc:
+            print(f"[retry {attempt}/{retries}] {url} at byte {offset} ({n} rows): {exc}", file=sys.stderr, flush=True)
+            time.sleep(min(60, 10 * attempt))
     raise RuntimeError(f"failed to stream {url}")
 
 

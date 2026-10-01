@@ -16,8 +16,8 @@ echo "== hardware"; nvidia-smi --query-gpu=name,memory.total,driver_version --fo
 nvcc --version 2>/dev/null | tail -1 || true
 df -h / "$(dirname "$LUMEN_DATA")" 2>/dev/null || true; free -g | head -2; nproc
 
-# AutoDL academic network acceleration (GitHub/HF) when available.
-[ -f /etc/network_turbo ] && source /etc/network_turbo || true
+# NOTE: do NOT source /etc/network_turbo here — it proxies traffic and slows the domestic pip/conda mirrors
+# (and ModelScope / hf-mirror are domestic anyway). Use it only for GitHub operations.
 export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 export PIP_INDEX_URL="${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
 
@@ -27,7 +27,9 @@ export HF_HOME="$LUMEN_DATA/cache/hf"
 # ---- python env (conda if present, else venv) ----
 if command -v conda >/dev/null 2>&1; then
   source "$(conda info --base)/etc/profile.d/conda.sh"
-  conda env list | grep -q "^$ENV_NAME " || conda create -y -n "$ENV_NAME" python=3.11
+  # repo.anaconda.com ("defaults") is unreachable from AutoDL: pin the Tsinghua mirror explicitly.
+  conda env list | grep -q "^$ENV_NAME " || conda create -y -n "$ENV_NAME" python=3.11 --override-channels \
+    -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
   conda activate "$ENV_NAME"
 else
   python3 -m venv "$LUMEN_DATA/venv" && source "$LUMEN_DATA/venv/bin/activate"

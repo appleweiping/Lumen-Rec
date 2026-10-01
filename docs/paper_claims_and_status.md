@@ -79,6 +79,19 @@ Official-baseline completion is necessary but no longer sufficient for paper
 readiness. Before final writing or GPT-5.5/Codex xhigh review, the paper must
 also include:
 
+**2026-10-01 ProMax page range closed.** Crossref now exposes the final ACM
+record for DOI `10.1145/3805712.3809600` with pages `2431--2441`; the ProMax
+entry in `Paper/references.bib` now carries that page range. The live probe
+`outputs/summary/paper_critical/promax_public_metadata_probe_20261001.{json,md}`
+closes `promax:final_page_range_missing_in_bib` and
+`promax:crossref_registry_not_visible` (Crossref 200). The DOI is registered
+(doi.org handle API, timestamp 2026-07-10; doi.org 302 -> dl.acm.org), but the
+probe's followed-redirect check still sees ACM DL bot-blocking (403), so
+`promax:doi_resolver_not_visible` stays open and
+`ProMax public metadata ready=false` under the unchanged evidence standard.
+Target formatting and private manual submission confirmation remain open;
+`final_submission_ready=false`.
+
 **2026-06-15 private/manual gate stamp-aware default refresh.** Codex repaired
 the date-sensitive defaults in
 `scripts/audit/main_build_manual_submission_private_confirmation_request_packet.py`,

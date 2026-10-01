@@ -1,0 +1,205 @@
+{
+  "aris_skill": "aris-citation-audit",
+  "bibtex": {
+    "doi": "10.1145/3805712.3809600",
+    "entry_type": "inproceedings",
+    "eprint": "2604.26231",
+    "isbn": "979-8-4007-2599-9",
+    "location": "Melbourne, VIC, Australia",
+    "numpages": "11",
+    "pages": "2431--2441"
+  },
+  "blocker_checks": [
+    {
+      "blocker": "promax:final_page_range_missing_in_bib",
+      "closed": true,
+      "closure_condition": "Add final ACM page range to the ProMax BibTeX entry.",
+      "current_value": "2431--2441"
+    },
+    {
+      "blocker": "promax:crossref_registry_not_visible",
+      "closed": true,
+      "closure_condition": "Crossref /works DOI lookup returns 200 with matching DOI metadata.",
+      "current_value": {
+        "status_code": 200,
+        "summary": {
+          "container_title": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+          "doi": "10.1145/3805712.3809600",
+          "page": "2431-2441",
+          "published_year": 2026,
+          "title": "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems"
+        }
+      }
+    },
+    {
+      "blocker": "promax:doi_resolver_not_visible",
+      "closed": false,
+      "closure_condition": "DOI resolver returns a successful response for the expected DOI.",
+      "current_value": {
+        "final_url": "https://doi.org/10.1145/3805712.3809600",
+        "status_code": 403
+      }
+    }
+  ],
+  "created_at_utc": "2026-10-01T14:02:31.327660+00:00",
+  "direct_checks": {
+    "acm_dl": {
+      "content_length_sampled": 5524,
+      "error": "HTTP Error 403: Forbidden",
+      "final_url": "https://dl.acm.org/doi/10.1145/3805712.3809600",
+      "ok": false,
+      "status_code": 403,
+      "url": "https://dl.acm.org/doi/10.1145/3805712.3809600"
+    },
+    "crossref": {
+      "content_length_sampled": 14331,
+      "error": "",
+      "final_url": "https://api.crossref.org/works/10.1145/3805712.3809600",
+      "ok": true,
+      "status_code": 200,
+      "url": "https://api.crossref.org/works/10.1145/3805712.3809600"
+    },
+    "crossref_summary": {
+      "container_title": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+      "doi": "10.1145/3805712.3809600",
+      "page": "2431-2441",
+      "published_year": 2026,
+      "title": "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems"
+    },
+    "doi_resolver": {
+      "content_length_sampled": 5524,
+      "error": "HTTP Error 403: Forbidden",
+      "final_url": "https://doi.org/10.1145/3805712.3809600",
+      "ok": false,
+      "status_code": 403,
+      "url": "https://doi.org/10.1145/3805712.3809600"
+    }
+  },
+  "doi": "10.1145/3805712.3809600",
+  "final_submission_ready": false,
+  "mode": "local_read_only_promax_public_metadata_probe",
+  "network_mode": "live",
+  "next_actions": [
+    "If all blocker checks are closed, update the external proceedings metadata audit and release-candidate stack.",
+    "Do not set final_submission_ready=true from this probe alone; final readiness still requires the full final submission gate.",
+    "If Crossref exposes a page range before BibTeX is updated, copy the final page range into Paper/references.bib and rerun the audits."
+  ],
+  "ok": true,
+  "promax_public_metadata_ready": false,
+  "read_only": true,
+  "remaining_blockers": [
+    "promax:doi_resolver_not_visible"
+  ],
+  "schema_version": "2026-06-12.promax_public_metadata_probe.v1",
+  "source_probes": [
+    {
+      "final_url": "https://arxiv.org/html/2604.26231v1",
+      "missing_patterns": [],
+      "name": "arxiv_html_promax_acm_metadata",
+      "ok": true,
+      "required_patterns": [
+        "10.1145/3805712.3809600",
+        "979-8-4007-2599-9/2026/07",
+        "49th International ACM SIGIR Conference",
+        "Melbourne, VIC, Australia"
+      ],
+      "response": {
+        "content_length_sampled": 369337,
+        "error": "",
+        "final_url": "https://arxiv.org/html/2604.26231v1",
+        "ok": true,
+        "status_code": 200,
+        "url": "https://arxiv.org/html/2604.26231v1"
+      },
+      "status_code": 200,
+      "url": "https://arxiv.org/html/2604.26231v1"
+    },
+    {
+      "final_url": "https://sigir2026.org/en-AU/pages/program/accepted-papers",
+      "missing_patterns": [],
+      "name": "sigir2026_accepted_papers_promax",
+      "ok": true,
+      "required_patterns": [
+        "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems",
+        "Yi Zhang, Yiwen Zhang, Kai Zheng, Tong Chen, Hongzhi Yin"
+      ],
+      "response": {
+        "content_length_sampled": 499561,
+        "error": "",
+        "final_url": "https://sigir2026.org/en-AU/pages/program/accepted-papers",
+        "ok": true,
+        "status_code": 200,
+        "url": "https://sigir2026.org/en-AU/pages/program/accepted-papers"
+      },
+      "status_code": 200,
+      "url": "https://sigir2026.org/en-AU/pages/program/accepted-papers"
+    },
+    {
+      "final_url": "https://about.uq.edu.au/experts/10854",
+      "missing_patterns": [],
+      "name": "uq_author_profile_promax_sigir2026",
+      "ok": true,
+      "required_patterns": [
+        "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems",
+        "SIGIR 2026"
+      ],
+      "response": {
+        "content_length_sampled": 267597,
+        "error": "",
+        "final_url": "https://about.uq.edu.au/experts/10854",
+        "ok": true,
+        "status_code": 200,
+        "url": "https://eecs.uq.edu.au/profile/2696/hongzhi-yin"
+      },
+      "status_code": 200,
+      "url": "https://eecs.uq.edu.au/profile/2696/hongzhi-yin"
+    },
+    {
+      "final_url": "https://sites.google.com/view/hongzhi-yin/publications",
+      "missing_patterns": [],
+      "name": "author_publications_promax_sigir2026",
+      "ok": true,
+      "required_patterns": [
+        "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems",
+        "SIGIR"
+      ],
+      "response": {
+        "content_length_sampled": 499790,
+        "error": "",
+        "final_url": "https://sites.google.com/view/hongzhi-yin/publications",
+        "ok": true,
+        "status_code": 200,
+        "url": "https://sites.google.com/view/hongzhi-yin/publications"
+      },
+      "status_code": 200,
+      "url": "https://sites.google.com/view/hongzhi-yin/publications"
+    },
+    {
+      "final_url": "https://about.uq.edu.au/experts/10854",
+      "missing_patterns": [],
+      "name": "uq_experts_profile_promax_sigir2026",
+      "ok": true,
+      "required_patterns": [
+        "ProMax: Exploring the Potential of LLM-derived Profiles with Distribution Shaping for Recommender Systems",
+        "SIGIR 2026"
+      ],
+      "response": {
+        "content_length_sampled": 267597,
+        "error": "",
+        "final_url": "https://about.uq.edu.au/experts/10854",
+        "ok": true,
+        "status_code": 200,
+        "url": "https://about.uq.edu.au/experts/10854"
+      },
+      "status_code": 200,
+      "url": "https://about.uq.edu.au/experts/10854"
+    }
+  ],
+  "warnings": [
+    "acm_dl_not_accessible:status=403"
+  ],
+  "will_copy": false,
+  "will_delete": false,
+  "will_ssh": false,
+  "will_start_experiment": false
+}

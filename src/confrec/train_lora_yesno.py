@@ -4,8 +4,11 @@ Each rated training example (user history, candidate, label) becomes
   standard : "Would this user like the candidate item?"    -> "Yes" if label else "No"
   mirror   : + "Would this user dislike the candidate item?" -> "No" if label else "Yes"
 The loss is cross-entropy on the single answer token only (prompt tokens masked), i.e. a proper scoring rule
-on P(Yes) restricted to {Yes, No}. Prompts are byte-identical to `pyes_scorer.build_prompt`, so the adapter is
-scored by the same scorer (vLLM `--enable-lora` or a merged checkpoint).
+on P(Yes) restricted to {Yes, No}. Prompt token ids come from `prompting.build_prompt` + `prompting.chat_ids`,
+the exact ids `pyes_scorer` sends to vLLM, so the adapter is scored on the sequence it was trained on. The answer
+ids are tok("Yes") / tok("No"), asserted to be single tokens inside the scorer's yes/no id sets. Over-long
+prompts are never truncated: examples with len(prompt) + 1 > --max_len are skipped and counted
+(<out>/train_report.json).
 
     python -m src.confrec.train_lora_yesno --train panels/toys_rated_train.jsonl --model <Qwen3-8B> \
         --out runs/toys_qwen_mirror_s0 --mode mirror --seed 0
@@ -20,12 +23,22 @@ from pathlib import Path
 import torch
 from torch.utils.data import Dataset
 
-from src.confrec.pyes_scorer import build_prompt
+from src.confrec.prompting import build_prompt, chat_ids, yes_no_ids
+from src.confrec.stats import strict_json
+
+
+def answer_id(tok, word: str, allowed) -> int:
+    ids = tok(word, add_special_tokens=False)["input_ids"]
+    if len(ids) != 1 or ids[0] not in allowed:
+        raise ValueError(f"{word!r} tokenizes to {ids}, not one id from the scorer's set {sorted(allowed)}")
+    return ids[0]
 
 
 class YesNoSet(Dataset):
     def __init__(self, rows, tok, mode, hist_len, max_len):
-        self.items = []
+        yes, no = yes_no_ids(tok)
+        self.answer = {"Yes": answer_id(tok, "Yes", yes), "No": answer_id(tok, "No", no)}
+        self.items, self.n_skipped, self.max_prompt_len = [], 0, 0
         for r in rows:
             texts = r.get("candidate_texts") or [""] * len(r["candidate_titles"])
             for title, text, y in zip(r["candidate_titles"], texts, r["candidate_labels"]):
@@ -33,15 +46,12 @@ class YesNoSet(Dataset):
                 if mode == "mirror":
                     qa.append(("dislike", "No" if y else "Yes"))
                 for q, ans in qa:
-                    msg = [{"role": "user", "content": build_prompt(r["history"], title, text, q, hist_len)}]
-                    try:
-                        prompt = tok.apply_chat_template(msg, tokenize=False, add_generation_prompt=True,
-                                                         enable_thinking=False)
-                    except TypeError:
-                        prompt = tok.apply_chat_template(msg, tokenize=False, add_generation_prompt=True)
-                    p_ids = tok(prompt, add_special_tokens=False)["input_ids"][-(max_len - 1):]
-                    a_ids = tok(ans, add_special_tokens=False)["input_ids"][:1]  # first answer token only
-                    self.items.append((p_ids + a_ids, len(p_ids)))
+                    p_ids = chat_ids(tok, build_prompt(r["history"], title, text, q, hist_len))
+                    self.max_prompt_len = max(self.max_prompt_len, len(p_ids))
+                    if len(p_ids) + 1 > max_len:
+                        self.n_skipped += 1
+                        continue
+                    self.items.append((p_ids + [self.answer[ans]], len(p_ids)))
 
     def __len__(self):
         return len(self.items)
@@ -92,8 +102,17 @@ def main() -> None:
     rows = [json.loads(l) for l in open(a.train, encoding="utf-8")]
     random.Random(a.seed).shuffle(rows)
     ds = YesNoSet(rows, tok, a.mode, a.hist_len, a.max_len)
+    n_built = len(ds)
     if a.max_examples:
         ds.items = ds.items[: a.max_examples]
+    print(f"examples: {n_built} built, {ds.n_skipped} skipped (prompt + answer > max_len={a.max_len}), "
+          f"{len(ds)} used; longest prompt {ds.max_prompt_len} tokens", flush=True)
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "train_report.json").write_text(json.dumps(strict_json(dict(
+        n_examples=len(ds), n_examples_built=n_built, n_skipped_overlength=ds.n_skipped, max_len=a.max_len,
+        max_prompt_len=ds.max_prompt_len, mode=a.mode, hist_len=a.hist_len, answer_ids=ds.answer,
+        train=a.train, model=a.model)), indent=2))
     model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=torch.bfloat16, device_map="auto")
     model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
@@ -107,10 +126,10 @@ def main() -> None:
                              remove_unused_columns=False)
     Trainer(model=model, args=args, train_dataset=ds,
             data_collator=lambda b: collate(b, tok.pad_token_id)).train()
-    Path(a.out).mkdir(parents=True, exist_ok=True)
     model.save_pretrained(a.out)
     tok.save_pretrained(a.out)
-    (Path(a.out) / "train_config.json").write_text(json.dumps({**vars(a), "n_examples": len(ds)}, indent=2))
+    (out / "train_config.json").write_text(json.dumps(strict_json(
+        {**vars(a), "n_examples": len(ds), "n_skipped_overlength": ds.n_skipped}), indent=2))
 
 
 if __name__ == "__main__":

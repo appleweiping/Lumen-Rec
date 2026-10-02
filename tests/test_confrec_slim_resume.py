@@ -54,3 +54,44 @@ def test_resume_from_last_complete_line(tmp_path, monkeypatch):
     assert [r["user_id"] for r in rows] == [f"u{i}" for i in range(300)]
     assert set(rows[0]) == set(slim.REVIEW_KEYS)              # only the kept fields
     assert len(calls) == 2 and "Range" in calls[1]
+
+
+def test_category_map_is_shared_with_builder():
+    from src.confrec.categories import CATEGORY
+    assert slim.CATEGORY is CATEGORY and CATEGORY["games"] == "Video_Games"
+
+
+def test_unwritable_row_is_kept_not_skipped(tmp_path, monkeypatch):
+    # a lone-surrogate escape used to raise on the utf-8 write AFTER the offset had advanced past the line,
+    # so the Range retry silently dropped that row
+    bad = b'{"user_id": "u1", "parent_asin": "i1", "rating": 5.0, "timestamp": 1, "title": "x\\ud800y"}\n'
+    payload = bad + PAYLOAD
+    monkeypatch.setattr(slim.requests, "get", lambda url, stream, timeout, headers: FakeResp(payload[
+        int(headers["Range"].split("=")[1].rstrip("-")) if headers else 0:], 206 if headers else 200))
+    monkeypatch.setattr(slim.time, "sleep", lambda s: None)
+    out = tmp_path / "m.jsonl.gz"
+    n = slim.stream_slim("http://x", ("user_id", "title"), out)
+    rows = [json.loads(l) for l in gzip.open(out, "rt", encoding="utf-8")]
+    assert n == 301 and len(rows) == 301
+    assert rows[0] == {"user_id": "u1", "title": "x\ud800y"}       # same string as the source escape
+    assert [r["user_id"] for r in rows[1:]] == [f"u{i}" for i in range(300)]
+
+
+def test_failed_row_is_retried_not_dropped(tmp_path, monkeypatch):
+    calls = []
+    real = slim._slim_line
+
+    def flaky(line, keys):
+        if b'"u5"' in line and not calls:
+            calls.append(1)
+            raise OSError("simulated write failure")
+        return real(line, keys)
+
+    monkeypatch.setattr(slim, "_slim_line", flaky)
+    monkeypatch.setattr(slim.requests, "get", lambda url, stream, timeout, headers: FakeResp(PAYLOAD[
+        int(headers["Range"].split("=")[1].rstrip("-")) if headers else 0:], 206 if headers else 200))
+    monkeypatch.setattr(slim.time, "sleep", lambda s: None)
+    out = tmp_path / "r.jsonl.gz"
+    assert slim.stream_slim("http://x", slim.REVIEW_KEYS, out) == 300
+    rows = [json.loads(l) for l in gzip.open(out, "rt", encoding="utf-8")]
+    assert [r["user_id"] for r in rows] == [f"u{i}" for i in range(300)]

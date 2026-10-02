@@ -32,6 +32,38 @@ def test_risk_coverage_prefers_informative_confidence():
     assert aurc_good < aurc_bad
 
 
+def test_risk_coverage_is_tie_invariant():
+    util = np.r_[np.ones(50), np.zeros(50)]
+    const = np.zeros(100)  # uninformative confidence must not get the oracle AURC from row order
+    _, _, a1 = M.risk_coverage(const, util)
+    _, _, a2 = M.risk_coverage(const, util[::-1])
+    assert abs(a1 - a2) < 1e-12 and abs(a1 - 0.5) < 1e-12
+
+
+def test_bias_index_residual_has_no_sign_under_calibration():
+    # both groups perfectly calibrated; head sits higher inside the same equal-mass bins
+    rng = np.random.default_rng(0)
+    n = 200_000
+    grp = rng.choice(["head", "mid", "tail"], size=n, p=[0.2, 0.6, 0.2])
+    conf = np.where(grp == "head", rng.uniform(0.55, 1, n), np.where(grp == "tail", rng.uniform(0, 0.75, n),
+                                                                    rng.uniform(0, 1, n)))
+    correct = (rng.uniform(size=n) < conf).astype(float)
+    adj = M.bias_index(conf, correct, grp, adjust=True)
+    raw = M.bias_index(conf, correct, grp, adjust=False)
+    assert abs(adj["head"]) < 0.004 and abs(adj["tail"]) < 0.004
+    assert raw["head"] > adj["head"] and raw["tail"] < adj["tail"]  # the unadjusted form leaks the confound
+
+
+def test_bias_index_ci_brackets_estimate():
+    rng = np.random.default_rng(1)
+    users = np.repeat(np.arange(200), 50)
+    grp = rng.choice(["head", "tail"], size=len(users))
+    conf = rng.uniform(size=len(users))
+    correct = (rng.uniform(size=len(users)) < np.where(grp == "head", conf * 0.8, conf)).astype(float)
+    ci = M.bias_index_ci(conf, correct, grp, users, n_boot=200)
+    assert ci["head"]["lo"] <= ci["head"]["est"] <= ci["head"]["hi"] and ci["head"]["hi"] < 0
+
+
 def test_ranking_metrics():
     out = M.ranking_metrics(np.array([1, 2, 11]))
     assert abs(out["HR@10"] - 2 / 3) < 1e-12

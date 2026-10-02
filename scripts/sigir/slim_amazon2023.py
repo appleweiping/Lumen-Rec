@@ -6,6 +6,7 @@ Writes `data/raw/amazon_<domain>/{<Cat>.jsonl.gz, meta_<Cat>.jsonl.gz}` exactly 
 1+100 same-candidate panels) are identical to those built from the full raw files.
 
 Usage (server):  python scripts/sigir/slim_amazon2023.py --domains sports,toys,home,tools
+Domains are the keys of src/confrec/categories.py (e.g. games -> Video_Games); finished files are skipped.
 """
 from __future__ import annotations
 
@@ -20,22 +21,25 @@ from pathlib import Path
 
 import requests
 
-CATEGORY = {
-    "sports": "Sports_and_Outdoors",
-    "toys": "Toys_and_Games",
-    "home": "Home_and_Kitchen",
-    "tools": "Tools_and_Home_Improvement",
-    "beauty": "All_Beauty",
-    "books": "Books",
-    "electronics": "Electronics",
-    "movies": "Movies_and_TV",
-}
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.confrec.categories import CATEGORY  # noqa: E402  (shared with build_rated_panels)
+
 REVIEW_KEYS = ("user_id", "parent_asin", "rating", "timestamp")
 # `store` (brand) is extra: Lumen's loader selects only its own columns, so processed data is unchanged;
 # the rated-panel builder uses it for the pseudonym-knockout diagnostic.
 META_KEYS = ("parent_asin", "title", "categories", "description", "store")
 ENDPOINT = os.environ.get("HF_ENDPOINT", "https://hf-mirror.com").rstrip("/")
 BASE = f"{ENDPOINT}/datasets/McAuley-Lab/Amazon-Reviews-2023/resolve/main/raw"
+
+
+def _slim_line(line: bytes, keys: tuple[str, ...]) -> str:
+    rec = json.loads(line)
+    out = json.dumps({k: rec.get(k) for k in keys}, ensure_ascii=False)
+    try:
+        out.encode("utf-8")
+    except UnicodeEncodeError:  # lone surrogate from a \ud8xx escape: keep it as an ASCII escape (same string)
+        out = json.dumps({k: rec.get(k) for k in keys})
+    return out + "\n"
 
 
 def stream_slim(url: str, keys: tuple[str, ...], out_path: Path, retries: int = 20) -> int:
@@ -59,14 +63,12 @@ def stream_slim(url: str, keys: tuple[str, ...], out_path: Path, retries: int = 
                     buf += chunk
                     *lines, buf = buf.split(b"\n")
                     for line in lines:
-                        offset += len(line) + 1
                         if line.strip():
-                            rec = json.loads(line)
-                            f.write(json.dumps({k: rec.get(k) for k in keys}, ensure_ascii=False) + "\n")
+                            f.write(_slim_line(line, keys))
                             n += 1
+                        offset += len(line) + 1  # only after the row is written: a failure retries this line
                 if buf.strip():  # final line without trailing newline
-                    rec = json.loads(buf)
-                    f.write(json.dumps({k: rec.get(k) for k in keys}, ensure_ascii=False) + "\n")
+                    f.write(_slim_line(buf, keys))
                     n += 1
                     offset += len(buf)
             tmp.replace(out_path)
@@ -100,6 +102,9 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()
     domains = [d for d in args.domains.split(",") if d]
+    unknown = [d for d in domains if d not in CATEGORY]
+    if unknown:
+        ap.error(f"unknown domain(s) {unknown}; known: {sorted(CATEGORY)}")
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         for msg in ex.map(slim_domain, domains, [args.root] * len(domains)):
             print(msg, flush=True)

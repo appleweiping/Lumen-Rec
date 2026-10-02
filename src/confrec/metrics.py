@@ -51,54 +51,83 @@ def nll(conf, correct, eps: float = 1e-7) -> float:
 
 def auroc(score, label) -> float:
     """Rank-based AUROC (Mann-Whitney U), ties averaged; NaN if a class is absent."""
+    from .stats import rankdata_avg
     score, label = np.asarray(score, float), np.asarray(label, int)
     pos, neg = label.sum(), (1 - label).sum()
     if pos == 0 or neg == 0:
         return float("nan")
-    order = np.argsort(score, kind="mergesort")
-    ranks = np.empty(len(score))
-    s = score[order]
-    i = 0
-    while i < len(s):  # average ranks over ties
-        j = i
-        while j + 1 < len(s) and s[j + 1] == s[i]:
-            j += 1
-        ranks[order[i: j + 1]] = (i + j) / 2 + 1
-        i = j + 1
+    ranks = rankdata_avg(score)  # average ranks over ties
     return float((ranks[label == 1].sum() - pos * (pos + 1) / 2) / (pos * neg))
 
 
 def risk_coverage(conf, utility):
     """Serve the most-confident units first. Returns (coverage, mean utility of served set) arrays
-    and AURC = area under the (1 - utility) risk curve (lower is better)."""
+    and AURC = area under the (1 - utility) risk curve (lower is better).
+
+    Tie-invariant: units with equal confidence are served as a block whose utilities are replaced by the
+    block mean, i.e. the expectation over random tie-breaking (input order never matters)."""
     conf, utility = np.asarray(conf, float), np.asarray(utility, float)
     order = np.argsort(-conf, kind="stable")
-    cum = np.cumsum(utility[order]) / np.arange(1, len(order) + 1)
+    c, u = conf[order], utility[order].copy()
+    i = 0
+    while i < len(c):
+        j = i
+        while j + 1 < len(c) and c[j + 1] == c[i]:
+            j += 1
+        if j > i:
+            u[i: j + 1] = u[i: j + 1].mean()
+        i = j + 1
+    cum = np.cumsum(u) / np.arange(1, len(order) + 1)
     cov = np.arange(1, len(order) + 1) / len(order)
     aurc = float(np.mean(1 - cum))
     return cov, cum, aurc
 
 
-def bias_index(conf, correct, group, n_bins: int = 10) -> dict:
-    """ProCal-style bias index: accuracy gap between groups at MATCHED confidence.
+def bias_index(conf, correct, group, n_bins: int = 10, adjust: bool = True, min_count: int = 20) -> dict:
+    """ProCal-style bias index: calibration gap between groups at MATCHED confidence.
 
-    Confidence is split into equal-mass bins; within each bin the per-group accuracy is compared to the
-    pooled accuracy. Returns {group: weighted mean (acc_group - acc_pooled)}. Positive = the group is
-    MORE accurate than its confidence suggests relative to others (under-confident), negative = over-.
+    Confidence is split into equal-mass bins (on average ranks, so tied confidences share a bin). Within each
+    bin, adjust=True compares each group's calibration residual (acc - conf) with the pooled residual, so a
+    group that merely sits higher inside the same bin gets no spurious sign; adjust=False compares raw
+    accuracy (the original ProCal form). Returns {group: weighted mean gap}. Positive = the group is MORE
+    accurate than its confidence suggests relative to others (under-confident), negative = over-confident.
     """
+    from .stats import rank_bins
     conf, correct, group = np.asarray(conf, float), np.asarray(correct, float), np.asarray(group)
-    edges = np.quantile(conf, np.linspace(0, 1, n_bins + 1))
-    idx = np.clip(np.searchsorted(edges, conf, side="right") - 1, 0, n_bins - 1)
+    idx = rank_bins(conf, n_bins)
+    resid = correct - conf if adjust else correct
     out = {}
     for g in np.unique(group):
         num = den = 0.0
         for b in range(n_bins):
             mb = idx == b
             mg = mb & (group == g)
-            if mg.sum() >= 20:
-                num += mg.sum() * (correct[mg].mean() - correct[mb].mean())
+            if mg.sum() >= min_count:
+                num += mg.sum() * (resid[mg].mean() - resid[mb].mean())
                 den += mg.sum()
         out[str(g)] = num / den if den else float("nan")
+    return out
+
+
+def bias_index_ci(conf, correct, group, clusters, n_bins: int = 10, adjust: bool = True,
+                  n_boot: int = 1000, seed: int = 0) -> dict:
+    """bias_index per group with a cluster (e.g. user) bootstrap CI: {group: {est, lo, hi, n_clusters}}."""
+    from .stats import percentile_ci
+    conf, correct, group = np.asarray(conf, float), np.asarray(correct, float), np.asarray(group)
+    uniq, inv = np.unique(np.asarray(clusters), return_inverse=True)
+    members = [np.flatnonzero(inv == c) for c in range(len(uniq))]
+    est = bias_index(conf, correct, group, n_bins, adjust)
+    rng = np.random.default_rng(seed)
+    boots = {g: [] for g in est}
+    for _ in range(n_boot):
+        idx = np.concatenate([members[c] for c in rng.integers(0, len(uniq), len(uniq))])
+        b = bias_index(conf[idx], correct[idx], group[idx], n_bins, adjust)
+        for g in boots:
+            boots[g].append(b.get(g, float("nan")))
+    out = {}
+    for g, v in est.items():
+        lo, hi = percentile_ci(boots[g])
+        out[g] = {"est": v, "lo": lo, "hi": hi, "n_clusters": int(len(uniq))}
     return out
 
 

@@ -62,7 +62,9 @@ spec leaves a detail open the MOST CONSERVATIVE option was taken:
     a resample (about 63% of the events are distinct), so their interval is the percentile interval of the replicates
     RE-CENTRED at the point estimate (est + replicate - mean replicate); the raw percentile interval is reported next to it.
  8. Bootstrap p-values (two-sided, vs the stated null, add-one smoothing) feed the Holm adjustment of the summary
-    (m = number of family domains, 4 expected). bias_index uses metrics.bias_index (10 equal-mass bins, adjust=True,
+    (m = number of family domains, 4 expected; an undefined p-value keeps its place in the family as the largest p). The
+    S3 admission rule needs all four family domains present (the sports entry is its `main` segment) and a CI that
+    excludes 0 with the same sign in at least 3 of them; it is evaluated for the LLM (each question) and every reference. bias_index uses metrics.bias_index (10 equal-mass bins, adjust=True,
     min_count 20) in an event-cluster bootstrap of min(500, n_boot) resamples drawn from the same stream as
     metrics.bias_index_ci (identical estimates/intervals; the replicates are kept for the head-minus-tail difference).
 
@@ -72,8 +74,8 @@ multiplicities (one resample matrix per segment, drawn from the stream of stats.
 point estimates of the engines are asserted against stats / metrics (auroc, risk_coverage, ece, bias_index) to
 SELF_CHECK_TOL, and the tests check every engine replicate-by-replicate against explicit resamples of the reference
 implementations. pct_ci has the definition of stats.percentile_ci (asserted equal in the tests) without its Python loop.
-Memory: the panel is streamed (peak RSS of a 10,000 x 101 domain with a 470 MB panel file was about 0.3 GB at n_boot 200);
-resample matrices are int16 (n_boot x n_events per segment).
+Memory: the panel is streamed; peak RSS of a synthetic 10,000 x 101 x 2-question domain (470 MB panel file, 9 reference
+methods) was about 0.33 GB at n_boot 2000 (resample matrices are int16, n_boot x n_events per segment).
 """
 from __future__ import annotations
 
@@ -424,6 +426,8 @@ class ServeEngine:
             res["size"] = np.full((B, N_QUINT), np.nan)
             res["served_util"] = {u: np.full((B, N_QUINT), np.nan) for u in self.u}
         if n == 0:
+            if self.q1 is not None:
+                res["served"][:], res["size"][:] = 0.0, 0.0
             return res
         grouped = len(self.starts) < n
         step = max(1, 600_000 // n)
@@ -465,16 +469,19 @@ class ServeEngine:
 
 
 class PooledAUC:
-    """Pooled pointwise AUROC over candidate rows with an event-cluster bootstrap. Rows are bucketed by their exact
-    value; a resample's positive / negative histograms are weighted sums of the per-event multiplicities, so no
-    row-level sorting is needed per resample (ties are exact)."""
+    """Pooled pointwise AUROC over candidate rows with an event-cluster bootstrap. A negative only matters through its
+    position relative to the positive scores, so rows are bucketed by the sorted DISTINCT POSITIVE values (bucket
+    2k + 1 = equal to the k-th distinct positive value, bucket 2k = strictly between the (k-1)-th and the k-th): at most
+    2 * #events + 1 buckets however fine the logit grid is, ties exact. A resample's positive / negative histograms are
+    weighted sums of the per-event multiplicities, so no row-level sorting is needed per resample."""
 
     def __init__(self, pos_val, pos_ev, neg_val, neg_ev):
-        vals = np.concatenate([pos_val, neg_val])
-        uniq, inv = np.unique(vals, return_inverse=True)
-        inv = inv.reshape(-1)
-        self.K = len(uniq)
-        self.pos_bucket, neg_bucket = inv[:len(pos_val)], inv[len(pos_val):]
+        pos_val, neg_val = np.asarray(pos_val, float), np.asarray(neg_val, float)
+        pu, pinv = np.unique(pos_val, return_inverse=True)
+        lo, hi = np.searchsorted(pu, neg_val, side="left"), np.searchsorted(pu, neg_val, side="right")
+        neg_bucket = np.where(hi > lo, 2 * lo + 1, 2 * lo)
+        self.K = 2 * len(pu) + 1
+        self.pos_bucket = 2 * pinv.reshape(-1) + 1
         self.pos_ev = np.asarray(pos_ev, np.int32)
         o = np.argsort(neg_bucket, kind="stable")
         self.neg_ev = np.asarray(neg_ev, np.int32)[o]
@@ -1459,15 +1466,15 @@ def run_domain(domain: str, audit_dir, panel_test, panel_valid, ref_ranks=None, 
 
 # -------------------------------------------------------------------------------------------------- summarize
 def holm(pvals: dict) -> dict:
-    """Holm step-down adjusted p-values for {key: p} (NaN p-values stay NaN and are not counted in m)."""
-    items = sorted(((p, k) for k, p in pvals.items() if p is not None and p == p), key=lambda t: t[0])
+    """Holm step-down adjusted p-values for {key: p}. m is the number of keys (the registered family size): a missing /
+    NaN p-value keeps its place in the family as the largest p (conservative) and its adjusted value stays NaN."""
+    ps = {k: (p if (p is not None and p == p) else 1.0) for k, p in pvals.items()}
+    items = sorted(((p, k) for k, p in ps.items()), key=lambda t: t[0])
     m = len(items)
     adj, running = {}, 0.0
     for i, (p, k) in enumerate(items):
         running = max(running, min(1.0, (m - i) * p))
-        adj[k] = running
-    for k in pvals:
-        adj.setdefault(k, NAN)
+        adj[k] = running if (pvals[k] is not None and pvals[k] == pvals[k]) else NAN
     return adj
 
 

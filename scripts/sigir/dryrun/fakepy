@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# PYTHON for the sandbox runs of the REAL run scripts (scripts/sigir/dryrun/setup_sandbox.py). Real interpreter and real
+# modules, except:
+#   -m src.confrec.pyes_scorer                  -> fake_scorer.py (same CLI; the REAL scorer against a fake vllm)
+#   -m src.confrec.gatefix_select               -> fake_gatefix.py (registered DEV identity constants re-derived from the
+#                                                  sandbox's own Pilot-1 panels, exactly as the real ones were)
+#   scripts/sigir/build_confirm_panels.py       -> fake_bcp.py (same: the registered Pilot-1 sha1 / 1500-line prefix /
+#                                                  1,683 fresh users re-derived at the sandbox scale; BCP_REAL=1 = unpatched)
+#   the pandas/vllm env probe, panel_reference.py (no original sports panel locally), slim_amazon2023.py (data present)
+# Analyses run with --n_boot $NBOOT appended when NBOOT is set (argparse keeps the last value). REALPY = the interpreter.
+echo "$*" >> "${SIMLOG:-/dev/null}"
+REALPY="${REALPY:-$(command -v python || command -v python3)}"
+DRY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+arg() { local k=$1; shift; while [ $# -gt 0 ]; do [ "$1" = "$k" ] && { echo "$2"; return; }; shift; done; }
+if [ "$1" = -c ]; then
+  case "$2" in
+    *"import sys, pandas, vllm"*)
+      echo "python (dry run) | pandas $("$REALPY" -c 'import pandas; print(pandas.__version__)') | vllm 0.30.0+fake"
+      exit 0 ;;
+  esac
+fi
+nb=(); [ -n "${NBOOT:-}" ] && nb=(--n_boot "$NBOOT")
+case "$1 ${2:-}" in
+  "-m src.confrec.pyes_scorer") shift 2; exec "$REALPY" "$DRY/fake_scorer.py" "$@" ;;
+  "-m src.confrec.gatefix_select") shift 2; exec "$REALPY" "$DRY/fake_gatefix.py" "$@" ;;
+  "-m src.confrec.diag_battery")
+    case "${3:-}" in analyze|t1check) exec "$REALPY" "$@" "${nb[@]}" ;; esac
+    exec "$REALPY" "$@" ;;
+  "-m src.confrec.pilot_mirror"|"-m src.confrec.pilot_kuairec") exec "$REALPY" "$@" "${nb[@]}" ;;
+  "-m src.confrec.pilot_pseudonym") exec "$REALPY" "$@" "${nb[@]}" ${NBOOT:+--bi_boot "$NBOOT"} ;;
+  "scripts/sigir/build_confirm_panels.py "*)
+    [ "${BCP_REAL:-0}" = 1 ] && exec "$REALPY" "$@"
+    shift; exec "$REALPY" "$DRY/fake_bcp.py" "$@" ;;
+  "scripts/sigir/panel_reference.py check") exit 1 ;;
+  "scripts/sigir/panel_reference.py verify")
+    r=$(arg --ranking "$@"); echo '{"marker_version": 2, "anchored": false, "dry_run": true}' > "$r.VERIFIED"; exit 0 ;;
+  "scripts/sigir/slim_amazon2023.py --domains") echo "slim skipped (dry run; data present)"; exit 0 ;;
+esac
+exec "$REALPY" "$@"

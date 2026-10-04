@@ -658,8 +658,15 @@ def _mf_pair_block(mf, ui, ii, y, groups, held, mask, n_boot, seed) -> dict:
 
 
 def cf_references(P, groups, events: dict, *, shrink_k=5.0, mf_dim=32, mf_iters=15, mf_lambda=0.05,
-                  mf_lambda_bias=5.0, mf_cutoff_q=MF_CUTOFF_QUANTILE, n_boot=2000, seed=0) -> tuple[dict, dict]:
-    """A3 block and the prior_means arrays (for A7)."""
+                  mf_lambda_bias=5.0, mf_cutoff_q=MF_CUTOFF_QUANTILE, n_boot=2000, seed=0, cutoff=None,
+                  pairs_out: dict | None = None) -> tuple[dict, dict]:
+    """A3 block and the prior_means arrays (for A7).
+
+    cutoff (Amendment 3 section 3): an explicit temporal-MF cutoff T (the T_d of ftgrid_split.json) used instead of the
+    mf_cutoff_q-quantile of P's candidate timestamps; None (the default) keeps the quantile and leaves the output
+    unchanged. pairs_out: when a dict is given, it receives the temporal MF with the fold-in per panel pair (aligned to
+    P): T, test (t >= T), mf_score, mf_residual (p_u.q_i), mf_item_bias (b_i), mf_user_bias (b_u) and mf_warm (user
+    and item both have training data). Neither argument changes any other quantity."""
     users, items, y = P["user"].tolist(), P["item"].tolist(), P["label"]
     print(f"[forensics]   A3: scanning {len(events)} users' raw events", flush=True)
     scan = scan_events(events, set(items), set(zip(users, items)))

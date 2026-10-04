@@ -43,9 +43,15 @@ Every scoring dir carries `run.key` (sha1 of panel bytes + model + adapter + arg
   "eval":  {"users", "user_ids_sha1", "candidates", "cal_candidates", "test_candidates", "users_both_classes_test",
             "users_both_classes_test_tail", "users_both_classes_all_rows", "share_test_pairs_item_seen_in_train"},
   "sd":    {"users", "user_ids_sha1", "user_ids_path"},             # S_d of A3 section 1
-  "files": {name: sha1},                                           # every file of panels/<d>/ except this json
+  "files": {name: sha1},                                           # every file ftgrid_data.py writes (the derived panels of
+                                                                   # stages 4-5 are deterministic functions of these files and of
+                                                                   # code that is itself hashed in the core list)
   "code_sha1": {"ftgrid_data.py": ..., "gateft_data.py": ..., "build_rated_panels.py": ...},
-  "gateft_T_match": true | null }                                  # ml1m: equals gateft_split.json T (asserted)
+  "args": {"seed", "n_train", "n_eval_max", "s_max", "train_cap", "tokenizer_used", "tokenizer" (basename),
+           "dev_users_sha1_checked", "gateft_split_checked"},
+  "gateft_T_match": true | null }                                  # ml1m: equals gateft_split.json T (asserted); a split with a
+                                                                   # null match (ml1m) or without a tokenizer length audit cannot
+                                                                   # be frozen (`ftgrid_freeze`)
 ```
 User-id lists are written one id per line in panel row order next to the json (`train_users.txt`, `eval_users.txt`,
 `sd_users.txt`), and their sha1 is over the lines joined by `\n` without a trailing newline.

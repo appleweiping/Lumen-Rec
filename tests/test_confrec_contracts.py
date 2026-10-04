@@ -18,7 +18,6 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-import numpy as np
 import pytest
 
 from src.confrec import build_rated_panels as brp

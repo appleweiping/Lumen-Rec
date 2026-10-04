@@ -1,12 +1,13 @@
 % =====================================================================================================================
-% Appendix (owner: results). Compact skeleton, about 1.7 pages when filled. Same fill rules and file aliases as
-% sections/experiments.tex (sel, gate, gft, cpu, grid, aud, ko, prn, mir, slot; plus diag = outputs/confrec/diag/diag.json, the
-% diagnosis battery, interpretive only). No URLs; no number is typed by hand: every slot is filled from a committed result file.
+% Appendix (owner: results). Compact skeleton, about 1.6 pages when filled. Same fill rules and file aliases as
+% sections/experiments.tex (sel, gate, gft, cpu, grid, aud, aud2q, aud2l, ko, prn, mir, slot; plus diag = outputs/confrec/diag/diag.json,
+% the diagnosis battery, interpretive only). No URLs; no number is typed by hand: every slot is filled from a committed result file.
 % Sections: app:prompts, app:sensitivity, app:prereg, app:battery, app:pseudonym, app:repro, app:tables.
-% FLOAT ORDER IS DELIBERATE: every single-column float comes before the first table*, and the table* floats are last (a table*
-% still deferred at the end of the document makes later single-column floats vanish). Do not reorder without recompiling.
-% If the appendix exceeds its budget, cut in this order: tab:app-seeds, app:battery, tab:app-expo, tab:app-more.
-% Fine-tuned items (Llama table, per-seed table, LoRA cells) exist only after a recorded GATE_FT_PASS (Amendment 3 section 0).
+% Every float is single-column (no table*), so the end-of-document float flush cannot drop one.
+% If the appendix exceeds its budget, cut in this order: tab:app-expo, the prose of app:battery, tab:app-seeds (keep the ML-1M rows and
+% the FT-C rows), tab:app-z2 only if the second-backbone clause of claim admission is dropped from the paper.
+% Fine-tuned items (LoRA columns, per-seed table, knockout table, FT-C rows) exist only after a recorded GATE_FT_PASS (Amendment 3
+% section 0); blocks between "% BRANCH-GATEFT-BEGIN" and "% BRANCH-GATEFT-END" are deleted otherwise.
 % =====================================================================================================================
 \section{Prompts}\label{app:prompts}
 All prompts are single-turn chat messages with thinking disabled; the answer is the first generated token, read as \texttt{Yes}
@@ -23,7 +24,7 @@ Would this user like the candidate item? Answer with only Yes or No.
 \end{quote}
 Next-item panels use the same template with plain history lines (``- \{title\}'', last 5 events) and the question
 \textsf{next} (``Will this user purchase the candidate item next?'') or \textsf{like}; their prompt stays frozen at V0. The like
-family adds ``Would this user dislike the candidate item?'' (dislike) and the paraphrases ``Is the candidate item a good match for
+family adds ``Would this user dislike the candidate item?'' and the paraphrases ``Is the candidate item a good match for
 this user's taste?'' and ``Would this user be disappointed by the candidate item?''. The threshold family (V1, V7) asks ``Will this
 user rate the candidate item 4 stars or higher (on a 1-5 scale)?'' (like), with parallel star-threshold wording for the other three.
 All of these were fixed in advance and are scored only after the zero-shot gate is passed. Table~\ref{tab:app-bank} lists the seven
@@ -51,11 +52,6 @@ V7 & V1 + V3 + V4 + V5 & 20 & combined\\
 \end{table}
 % MISSING_REF: Kang et al., 2023, "Do LLMs Understand User Preferences? Evaluating LLMs On User Rating Prediction" (basis of V1, V4, V5);
 % see paper_missing_refs.txt. Add the citation to the "Basis" column of the rows V1, V4, V5 once the entry exists.
-
-The diagnosis battery (Appendix~\ref{app:battery}) adds four strings: a no-user probe (``Movie: \{title\} \ldots{} Is this movie widely
-considered good?''), a positive control that appends ``(This user later rated this item r/5.)'', an evidence injection that appends
-``Average rating by other users before this date: m/5 (n ratings)'', and a digit readout (``What star rating from 1 to 5 would this
-user give the candidate item?'', answered by one digit).
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Prompt Sensitivity of the Zero-Shot Channel}\label{app:sensitivity}
@@ -103,15 +99,20 @@ integrity checks); the next-item audit (zero-shot scoring under V0 before the fr
 1--1000 quarantined); the diagnosis battery (interpretive only) and CPU artifact checks (exploratory, three wording-only rules); and the
 forking-path rules (immutable constants 0.60, 0.1863 and 0.65; one prompt round; fixed unit roles; no promoted arm; reference rows in
 every rated table; claim admission; $2\sigma_{\rm seed}$ rule; retirement rule of the nested method slot; banned claims).
-\textbf{Amendment 3} (before any fine-tuned adapter existed): the fine-tuned program, conditional on a recorded Gate-FT pass: data roles
-(the first 1,500 users of each rated domain train, the next up to 3,000 evaluate, split at the 0.8 quantile $T_d$ into CAL and TEST), the
-endpoint dictionary, the zero-shot descriptive panels, the per-seed knockout reading, pruning arms P0--P3, the nested method slot with its
-kill rule, a Llama replication on ML-1M and Toys, and cut rules announced before any result.
+\textbf{Amendment 3} (before any fine-tuned adapter existed; revised before any outcome statistic of one): the fine-tuned program,
+conditional on a recorded Gate-FT pass except for its zero-shot panels: data roles (the first 1,500 users of each rated domain train,
+the next up to 3,000 evaluate, split at the 0.8 quantile $T_d$ into CAL and TEST), the endpoint dictionary with the single primary
+hypothesis P1, the zero-shot panels (rated, and a Llama next-item replication on events 1,001--3,000), the per-model knockout labels,
+pruning arms with removal within each label class, the nested method slot with its kill rule, a Llama replication on ML-1M and Toys, a
+within-item label-permutation control, the Holm families, and cut rules announced before any result.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Diagnosis Battery}\label{app:battery}
 The battery ran on burned users (Qwen3-8B, fp16) after the freeze. Its readings are interpretive only and cannot change any gate, bank,
-split or contingency; the star-permutation reading is re-tested on evaluation users in Table~\ref{tab:decomp}.
+split or contingency; the star-permutation reading is re-tested on evaluation users in Table~\ref{tab:decomp}. It adds four strings: a
+no-user probe (``Movie: \{title\} \ldots{} Is this movie widely considered good?''), a positive control that appends ``(This user later
+rated this item r/5.)'', an evidence injection that appends ``Average rating by other users before this date: m/5 (n ratings)'', and a
+digit readout (``What star rating from 1 to 5 would this user give the candidate item?'', answered by one digit).
 
 \begin{table}[!tb]
 \caption{Diagnosis battery on burned users with the registered reading of each probe (95\% user-bootstrap intervals). Interpretive only.}
@@ -137,15 +138,44 @@ T4: Llama-3.1-8B-Instruct, V0 like, UAUC & $\ge0.62$ is exploratory only & \DATA
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Pseudonym Knockout Protocol}\label{app:pseudonym}
-The knockout runs on Amazon Toys and Video Games, as a test-time intervention on a fixed model (adapters are not retrained on
-pseudonyms). A single-pass, whole-word, case-insensitive substitution replaces every \texttt{store} string in the history and the
-candidate text by a pseudonym; a stop-list excludes generic or placeholder stores and strings shorter than four characters or made of
-digits. Pseudonyms are injective within a panel and never equal a real store string. The placebo maps every brand that the pseudonym arm
-maps, history-only brands included, to another real brand of the same tercile of category-wide brand review counts, with identical
-substituted key sets. Treated candidates are those whose store string occurs as a whole word in their own title (their share is
-reported); brand tokens beyond the store field are not substituted. Intervals are user-cluster bootstraps; UAUC is computed over all
-candidates (primary) and over treated candidates. A UAUC fall of more than 0.02 everywhere means that pseudonymisation destroys evidence
-in that domain.
+The knockout is a test-time intervention on fixed models (adapters are not retrained on pseudonyms). It runs on Amazon Toys and Video
+Games for Qwen3-8B (zero-shot and LoRA seeds 0--2), on Toys for Llama-3.1-8B-Instruct, and on Sports for Qwen3-8B unless cut. A
+single-pass, whole-word, case-insensitive substitution replaces every \texttt{store} string in the history and the candidate text by a
+pseudonym; a stop-list excludes generic or placeholder stores and strings shorter than four characters or made of digits. Pseudonyms are
+injective within a panel and never equal a real store string. The placebo maps every brand that the pseudonym arm maps, history-only
+brands included, to another real brand of the same tercile of category-wide brand review counts, with identical substituted key sets.
+Treated candidates are those whose store string occurs as a whole word in their own title (their share is reported); brand tokens beyond
+the store field are not substituted. Intervals are user-cluster bootstraps; UAUC is computed over all candidates (primary) and over
+treated candidates. The label of each model follows the registered rule of Section~\ref{sec:exp-rq5}; NULL means that pseudonymisation
+destroys evidence in that domain (a UAUC fall of more than 0.02 overall and in the tail). Table~\ref{tab:app-ko} lists every model.
+
+% BRANCH-GATEFT-BEGIN
+\begin{table}[!tb]
+\caption{Pseudonym knockout by model: head-minus-tail drop of $\ell$ on store-in-title candidates and the registered label (POSITIVE,
+NEGATIVE, NULL, INDETERMINATE, INCOMPLETE). ``Not run'' only where a cut rule applies.}
+\label{tab:app-ko}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+% ROWS: Qwen3-8B zero-shot and LoRA seeds 0, 1, 2; Llama-3.1-8B-Instruct zero-shot and LoRA seeds 0, 1, 2 (Toys only). COLUMNS: Toys, Video
+% Games, Sports. Cell (alias ko): head_minus_tail.delta (pseudonym arm, top vs bottom popularity quintile, with interval) and label
+% = pilot_pseudonym.decide() verbatim; one cell "drop; label". The wording rule of RQ5 reads this table (Qwen POSITIVE on Toys and Video
+% Games, zero-shot and all three seeds; Llama Toys same sign).
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & Toys & Video Games & Sports\\
+\midrule
+Qwen3-8B, zero-shot & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label}\\
+Qwen3-8B, LoRA seed 0 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label}\\
+Qwen3-8B, LoRA seed 1 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label}\\
+Qwen3-8B, LoRA seed 2 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label}\\
+Llama, zero-shot & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & -- & --\\
+Llama, LoRA seed 0 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & -- & --\\
+Llama, LoRA seed 1 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & -- & --\\
+Llama, LoRA seed 2 & \DATANEEDED{ko:head\_minus\_tail.delta; ko:label} & -- & --\\
+\bottomrule
+\end{tabular}}
+\end{table}
+% BRANCH-GATEFT-END
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Reproducibility Checklist}\label{app:repro}
@@ -154,13 +184,17 @@ in that domain.
   thinking off; prefill-only fp16 scoring with vLLM~\citep{kwon2023vllm}; \texttt{Yes}/\texttt{No} read by token id from the top-50
   log-probabilities; at most 4,096 tokens (3,072 in the next-item audit); 100-user chunks.
 \item \emph{Fine-tuning.} LoRA~\citep{hu2022lora} on the query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05,
-  learning rate $10^{-4}$, cosine decay, 3\% warm-up, one epoch, bf16, batch 8 $\times$ 4, prompts above 1,024 tokens skipped and
-  counted; seeds 0, 1, 2 (pruning: five seeds); every seed is reported.
-\item \emph{Statistics.} Percentile bootstrap, 2,000 resamples, seed 0, over users or events; tie-aware ranks; Holm correction within each
-  research question; a gain needs $2\sigma_{\rm seed}$ with all seeds agreeing in sign.
-\item \emph{Data and hashes.} Training users are the first 1,500 users of each rated domain in seed-0 order and evaluation users the next
-  ones, disjoint by id. Pilot ML-1M panel 985494c7, pilot Toys panel 69252b48, registered V0 prompts on the pilot ML-1M panel 12e83c4f
-  (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1, rendered prompt-bank sha1, user-id list sha1 from the freeze record}.
+  learning rate $10^{-4}$, cosine decay, 3\% warm-up, one epoch, bf16, batch 8 $\times$ 4; at most 24,000 training examples per domain;
+  prompts above 1,024 tokens skipped and counted (a domain with more than 2\% such prompts trains with the 99.5th-percentile length
+  rounded up to 256); seeds 0, 1, 2 (pruning: five seeds; permutation control: seeds 0 and 1); every seed is reported, and a run that
+  fails its integrity checks twice is reported as missing.
+\item \emph{Statistics.} Percentile bootstrap, 2,000 resamples, seed 0, over users or events; tie-aware ranks; Holm correction within the
+  registered families; P1 and the pruning contrast are single tests at 0.05; a fine-tuned gain needs $2\sigma_{\rm seed}$ with all seeds
+  agreeing in sign.
+\item \emph{Data and hashes.} Training users are the first 1,500 users of each rated domain in seed-0 row order and evaluation users the
+  next ones (at most 3,000), disjoint by id. Pilot ML-1M panel 985494c7, pilot Toys panel 69252b48, registered V0 prompts on the pilot
+  ML-1M panel 12e83c4f (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s, rendered prompt-bank sha1, user-id list
+  sha1s and the time split $T_d$ of every domain from the freeze record and ftgrid\_split.json}.
 \item \emph{Software, compute, artifact.} \DATANEEDED{package versions and GPU model from each report.json; total GPU hours}. Prompts, panel
   builders, scorers, analysis scripts and every result file are released with the anonymous artifact; every number in the paper is read
   from a committed result file.
@@ -169,9 +203,10 @@ in that domain.
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Full Per-Panel Tables}\label{app:tables}
 Table~\ref{tab:corrections} lists the corrections against their controls and Table~\ref{tab:slot} the optional method slot;
-Table~\ref{tab:app-llama} replicates the rated-panel endpoints with the second backbone; Table~\ref{tab:serving} gives selective serving by
-confidence; Table~\ref{tab:app-seeds} lists every seed of the fine-tuned grid, Table~\ref{tab:app-more} the further rated-panel endpoints,
-and Table~\ref{tab:app-expo} the exposure statistics not shown in Table~\ref{tab:exposure}.
+Table~\ref{tab:app-llama} replicates the rated-panel endpoints with the second backbone; Table~\ref{tab:serving} gives selective serving
+by confidence; Table~\ref{tab:app-seeds} lists every seed of the fine-tuned grid and the permutation control; Table~\ref{tab:app-expo}
+gives the tail share of the top-10 lists not shown in Table~\ref{tab:exposure}; Table~\ref{tab:app-z2} compares the two backbones on the
+next-item panels.
 
 \begin{table}[!tb]
 \caption{Corrections against their controls. Row 0: raw UAUC and references; rows 1--2: invariance checks on stored scores; rows 3--4:
@@ -210,16 +245,16 @@ priors on $S_d$; rows 5--7: the two-view contrast, scored only after the zero-sh
 \caption{Nested method slot: TEST UAUC (seed mean, s.d.); last row before the references: paired difference offset minus stacking.}
 \label{tab:slot}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: SFT full vocabulary (Gate-FT recipe; context), SFT-binary (b = 0), post-hoc stacking, prior-offset LoRA, difference, references.
-% COLUMNS: four rated datasets (ML-1M, Toys, Video Games, Sports; a cell reads "not run" after the kill rule fires). Alias slot:
-% UAUC_mean_sd; d_offset_minus_stack (mean, seed range, interval). References: cpu.
+% ROWS: SFT with b = 0 (the main-grid adapters; context), post-hoc stacking, prior-offset LoRA, difference, references.
+% COLUMNS: four rated datasets (ML-1M, Toys, Video Games, Sports; a cell reads "not run" after the kill rule fires, in the order
+% ML-1M, Toys, Video Games, Sports). Alias slot: UAUC_mean_sd; d_offset_minus_stack (mean, seed range, interval). SFT row: grid:UAUC.
+% References: cpu.
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
  & ML-1M & Toys & Video Games & Sports\\
 \midrule
-SFT, full vocabulary~\citep{bao2023tallrec} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
-SFT-binary ($b=0$) & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
+SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
 Post-hoc stacking & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Prior-offset LoRA & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Offset $-$ stacking & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack}\\
@@ -232,12 +267,14 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 
 \begin{table}[!tb]
 \caption{Second backbone, Llama-3.1-8B-Instruct, ML-1M and Toys (cells and rows as in Tables~\ref{tab:reliability} and~\ref{tab:decomp};
-decomposition on $S_d$). A cell reads ``not run'' only where the registered cut rule applies.}
+decomposition on $S_d$; P1 and the LoRA columns only after a Gate-FT pass). A cell reads ``not run'' only where the registered cut rule
+applies.}
 \label{tab:app-llama}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
-% COLUMNS and ROW sources exactly as tab:reliability and tab:decomp (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, written to a
-% separate output root; columns ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA (Amendment 3 section 8; cut rule: Llama to ML-1M only). The
-% reference rows repeat the Qwen3-8B reference values (same rows, same panel).
+% COLUMNS and ROW sources exactly as tab:reliability and tab:decomp (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, report root
+% outputs/confrec/ftgrid_llama/report (Amendment 3 sections 4 and 8); columns ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA. The zero-shot
+% columns exist in every Gate-FT branch (Z1), the LoRA columns and P1 only after GATE_FT_PASS. The reference rows repeat the
+% non-LLM values of the same panel and rows. Cut rule: Llama Toys fine-tuning may be cut on 2026-10-22.
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -250,134 +287,142 @@ UAUC of $\ell$ & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{g
 \quad prior-only item mean (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
 \quad popularity (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_popularity}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_popularity}}\\
 \quad temporal biased MF (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
-ECE, raw $\to$ Platt & \DATANEEDED{grid:ece10\_raw, ece10\_platt} & \DATANEEDED{grid:ece10\_raw, ece10\_platt} & \DATANEEDED{grid:ece10\_raw, ece10\_platt} & \DATANEEDED{grid:ece10\_raw, ece10\_platt}\\
-Correct-but-unsure mass & \DATANEEDED{grid:mass\_correct\_unsure} & \DATANEEDED{grid:mass\_correct\_unsure} & \DATANEEDED{grid:mass\_correct\_unsure} & \DATANEEDED{grid:mass\_correct\_unsure}\\
-Confidently-wrong mass & \DATANEEDED{grid:mass\_wrong\_confident} & \DATANEEDED{grid:mass\_wrong\_confident} & \DATANEEDED{grid:mass\_wrong\_confident} & \DATANEEDED{grid:mass\_wrong\_confident}\\
-Platt errors: AUROC / AURC & \DATANEEDED{grid:auroc\_platt\_err, aurc\_platt\_err} & \DATANEEDED{grid:auroc\_platt\_err, aurc\_platt\_err} & \DATANEEDED{grid:auroc\_platt\_err, aurc\_platt\_err} & \DATANEEDED{grid:auroc\_platt\_err, aurc\_platt\_err}\\
-Personal share & \DATANEEDED{grid:personal\_share} & \DATANEEDED{grid:personal\_share} & \DATANEEDED{grid:personal\_share} & \DATANEEDED{grid:personal\_share}\\
-$\Delta$UAUC$(M_2-M_1)$ & \DATANEEDED{grid:dUAUC\_M2\_M1} & \DATANEEDED{grid:dUAUC\_M2\_M1} & \DATANEEDED{grid:dUAUC\_M2\_M1} & \DATANEEDED{grid:dUAUC\_M2\_M1}\\
+ECE (after Platt) & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
+Platt slope & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope}\\
+Correct decisions in bottom tertile & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
+Errors in top tertile & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
+Non-prior share $1-\rho^2/r_8$ & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share}\\
+$G=\Delta$UAUC$(M_2-M_1)$ & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
 Star permutation $\Delta$UAUC & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC}\\
-Popularity link of $\hat\pi$ & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+Popularity link of $\hat\pi$ (partial $\rho$) & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+P1: $G_{\rm FT}-G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--}\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-\begin{table*}[t]
+\begin{table}[!tb]
 \caption{Selective serving by confidence (RQ3), Qwen3-8B, question \textsf{next}. A: NDCG@10 of the served half (50\% coverage) minus
-full coverage. B: served share of niche- minus mainstream-quintile users at 50\% coverage. Last row: range over the baselines' own score
-margins where a score column exists.}
+full coverage. B: served share of niche- minus mainstream-quintile users at 50\% coverage. Last row of each block: range over the
+baselines' own score margins where a score column exists.}
 \label{tab:serving}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: five signals + baseline row. COLUMNS: block A and block B, each S1k, S10k, Toys, Home, Tools. Sources (alias aud, letter D,
+% ROWS: five signals + baseline row per block. COLUMNS: S1k, S10k, Toys, Home, Tools. Sources (alias aud, letter D,
 % D.signals[<signal>], signal in p_max, margin, neg_entropy, max_logit, random): A = D.gain_at_50_vs_full.ndcg10;
 % B = D.niche.niche_minus_mainstream_served_share (served share of user-popularity quintile 0 minus quintile 4 at 50% coverage).
 % The baseline row is NOT produced by nextitem_audit.py (it has no baseline scores): fill it only if a baseline score export exists
 % (range over the 8 baselines), otherwise write "no score column" in every cell and say so in the text.
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lccccccccccc@{}}
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lccccc@{}}
 \toprule
- & \multicolumn{5}{c}{A. NDCG@10 gain, confident half} & & \multicolumn{5}{c}{B. Niche $-$ mainstream served share}\\
-\cmidrule(lr){2-6}\cmidrule(lr){8-12}
-Signal & S1k & S10k & Toys & Home & Tools & & S1k & S10k & Toys & Home & Tools\\
+\multicolumn{6}{@{}l}{\emph{A. NDCG@10 gain of the confident half}}\\
+Signal & S1k & S10k & Toys & Home & Tools\\
+$p_{\max}$ & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
+margin & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
+negative entropy & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
+maximum logit & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
+random signal & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
+baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range}\\
 \midrule
-$p_{\max}$ & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-margin & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-negative entropy & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-maximum logit & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-random signal & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range}\\
+\multicolumn{6}{@{}l}{\emph{B. Niche $-$ mainstream served share}}\\
+$p_{\max}$ & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
+margin & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
+negative entropy & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
+maximum logit & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
+random signal & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
+baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range}\\
 \bottomrule
 \end{tabular}}
-\end{table*}
+\end{table}
 
-\begin{table*}[t]
-\caption{Every seed of the fine-tuned grid (Qwen3-8B, LoRA, seeds 0--2), TEST rows. ECE: 10 equal-mass bins after Platt scaling fitted on
-CAL; Brier skill and Platt slope: of the same Platt map. The ML-1M UAUC seeds equal those of Table~\ref{tab:gate-outcomes}.}
+% BRANCH-GATEFT-BEGIN
+\begin{table}[!tb]
+\caption{Every seed of the fine-tuned grid (Qwen3-8B, LoRA, seeds 0--2), TEST rows, and the within-item label-permutation control (FT-C;
+ML-1M, seeds 0 and 1). All rows: CAL $\cup$ TEST rows of the evaluation users; ECE: 10 equal-mass bins after Platt scaling fitted on CAL;
+slope: of that map. The ML-1M UAUC seeds equal those of Table~\ref{tab:gate-outcomes}.}
 \label{tab:app-seeds}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: UAUC, ECE (Platt), Brier skill (Platt), Platt slope, reference. COLUMNS: ML-1M, Toys, Video Games, Sports x seeds 0, 1, 2 (alias
-% grid: UAUC, ece10_platt, brier_skill_platt, platt_slope). The Gate-FT seeds of ML-1M must equal gft:UAUC_post_T_per_seed.
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lcccccccccccc@{}}
+% ROWS: 12 (domain, seed) rows and 4 FT-C rows. COLUMNS (alias grid): UAUC, UAUC_all_rows (E-A secondary, the robustness split of Amendment 3
+% section 0), item mean (ref.; cpu:UAUC_item_mean_prior, the same value on the three rows of a domain), ece10_platt, platt_slope. The
+% Gate-FT seeds of ML-1M must equal gft:UAUC_post_T_per_seed. FT-C rows (A3 section 9; adapters trained on labels permuted within each item,
+% ML-1M TRAIN examples, seed 0 of the permutation): permuted UAUC (ftc_UAUC, ftc_UAUC_all_rows) and the contrast real minus permuted at the same
+% seed with its user-bootstrap interval (ftc_dUAUC_real_minus_perm on TEST rows, ftc_dUAUC_all_rows on all rows); descriptive, in no Holm family.
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lccccc@{}}
 \toprule
- & \multicolumn{3}{c}{ML-1M} & \multicolumn{3}{c}{Toys} & \multicolumn{3}{c}{Video Games} & \multicolumn{3}{c}{Sports}\\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}
-Seed & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2 & 0 & 1 & 2\\
+ & UAUC & All rows & Item mean (ref.) & ECE & Slope\\
 \midrule
-UAUC & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
-ECE (Platt) & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
-Brier skill (Platt) & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt} & \DATANEEDED{grid:brier\_skill\_platt}\\
-Platt slope & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope}\\
+ML-1M, seed 0 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+ML-1M, seed 1 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+ML-1M, seed 2 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Toys, seed 0 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Toys, seed 1 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Toys, seed 2 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Video Games, seed 0 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Video Games, seed 1 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Video Games, seed 2 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Sports, seed 0 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Sports, seed 1 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
+Sports, seed 2 & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC\_all\_rows} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:platt\_slope}\\
 \midrule
-UAUC, item mean (ref.) & \multicolumn{3}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{3}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{3}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{3}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
+ML-1M, permuted, seed 0 & \DATANEEDED{grid:ftc\_UAUC} & \DATANEEDED{grid:ftc\_UAUC\_all\_rows} & -- & -- & --\\
+ML-1M, permuted, seed 1 & \DATANEEDED{grid:ftc\_UAUC} & \DATANEEDED{grid:ftc\_UAUC\_all\_rows} & -- & -- & --\\
+ML-1M, real $-$ permuted, seed 0 & \DATANEEDED{grid:ftc\_dUAUC\_real\_minus\_perm} & \DATANEEDED{grid:ftc\_dUAUC\_all\_rows} & -- & -- & --\\
+ML-1M, real $-$ permuted, seed 1 & \DATANEEDED{grid:ftc\_dUAUC\_real\_minus\_perm} & \DATANEEDED{grid:ftc\_dUAUC\_all\_rows} & -- & -- & --\\
 \bottomrule
 \end{tabular}}
-\end{table*}
+\end{table}
+% BRANCH-GATEFT-END
 
-\begin{table*}[t]
-\caption{Further rated-panel endpoints (Qwen3-8B; layout as in Table~\ref{tab:decomp}; subset $S_d$ unless stated). Tail: UAUC of $\ell$
-on tail candidates; $\hat e=\ell-\hat\pi$; $r$: raw split-half correlation of the donor means; Platt slope: slope of the Platt map fitted on
-CAL; s.d.\ $\tau_P$: within-user s.d.\ of the star-permutation difference; partial $\rho$ given the prior-only item mean; Bias Index: head
-minus tail accuracy at matched confidence; top-$k$: per-user top-$k$ error target.}
-\label{tab:app-more}
-\centering\scriptsize\setlength{\tabcolsep}{4pt}
-% COLUMNS as tab:reliability. ROWS (alias grid; Amendment 3 E-A, E-C, E-D, E-E): uauc_L_Sd = UAUC of L on S_d; UAUC_tail = UAUC of l on
-% tail candidates (TEST rows, all EVAL users); platt_slope = slope of the Platt map fitted on CAL; uauc_nohist = UAUC of L_nohist alone;
-% uauc_evidence = UAUC of e-hat = l - pi-hat; r_split_half = raw donors 1-4 vs 5-8 correlation; starperm_sd_tau; partial_rho_L_logpop =
-% partial Spearman of L with log popularity given the prior-only item mean (ML-1M also release year; Toys also description length and
-% has_store); bias_index_head_minus_tail; auroc_topk_err and aurc_topk_err (target: per-user top-k error, k = the user's number of TEST
-% likes). Reference row: cpu.
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lcccccccc@{}}
-\toprule
- & \multicolumn{2}{c}{ML-1M} & \multicolumn{2}{c}{Toys} & \multicolumn{2}{c}{Video Games} & \multicolumn{2}{c}{Sports}\\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
- & ZS & LoRA & ZS & LoRA & ZS & LoRA & ZS & LoRA\\
-\midrule
-UAUC of $\ell$ on $S_d$ & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd} & \DATANEEDED{grid:uauc\_L\_Sd}\\
-Tail UAUC of $\ell$ (all EVAL users) & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail} & \DATANEEDED{grid:UAUC\_tail}\\
-Platt slope & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope} & \DATANEEDED{grid:platt\_slope}\\
-UAUC of no-history logit & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist} & \DATANEEDED{grid:uauc\_nohist}\\
-UAUC of $\hat e$ & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence}\\
-Split-half $r$ of $\hat\pi$ (raw) & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half} & \DATANEEDED{grid:r\_split\_half}\\
-Star permutation, s.d.\ $\tau_P$ & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau} & \DATANEEDED{grid:starperm\_sd\_tau}\\
-Popularity link of $\ell$ (partial $\rho$) & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop}\\
-Bias Index, head $-$ tail & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail} & \DATANEEDED{grid:bias\_index\_head\_minus\_tail}\\
-Top-$k$ errors: AUROC / AURC & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err} & \DATANEEDED{grid:auroc\_topk\_err, aurc\_topk\_err}\\
-\midrule
-UAUC, prior-only item mean (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
-\bottomrule
-\end{tabular}}
-\end{table*}
-
-\begin{table*}[t]
-\caption{Exposure statistics not shown in Table~\ref{tab:exposure} (RQ3): APLT, the mean tail share of the top-10 lists, for the five
-splits, and the coverage of the top-10 lists (distinct items in all top-10 lists over distinct candidate items) for the four domains
-(sports: events 1001--10000). Same methods and splits as Table~\ref{tab:exposure}.}
+\begin{table}[!tb]
+\caption{Tail share of the top-10 lists (APLT) for the methods of Table~\ref{tab:exposure} (RQ3); same splits (S1k, S10k: sports events
+1--1000, 1001--10000). First row: tail share of the candidate pool (level).}
 \label{tab:app-expo}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: pool tail share (level) + the 11 methods of tab:exposure. COLUMNS: APLT for S1k, S10k, Toys, Home, Tools; coverage_top10 for
-% S10k, Toys, Home, Tools. Sources (alias aud, letter B): B.tail_share_top10 (= APLT), B.pool_tail_share, B.coverage_top10.
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lcccccccccc@{}}
+% ROWS: pool tail share (level) + the 11 methods of tab:exposure. COLUMNS: APLT for S1k, S10k, Toys, Home, Tools. Sources (alias aud,
+% letter B): B.pool_tail_share (level), B.tail_share_top10 (= APLT); LLM rows: questions[q].B_exposure.llm; the other rows:
+% reference[<method>].B_exposure. Coverage of the top-10 lists (B.coverage_top10) is a registered output that stays in the released files.
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lccccc@{}}
 \toprule
- & \multicolumn{5}{c}{APLT (tail share of the top-10)} & \multicolumn{4}{c}{Coverage of the top-10 lists}\\
-\cmidrule(lr){2-6}\cmidrule(lr){7-10}
-Method & S1k & S10k & Toys & Home & Tools & S10k & Toys & Home & Tools\\
+Method & S1k & S10k & Toys & Home & Tools\\
 \midrule
-Pool tail share (level) & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & -- & -- & -- & --\\
+Pool tail share (level) & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share}\\
 \midrule
-LLM, \textsf{next} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-LLM, \textsf{like} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-C-CRP & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-ELMRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-IRLLRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-LLM2Rec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-LLMEmb & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-LLM-ESR & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-ProEx & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-ProMax & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
-RLMRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10} & \DATANEEDED{aud:B.coverage\_top10}\\
+LLM, \textsf{next} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM, \textsf{like} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+C-CRP (verbalised) & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ELMRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+IRLLRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM2Rec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLMEmb & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM-ESR & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ProEx & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ProMax & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+RLMRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
 \bottomrule
 \end{tabular}}
-\end{table*}
+\end{table}
+
+\begin{table}[!tb]
+\caption{Second backbone on the next-item panels (RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on the same 2,000 events (1,001--3,000) of
+each domain, question \textsf{next}, prompt V0; Sports events 1--1000 stay quarantined. Cells: Qwen / Llama.}
+\label{tab:app-z2}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+% ROWS: the endpoints of sections B, D, E of the next-item audit (Amendment 3 section 4, Z2). COLUMNS: Sports, Toys, Home, Tools. Cell:
+% the value for Qwen3-8B (alias aud2q) / for Llama-3.1-8B-Instruct (alias aud2l); the paired comparison is the pair of values on identical
+% events (same field paths as aud). An S3 or S5 finding meets the second-backbone clause of claim admission only if the sign of
+% delta_head (resp. of the head-minus-tail contrasts) agrees on at least 3 of 4 domains.
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & Sports & Toys & Home & Tools\\
+\midrule
+$\Delta_{\rm head}$, \textsf{next} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head}\\
+Gini of exposure, \textsf{next} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure}\\
+NDCG@10 gain, confident half ($p_{\max}$) & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full}\\
+Niche $-$ mainstream served share ($p_{\max}$) & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share}\\
+Mean $p$, head $-$ tail & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p}\\
+Bias Index, head $-$ tail & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail}\\
+\bottomrule
+\end{tabular}}
+\end{table}

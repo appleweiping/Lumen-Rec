@@ -1,0 +1,2 @@
+{"default_signal": 0.12, "default_mass": 0.99999,
+ "signal": {"ml1m": {"V3": 0.45}, "toys": {"V3": 0.30}, "ml1m_confirm": {"V3": 0.45}}}

@@ -46,9 +46,9 @@ factorisation scored on the same pairs, without which a confidence number cannot
 % MISSING_REF (optional support for the last sentence): Ferrari Dacrema et al., RecSys 2019, weak-baseline critique; see paper_missing_refs.txt
 
 What remains open is how much of $\py$ is a prior about the item and how much is evidence about this user. Write the
-log-odds of \emph{Yes} as $\ell(u,i)=b_u+\pi(i)+e(u,i)$: a user offset $b_u$, an item prior $\pi(i)$ that the model brings
-to item $i$ whoever asks (possibly linked to popularity), and personal evidence $e(u,i)$. Only $e$
-personalises the ranking, and the prior is what per-user calibration cannot touch: a short invariance lemma
+log-odds of \emph{Yes} for user $u$ and item $i$ as $\ell(u,i)=b_u+\pi(i)+e(u,i)$: a user offset $b_u$, an item prior
+$\pi(i)$ that the model brings to the item whoever asks (possibly linked to popularity), and personal evidence $e(u,i)$.
+Only $e$ personalises the ranking, and the prior is what per-user calibration cannot touch: a short invariance lemma
 (Section~\ref{sec:prelim}) shows that any strictly increasing per-user map of the scores, such as temperature or Platt
 scaling~\citep{guo2017calibration}, leaves per-user AUC and within-user NDCG unchanged. Post-hoc calibration of this kind
 therefore cannot improve ranking; what remains are item-dependent corrections, cross-user decisions and training.

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -66,7 +67,28 @@ def required(stage: str, root: Path, splits=None, ftgrid_dir: str = "outputs/con
     missing = [rel for rel, p in items if not p.exists()]
     if missing:
         raise SystemExit(f"freeze stage {stage}: these required files do not exist yet: {missing}")
+    if stage == "core":
+        bad = split_problems([(rel, p) for rel, p in items if rel.endswith("ftgrid_split.json")])
+        if bad:
+            raise SystemExit("freeze stage core: a split file cannot be frozen as it is: " + "; ".join(bad))
     return items
+
+
+def split_problems(splits) -> list:
+    """Content a frozen ftgrid_split.json must have: the TRAIN length audit measured with a tokenizer (stage 0 of
+    run_ftgrid.sh passes --tokenizer), and for ml1m a T that was checked against Gate-FT's."""
+    out = []
+    for rel, p in splits:
+        try:
+            js = json.loads(Path(p).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            out.append(f"{rel}: unreadable ({e})")
+            continue
+        if ((js.get("train") or {}).get("overlength") or {}).get("share_above_1024") is None:
+            out.append(f"{rel}: the TRAIN length audit has no tokenizer measurement (rebuild with --tokenizer)")
+        if js.get("domain") == "ml1m" and js.get("gateft_T_match") is not True:
+            out.append(f"{rel}: ml1m T was not checked against Gate-FT's (rebuild with --gateft_split)")
+    return out
 
 
 def lines_for(stage: str, root: Path, splits=None, ftgrid_dir: str = "outputs/confrec/ftgrid") -> list:

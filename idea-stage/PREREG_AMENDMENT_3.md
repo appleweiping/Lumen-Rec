@@ -66,8 +66,11 @@ is authoritative, and any difference is explained in PILOT_LOG):
 | Sports | 15,695 | 3,000 | 7,654 | 997 | 14% |
 
 **Minimum n.** `ftgrid_split.json` also records, from labels only, the number of EVAL users with both classes among their
-TEST candidates, overall and in the popularity tail. **An endpoint computed on fewer than 150 users is descriptive**: no
-CI-based claim and no Holm family (the G9 warning level).
+TEST candidates, overall and in the popularity tail (the tail is `stats.rank_bins(pop, 5) == 0` with the bins cut over **all
+EVAL candidates, CAL ∪ TEST**, as `pilot_pseudonym` cuts them; every tail endpoint uses the same bins). **An endpoint computed on
+fewer than 150 users is descriptive**: no CI-based claim and no Holm family (the G9 warning level). The split file also records
+the build arguments (seed, sizes, cap, whether a tokenizer measured the length rule, whether the DEV and Gate-FT checks ran);
+a split that was built without a tokenizer, or an ML-1M split not checked against Gate-FT's T, cannot be frozen.
 
 **Scoring scope.**
 - Every model scores the **whole EVAL panel** (CAL ∪ TEST) once with the `like` question.
@@ -76,10 +79,12 @@ CI-based claim and no Holm family (the G9 warning level).
   TEST-only panel; the pointwise prompts do not depend on the other candidates). Donors of the swap prior come from S_d.
   S_d is recorded in `ftgrid_split.json`.
 
-**TRAIN length rule.** The TRAIN prompts under the selected variant are tokenised on CPU; the share above 1,024 tokens is
-written to `ftgrid_split.json`. Above 2% for a domain, that domain trains with max_len = the 99.5th-percentile length rounded
-up to 256 (micro-batch × accumulation stays 32; the loss scale is tested). Below 2%, G9's 1,024 with skip-and-count applies.
-Measured under V3 and V7 on 300 Toys DEV users: 0.55% and 7.4% above 1,024 (V0, V1, V2, V4, V5: 0%; ML-1M: 0% for all).
+**TRAIN length rule.** The TRAIN prompts (the examples of `train.jsonl`, after the cap) under the selected variant are tokenised
+on CPU; the share above 1,024 tokens is written to `ftgrid_split.json`. If more than 2% of a domain's examples exceed 1,024,
+that domain trains with max_len = the 99.5th-percentile length rounded up to 256 (micro-batch × accumulation stays 32; the loss
+scale is tested); otherwise (2% or less) G9's 1,024 with skip-and-count applies. The "seen" share of TEST pairs counts items
+occurring in `train.jsonl`. Measured under V3 and V7 on 300 Toys DEV users: 0.55% and 7.4% above 1,024 (V0, V1, V2, V4, V5:
+0%; ML-1M: 0% for all).
 
 ## 2. Regimes, models and training
 
@@ -154,8 +159,8 @@ Amendment 1 P1.6 (donors in S_d); ê = L − π. UAUC of π alone, L_nohist alon
 **E-E Popularity** (the two-axis analysis). Partial Spearman of L and of π with log popularity controlling for the shrunk q̂
 (`forensics.popularity_partial`, item level and pair level; ML-1M also controls release year, Toys and Sports also description
 length and has_store). Bias Index head vs tail with confidence = the CAL-fit Platt probability, group = `rank_bins(pop, 5)`
-bins 4 vs 0, 10 confidence bins, residual-adjusted (`metrics.bias_index_ci`). Popularity is the all-time category count
-(Amendment 1 C2). Tail-only UAUC is exploratory.
+bins 4 vs 0 (bins cut over all EVAL candidates, section 1), 10 confidence bins, residual-adjusted (`metrics.bias_index_ci`).
+Popularity is the all-time category count (Amendment 1 C2). Tail-only UAUC is exploratory.
 
 **P1 — the one primary hypothesis of the program (directional; ML-1M, Qwen3-8B).** Supervised fine-tuning increases the personal
 information gain: for the 3 seeds, G_FT,s − G_ZS > 0. **P1 holds iff** the mean over seeds is > 0 with p < 0.05, all 3 seeds are
@@ -249,8 +254,9 @@ A Llama result never overrides a Qwen failure; a Llama-only result is explorator
 - **Purpose.** What does fine-tuning learn beyond item priors? An adapter trained on labels permuted **within each item** keeps
   every item's label marginal (the item prior) and destroys the user–item personal evidence.
 - **Construction.** On the ML-1M TRAIN examples, for every item with at least 2 TRAIN examples the labels of its examples are
-  randomly permuted among those examples (seed 0); items with one example keep their label. `ftgrid_data.py` writes the file and
-  asserts that every item's label sum is preserved.
+  randomly permuted among those examples (seed 0; each candidate's star rating moves with its label, so label = [rating ≥ 4]
+  still holds); items with one example keep their label. `ftgrid_data.py` writes the file and asserts that every item's label
+  sum (and rating multiset) is preserved and that nothing else changes.
 - **Runs.** Seeds 0 and 1, the §2 recipe. **Endpoint:** UAUC(real FT, same seed) − UAUC(permuted) on TEST and on all rows, with
   the user-bootstrap CI, and the E-A references. Descriptive; not in any Holm family.
 
@@ -288,7 +294,9 @@ would affect; a cut item is reported as "not run"):
 - **Deviations from the judge's ranked actions** (judge.md 9–10), stated so they cannot be read as silent: the high-loss pruning
   arm is dropped; stackers are cross-fitted within S_d's TEST rows instead of fit on DEV and evaluated on CONFIRM; the swap and
   no-history arms of the selected variant are scored under section 4 on EVAL users after the gate-fix decisions are recorded,
-  without a GATE_PASS (G8 allows descriptive endpoints on CONFIRM users in the F0/F1 branches).
+  without a GATE_PASS (G8 allows descriptive endpoints on CONFIRM users in the F0/F1 branches). Amendment 2 P also lists a
+  comparison of selective serving with the baselines' own confidence: it is **not run**, because the baselines' score files are
+  not available (only their ranks and top-10 lists), and is reported as not run.
 - **Verification.** The records in PILOT_LOG are committed and pushed to GitHub (`sigir2027`) at the time of recording, so the push
   time is a public timestamp. An anonymous third-party timestamp of this file's sha1 (OpenTimestamps) may be added by the
   authors. Every verdict is same-family and provisional.

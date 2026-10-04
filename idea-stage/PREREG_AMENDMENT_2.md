@@ -148,7 +148,9 @@ closed conservatively:
 **G7 Stage 3, only on GATE_PASS.**
 - Under V\*, score like, dislike, like_para, the swap prior (K = 8) and the no-history prior on:
   - CONFIRM ML-1M;
-  - the second rated domain: fresh Toys if ≥ 500 fresh users are eligible, otherwise Video_Games.
+  - the second rated domain: fresh Toys if ≥ 500 fresh users are eligible, otherwise Video_Games. Scale (added 2026-10-04,
+    before any GPU job of the round): the first 1,500 fresh Toys users in the row order of `toys_confirm_h20.jsonl` (for
+    Video_Games, the first 1,500 users of its panel), so that this registered arm costs about 2 GPU-h and not about 15.
 - MIRROR's next-item no-loss check runs under V0 on the first 1,000 events of the **sports VALID** panel. Sports TEST
   events 1–1000 are quarantined.
 - Apply the §3.1 table with P1 and the closed hole.

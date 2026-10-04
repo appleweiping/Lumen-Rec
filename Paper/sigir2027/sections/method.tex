@@ -1,27 +1,113 @@
-\section{\method{}: Scoring the Personal Evidence}
-\label{sec:method}
+% Section "Measurement and Actionability Tools" (owner: protocol). Reuses the file name method.tex.
+% Labels provided: sec:tools (= sec:method), eq:bi, sec:slot.
+% External labels used: sec:prelim, eq:decomp, lem:invariance, prop:itemdep (preliminaries.tex); tab:rq (observation.tex);
+% app:pseudonym (appendix.tex).
+% Definitions follow PREREG_AMENDMENT_3 (re-read 2026-10-04 04:30: endpoint dictionary E-A..E-E, sections 4--9, P1) and
+% docs/sigir/NEXTITEM_AUDIT_SPEC.md. m(i) = prior-only item mean (A3: q-hat, shrunk). Decision thresholds live in Table tab:rq.
+% Not stated here for space (registered, descriptive): A3 section 9 control (two adapters trained on labels permuted within
+% each item), the seen/unseen split of the knockout, the tail-only UAUC.
+% The optional method is wrapped in METHOD-SLOT-BEGIN / METHOD-SLOT-END and can be deleted without touching anything else.
+\section{Measurement and Actionability Tools}
+\label{sec:tools}\label{sec:method}
 
-\paragraph{Mirrored scoring.} For each user--candidate pair we ask both questions and score
-\begin{equation}
-  s_{\method}(u,i) \;=\; \ell_{\textsf{like}}(u,i) - \ell_{\textsf{dislike}}(u,i) \;=\; 2\,\hat e(u,i).
+\paragraph{Calibration and error anatomy (rated panels).}
+A global Platt map of the logit, fitted on all CAL rows of a model's EVAL users, is applied to TEST; ECE (10 equal-mass
+bins)~\citep{naeini2015ece}, Brier skill over the CAL base rate and the Platt slope are reported. For a user with both
+classes among the TEST rows, let $k$ be the number of TEST likes and $c_u$ the midpoint of the $k$-th and $(k{+}1)$-th
+largest TEST logits: the decision is $\mathbf 1[\ell\ge c_u]$ with margin $|\ell-c_u|$. Over margin tertiles of all TEST
+pairs we report $P(\text{wrong}\mid\text{tertile})$, the share of errors in the top tertile (confident errors) and of
+correct decisions in the bottom tertile (correct but unsure), and the AUROC and AURC (area under the risk--coverage curve)
+of the margin for correctness.
+
+\paragraph{Item prior and reliability.}
+The swap prior $\hat\pi(i)$ is the mean of $\ell_{\textsf{like}}(d_k,i)$ over $K=8$ donors $d_k$ whose histories are
+rendered as for real users and who hold $i$ neither in their history nor as a candidate; an empty-history prompt gives the
+PMI-style no-history logit $\ell_\emptyset(i)$~\citep{holtzman2021surface}. Both arms are scored on the decomposition
+subset, the first 1,000 EVAL users with both classes among their TEST candidates, on their TEST rows, with donors drawn
+from it. With $r_c$ the pooled within-user correlation of the centred donor-half means (donors 1--4 versus 5--8),
+$r_8=2r_c/(1+r_c)$, and $\rho$ that of centred $\ell$ and $\hat\pi$, the item-prior share is $\rho^2/r_8$;
+$1-\rho^2/r_8$ is reported unclipped as an upper bound on the personal share $\mathcal S$ of Section~\ref{sec:prelim} and
+labelled uninterpretable if $r_8<0.7$.
+
+\paragraph{Information gain and star permutation.}
+Logistic stackers are cross-fitted over the two halves of the decomposition subset (each fitted on the other half's TEST
+rows, UAUC on the pooled predictors): M0 uses the prior-only item mean $m(i)$ (other users' ratings strictly before the
+candidate, shrunk), M1 adds $\hat\pi$, M2 adds the evidence $\hat e=\ell-\hat\pi$, and M3 pairs $m$ with the MF personal
+residual. The information gain is $\mathcal G=\Delta\mathrm{UAUC}(\text{M2}-\text{M1})$, the CF reference
+$\mathcal G_{\rm CF}=\Delta\mathrm{UAUC}(\text{M3}-\text{M0})$. The star permutation shuffles the ``(rated $r$/5)'' suffixes
+among the same history events ($K=2$ permutations); with $\tau_P=\ell-\bar\ell_{\rm perm}$ and
+$\Delta\mathrm{UAUC}=\mathrm{UAUC}(\ell)-\mathrm{UAUC}(\ell_{\rm perm})$, the model is said to ignore the user's ratings
+when $|\Delta\mathrm{UAUC}|<0.005$ and the within-user standard deviation of $\tau_P$ is below $0.10$ (wording flags).
+
+\paragraph{Two-axis popularity analysis.}
+Popularity $n_i$ is the all-time category event count, used through ranks. \emph{Level}: the partial Spearman correlation
+of $\ell$ and of $\hat\pi$ with $\log(1+n_i)$ given $m(i)$ and, per domain, release year (ML-1M) or description length and
+a has-store flag (Toys, Sports). \emph{Gap}, following ProCal~\citep{xiong2023procal}: with confidence $c$ (the CAL-fitted
+Platt probability on rated panels, the list-normalised $p$ below on next-item panels), label $y$, residual $r=y-c$ and ten
+equal-mass confidence bins $b$, the residual-adjusted Bias Index of a popularity group $g$ is
+\begin{equation}\label{eq:bi}
+  \mathrm{BI}_g=\frac{\sum_b n_{gb}\,(\bar r_{gb}-\bar r_{b})}{\sum_b n_{gb}},
 \end{equation}
-Under the decomposition of Section~\ref{sec:prelim} the item term $a(i)$ cancels exactly, so by
-Proposition~\ref{prop:monotone} \method{} reorders a user's candidates whenever $a(i)$ varies across them. Both
-prompts share the history-and-candidate prefix, so with prefix caching the extra cost is one additional
-single-token decode per pair. A calibrated probability for serving decisions is obtained by temperature-scaling
-$s_{\method}$ on validation users.
+with $n_{gb}$, $\bar r_{gb}$ the count and mean residual of $g$ in bin $b$ and $\bar r_b$ the pooled mean, so within-bin
+differences in confidence create no spurious sign; we report $\mathrm{BI}_{\rm head}-\mathrm{BI}_{\rm tail}$ (top versus
+bottom popularity quintile).
 
-\paragraph{Why not subtract an item prior?} Alternatives estimate $a(i)$ from \emph{other} inputs---a content-free
-prompt~\citep{zhao2021calibrate}, the answer prior~\citep{holtzman2021surface}, the same question without history,
-or the average over other users' histories---and subtract it. These estimate the prior of \emph{Yes for item $i$},
-which mixes acquiescence with genuine item quality (an item most users like is not an artifact). The mirrored
-question isolates the polarity-invariant part only. Whether this distinction matters is an empirical question we
-test directly (Section~\ref{sec:exp}).
+\paragraph{Pseudonym knockout.}
+On Toys and Video Games (and Llama on Toys) the whole EVAL panel is scored by fixed models (every adapter and the zero-shot
+model; no retraining) in three arms: real; pseudonym, every brand string (the Amazon store field) in history and candidate
+text replaced by an injective invented pseudonym (Appendix~\ref{app:pseudonym}); and placebo, every brand so replaced
+swapped for a real brand of the same tercile of category-wide brand review counts. On candidates whose store string occurs
+in their title, $\Delta_{\rm arm}=\ell_{\rm real}-\ell_{\rm arm}$ is summarised by the head-minus-tail contrast (top versus
+bottom popularity quintile), its slope on log popularity and the tail $\Delta$UAUC. The registered decision function labels
+a model POSITIVE (thresholds in Table~\ref{tab:rq}), NEGATIVE (slope interval contains 0 and the pseudonym and placebo
+contrasts differ by at most $0.05$), NULL (UAUC falls by more than $0.02$ overall and in the tail) or INDETERMINATE.
 
-\paragraph{Mirror tuning.} Standard yes/no fine-tuning~\citep{bao2023tallrec} trains only the \textsf{like}
-question, so nothing constrains the item term. Mirror tuning adds, for each training pair $(u,i,y)$, the mirrored
-example with the \textsf{dislike} question and label $1-y$; the loss is cross-entropy on the single answer token,
-a proper scoring rule on \py{}. \DATANEEDED{if mirror tuning is retained after M3: one sentence on why it keeps
-$a(i)$ small, supported by the measured SD of $a(i)$ before/after.}
+\paragraph{List-normalised confidence, selective serving and exposure.}
+On next-item panels the 101 logits of an event are normalised by $p_c=\exp(\ell_c/T)/\sum_{c'}\exp(\ell_{c'}/T)$, with the
+temperature $T$~\citep{guo2017calibration} fitted per domain and question on the 2,000 VALID events by minimum mean
+negative log-likelihood of the positive and applied unchanged to TEST; being strictly increasing within an event, the map
+is rank-inert (Lemma~\ref{lem:invariance}). Top-label ECE (15 equal-width bins) and the multiclass Brier score use
+$p_{\max}=\max_c p_c$ against whether the top-1 candidate is the positive. Selective serving serves events by decreasing
+confidence ($p_{\max}$, margin, negative entropy, uncalibrated maximum logit; random control) and reports NDCG@10
+risk--coverage curves~\citep{geifman2017selective} and the gain of serving the confident half; at 50\% coverage the served
+shares of niche and mainstream users (lowest and highest quintile of a popularity profile, the mean over history items of
+head 2, mid 1, tail 0) are compared. Exposure is read from the top-10 list: head share, tail share (APLT) and the Gini
+coefficient of exposure counts, with $\Delta_{\rm head}$ the head share minus that expected under random ranking of the
+same candidates.
 
-\paragraph{Complexity.} \DATANEEDED{measured throughput: prompts/s for single vs mirrored scoring with prefix caching.}
+\paragraph{Item-dependent corrections and \method{}.}
+Per-user Platt scaling and offset removal check Lemma~\ref{lem:invariance} on the stored scores; the routes left open by
+Proposition~\ref{prop:itemdep} are the no-history correction $\ell-\ell_\emptyset(i)$ and the swap-prior evidence
+$\hat e$, tested against the raw score, and \method{}: $s_{\method}=\ell_{\textsf{like}}-\ell_{\textsf{dislike}}$ with
+acquiescence $a=\tfrac12(\ell_{\textsf{like}}+\ell_{\textsf{dislike}})$, the contrast family of contrast-consistent
+search~\citep{burns2023ccs}, scored only after GATE\_PASS and not a contribution. Such corrections can reorder, but
+reordering is not improving: any two-prompt claim must beat both the equal-compute paraphrase placebo
+$\tfrac12(\ell_{\textsf{like}}+\ell_{\textsf{like\_para}})$ and a correlation-matched ensemble null, the UAUC of an
+equal-weight standardised sum of two readouts with the observed per-user AUCs and within-class correlation under a
+binormal model (the empirical z-sum of \textsf{like} and $-\textsf{dislike}$ is reported beside it). \method{} is
+classified by the registered decision rule of the pilot protocol, including a next-item NDCG@10 loss of at most $0.005$ on
+the first 1,000 Sports VALID events; an unmatched configuration is INDETERMINATE.
+
+\paragraph{Pruning arms (RQ6).}
+On ML-1M, P0 trains on all TRAIN examples and each pruned arm removes 25\% of the positives and of the negatives: P1 at
+random; P2 the most uncertain under the zero-shot model (largest $u=-|\ell_{\rm ZS}-\tau|$, with $\tau$ the
+$(1-\beta)$-quantile of its logits and $\beta$ the TRAIN label mean; a quantile rule in the spirit of
+UNIT~\citep{wu2025unit}); P3 the most prior-congruent, ranked by $(2y-1)(m-\bar m)$. Each arm has seeds 0--4 (the Gate-FT
+adapters are P0 seeds 0--2); a ``beats random'' result is worded as ``pruning the zero-shot model's uncertain examples
+helped'', never as uncertainty improving ranking.
+
+% METHOD-SLOT-BEGIN
+\subsection{Optional method: prior-offset LoRA}
+\label{sec:slot}
+Training changes what confidence encodes, which no post-hoc map can. We let the adapter model only the personal part: in
+training the Yes logit of the last position is shifted before the full-vocabulary softmax,
+$\ell'_{\rm Yes}=\ell_{\rm Yes}+b\,z(m)$, with $z(m)$ the TRAIN-standardised prior-only item mean, $b$ a learned scalar
+initialised at 0 and no gradient into $m$; the ranking score is $\ell_{\rm Yes}-\ell_{\rm No}+b\,z(m)$. The comparators,
+with the same seeds and TRAIN set, are SFT ($b=0$; the fine-tuned regime itself) and post-hoc stacking (the SFT logit
+stacked with $z(m)$ by logistic regression fitted on CAL); the endpoint is $\Delta$UAUC(prior-offset $-$ post-hoc stacking)
+on TEST. A dataset passes if the seed-averaged $\Delta$UAUC is at least $+0.01$, its interval excludes 0 and the
+$2\sigma_{\rm seed}$ rule holds; datasets run in the order ML-1M, Toys, Video Games, Sports, and the slot is killed as soon
+as it fails on two (it survives only with three passes), at the latest on 2026-11-30.
+\DATANEEDED{slot outcome: retained or killed, with the per-dataset UAUC gain over post-hoc stacking, its interval and
+the seeds}
+% METHOD-SLOT-END

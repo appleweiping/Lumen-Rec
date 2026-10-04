@@ -1,22 +1,26 @@
 % Conclusion (owner: intro). Pre-results draft: the only unconditional statements are the two data-independent ones (decomposition
 % and invariance lemma); everything empirical is a \DATANEEDED slot and must come from committed result files and satisfy the
-% registered claim-admission rule (otherwise direction-free wording). The sentences "each such route was tested against its own
-% control" and the first sentence describe the registered grid: re-verify them against what was actually run (cut rules).
+% registered claim-admission rule (otherwise direction-free wording). The first sentence and "the audit tests each against its own
+% control" describe the registered grid: re-verify them against what was actually run (cut rules) before submission.
 % Cross-references: sec:prelim, tab:guide (one-table guide).
 \section{Conclusion}
 \label{sec:conclusion}
 
-We audited what the token confidence of yes/no LLM recommenders knows, with labels that match the question and a protocol
-registered before the confirmatory data were scored. Two statements do not depend on the data: the confidence decomposes into
+This paper audits what the token confidence of yes/no LLM recommenders knows, with labels that match the question and a
+protocol registered before the confirmatory data were scored. Two statements do not depend on the data: the confidence decomposes into
 a user offset, an item prior and personal evidence, and no strictly increasing per-user map of the scores can change per-user
 AUC or within-user NDCG (Section~\ref{sec:prelim}).
 \DATANEEDED{2--3 sentences from the decomposition tables only: personal share and information gain over the prior-only item
 mean by regime and backbone, and the quality-partialled popularity link of the prior, each with its confirmation-user CI;
 direction-free unless the claim-admission rule is met}
-The lemma leaves open item-dependent corrections, cross-user decisions and training; each was tested against its own control.
+The lemma leaves open item-dependent corrections, cross-user decisions and training; the audit tests each against its own control.
 \DATANEEDED{1--2 sentences from the actionability tables only: which of item-dependent corrections, cross-user selective serving,
 static exposure and pruning beat their placebo, ensemble null, random or matched-random control, with effect size and CI, or
 that none did}
+% METHOD-SLOT-BEGIN (conclusion): delete this sentence if the nested method slot is retired at its kill date
+\DATANEEDED{branch: only if the nested method slot (prior-offset LoRA) survives its kill rule -- one sentence on its gain over
+post-hoc stacking; else omit}
+% METHOD-SLOT-END (conclusion)
 \DATANEEDED{branch: one sentence restating the registered gate outcomes (zero-shot remedy, fine-tuning gate) as the branch that
 occurred}
 Table~\ref{tab:guide} condenses the answers to the six practitioner questions into one table.

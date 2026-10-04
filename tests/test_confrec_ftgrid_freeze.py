@@ -18,6 +18,12 @@ src/prune.py
 """
 
 
+def split_json(domain, tokenized=True, gateft_match=True):
+    """The parts of an ftgrid_split.json that the freeze reads."""
+    return {"domain": domain, "train": {"overlength": {"share_above_1024": 0.0 if tokenized else None}},
+            "gateft_T_match": gateft_match if domain == "ml1m" else None}
+
+
 def repo(tmp_path, with_prune=True, with_splits=True):
     root = tmp_path / "repo"
     (root / "idea-stage").mkdir(parents=True)
@@ -33,7 +39,7 @@ def repo(tmp_path, with_prune=True, with_splits=True):
         for d in ff.DOMAINS:
             p = root / "outputs" / "confrec" / "ftgrid" / "panels" / d
             p.mkdir(parents=True)
-            (p / "ftgrid_split.json").write_text(json.dumps({"domain": d}), encoding="utf-8")
+            (p / "ftgrid_split.json").write_text(json.dumps(split_json(d)), encoding="utf-8")
     (root / "docs" / "sigir" / "PILOT_LOG.md").write_text("# log\n", encoding="utf-8")
     return root
 
@@ -79,6 +85,21 @@ def test_a_missing_listed_file_or_split_is_an_error_not_a_skip(tmp_path):
     with pytest.raises(SystemExit, match="ftgrid_split.json"):
         ff.required("core", root2)
     assert ff.required("amendment", root2)                         # the amendment stage never needs splits
+
+
+def test_a_split_without_a_tokenizer_audit_or_without_the_gateft_check_cannot_be_frozen(tmp_path):
+    root = repo(tmp_path)
+    sp = root / "outputs" / "confrec" / "ftgrid" / "panels"
+    (sp / "toys" / "ftgrid_split.json").write_text(json.dumps(split_json("toys", tokenized=False)), encoding="utf-8")
+    with pytest.raises(SystemExit, match="no tokenizer measurement"):
+        ff.required("core", root)
+    (sp / "toys" / "ftgrid_split.json").write_text(json.dumps(split_json("toys")), encoding="utf-8")
+    (sp / "ml1m" / "ftgrid_split.json").write_text(json.dumps(split_json("ml1m", gateft_match=None)), encoding="utf-8")
+    with pytest.raises(SystemExit, match="Gate-FT"):
+        ff.required("core", root)
+    (sp / "ml1m" / "ftgrid_split.json").write_text(json.dumps(split_json("ml1m")), encoding="utf-8")
+    assert ff.required("core", root)                                 # now it can be frozen
+    assert ff.required("amendment", root)                            # other stages never read the splits
 
 
 def test_check_is_case_insensitive_and_print_lists_one_hash_per_file(tmp_path):

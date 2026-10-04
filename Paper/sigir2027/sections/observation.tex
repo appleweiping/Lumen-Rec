@@ -1,30 +1,117 @@
-\section{What Does the Yes/No Confidence Measure?}
-\label{sec:observation}
+% Section "Audit Protocol" (owner: protocol). Reuses the file name observation.tex.
+% Labels provided: sec:protocol (= sec:observation), tab:rules (registered gate rules), tab:rq (research questions).
+% External labels used: sec:tools (method.tex); sec:exp, tab:gate-outcomes (experiments.tex); app:prereg, app:prompts, app:repro (appendix.tex).
+% Every threshold below is copied from PREREG_AMENDMENT_1/2/3 (G0--G9, F, A, N; fine-tuned program, re-read 2026-10-04 04:30)
+% and docs/sigir/NEXTITEM_AUDIT_SPEC.md; no result appears here except the three registered gate outcomes.
+% Page-budget note: Table tab:rules duplicates the rule column of tab:gate-outcomes and Appendix app:sensitivity/app:prereg; it is
+% the first candidate to drop if space is needed (then replace its two references by Table~\ref{tab:gate-outcomes}).
+\section{Audit Protocol}
+\label{sec:protocol}\label{sec:observation}
 
-We first characterise token-level \py{} of zero-shot and fine-tuned LLM recommenders on rated panels
-(Table~\ref{tab:data}), answering Q1--Q5. Each analysis reports a paired user-bootstrap 95\% CI.
+\paragraph{Registration.}
+Three dated, binding amendments register the audit (operationalisations before any pilot data existed; the one-round
+prompt remedy after the pilot gates were read; the fine-tuned program before any adapter existed; Appendix~\ref{app:prereg}),
+with hashes recorded before the runs they govern. Quantities computed on design users before a gate are
+\emph{exploratory}: they generate hypotheses, are never reported as findings, and are re-measured as pre-declared
+endpoints on fresh users.
 
-\paragraph{RQ1 (Q1, Q2, Q4): Is the model sure when it is right, and is it wrong because it is unsure?}
-\DATANEEDED{reliability diagrams of token \py{} vs verbalized confidence vs rated labels (ECE, Brier, AUC, UAUC);
-error anatomy: fraction of correct-but-unsure ($|\hat p-0.5|<\tau$, correct) and confidently-wrong
-($|\hat p-0.5|\ge\tau$, wrong) predictions; AUROC of confidence for correctness.}
+\paragraph{Panels, labels and user roles.}
+\emph{Rated panels} (MovieLens-1M; Amazon Reviews 2023 Toys, Video Games, Sports) use labels that match the question:
+$y=1$ for rating $\ge4$, $y=0$ for $\le2$, three-star items dropped, first rating per (user, item) only; a user needs at
+least three history events and, among at most 20 candidates (the latest rated items), three likes and three dislikes.
+% MISSING_REF: MovieLens-1M (Harper and Konstan, 2015) and Amazon Reviews 2023 (Hou et al., 2024) dataset citations
+Eligible users are shuffled with seed 0. The first 1,500 are TRAIN users (on ML-1M and Toys the pilot users, hence the DEV
+users of the prompt remedy); the next $\min(3{,}000,\text{eligible}-1{,}500)$ are EVAL users, disjoint by user id and
+never trained or selected on: 1,683 on ML-1M (the CONFIRM users of the gates), 3,000 on Toys, 2,609 on Video Games, 3,000
+on Sports. With $T$ the 0.8-quantile of the candidate timestamps of a panel's TRAIN and EVAL users, training examples are
+TRAIN candidates before $T$, calibrators are fitted on EVAL candidates before $T$ (CAL), and every rated endpoint but the
+G6 gate uses EVAL candidates at or after $T$ (TEST). \emph{Next-item panels} are the frozen same-candidate panels of an
+existing benchmark protocol (Amazon Sports, Toys, Home, Tools; 10,000 events; one positive and 100 popularity-sampled
+negatives), on which an existing verbalized reranker (C-CRP) and eight official baselines are already evaluated; their
+first 2,000 VALID events fit temperatures only, and Sports TEST events 1--1,000 are quarantined and reported separately.
 
-\paragraph{RQ2 (Q5): Are popular items endorsed more confidently---and is it warranted?}
-Following the proximity-bias analysis of \citet{xiong2023procal}, we separate the \emph{level} of confidence
-from the \emph{calibration gap at matched confidence} across item-popularity deciles.
-\DATANEEDED{confidence level by popularity decile; matched-confidence bias index head vs tail; spread of the
-within-user-centred item term $a(i)$ (SD across items) and Spearman correlation of $a(i)$, valence $v(i)$ and the
-user-marginalised prior $\pi(i)$ with log-popularity.}
+\paragraph{Backbones, regimes, prompts and readout.}
+Qwen3-8B~\citep{yang2025qwen3} is primary; Llama-3.1-8B-Instruct~\citep{grattafiori2024llama3} replicates on ML-1M and Toys
+(zero-shot and fine-tuned) and on next-item events 1,001--3,000 (zero-shot, V0), subject to registered cut rules
+(\DATANEEDED{panels and regimes actually run on Llama}), and never rescues a Qwen result. Rated panels, regimes and
+backbones share the prompt chosen by the remedy ($V^\ast$ if a fix is found, else V0; Appendix~\ref{app:prompts});
+next-item panels stay at V0 and no adapter is scored on them. Zero-shot scoring is a single fp16 prefill pass in
+vLLM~\citep{kwon2023vllm} (chat template, thinking off) that reads Yes and No by token id from the top-50
+log-probabilities; a run that fails E1 (Table~\ref{tab:rules}) is rerun once and otherwise reported missing, never
+replaced. The fine-tuned regime is TALLRec-style~\citep{bao2023tallrec} LoRA~\citep{hu2022lora} yes/no SFT on identical
+prompt tokens (rank 16, $\alpha=32$, learning rate $10^{-4}$, one epoch; seeds 0--2, five for pruning; hyperparameters
+fixed before training, Appendix~\ref{app:repro}).
 
-\paragraph{RQ3: Is the item term familiarity? A pseudonym knockout.}
-We replace every brand name in history and candidate text with a consistent invented pseudonym, and, as a
-placebo, with another real brand of matched popularity (Appendix~\ref{app:pseudonym}).
-\DATANEEDED{$\Delta\ell$ (real $-$ pseudonym) by popularity decile with head$-$tail CI; placebo $\Delta$; change of
-the matched-confidence bias index; tail UAUC.}
+\begin{table*}[t]
+\caption{Registered gate rules (Amendment 2); all constants are immutable and Gate-FT runs in every branch. Outcomes: Table~\ref{tab:gate-outcomes}.}
+\label{tab:rules}
+\footnotesize
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{@{}p{0.075\textwidth}p{0.905\textwidth}@{}}
+\toprule
+Gate & Registered rule\\\midrule
+G0 & \emph{Bars and invariants.} ML-1M zero-shot rated UAUC $\ge0.60$ (point estimate); Sports next-item NDCG@10 $\ge0.18632$ ($=0.8\times0.2329$, C-CRP on the same panel); Gate-FT mean UAUC $\ge0.65$. No variant contains collaborative-filtering or popularity statistics, the user's mean rating, few-shot examples, thinking, or a verbalized or digit readout; the next-item prompt stays at V0 (scored under a registered carve-out that no gate reads).\\
+G1--G5 & \emph{Stage 1 (DEV, blind to \method{}).} Score only \textsf{like} for V0 and six variants (V1--V5, V7; Appendix~\ref{app:prompts}). A variant is eligible if E1 (rows with neither answer token $\le0.5\%$, no over-length prompt, mean Yes+No mass $\ge0.95$) holds on both panels and E2 (Toys-DEV UAUC $\ge$ UAUC(V0)$\,-0.010$) holds; $V^\ast$ has the highest ML-1M-DEV UAUC (ties within $0.005$: higher Toys-DEV UAUC, then a fixed simplicity order). FIX\_FOUND iff $V^\ast\neq$ V0 and the one-sided paired user-bootstrap lower bound of UAUC$(V^\ast)-$UAUC(V0) on ML-1M DEV is $>0$ (2,000 resamples, seed 0, level $1-0.05/6$).\\
+G6, G7 & \emph{Stage 2 (CONFIRM, once).} GATE\_PASS iff UAUC$(V^\ast)\ge0.60$ on the point estimate and E1 holds on the fresh ML-1M users. \emph{Stage 3 (only on GATE\_PASS).} The \textsf{dislike}, \textsf{like\_para}, swap-prior ($K=8$) and no-history arms on CONFIRM ML-1M and a second rated domain (the first 1,500 fresh Toys users if $\ge500$ fresh users are eligible, else Video Games), and the next-item no-loss check of \method{} at V0 on the first 1,000 Sports VALID events. (Amendment 3 scores the swap and no-history arms on EVAL users in every branch, as decomposition inputs.)\\
+G8 & \emph{Contingency.} F0 (no fix on DEV) or F1 (CONFIRM UAUC $<0.60$ or E1 fails): no second prompt round, no threshold change, no backbone rescue; zero-shot rated results become the descriptive finding ``below the registered bar'' and the pseudonym knockout moves to the fine-tuned regime.\\
+G9 & \emph{Gate-FT.} LoRA SFT, seeds 0--2, prompt $V^\ast$ (V0 under F0), trained on the DEV users' ML-1M candidates before $T$, evaluated on CONFIRM candidates at or after $T$. PASS iff the mean UAUC over the three seeds is $\ge0.65$ and every run passes E1 (else INCOMPLETE: the broken run is rerun, no seed is replaced); the bar lies between published MF (0.636) and fine-tuned TALLRec (0.682) on harder labels~\citep{zhang2025collm}. The fine-tuned program runs only after a PASS; on FAIL the paper is the zero-shot audit plus the next-item audit.\\
+\bottomrule
+\end{tabular}
+\end{table*}
 
-\paragraph{RQ4 (Q2, Q4 validity): Are ``confident errors'' errors?}
-Logged negatives may be unexposed positives. On KuaiRec's fully observed matrix~\citep{gao2022kuairec} we compare
-calibration under logged (missing-as-negative) and fully observed labels for the same pairs.
-\DATANEEDED{share of top-decile logged false positives that are true positives; exposure gap ECE(logged)$-$ECE(full) with CI.}
+\paragraph{Registered gates and the one-round remedy.}
+Table~\ref{tab:rules} summarises G0--G9. Under V0 the zero-shot channel failed the registered rated gate (ML-1M UAUC
+$0.587<0.60$) and passed the registered next-item gate (Sports NDCG@10 $0.2093\ge0.18632$); a pilot on the fully observed
+KuaiRec matrix~\citep{gao2022kuairec} returned NULL (zero-shot UAUC $0.469<0.58$), so no fully-observed-label claim is
+made and no dynamic feedback loop is run. We report the rated failure as a registered negative result of the zero-shot
+channel under the registered prompt; the registered response is one prompt-fix round (bar unchanged) and a fine-tuned
+gate in every branch.
+\DATANEEDED{G5/G6 and G9 outcomes: $V^\ast$, CONFIRM UAUC with 95\% interval, GATE\_PASS or the registered failure state,
+Gate-FT mean and seeds (Table~\ref{tab:gate-outcomes})}
+On GATE\_PASS, V0 versus $V^\ast$ is reported as prompt sensitivity; otherwise the fine-tuned regime carries the
+decomposition and knockout analyses.
 
-\paragraph{Summary.} \DATANEEDED{one paragraph tying RQ1--RQ4 to the decomposition $\ell = a(i) + e(u,i)$.}
+\paragraph{Non-LLM references.}
+Every rated-panel table carries three references on identical rows as context, never as gates: the prior-only item mean
+$m(i)$ (mean rating of $i$ by other users strictly before the candidate's timestamp, shrunk), popularity (all-time category
+event count, through ranks) and a temporal biased matrix factorisation (MF) fitted before $T$ with users folded in from
+earlier events, with its personal residual as the CF personal-signal reference. Next-item tables carry the ranks and top-10
+lists of C-CRP and the eight official
+baselines~\citep{wang2024elmrec,wang2025irllrec,he2025llm2rec,liu2025llmemb,liu2024llmesr,zhang2026proex,zhang2026promax,ren2024rlmrec}
+as context and testbed, never as a state-of-the-art claim; every claim is a same-candidate claim.
+
+\paragraph{Statistics and claim admission.}
+Intervals are 95\% percentile bootstraps (2,000 resamples, seed 0) over users, events or (item-level correlations) items;
+contrasts are paired and p-values are the two-sided bootstrap p-values of the same resamples.
+% MISSING_REF: Holm (1979), a simple sequentially rejective multiple test procedure -- cite at "Holm's correction"
+Holm's correction applies within each registered family (the regime contrast per Qwen domain, the decomposition endpoints
+per domain and regime, the method slot over its datasets, each next-item endpoint over the four domains); the one primary
+fine-tuning hypothesis P1 and the pruning test are single tests at $\alpha=0.05$, and an endpoint on fewer than 150 users
+is descriptive. Fine-tuned runs report every seed, and a result is confirmed only if Holm $p<0.05$ and, for fine-tuned
+results, it exceeds $2\sigma_{\rm seed}$ with all seeds agreeing in sign. The bars admit no re-anchoring, interval-based
+reinterpretation or ``near-miss'' rule, and a CONFIRM failure is final; selection never reads the mirrored, paraphrase or
+evidence arms, and no arm is promoted because it cleared a bar on design users; a configuration matching no branch of a
+registered rule is INDETERMINATE, never positive. A finding enters the abstract only if it is confirmed on fresh users and
+replicated in sign on a fresh Amazon domain and on the second backbone; until then the wording stays direction-free.
+
+\paragraph{Research questions.}
+Table~\ref{tab:rq} maps the seed questions S1--S6 to RQ1--RQ6 and fixes their registered endpoints (estimators:
+Section~\ref{sec:tools}; results: Section~\ref{sec:exp}).
+
+\begin{table*}[t]
+\caption{Research questions (RQ$k$ answers seed question S$k$) and registered endpoints, for both regimes, Qwen3-8B with Llama-3.1-8B replication, non-LLM references in every table. Rated endpoints use TEST candidates of EVAL users, next-item endpoints TEST events. $p$: list-normalised probability, $p_{\max}$ its maximum over the 101 candidates; margin tertiles, $\hat e=\ell-\hat\pi$, $\mathcal G$, AURC and the other estimators: Section~\ref{sec:tools}.}
+\label{tab:rq}
+\footnotesize
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{@{}p{0.14\textwidth}p{0.285\textwidth}p{0.285\textwidth}p{0.24\textwidth}@{}}
+\toprule
+RQ & Rated panels & Next-item panels & Rule\\\midrule
+\raggedright RQ1: sure when right? & AUROC, AURC of the margin for correctness of the per-user top-$k$ decision; share of correct decisions in the bottom margin tertile & AUROC of $p_{\max}$, margin, negative entropy for top-1 correctness; unsure-correct rate (bottom $p_{\max}$ tertile) & paired intervals\\
+\raggedright RQ2: wrong because unsure? & $P(\text{wrong}\mid\text{margin tertile})$; share of errors in the top tertile & confident-error rate (top tertile); share of top-1 errors in that tertile & as RQ1\\
+\raggedright RQ3: over-exposure (static)? & --- & $\Delta_{\rm head}$ (top-10 head share minus pool head share; also vs target share); Gini, tail share (APLT); at 50\% coverage: NDCG@10 gain, niche served share & versus random serving; $\Delta_{\rm head}$ excludes 0, one sign, in $\ge3$ of 4 domains; no dynamic claim\\
+\raggedright RQ4: confidence versus truth, and through what? & UAUC (TEST, all rows, seen/unseen items) beside the references and regime contrast; ECE, Brier skill, Platt slope; UAUC of $\hat\pi$ and $\hat e$; non-prior share; $\mathcal G=\Delta$UAUC(M2$-$M1) and $\mathcal G_{\rm CF}$; star-permutation $\Delta$UAUC & pooled AUROC, per-event AUC; top-label ECE, Brier of $p$; NDCG@10, HR@10, MRR & regimes paired on identical rows; $r_8<0.7$: uninterpretable; P1 (ML-1M, Qwen): mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}>0$, $p<0.05$, 3/3 seeds, $>2\sigma_{\rm seed}$\\
+\raggedright RQ5: popular means confident, and warranted? & partial Spearman link of $\ell$ and $\hat\pi$ with log popularity given $m(i)$; head--tail Bias Index; knockout: head$-$tail $\Delta_{\rm pseudo}\ge0.20$ (interval above 0), $|\Delta_{\rm placebo}|\le0.05$, $|\Delta$UAUC$_{\rm tail}|\le0.01$ & mean $p$ and residual $y-p$ by popularity group (top 10); head--tail Bias Index & ``familiarity'' only if Qwen is POSITIVE on Toys and Video Games (zero-shot, every seed) and Llama on Toys has the same sign\\
+\raggedright RQ6: prune noisy data? & ML-1M TEST UAUC after removing 25\% per class (random P1, most uncertain P2, most prior-congruent P3) against full data P0, seeds 0--4 & --- & P2$-$P1 is the one test: beats iff interval above 0, mean $>2$ SD of paired differences, 5/5 positive; equal iff interval within $\pm0.01$\\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,5 +1,15 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Gate-FT result (registered G9; `outputs/confrec/gateft/gate_ft.json`): **GATE_FT_PASS**
+
+TALLRec-style LoRA (r 16, alpha 32, lr 1e-4, 1 epoch, seeds 0, 1, 2; prompt V1; trained on the 23,348 pre-T DEV candidates, 46 minutes per seed
+at 8.5 examples/s) scored on the fresh CONFIRM users' post-T candidates (366 users with both classes): **UAUC per seed 0.7400, 0.7447, 0.7427; mean
+over seeds 0.7425, 95% user-bootstrap CI of the seed-averaged UAUC [0.7232, 0.7609]**, against the registered bar 0.65 (point estimate of the
+mean over seeds). Integrity holds for every run (no problems listed). Zero-shot context on the same rows (never gates): UAUC 0.5960 and a
+Platt slope of 0.092 (ECE 0.344), so the paired gain is dUAUC(LoRA − zero-shot) = +0.1465 [0.1242, 0.1686]. Consequences (Amendment 3
+section 0): the fine-tuned program (sections 1–3 and 5–9: the fine-tuned grid on the four rated domains, the pseudonym knockout, S6 pruning, the
+Llama replication, the permutation control and the nested method slot) now runs; the Gate-FT adapters are this program's ML-1M adapters.
+
 ## 2026-10-04 · Amendment 3 addendum 4 (S6 implementation readings; recorded before the TRAIN zero-shot pass and any pruned adapter)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_4.md` sha1 = b0bca2a7cfa269da58d25297bd9dfc3e48b43372 (class-size rounding, τ's quantile rule and the handling of

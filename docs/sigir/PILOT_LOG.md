@@ -2,6 +2,9 @@
 
 ## 2026-10-04 · Amendment 3 recorded (enables the training of the Gate-FT adapters; scoring still waits for the full record)
 
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md` sha1 = 7d855492a6f6486f964a2601c485b1b89b8d58ee (dated addendum 1: how the three
+implementers' open choices were resolved; part of Amendment 3, recorded before any adapter was trained or scored).
+
 `idea-stage/PREREG_AMENDMENT_3.md` sha1 = 4db1b62f30399c4d2d06fae205cfc0a52db8a419 (the fine-tuned program; section 0 of that file:
 training needs this line, scoring of any adapter or of the zero-shot panels of section 4 needs in addition the sha1 of every file of
 its FREEZE `core` list and of the `ftgrid_split.json` of each domain, to be written by

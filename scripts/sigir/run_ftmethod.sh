@@ -24,8 +24,9 @@
 #            changed since the check: refused)
 #   stage 3  (GPU) the prior-offset adapters o0-o2: seeds 0-2, standard mode, each with the recipe of its SFT comparator
 #            (micro-batch, accumulation and max_len of its train_config.json; effective batch 32), which the trainer
-#            checks again (--sft_adapter: TRAIN bytes, seed, recipe, examples); an adapter with train_config.json,
-#            offset.json and weights is never retrained
+#            checks again (--sft_adapter: TRAIN bytes, seed, recipe, examples); b in an AdamW group of its own at lr 1e-2
+#            (Amendment 3 addendum 3: the trainer's --b_lr default, so no flag is passed here); an adapter with
+#            train_config.json, offset.json and weights is never retrained
 #   stage 4  (GPU) like on eval.jsonl for o0-o2: pyes_scorer --lora exactly as for the SFT adapters; E1 (censored-2 share
 #            <= 0.5%, no overlength prompt, Yes+No mass >= 0.95): a failing run is moved to DIR.e1fail.<time> and rerun
 #            once; a second failure leaves DIR/FAILED_INTEGRITY (the seed is missing, never replaced)

@@ -1,20 +1,22 @@
 % =====================================================================================================================
-% Appendix (owner: results). Compact skeleton, measured at about 1.7 pages with every slot replaced by a typical cell (about 1.5 after
-% the cut order below). Same fill rules and file aliases as
-% sections/experiments.tex (sel, gate, gft, cpu, grid, aud, aud2q, aud2l, ko, prn, corr, mir, slot; plus diag = outputs/confrec/diag/diag.json,
-% the diagnosis battery, interpretive only). No URLs; no number is typed by hand: every slot is filled from a committed result file.
-% Sections: app:prompts, app:sensitivity, app:prereg, app:battery, app:pseudonym, app:repro, app:tables.
+% Appendix (owner: results; integrated 2026-10-04). Compact skeleton. Same fill rules and file aliases as sections/experiments.tex
+% (sel, gate, gft, cpu, grid, aud, aud2q, aud2l, ko, prn, corr, mir, slot). No URLs; no number is typed by hand: every slot is filled
+% from a committed result file.
+% Sections: app:prompts (= app:sensitivity), the per-panel tables (no heading; former app:tables, unreferenced), app:prereg
+% (= app:pseudonym = app:repro).
 % Every float is single-column with the specifier p (!tbp): a float with only t/b that is still queued at the end of the document is
 % lost, and so is a single-column float queued behind a deferred table*.
-% If the appendix exceeds its budget, cut in this order: the prose of app:battery, then tab:app-battery itself, tab:app-seeds (keep the
-% FT-C rows), the share and ECE rows of tab:app-llama, the baseline rows of tab:serving, tab:app-z2 only if the second-backbone clause of
-% claim admission is dropped from the paper.
+% Integration cuts (page budget, see INTEGRATION_NOTES.md): the diagnosis-battery section app:battery and its table tab:app-battery
+% (interpretive only, alias diag = outputs/confrec/diag/diag.json; 6 slots) were removed and are mentioned in one clause of the
+% Findings and of app:prereg; the "baselines' own margin" rows of tab:serving were removed because that comparison is not run
+% (tab:serving itself was then merged into tab:anatomy, block C, in experiments.tex)
+% (Amendment 3 section 11). Remaining cut order if a filled draft exceeds 9 pages: tab:app-seeds (keep the FT-C rows), the share and
+% ECE rows of tab:app-llama, tab:app-z2 only if the second-backbone clause of claim admission is dropped from the paper.
 % Fine-tuned items (LoRA columns, per-seed table, FT-C rows) exist only after a recorded GATE_FT_PASS (Amendment 3 section 0); blocks
 % between "% BRANCH-GATEFT-BEGIN" and "% BRANCH-GATEFT-END" are deleted otherwise.
 % =====================================================================================================================
-\section{Prompts}\label{app:prompts}
-All prompts are single-turn chat messages with thinking disabled; the answer is the first generated token, read as \texttt{Yes}
-or \texttt{No} by token id from the top-50 log-probabilities. \textbf{V0}, the registered prompt of the rated panels (user
+\section{Prompts, Registration and Reproducibility}\label{app:prompts}\label{app:sensitivity}
+All prompts are single-turn chat messages (thinking disabled). \textbf{V0}, the registered prompt of the rated panels (user
 message, no system message):
 \begin{quote}\ttfamily\scriptsize\raggedright
 You are an expert recommendation system.\\[1pt]
@@ -25,44 +27,38 @@ Title: \{title\}\\
 Description: \{first 200 characters, if present\}\\[1pt]
 Would this user like the candidate item? Answer with only Yes or No.
 \end{quote}
-Next-item panels use the same template with plain history lines (last 5 events) and the question \textsf{next} (``Will this user
-purchase the candidate item next?'') or \textsf{like}; their prompt stays frozen at V0. The dislike and paraphrase questions and the
-threshold question of V1 and V7 (``Will this user rate the candidate item 4 stars or higher (on a 1-5 scale)?'') were fixed in advance
-and are scored only after the zero-shot gate (Table~\ref{tab:app-bank}).
+Next-item panels use plain history lines (last 5 events) and the question \textsf{next} (``Will this user purchase the candidate
+item next?'') or \textsf{like}, frozen at V0. V1 and V7 (Table~\ref{tab:app-bank}) ask ``Will this user rate the candidate item 4 stars or higher (on a 1-5
+scale)?''; every variant's dislike and paraphrase strings were fixed in advance and are scored only after the zero-shot gate. Table~\ref{tab:app-sens} publishes all $7\times2$ development UAUCs of the remedy round: a
+variant is eligible if E1 holds on both panels and E2 holds, and $V^\ast$ is the eligible variant with the highest ML-1M UAUC,
+ties within 0.005 broken by the Toys UAUC and then by the simplicity order V0, V1, V5, V3, V4, V2, V7.
 
-\begin{table}[!tbp]
-\caption{Registered prompt-variant bank (rated panels; no variant uses collaborative statistics, the user's mean rating, few-shot
-examples, thinking or a digit readout; V6 was dropped before scoring).}
+\begin{table}[!htbp]
+\caption{Registered variant bank (no variant uses CF or popularity statistics, the user's mean rating, few-shot examples,
+thinking, or a verbalised or digit readout; V6 dropped before scoring).}
 \label{tab:app-bank}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llcl@{}}
 \toprule
 Id & Change relative to V0 & History & Basis\\
 \midrule
 V0 & none (registered control) & 10 & --\\
-V1 & threshold question family & 10 & registered label\\
+V1 & threshold question family & 10 & registered label; \citep{kang2023llmrating}\\
 V2 & same 10 events as liked ($>3$) and disliked ($\le3$) lists & 10 & TALLRec~\citep{bao2023tallrec}\\
 V3 & longer history & 20 & ReLLa~\citep{lin2024rella}\\
-V4 & history lines annotated with genres (ML-1M) or categories (Amazon, 80 characters) & 10 & rating-prediction prompts\\
-V5 & system message with role and the 1--5 scale; no persona line & 10 & rating-prediction prompts\\
+V4 & history lines annotated with genres (ML-1M) or categories (Amazon, 80 characters) & 10 & rating prediction~\citep{kang2023llmrating}\\
+V5 & system message with role and the 1--5 scale; no persona line & 10 & rating prediction~\citep{kang2023llmrating}\\
 V7 & V1 + V3 + V4 + V5 & 20 & combined\\
 \bottomrule
 \end{tabular}}
 \end{table}
-% MISSING_REF: Kang et al., 2023, "Do LLMs Understand User Preferences? Evaluating LLMs On User Rating Prediction" (basis of V1, V4, V5);
-% see paper_missing_refs.txt. Add the citation to the "Basis" column of the rows V1, V4, V5 once the entry exists.
 
-% ---------------------------------------------------------------------------------------------------------------------
-\section{Prompt Sensitivity of the Zero-Shot Channel}\label{app:sensitivity}
-Table~\ref{tab:app-sens} publishes all $7\times2$ development UAUCs of the registered remedy round (burned users, like question).
-
-\begin{table}[!tbp]
-\caption{Prompt sensitivity (G5): like-question UAUC of the seven variants on the two development panels (1,500 burned users each).
-E1: censored rows $\le0.5\%$, no overlength prompt, Yes$+$No mass $\ge0.95$; E2: Toys UAUC $\ge$ V0 $-0.010$; Tied: within 0.005 of the
-best eligible ML-1M UAUC.}
+\begin{table}[!htbp]
+\caption{Prompt sensitivity (G5): \textsf{like} UAUC on the development panels (1,500 burned users each). E2: Toys UAUC $\ge$
+V0 $-0.010$; Tied: within 0.005 of the best eligible ML-1M UAUC.}
 \label{tab:app-sens}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS: V0, V1, V2, V3, V4, V5, V7. COLUMNS (alias sel; table[V][panel]): UAUC (ml1m), UAUC (toys), E1 (both panels: yes/no),
 % E2, eligible, tied_with_max. Cell format: UAUC with three decimals (the user-cluster interval is in selection.json). Reference row:
 % cpu on the same burned users (prior-only item mean). V* = sel:v_star; a fix needs V* != V0 and a positive one-sided lower bound
@@ -86,91 +82,13 @@ Item mean (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior} & \DATANEEDED{cpu:UA
 \end{table}
 
 % ---------------------------------------------------------------------------------------------------------------------
-\section{Registered Amendments}\label{app:prereg}
-Each amendment was written before the data it governs were generated; the registration is a timestamped project document, not an entry
-in a public registry. \textbf{Amendment 1} (before any pilot data): scoring, resampling, tie and split conventions and the rebuild of the
-next-item panels. \textbf{Amendment 2} (after the pilot gate result, before further GPU jobs): the remedy round, Gate-FT, the plan of the
-next-item audit, the diagnosis battery and CPU artifact checks (interpretive and exploratory) and the forking-path rules (immutable
-constants 0.60, 0.1863 and 0.65; one prompt round; fixed unit roles; reference rows; claim admission; banned claims).
-\textbf{Amendment 3} (before any fine-tuned adapter existed; revised before any outcome statistic of one): data roles, the endpoint
-dictionary with the single primary hypothesis P1, the zero-shot panels, the knockout labels, the pruning arms, the nested method slot, the
-Llama replication, a within-item permutation control, the Holm families and the cut rules, all conditional on a recorded Gate-FT pass
-except the zero-shot panels.
+% Full per-panel tables (integration: the section heading and its one-line lead-in were removed for the page budget).
 
-% ---------------------------------------------------------------------------------------------------------------------
-\section{Diagnosis Battery}\label{app:battery}
-The battery ran on burned users (Qwen3-8B, fp16) after the freeze; its readings are interpretive only and cannot change any gate, bank,
-split or contingency (the star-permutation reading is re-tested in Table~\ref{tab:decomp}). Its extra strings are a no-user probe
-(``Is this movie widely considered good?''), a positive control (appends the true rating), an evidence injection (appends the
-prior-only item mean) and a digit readout (``What star rating from 1 to 5 \ldots{}?'').
-
-\begin{table}[!tbp]
-\caption{Diagnosis battery on burned users with the registered reading of each probe (interpretive only).}
-\label{tab:app-battery}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS and sources (alias diag = outputs/confrec/diag/diag.json): T0 diag:T0.spearman and diag:T0.like_rho; T1 diag:T1.UAUC; T2
-% diag:T2.transmission (ML-1M; and the first 500 Toys users); T3 diag:T3.dUAUC; star permutation diag:starperm.dUAUC and
-% diag:starperm.sd_tau; T4 diag:T4.UAUC (Llama-3.1-8B-Instruct, V0 like).
-\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}p{0.34\columnwidth}p{0.36\columnwidth}c@{}}
-\toprule
-Probe & Registered reading & Observed\\
-\midrule
-T0: no-user probe, Spearman with the item mean & $\ge0.5$ with a weak like-logit link: knowledge unused; $<0.3$: knowledge-limited & \DATANEEDED{diag:T0.spearman, like\_rho}\\
-T1: true rating appended & UAUC $<0.90$: readout broken & \DATANEEDED{diag:T1.UAUC}\\
-T2: item mean injected, transmission & $\ge0.8$: knowledge-limited; $<0.5$: readout-limited & \DATANEEDED{diag:T2.transmission}\\
-T3: digit minus yes/no, UAUC & $\ge+0.03$: format bottleneck & \DATANEEDED{diag:T3.dUAUC}\\
-Star permutation ($K{=}2$): $\Delta$UAUC, s.d. of $\tau_P$ & $|\Delta|<0.005$ and s.d. $<0.10$: ratings ignored & \DATANEEDED{diag:starperm.dUAUC, sd\_tau}\\
-T4: Llama-3.1-8B-Instruct, V0, UAUC & $\ge0.62$: exploratory only & \DATANEEDED{diag:T4.UAUC}\\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-% ---------------------------------------------------------------------------------------------------------------------
-\section{Pseudonym Knockout Protocol}\label{app:pseudonym}
-The knockout is a test-time intervention on fixed models (no retraining on pseudonyms). Beyond Section~\ref{sec:tools}: a single-pass,
-whole-word, case-insensitive substitution replaces every \texttt{store} string in the history and the candidate text; a stop-list
-excludes generic or placeholder stores and strings shorter than four characters or made of digits; pseudonyms are injective within a
-panel and never equal a real store string. The placebo maps every brand that the pseudonym arm maps, history-only brands included, to
-another real brand of the same tercile of category-wide brand review counts, with identical substituted key sets. Treated candidates are
-those whose store string occurs as a whole word in their own title (their share is reported); brand tokens beyond the store field are
-not substituted. UAUC is computed over all candidates (primary) and over treated candidates; a NULL label means that pseudonymisation
-destroys evidence in that domain.
-
-% ---------------------------------------------------------------------------------------------------------------------
-\section{Reproducibility Checklist}\label{app:repro}
-\begingroup\emergencystretch=3em
-\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item \emph{Models and scoring.} Qwen3-8B~\citep{yang2025qwen3}, Llama-3.1-8B-Instruct~\citep{grattafiori2024llama3}; vLLM~\citep{kwon2023vllm}
-  prefill, at most 4,096 tokens (3,072 in the next-item audit), 100-user chunks.
-\item \emph{Fine-tuning.} LoRA~\citep{hu2022lora} on the query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05,
-  learning rate $10^{-4}$, cosine decay, 3\% warm-up, one epoch, bf16, effective batch 32 ($8\times4$); at most 24,000 training examples per domain;
-  prompts above 1,024 tokens skipped and counted (a domain with more than 2\% such prompts trains with the 99.5th-percentile length
-  rounded up to 256); seeds 0, 1, 2 (pruning: five; permutation control: 0 and 1); every seed is reported, and a run that fails its
-  integrity checks twice is reported as missing.
-\item \emph{Data and hashes.} Training users are the first 1,500 users of each rated domain in seed-0 row order and evaluation users the
-  next ones (at most 3,000), disjoint by id. Pilot ML-1M panel 985494c7, pilot Toys panel 69252b48, registered V0 prompts on the pilot
-  ML-1M panel 12e83c4f (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s, rendered prompt-bank sha1, user-id list
-  sha1s and the time split $T_d$ of every domain from the freeze record and ftgrid\_split.json}.
-\item \emph{Software, compute, artifact.} \DATANEEDED{package versions and GPU model from each report.json; total GPU hours}. Prompts, panel
-  builders, scorers, analysis scripts and every result file are released with the anonymous artifact; every number in the paper is read
-  from a committed result file.
-\end{itemize}
-\endgroup
-
-% ---------------------------------------------------------------------------------------------------------------------
-\section{Full Per-Panel Tables}\label{app:tables}
-Table~\ref{tab:corrections} lists the corrections against their controls and Table~\ref{tab:slot} the optional method slot;
-Table~\ref{tab:app-llama} replicates the rated-panel endpoints with the second backbone; Table~\ref{tab:serving} gives selective serving
-by confidence; Table~\ref{tab:app-seeds} lists every seed of the fine-tuned grid and the permutation control; Table~\ref{tab:app-z2}
-compares the two backbones on the next-item panels.
-
-\begin{table}[!tbp]
-\caption{Corrections against their controls: raw UAUC and references (0), invariance checks on stored scores (1--2), priors on $S_d$
-(3--4), the two-view contrast, scored only after the zero-shot gate is passed (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain};
-Sports: validation events 1--1000.}
+\begin{table}[!htbp]
+\caption{Corrections against controls: references (0), invariance checks (1--2), priors on $S_d$ (3--4), two-view contrast after
+GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sports: VALID events 1--1000.}
 \label{tab:corrections}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS and sources. 0: one cell "raw / item mean / MF" = grid:UAUC; cpu:UAUC_item_mean_prior; cpu:UAUC_mf_temporal (zero-shot,
 % same rows). 1: corr:max_abs_dAUC_user (rated: max over users of |AUC after per-user Platt scaling minus before|);
 % corr:max_abs_dNDCG_event (sports: max over events of |NDCG@10 change| after the list softmax). 2: corr:dAUC_pooled_offset_removal
@@ -198,10 +116,10 @@ Sports: validation events 1--1000.}
 \end{table}
 
 % METHOD-SLOT-BEGIN (appendix)
-\begin{table}[!tbp]
+\begin{table}[!htbp]
 \caption{Nested method slot: TEST UAUC (seed mean, s.d.) and the paired difference offset minus stacking.}
 \label{tab:slot}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS: SFT with b = 0 (the main-grid adapters; context), post-hoc stacking, prior-offset LoRA, difference, references.
 % COLUMNS: four rated datasets (ML-1M, Toys, Video Games, Sports; a cell reads "not run" after the kill rule fires, in the order
 % ML-1M, Toys, Video Games, Sports). Alias slot: UAUC_mean_sd; d_offset_minus_stack (mean, seed range, interval). SFT row: grid:UAUC.
@@ -222,12 +140,12 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 \end{table}
 % METHOD-SLOT-END (appendix)
 
-\begin{table}[!tbp]
-\caption{Second backbone, Llama-3.1-8B-Instruct, ML-1M and Toys (key rows of Tables~\ref{tab:reliability} and~\ref{tab:decomp}, same
-cells; decomposition on $S_d$; P1 and the LoRA columns only after a Gate-FT pass; ``not run'' only under a registered cut rule).}
+\begin{table}[!htbp]
+\caption{Second backbone, Llama-3.1-8B-Instruct: key rows of Table~\ref{tab:reliability} (``not run'' only under a registered
+cut rule).}
 \label{tab:app-llama}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-% COLUMNS and ROW sources exactly as tab:reliability and tab:decomp (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, report root
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
+% COLUMNS and ROW sources exactly as tab:reliability (blocks A and B; block B is the former tab:decomp) (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, report root
 % outputs/confrec/ftgrid_llama/report (Amendment 3 sections 4 and 8); columns ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA. The zero-shot
 % columns exist in every Gate-FT branch (Z1), the LoRA columns and P1 only after GATE_FT_PASS. The reference rows repeat the
 % non-LLM values of the same panel and rows. Cut rule: Llama Toys fine-tuning may be cut on 2026-10-22. Platt slope, Brier skill and the
@@ -250,45 +168,16 @@ Errors in top tertile & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEE
 Non-prior share $1-\rho^2/r_8$ & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share}\\
 $\mathcal G=\Delta$UAUC(M2$-$M1) & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
 Star permutation $\Delta$UAUC & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC}\\
-Popularity link of $\hat\pi$ (partial $\rho$) & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+Popularity link of $\hat\pi$ (partial Spearman) & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
 P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--}\\
 \bottomrule
 \end{tabular}}
 \end{table}
-
-\begin{table}[!tbp]
-\caption{Selective serving (RQ3), Qwen3-8B, question \textsf{next} (estimates). Gain: NDCG@10 of the served half (50\% coverage) minus
-full coverage; share: served share of niche- minus mainstream-quintile users. Baselines: range of their own score margins, if exported.}
-\label{tab:serving}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: gain and share for the signals p_max and random, and for the baselines' own margin. COLUMNS: S1k, S10k, Toys, Home, Tools. Sources
-% (alias aud, letter D, D.signals[<signal>], signal in p_max, random): gain = D.gain_at_50_vs_full.ndcg10; share =
-% D.niche.niche_minus_mainstream_served_share (served share of user-popularity quintile 0 minus quintile 4 at 50% coverage). The signals
-% margin, neg_entropy and max_logit are registered outputs that stay in the released files. The baseline rows are NOT produced by
-% nextitem_audit.py (it has no baseline scores): fill them only if a baseline score export exists (range over the 8 baselines),
-% otherwise write "no score column" in every cell and say so in the text.
-\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-Signal & S1k & S10k & Toys & Home & Tools\\
-\midrule
-Gain, $p_{\max}$ & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
-Gain, random signal & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud:D.gain\_at\_50\_vs\_full}\\
-Gain, baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range}\\
-\midrule
-Share, $p_{\max}$ & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-Share, random signal & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share}\\
-Share, baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range} & \DATANEEDED{no score column, or range}\\
-\bottomrule
-\end{tabular}}
-\end{table}
-
 % BRANCH-GATEFT-BEGIN
-\begin{table}[!tbp]
-\caption{Every LoRA seed (Qwen3-8B) on TEST rows and the within-item label-permutation control (FT-C; ML-1M, seeds 0, 1). All rows: CAL
-$\cup$ TEST rows of the evaluation users. The ML-1M seeds equal those of Table~\ref{tab:gate-outcomes}.}
+\begin{table}[!htbp]
+\caption{Every LoRA seed (Qwen3-8B; all rows: CAL $\cup$ TEST) and the within-item label-permutation control (ML-1M).}
 \label{tab:app-seeds}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS: the four rated domains and three FT-C rows. COLUMNS (alias grid): UAUC and UAUC_all_rows per seed (E-A and its secondary (i); one cell
 % "seed 0 / seed 1 / seed 2", values only), item mean (ref.; cpu:UAUC_item_mean_prior). The Gate-FT seeds of ML-1M must equal
 % gft:UAUC_post_T_per_seed. FT-C rows (A3 section 9; adapters trained on labels permuted within each item, ML-1M TRAIN examples, permutation
@@ -312,20 +201,24 @@ ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minu
 \end{table}
 % BRANCH-GATEFT-END
 
-\begin{table}[!tbp]
-\caption{Second backbone on the next-item panels (RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on the same 2,000 events (1,001--3,000)
-of each domain, question \textsf{next}, prompt V0. Cells: Qwen / Llama.}
+\begin{table}[!htbp]
+\caption{Second backbone, next-item (RQ1--RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on events 1,001--3,000 of each domain,
+\textsf{next}, V0.}
 \label{tab:app-z2}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-% ROWS: the endpoints of sections B, D, E of the next-item audit (Amendment 3 section 4, Z2). COLUMNS: Sports, Toys, Home, Tools. Cell:
+\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
+% ROWS: key endpoints of sections B, C, D, E of the next-item audit (Amendment 3 section 4, Z2, as revised 2026-10-04: sections A-E,
+% Llama temperature fitted on the first 500 VALID events of each domain, Qwen on its 2,000). COLUMNS: Sports, Toys, Home, Tools. Cell:
 % the value for Qwen3-8B (alias aud2q) / for Llama-3.1-8B-Instruct (alias aud2l); the paired comparison is the pair of values on identical
 % events (same field paths as aud). An S3 or S5 finding meets the second-backbone clause of claim admission only if the sign of
-% delta_head (resp. of the head-minus-tail contrasts) agrees on at least 3 of 4 domains.
+% delta_head (resp. of the head-minus-tail contrasts) agrees on at least 3 of 4 domains; an S1 or S2 finding that rests on the next-item
+% panels needs the C rows (integration addition, 2026-10-04: two rows, 8 slots, field paths as in tab:anatomy).
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
  & Sports & Toys & Home & Tools\\
 \midrule
+$\mathrm{acc}_{\rm high}-\mathrm{acc}_{\rm low}$ ($p_{\max}$ tertiles) & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile}\\
+Top-1 errors in the top tertile & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile}\\
 $\Delta_{\rm head}$, \textsf{next} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head}\\
 Gini of exposure, \textsf{next} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure}\\
 NDCG@10 gain, confident half ($p_{\max}$) & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full}\\
@@ -335,3 +228,33 @@ Bias Index, head $-$ tail & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / 
 \bottomrule
 \end{tabular}}
 \end{table}
+
+% ---------------------------------------------------------------------------------------------------------------------
+\paragraph{Registered amendments}\label{app:prereg}\label{app:pseudonym}\label{app:repro}
+(timestamped project documents, not public-registry entries). Amendment 1, before any pilot data: scoring, resampling, tie and
+split conventions. Amendment 2, after the pilot gates: the remedy round, Gate-FT, the next-item audit, an interpretive diagnosis
+battery and the forking-path rules. Amendment 3, before any adapter existed: the fine-tuned programme (with two implementation addenda), all but its zero-shot
+panels conditional on a Gate-FT pass.
+
+\paragraph{Pseudonym knockout.}
+Every store string in history and candidate text is replaced in one case-insensitive pass over whole words; a stop-list
+excludes generic or placeholder stores and strings shorter than four characters or made of digits; pseudonyms are injective
+within a panel and never equal a real store string. The placebo maps every brand the pseudonym arm maps, history-only brands included,
+to another real brand of the same tercile of category-wide brand review counts. Treated candidates are those whose store string occurs
+as a whole word in their own title (share reported); brand tokens beyond the store field are not substituted. UAUC is computed over all
+candidates (primary) and over treated candidates; the registered seen/unseen-item split is not run. A model is NULL iff UAUC falls by more than 0.02 (real minus pseudonym) overall and in
+the tail (pseudonymisation destroys evidence); POSITIVE under the thresholds of Table~\ref{tab:rq}; NEGATIVE iff the interval of the
+pseudonym slope contains 0 and the head-minus-tail contrasts of pseudonym and placebo differ by at most 0.05; INDETERMINATE
+otherwise; INCOMPLETE if an input is missing.
+
+\paragraph{Reproducibility checklist.}
+\emph{Scoring:} vLLM prefill, at most 4,096 tokens (3,072 next-item), 100-user chunks. \emph{Fine-tuning:} LoRA~\citep{hu2022lora} on the
+query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05, learning rate $10^{-4}$, cosine decay, 3\% warm-up,
+one epoch, bf16, effective batch 32 ($8\times4$); at most 24,000 training examples per domain; prompts above 1,024 tokens skipped and
+counted (a domain with more than 2\% such prompts trains with the 99.5th-percentile length rounded up to 256); permutation control:
+seeds 0 and 1.
+\emph{Data and hashes:} pilot ML-1M panel 985494c7, pilot Toys panel 69252b48, registered V0 prompts on the pilot ML-1M panel 12e83c4f
+(first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s, rendered prompt-bank sha1, user-id list
+  sha1s and the time split $T_d$ of every domain from the freeze record and ftgrid\_split.json}. \emph{Software, compute, artefact:}
+\DATANEEDED{package versions and GPU model from each report.json; total GPU hours}. Prompts, panel builders, scorers, analysis scripts
+and every result file are released with the anonymous artefact; every number in the paper is read from a committed result file.

@@ -16,7 +16,9 @@ dataset (TEST rows; seeds 0-2 paired by seed; the conventions of src/confrec/ftg
                      CAL rows of the EVAL users (ftgrid_report.logit_fit) and applied to TEST: UAUC of its linear
                      predictor; the coefficients
   prior_offset_LoRA  the scorer's logit(Yes) - logit(No) of the prior-offset adapter o<k> (--method_dir/scores/o<k>/like)
-                     + b_k * z(q-hat), b_k from the adapter's offset.json, z with the recorded TRAIN constants
+                     + b_k * z(q-hat), b_k from the adapter's offset.json (b trained in its own AdamW group at lr 1e-2,
+                     Amendment 3 addendum 3; any other group makes the dataset INVALID), z with the recorded TRAIN
+                     constants
   difference         the endpoint dUAUC(prior-offset - post-hoc stacking): per seed and seed-averaged (mean over users
                      of the per-user AUC difference averaged over the seeds) with the user-bootstrap CI and p
                      (ftgrid_report.contrast_models: 2,000 resamples, seed 0, p = 2 min(P*(d <= 0), P*(d >= 0)) with
@@ -79,7 +81,9 @@ OPERATIONALIZATIONS = (
     "where q-hat is not finite, as in training",
     "prior-offset ranking score of seed k = like logit of o<k> + b_k z, b_k = offset.json b of the adapter that was "
     "scored (its weights sha1 equals the like pass's run.key, its standardisation constants and manifest sha1 equal "
-    "the current manifest's)",
+    "the current manifest's, and b was trained in its own AdamW group at lr 1e-2 with weight decay 0: Amendment 3 "
+    "addendum 3); training shifted the single answer token tok('Yes'), the test-time score adds b z to the scorer's "
+    "logit(Yes) - logit(No) over the yes / no id sets, as registered",
     "post-hoc stacking of seed k: ftgrid_report.logit_fit (logistic regression with intercept, Newton, features "
     "standardised on the fitting rows, L2 1e-4 on the slopes) of the label on [like logit of s<k>, z] over the CAL rows "
     "of the EVAL users (finite in every logit of the seeds present), applied to the TEST rows (linear predictor); "
@@ -91,12 +95,13 @@ OPERATIONALIZATIONS = (
     "endpoint = ftgrid_report.contrast_models({seed k: (prior-offset score, stacking predictor)}): per-seed dUAUC, the "
     "seed-averaged dUAUC with the 95% percentile CI over 2,000 user resamples (seed 0) and p = min(1, 2 min((#{d* <= 0} "
     "+ 1)/(B + 1), (#{d* >= 0} + 1)/(B + 1))); sigma_seed = SD (ddof 1) of the 3 per-seed values",
-    "pass = complete (3 seeds) and seed-averaged dUAUC >= 0.01 and ci_excludes_0 (the literal 'CI excludes 0') and "
-    "every per-seed dUAUC > 0 and mean > 2 sigma_seed; fewer than 150 users makes the endpoint descriptive (p and "
-    "ci_excludes_0 null, A3 section 1), which cannot pass: FAIL with that reason",
-    "status INCOMPLETE (a registered seed missing) and INVALID (an input problem: sha1, pairing or manifest mismatch) "
-    "are neither PASS nor FAIL: the slot step does not count them as failed and refuses every later dataset until "
-    "they are resolved",
+    "pass = complete (3 seeds) and seed-averaged dUAUC >= 0.01 and ci_excludes_0 (the literal 'CI excludes 0', kept by "
+    "the main-session decision of 2026-10-04) and every per-seed dUAUC > 0 and mean > 2 sigma_seed; fewer than 150 "
+    "users makes the endpoint descriptive (p and ci_excludes_0 null, A3 section 1), which cannot pass: FAIL with that "
+    "reason",
+    "status INCOMPLETE (a registered seed missing) and INVALID (an input problem: sha1, pairing, manifest or b-group "
+    "mismatch) are neither PASS nor FAIL: the slot step does not count them as failed and refuses every later dataset "
+    "until they are resolved (main-session decision of 2026-10-04)",
 )
 
 

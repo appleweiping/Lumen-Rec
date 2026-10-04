@@ -493,12 +493,13 @@ def test_the_trainer_is_last_token_trainer_with_the_offset_and_an_optional_b_gro
     ids, att, lab = lm_batch(torch)
     b = torch.nn.Parameter(torch.tensor(0.4))
 
-    class Base:                                                              # transformers.Trainer's two hooks used here
+    class Base:                                       # transformers.Trainer's two hooks used here (optimizer built once)
         def __init__(self, model=None, **kw):
             self.model, self.optimizer = model, None
 
         def create_optimizer(self):
-            self.optimizer = torch.optim.SGD(list(self.model.parameters()) + [b], lr=0.1)
+            if self.optimizer is None:
+                self.optimizer = torch.optim.SGD(list(self.model.parameters()) + [b], lr=0.1)
             return self.optimizer
 
     cls = tlo.prior_offset_trainer(Base, YES, b)
@@ -510,14 +511,96 @@ def test_the_trainer_is_last_token_trainer_with_the_offset_and_an_optional_b_gro
         assert torch.equal(tr.compute_loss(model, inputs, num_items_in_batch=6), offset_loss(model, ids, att, lab, b, z, 6))
         loss, out = tr.compute_loss(model, inputs, return_outputs=True)
         assert torch.equal(loss, offset_loss(model, ids, att, lab, b, z)) and out.logits.shape[1] == 2
-    assert [len(g["params"]) for g in tr.create_optimizer().param_groups] == [3]       # default: b with the LoRA group
-    tr2 = tlo.prior_offset_trainer(Base, YES, b, b_lr=0.05)(model=model)
+    for b_lr in (None, 0, 0.0):                                              # b with the LoRA group (--b_lr 0)
+        opt = tlo.prior_offset_trainer(Base, YES, b, b_lr)(model=model).create_optimizer()
+        assert [len(g["params"]) for g in opt.param_groups] == [3]
+        assert tlo.b_group_record(opt, b) == {"own_group": False, "lr": 0.1, "weight_decay": 0.0, "n_params_in_group": 3}
+    tr2 = tlo.prior_offset_trainer(Base, YES, b, b_lr=0.01)(model=model)
     tr2.create_optimizer()
+    tr2.create_optimizer()                                                   # the Trainer's second call: idempotent
     groups = tr2.optimizer.param_groups
     assert [len(g["params"]) for g in groups] == [2, 1] and groups[1]["params"][0] is b
-    assert (groups[1]["lr"], groups[1]["weight_decay"]) == (0.05, 0.0) and tlo.b_in_optimizer(tr2.optimizer, b)
+    assert (groups[1]["lr"], groups[1]["weight_decay"]) == (0.01, 0.0) and tlo.b_in_optimizer(tr2.optimizer, b)
+    assert tlo.b_group_record(tr2.optimizer, b) == {"own_group": True, "lr": 0.01, "weight_decay": 0.0,
+                                                    "n_params_in_group": 1}
     with pytest.raises(RuntimeError, match="appears 0 times"):
         tlo.own_param_group(torch.optim.SGD(model.parameters(), lr=0.1), b, 0.05)
+
+
+def test_b_lr_defaults_to_its_own_group_at_1e_2_and_0_keeps_the_lora_group():
+    """Amendment 3 addendum 3: --b_lr 1e-2 is the default (b's own group); 0 keeps the literal pre-addendum reading."""
+    a = tlo.parse_args(train_argv("t.jsonl", "sft"))
+    assert a.b_lr == tlo.B_LR == 0.01
+    assert tlo.intended_b_group(a) == {"own_group": True, "lr": 0.01, "weight_decay": 0.0}
+    a0 = tlo.parse_args(train_argv("t.jsonl", "sft", **{"--b_lr": "0"}))
+    assert tlo.intended_b_group(a0) == {"own_group": False, "lr": 1e-4, "weight_decay": 0.0}
+    assert tlo.b_group_problems({"own_group": True, "lr": 0.01, "weight_decay": 0.0, "n_params_in_group": 1}, a) == []
+    assert len(tlo.b_group_problems({"own_group": False, "lr": 1e-4, "weight_decay": 0.0}, a)) == 2
+    assert tlo.b_group_problems({"own_group": False, "lr": 1e-4, "weight_decay": 0.0}, a0) == []
+    with pytest.raises(SystemExit):
+        tlo.parse_args(train_argv("t.jsonl", "sft", **{"--b_lr": "-0.01"}))
+
+
+def toy_run(torch, b_lr, steps: int = 200, horizon: int = 730, batch: int = 8, seed: int = 0):
+    """The prior-offset trainer in a transformers-like loop: the recipe's AdamW (lr 1e-4, weight decay 0) over the
+    trainable parameters plus b, the create_optimizer override (called twice, as the Trainer does), and
+    transformers.get_cosine_schedule_with_warmup's multiplier (3% warmup) over an ML-1M-sized horizon (about 730
+    steps); `steps` steps of batches whose labels depend on z (Yes iff z > 0). Returns (b, b's group record, the
+    optimizer)."""
+    model = tiny_lm(torch)
+    b = torch.nn.Parameter(torch.zeros(()))
+    params = list(model.parameters()) + [b]               # as a PEFT model's named_parameters, b registered on it
+
+    class Base:
+        def __init__(self, model=None, **kw):
+            self.model, self.optimizer = model, None
+
+        def create_optimizer(self):
+            if self.optimizer is None:
+                self.optimizer = torch.optim.AdamW([{"params": params, "weight_decay": 0.0}], lr=1e-4)
+            return self.optimizer
+
+    tr = tlo.prior_offset_trainer(Base, YES, b, b_lr)(model=model)
+    tr.create_optimizer()                                 # train_lora_offset.train: built and checked before train()
+    rec = tlo.b_group_record(tr.optimizer, b)
+    opt = tr.create_optimizer()                           # the Trainer's own call inside train(): reused
+    warm = math.ceil(0.03 * horizon)
+
+    def mult(step):                                       # transformers.get_cosine_schedule_with_warmup
+        if step < warm:
+            return step / max(1, warm)
+        return max(0.0, 0.5 * (1.0 + math.cos(math.pi * (step - warm) / max(1, horizon - warm))))
+    sched = torch.optim.lr_scheduler.LambdaLR(opt, mult)  # one multiplier for every group
+    g = torch.Generator().manual_seed(seed)
+    for _ in range(steps):
+        ids = torch.randint(3, 12, (batch, 5), generator=g)
+        z = torch.randn(batch, generator=g)
+        ans = torch.where(z > 0, torch.tensor(YES), torch.tensor(NO))
+        ids[:, -1] = ans
+        lab = torch.full_like(ids, -100)
+        lab[:, -1] = ans
+        loss = tr.compute_loss(model, {"input_ids": ids, "attention_mask": torch.ones_like(ids), "labels": lab, "z": z})
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+        sched.step()
+    return float(b.detach()), rec, opt
+
+
+def test_b_moves_beyond_1_within_200_steps_in_its_own_group_and_not_in_the_lora_group():
+    """The optimizer arithmetic behind addendum 3: with labels planted on z, b in its own group (lr 1e-2, the same
+    cosine schedule and warmup) passes |b| = 1 within 200 steps; in the LoRA group (--b_lr 0, lr 1e-4) AdamW moves it
+    by at most about the summed learning rates (~0.02 here)."""
+    torch = torch_or_skip()
+    b_own, rec, opt = toy_run(torch, tlo.B_LR)
+    assert abs(b_own) > 1.0, b_own
+    assert rec == {"own_group": True, "lr": 0.01, "weight_decay": 0.0, "n_params_in_group": 1}
+    held = [grp for grp in opt.param_groups if any(p.ndim == 0 for p in grp["params"])]
+    assert len(held) == 1 and held[0]["initial_lr"] == rec["lr"] and len(held[0]["params"]) == 1    # the recorded lr
+    assert [grp["initial_lr"] for grp in opt.param_groups if grp is not held[0]] == [1e-4]
+    b_shared, rec0, _ = toy_run(torch, 0)
+    assert abs(b_shared) < 0.05, b_shared
+    assert rec0 == {"own_group": False, "lr": 1e-4, "weight_decay": 0.0, "n_params_in_group": 3}
 
 
 def test_b_is_a_zero_float32_parameter_registered_on_the_model():
@@ -613,6 +696,7 @@ def test_the_train_cli_has_train_lora_yesnos_options_and_defaults():
     assert set(mine) - set(theirs) == {"--qhat", "--manifest", "--sft_adapter", "--b_lr"}
     assert {s for s, a in mine.items() if a.required} == {"--train", "--model", "--out", "--qhat", "--manifest",
                                                           "--sft_adapter"}
+    assert mine["--b_lr"].default == tlo.B_LR == 0.01                       # Amendment 3 addendum 3
 
 
 def _function(path: Path, name: str) -> ast.FunctionDef:
@@ -682,7 +766,8 @@ def fake_stack(monkeypatch, torch) -> dict:
         def create_optimizer(self):                                          # as transformers: built once, then reused
             if self.optimizer is None:
                 seen["optimizers_built"] = seen.get("optimizers_built", 0) + 1
-                self.optimizer = torch.optim.SGD([p for p in self.model.parameters() if p.requires_grad], lr=1.0)
+                self.optimizer = torch.optim.SGD([p for p in self.model.parameters() if p.requires_grad],
+                                                 lr=self.args.learning_rate, weight_decay=0.0)
             return self.optimizer
 
         def train(self):
@@ -739,15 +824,26 @@ def test_main_learns_b_and_records_it_where_the_scorer_and_the_report_read_it(wo
     assert cfg["loss"] == "last_token_prior_offset" and cfg["n_examples"] == n and cfg["n_skipped_overlength"] == 0
     assert off_j["standardisation"] == read_json(q / "qhat_manifest.json")["standardisation"]
     assert off_j["qhat_manifest_sha1"] == sha1_file(q / "qhat_manifest.json") and off_j["yes_token_id"] == YES
-    assert off_j["seed"] == 0 and off_j["domain"] == "ml1m" and off_j["b_init"] == 0.0 and off_j["b_lr"] is None
+    assert off_j["seed"] == 0 and off_j["domain"] == "ml1m" and off_j["b_init"] == 0.0 and off_j["b_lr"] == 0.01
+    grp = off_j["b_group"]                                                   # the optimizer's group of b, recorded
+    assert {k: grp[k] for k in ("own_group", "lr", "weight_decay", "n_params_in_group")} == {
+        "own_group": True, "lr": 0.01, "weight_decay": 0.0, "n_params_in_group": 1}
+    assert grp["registered"] is True and grp["source"].startswith("the Trainer's optimizer") and grp["init"] == 0.0
+    assert cfg["prior_offset"]["b_group"] == grp and cfg["b_lr"] == 0.01
     assert read_json(out / "train_report.json")["n_examples"] == n
     ps.check_lora_variant(out, "V0", 10)                                    # pyes_scorer --lora reads it as an SFT adapter
     ps.check_lora_variant(out, "V0", 0)
+    out0 = tmp_path / "o0_b_lr_0"                                            # --b_lr 0: b stays in the LoRA group
+    off0 = tlo.main(train_argv(train, sft, out0, **{"--seed": "0", "--max_len": "4096", "--b_lr": "0",
+                                                     "--qhat": str(q / "train_qhat.csv.gz"),
+                                                     "--manifest": str(q / "qhat_manifest.json")}))
+    assert {k: off0["b_group"][k] for k in ("own_group", "lr", "registered")} == {"own_group": False, "lr": 1e-4,
+                                                                                  "registered": False}
     (sft / "train_config.json").write_text(json.dumps(sft_config(train, seed=0, max_len=4096, n_examples=n + 1)),
                                            encoding="utf-8")
     with pytest.raises(SystemExit, match="examples"):                       # the comparator's examples, before the model
         tlo.main(argv)
-    assert seen["model_loads"] == 1
+    assert seen["model_loads"] == 2
 
 
 # ---------------------------------------------------------------- 5. tiny-model Trainer runs (GPU server env)
@@ -814,15 +910,80 @@ def test_tiny_lora_with_b_fixed_at_zero_trains_exactly_like_sft(tmp_path, grad_a
 
 def test_tiny_lora_learns_b_in_the_optimizer_and_never_saves_it(tmp_path):
     pytest.importorskip("torch")
-    model, b, trainer, _ = _tiny_run(tmp_path / "run", offset=True, learn_b=True)
-    assert float(b) != 0.0 and tlo.b_in_optimizer(trainer.optimizer, b)
+    model, b, trainer, _ = _tiny_run(tmp_path / "run", offset=True, learn_b=True)          # --b_lr 0: the LoRA group
+    assert float(b.detach()) != 0.0 and tlo.b_in_optimizer(trainer.optimizer, b)
     model.save_pretrained(tmp_path / "adapter")
     keys = tlo.saved_adapter_keys(tmp_path / "adapter")
     assert keys and all("lora_" in k for k in keys) and not any(tlo.OFFSET_PARAM in k for k in keys)
-    _, b2, trainer2, _ = _tiny_run(tmp_path / "run2", offset=True, learn_b=True, b_lr=0.05)
-    groups = trainer2.optimizer.param_groups
-    own = [g for g in groups if any(p is b2 for p in g["params"])]
-    assert len(own) == 1 and len(own[0]["params"]) == 1 and own[0]["lr"] == pytest.approx(0.05)
+    _, b2, trainer2, _ = _tiny_run(tmp_path / "run2", offset=True, learn_b=True, b_lr=tlo.B_LR)
+    assert tlo.b_group_record(trainer2.optimizer, b2) == {"own_group": True, "lr": 0.01, "weight_decay": 0.0,
+                                                          "n_params_in_group": 1}
+    assert float(b2.detach()) != 0.0
+
+
+def _tiny_registered_run(tmp_path, b_lr, steps: int = 200, horizon: int = 730, bsz: int = 8):
+    """The tiny model under the registered TrainingArguments (train_lora_yesno.training_arguments: AdamW lr 1e-4, cosine,
+    3% warmup, one epoch; bf16 off on CPU), an epoch of `horizon` steps (ML-1M's size) stopped after `steps`, labels
+    planted on z (Yes iff z > 0). Returns (b, b's group as recorded before training, the trainer)."""
+    torch = pytest.importorskip("torch")
+    transformers = pytest.importorskip("transformers")
+    peft = pytest.importorskip("peft")
+    from src.confrec import train_lora_yesno as tl
+    cfg = transformers.Qwen3Config(vocab_size=300, hidden_size=64, intermediate_size=128, num_hidden_layers=2,
+                                   num_attention_heads=4, num_key_value_heads=2, head_dim=16, max_position_embeddings=128)
+    torch.manual_seed(0)
+    model = transformers.Qwen3ForCausalLM(cfg).train()
+    torch.manual_seed(0)
+    model = peft.get_peft_model(model, peft.LoraConfig(r=4, lora_alpha=8, lora_dropout=0.0, task_type="CAUSAL_LM",
+                                                       target_modules=["q_proj", "k_proj", "v_proj", "o_proj"]))
+    b = tlo.attach_prior_offset(model)
+
+    class Planted(torch.utils.data.Dataset):
+        def __init__(self, n):
+            g = torch.Generator().manual_seed(5)
+            self.items = []
+            for _ in range(n):
+                seq = torch.randint(10, 300, (6,), generator=g).tolist()
+                z = float(torch.randn((), generator=g))
+                seq[-1] = 7 if z > 0 else 8                                     # "Yes" 7 iff z > 0, else "No" 8
+                self.items.append({"input_ids": seq, "labels": [-100] * 5 + [seq[-1]], "z": z})
+
+        def __len__(self):
+            return len(self.items)
+
+        def __getitem__(self, i):
+            return self.items[i]
+
+    class Stop(transformers.TrainerCallback):
+        def on_step_end(self, args, state, control, **kw):
+            if state.global_step >= steps:
+                control.should_training_stop = True
+
+    ns = SimpleNamespace(out=str(tmp_path), bsz=bsz, grad_accum=1, epochs=1.0, lr=1e-4, seed=0)
+    kw = {**tl.training_arguments(ns), "bf16": False, "use_cpu": True, "disable_tqdm": True}
+    trainer = tlo.prior_offset_trainer(transformers.Trainer, 7, b, b_lr)(
+        model=model, args=transformers.TrainingArguments(**kw), train_dataset=Planted(horizon * bsz),
+        data_collator=lambda batch: tlo.collate_offset(batch, 0), callbacks=[Stop()])
+    trainer.create_optimizer()
+    rec = tlo.b_group_record(trainer.optimizer, b)
+    trainer.train()
+    assert trainer.state.global_step == steps
+    return b, rec, trainer
+
+
+def test_tiny_lora_b_passes_1_within_200_registered_steps_in_its_own_group_only(tmp_path):
+    """Amendment 3 addendum 3 on the real Trainer: under the registered schedule b's own AdamW group (lr 1e-2) carries
+    |b| past 1 within 200 steps when the labels depend on z; in the LoRA group (--b_lr 0, lr 1e-4) it cannot. The
+    group holding b is its own, with the recorded lr as the schedule's base (initial_lr)."""
+    pytest.importorskip("torch")
+    b, rec, trainer = _tiny_registered_run(tmp_path / "own", tlo.B_LR)
+    assert abs(float(b.detach())) > 1.0, float(b.detach())
+    assert rec == {"own_group": True, "lr": 0.01, "weight_decay": 0.0, "n_params_in_group": 1}
+    assert tlo.b_group_record(trainer.optimizer, b) == rec                   # after training: initial_lr, the same
+    assert {g.get("initial_lr") for g in trainer.optimizer.param_groups if len(g["params"]) > 1} == {1e-4}
+    b0, rec0, _ = _tiny_registered_run(tmp_path / "shared", 0)
+    assert abs(float(b0.detach())) < 0.05, float(b0.detach())
+    assert rec0["own_group"] is False and rec0["lr"] == 1e-4
 
 
 # ---------------------------------------------------------------- 6. the report
@@ -969,7 +1130,9 @@ def report_world(tmp: Path, n_users: int = 200, plant: str = "pass", flip_test: 
         sft_adapter = tmp / "sft_adapters" / f"s{k}"
         (adir / "offset.json").write_text(json.dumps(
             {"format": tlo.OFFSET_FORMAT, "seed": k, "domain": "ml1m", "b": bk, "standardisation": consts,
-             "qhat_manifest_sha1": man_sha, "sft_adapter": str(sft_adapter), "yes_token_id": 7}), encoding="utf-8")
+             "qhat_manifest_sha1": man_sha, "sft_adapter": str(sft_adapter), "yes_token_id": 7, "b_lr": tlo.B_LR,
+             "b_group": {"own_group": True, "lr": tlo.B_LR, "weight_decay": 0.0, "n_params_in_group": 1,
+                         "source": "the Trainer's optimizer, before the first step"}}), encoding="utf-8")
         (adir / "train_config.json").write_text(json.dumps({"seed": k, "prior_offset": {"b": bk}}), encoding="utf-8")
         write_run(sfts / f"s{k}" / "like", rows, L_s, eval_sha, sft_adapter)
         write_run(mdir / "scores" / f"o{k}" / "like", rows, L_o, eval_sha, adir,
@@ -991,6 +1154,8 @@ def test_report_from_files_planted_pass(tmp_path):
     slot = res["slot"]
     assert list(slot) == list(fm.ALIAS) and res["alias"] == "slot"
     assert slot["prior_offset_LoRA"]["b"] == {"o0": 0.3, "o1": 0.2, "o2": 0.1}
+    assert all(res["offsets"][f"o{k}"]["b_group"]["own_group"] is True and res["offsets"][f"o{k}"]["b_group"]["lr"]
+               == 0.01 for k in range(3))
     nu = {slot[p]["rows"]["n_users"] for p in ("SFT_b0", "post_hoc_stacking", "prior_offset_LoRA", "difference")}
     assert nu == {200} and slot["reference"]["rows"]["n_users"] == 200        # identical users in every block
     assert slot["SFT_b0"]["mean_over_seeds"]["est"] == pytest.approx(0.5, abs=0.1)
@@ -1054,6 +1219,12 @@ def test_report_input_problems_make_it_invalid(tmp_path):
     m["eval"]["sha1"] = "0" * 40
     (w.method / tlo.MANIFEST).write_text(json.dumps(m), encoding="utf-8")
     assert run_report(w)["decision"]["status"] == "INVALID"
+    w = report_world(tmp_path / "e")                                          # b trained in the LoRA group (--b_lr 0)
+    off = read_json(w.method / "adapters" / "o1" / "offset.json")
+    off["b_group"] = {"own_group": False, "lr": 1e-4, "weight_decay": 0.0}
+    (w.method / "adapters" / "o1" / "offset.json").write_text(json.dumps(off), encoding="utf-8")
+    res = run_report(w)
+    assert res["decision"]["status"] == "INVALID" and any("addendum 3" in p for p in res["input_checks"]["problems"])
 
 
 # ---------------------------------------------------------------- 6b. the slot across datasets
@@ -1306,8 +1477,11 @@ def audit(text: str) -> tuple[list, Counter]:
 
 
 def test_every_flag_the_script_passes_exists_in_the_real_argparse():
-    problems, count = audit(SCRIPT.read_text(encoding="utf-8"))
+    text = SCRIPT.read_text(encoding="utf-8")
+    problems, count = audit(text)
     assert not problems, "\n".join(problems)
+    trains = [flags for t, s, flags, _ in invocations(text) if (t, s) == ("src.confrec.train_lora_offset", "train")]
+    assert trains and all("--b_lr" not in {f for f, _ in flags} for flags in trains)   # addendum 3: the default applies
     for key, n in {("src.confrec.train_lora_offset", "qhat"): 1, ("src.confrec.train_lora_offset", "train"): 1,
                    ("src.confrec.ftmethod_report", "dataset"): 1, ("src.confrec.ftmethod_report", "slot"): 2,
                    ("src.confrec.pyes_scorer", None): 2, ("src.confrec.ftgrid_freeze", None): 4}.items():
@@ -1447,6 +1621,10 @@ def test_chain_layout_and_adapters(chain):
             assert cfg[key] == gt[key], (k, key)
         assert cfg["bsz"] * cfg["grad_accum"] == 32 and Path(cfg["train"]).name == "train.jsonl"
         assert off["b"] == pytest.approx(0.05 * (k + 1)) and off["seed"] == k and off["n_examples"] == n
+        assert off["b_lr"] == cfg["b_lr"] == 0.01                            # the trainer's default (addendum 3)
+        assert {x: off["b_group"][x] for x in ("own_group", "lr", "weight_decay", "registered")} == {
+            "own_group": True, "lr": 0.01, "weight_decay": 0.0, "registered": True}
+        assert off["b_group"]["source"].startswith("intended") and cfg["prior_offset"]["b_group"] == off["b_group"]
         assert off["qhat_manifest_sha1"] == sha1_file(m / "qhat_manifest.json")
         assert off["sft_adapter"] == f"{GRID_DRY}/_dry/gateft/adapters/s{k}" and off["dry_run"] is True
         d = m / "scores" / f"o{k}" / "like"

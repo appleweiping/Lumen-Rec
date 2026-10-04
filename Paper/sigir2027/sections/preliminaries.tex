@@ -1,57 +1,56 @@
-% Section "Setting and Notation" (owner: prelim). Definitions plus three proved statements; no empirical result appears here.
-% Labels provided: sec:prelim, eq:logit, eq:decomp, lem:invariance (= prop:monotone, kept as an alias), prop:itemdep,
-% prop:contam. Numbering follows acmart (theorem counter within the section).
-% The binormal statement (Proposition 3) is self-contained: delete everything between PROP3-BEGIN and PROP3-END if space is
-% needed (about a third of a page); nothing else in this file depends on it.
-% No macros are defined here; the section uses only the packages loaded by main.tex (amsmath, acmart's newtxmath).
+% Section "Setting and Notation" (owner: prelim; integrated 2026-10-04). Definitions plus two proved statements; no empirical
+% result appears here.
+% Labels provided: sec:prelim, eq:logit, eq:decomp, lem:invariance (= prop:monotone, kept as an alias), prop:itemdep.
+% Numbering follows acmart (theorem counter within the section).
+% Integration: the audit quantities follow PREREG_AMENDMENT_3 section 3 (non-prior share 1 - rho^2/r_8 with r_8 = the r_8c of the
+% amendment, an upper bound on the personal share; G = dUAUC(M2 - M1) of stackers cross-fitted on the TEST rows of S_d; M3 for the
+% CF reference). The binormal Proposition 3.3 (PROP3, label prop:contam) was cut for space; its text is kept in the integration
+% notes (INTEGRATION_NOTES.md) and can be restored verbatim if a page becomes free. Nothing else depended on it.
+% K denotes the number of donors of the swap prior (K = 8) only; the star permutation is described in words (two permutations).
 \section{Setting and Notation}
 \label{sec:prelim}
 
 \paragraph{Yes/no recommender and token confidence.}
-A pointwise yes/no recommender~\citep{bao2023tallrec,zhang2025collm} scores a user $u$ (history $H_u$) and a candidate
-item $i$ by asking a binary question $q$ about the pair (default $q=\textsf{like}$, ``Would this user like the candidate
-item?'') and reading the next-token distribution of a language model $f$, zero-shot or with a LoRA adapter fitted to
-yes/no labels. Its \emph{confidence} is the log-odds
+A pointwise yes/no recommender~\citep{bao2023tallrec,zhang2025collm} scores a user $u$ and a candidate item $i$ by asking a
+binary question $q$ about the pair (default $q=\textsf{like}$, ``Would this user like the candidate item?'') and reading the
+next-token distribution of a language model $f$, zero-shot or with a LoRA adapter fitted to yes/no labels. Its
+\emph{confidence} is the log-odds
 \begin{equation}\label{eq:logit}
   \ell(u,i)=\log P_f(\texttt{Yes}\mid x_q(u,i))-\log P_f(\texttt{No}\mid x_q(u,i)),
 \end{equation}
-with $\hat p=\sigma(\ell)$, where $P_f(\texttt{Yes}\mid x)$ sums the probabilities of the vocabulary ids whose decoded text,
-stripped and lower-cased, is ``yes'' (likewise \texttt{No}): the answer is read from token ids, not parsed from generated
-text, and candidates are ranked by $\ell$.
+where $P_f(\texttt{Yes}\mid x)$ sums the probabilities of the vocabulary ids whose decoded text, stripped and lower-cased, is
+``yes'' (likewise \texttt{No}); the answer is read from token ids, and candidates are ranked by $\ell$.
 
 \paragraph{Panels and metrics.}
 A \emph{unit} is a user (rated panels) or a prediction event (next-item panels) with candidate set $C_u$ and labels
-$y(u,i)\in\{0,1\}$. \emph{Rated panels} take the user's earlier rated items, shown with their ratings, as history and the
-user's own later rated items as candidates, with $y=1$ for rating $\ge4$, $y=0$ for rating $\le2$ and 3-star items dropped,
-so the label answers the question asked. With $c(x)=1,\tfrac12,0$ for $x>0,\,x=0,\,x<0$, the per-user AUC of a score $s$ and
-its mean over users with both classes (UAUC~\citep{zhang2025collm,zhang2024binllm}) are
+$y(u,i)\in\{0,1\}$. \emph{Rated panels} show the user's earlier ratings as history and use the user's own later rated items as
+candidates, labelled by whether the user liked them (Section~\ref{sec:protocol}). With
+$c(x)=1,\tfrac12,0$ for $x>0,\,x=0,\,x<0$, the per-user AUC of a score $s$ and its mean over users with both classes
+(UAUC~\citep{zhang2025collm,zhang2024binllm}) are
 \[
   \mathrm{AUC}_u(s)=\frac{1}{|C_u^+||C_u^-|}\sum_{i\in C_u^+}\sum_{j\in C_u^-}c(s_i-s_j),\quad
   \mathrm{UAUC}=\operatorname*{mean}_{u}\mathrm{AUC}_u .
 \]
-\emph{Same-candidate next-item panels} hold, per event, one positive and 100 negatives sampled by popularity, ranked
-identically by every system (this is not full-catalogue ranking).% TODO: cite Krichene and Rendle (sampled metrics) once in the bib
-\ If $a$ candidates score above the positive and $t$ tie with it, its tie-aware rank $R$ is uniform on
-$\{1{+}a,\dots,1{+}a{+}t\}$; HR@$k$ is the expectation of $\mathbf 1[R{\le}k]$, NDCG@$k$ of $\mathbf 1[R{\le}k]/\log_2(1{+}R)$
-and MRR of $1/R$ (we report $k{=}10$). Design decisions use \emph{dev} users only; every confirmatory estimate uses fresh
-\emph{confirmation} users, disjoint by id.
+\emph{Same-candidate next-item panels} hold, per event, one positive and 100 popularity-sampled negatives, ranked identically
+by every system; this is not full-catalogue ranking~\citep{krichene2020sampled}. If $a$ candidates score above the positive and
+$t$ tie with it, its tie-aware rank $R$ is uniform on $\{1{+}a,\dots,1{+}a{+}t\}$; HR@$k$, NDCG@$k$ and MRR are the expectations
+of $\mathbf 1[R{\le}k]$, $\mathbf 1[R{\le}k]/\log_2(1{+}R)$ and $1/R$ ($k{=}10$).
 
 \paragraph{Decomposition and audit quantities.}
 Let $\pi(i)=\mathbb E_D[\ell(D,i)]$ be the \emph{item prior}, the expected confidence for $i$ under the history of a donor
-$D$ who has not seen $i$ (estimated by the mean $\hat\pi(i)$ over $K$ donors). With the user offset
+$D$ who has not seen $i$ (estimated by the mean $\hat\pi(i)$ over $K=8$ donors). With the user offset
 $b_u=|C_u|^{-1}\sum_{i\in C_u}[\ell(u,i)-\pi(i)]$, the remainder is the \emph{personal evidence} $e$:
 \begin{equation}\label{eq:decomp}
   \ell(u,i)=b_u+\pi(i)+e(u,i),\qquad \textstyle\sum_{i\in C_u}e(u,i)=0,
 \end{equation}
-so within a unit only $\pi+e$ orders candidates. The audit reports three quantities. The \emph{personal share}
-$\mathcal S=1-\mathrm{cor}(\tilde\ell,\tilde\pi)^2$, with $\mathrm{cor}$ pooled over pairs after centring within units, is
-the fraction of within-unit variance of $\ell$ that no linear function of the prior explains; as $\hat\pi$ is noisy,
-$\mathrm{cor}^2$ is divided by the Spearman--Brown reliability $r_K=2r_{\rm sh}/(1{+}r_{\rm sh})$ from the correlation
-$r_{\rm sh}$ of two independent $K/2$-donor means. The \emph{information gain} $\mathcal G$ is the UAUC increase from adding
-$\ell$ to the prior-only item mean $m(i)$ (other users' mean rating of $i$ strictly before the candidate's timestamp) in a
-logistic stacker of $y$ on $(m,\ell)$, fitted on dev and evaluated on confirmation users. The \emph{popularity link}
-$\mathcal L$ is the Spearman correlation of $\pi(i)$ with $\log(1{+}n_i)$ ($n_i$: all-time event count), also partialled on
-$m(i)$.
+so within a unit only $\pi+e$ orders candidates; the \emph{personal share} $\mathcal S$ is the fraction of the within-unit
+variance of $\ell$ due to $e$. On rated panels the audit reports (estimators: Section~\ref{sec:tools}) the \emph{non-prior share}
+$1-\rho^2/r_8$, with $\rho$ the pooled within-unit correlation of $\ell$ and $\hat\pi$ and $r_8$ the Spearman--Brown
+reliability~\citep{spearman1910correlation,brown1910experimental} of the 8-donor mean, an upper bound on $\mathcal S$ (it also
+contains donor noise and user-by-prior interactions); the \emph{information gain} $\mathcal G$, the UAUC gain of cross-fitted
+stackers when $\hat e=\ell-\hat\pi$ is added to $\hat\pi$ and the prior-only item mean $m(i)$ (other users' mean rating of $i$
+before the candidate's timestamp), beside the analogous gain $\mathcal G_{\rm CF}$ of a matrix-factorisation residual over $m$;
+and the \emph{popularity link}, the partial Spearman correlation of $\ell$ and of $\hat\pi$ with log popularity given $m(i)$.
 
 \paragraph{Where can confidence change a ranking?}
 \begin{lemma}[Invariance]\label{lem:invariance}\label{prop:monotone}
@@ -64,11 +63,11 @@ $1{+}a{+}t/2$).
 \begin{proof}
 Strict monotonicity preserves each of $s_i>s_j$, $s_i=s_j$ and $s_i<s_j$.
 \end{proof}
-Temperature scaling~\citep{guo2017calibration}, Platt scaling with positive slope, removal of $b_u$ and the list softmax
-$w_i\propto\exp(\ell_i/T)$ are such maps: per-user calibration, however it is fitted, cannot change UAUC or within-unit
-NDCG, let alone improve them. The lemma fails for merely non-decreasing maps (isotonic regression): they never reverse a
-strict preference but create ties (a merged inverted pair gains $\frac12$, a merged correct pair loses $\frac12$), so a map
-fitted on the evaluation labels can raise AUC through ties alone.
+Temperature scaling~\citep{guo2017calibration}, Platt scaling~\citep{platt2000probabilities} with positive slope, removal of
+$b_u$ and the list softmax $w_i\propto\exp(\ell_i/T)$ are such maps: per-user calibration, however it is fitted, cannot change
+UAUC or within-unit NDCG, let alone improve them. The lemma fails for merely non-decreasing maps (isotonic
+regression~\citep{zadrozny2002transforming}): they never reverse a strict preference but create ties (a merged inverted pair
+gains $\frac12$, a merged correct pair loses $\frac12$), so a map fitted on the evaluation labels can raise AUC through ties alone.
 
 \begin{proposition}[Item-dependent corrections]\label{prop:itemdep}
 For continuous, strictly increasing $g_{u,i}$ and $s'_i=g_{u,i}(s_i)$, $i\in C_u$, the weak order of $C_u$ is unchanged for
@@ -79,33 +78,9 @@ every score vector if and only if all $g_{u,i}$ coincide.
 $g_{u,i}(x{+}\varepsilon)<g_{u,j}(x)$ for some $\varepsilon>0$, so $s_j=x$, $s_i=x{+}\varepsilon$ gives $s_i>s_j$ but
 $s'_i<s'_j$.
 \end{proof}
-Contextual~\citep{zhao2021calibrate} and batch calibration~\citep{zhou2024batch} subtract a prior estimated from
-content-free inputs or from the batch; for a binary question this is a constant of the unit and rank-inert.
-Candidate-conditioned priors (the no-history prompt, in the spirit of PMI scoring~\citep{holtzman2021surface}; the
-history-swap prior $\hat\pi$) and second readouts of the same pair (a mirrored or paraphrased question) are
-item-dependent: for $s'=s-\lambda b(i)$ a pair with $s_i>s_j$ is exchanged or tied exactly when
-$s_i-s_j\le\lambda(b_i-b_j)$. Reordering is not improving, so each such correction is compared with an equal-compute
-control. Across units the lemma is silent: per-user offsets change pooled AUC, thresholds and selective serving, and
-training changes $f$ itself.
-
-% PROP3-BEGIN
-\begin{proposition}[Item prior and discriminability]\label{prop:contam}
-Fix a unit; let $A(\cdot)$ be the population AUC, $\Pr(\text{a positive outscores a negative})$, of a score on its
-candidates (UAUC estimates its mean over units). Assume that, given $y$, $\pi(i)$ and $e(u,i)$ are independent Gaussians
-with class means $\nu_y,\mu_y$ (unit constants are absorbed in $b_u$) and class-independent standard deviations
-$\tau_\pi,\tau_e$. With $d_e=(\mu_1-\mu_0)/\tau_e$, $d_\pi=(\nu_1-\nu_0)/\tau_\pi$ and $\rho=\tau_\pi^2/(\tau_\pi^2+\tau_e^2)$,
-\[
-  A(\ell)=\Phi\Big(\tfrac{1}{\sqrt2}\big[\sqrt{1-\rho}\,d_e+\sqrt{\rho}\,d_\pi\big]\Big),\qquad A(e)=\Phi\big(d_e/\sqrt2\big).
-\]
-If the prior carries no label information ($d_\pi=0$), then $\Phi^{-1}(A(\ell))=\sqrt{1-\rho}\,\Phi^{-1}(A(e))$.
-\end{proposition}
-\begin{proof}
-For a positive $i$ and a negative $j$, $\ell(u,i)-\ell(u,j)$ ($b_u$ cancels) is Gaussian with mean
-$\tau_\pi d_\pi+\tau_e d_e$ and variance $2(\tau_\pi^2+\tau_e^2)$; divide, using
-$(\tau_\pi,\tau_e)/\sqrt{\tau_\pi^2+\tau_e^2}=(\sqrt\rho,\sqrt{1-\rho})$. Dropping $\pi$ gives $A(e)$.
-\end{proof}
-So a label-free item prior shrinks the sensitivity index of $e$ by $\sqrt{1-\rho}$, where $\rho$ is the item-prior share of
-within-class variance (the analogue of $1-\mathcal S$). Subtracting a noisy $\hat\pi=\pi+\eta$ ($\eta$ Gaussian, independent
-of $y$) leaves $e-\eta$, the case $d_\pi=0$ with $\tau_\eta$ for $\tau_\pi$, so the reliability of $\hat\pi$ must accompany any
-prior-subtraction result. The binormal form is a benchmark, not a claim about the data.
-% PROP3-END
+Contextual~\citep{zhao2021calibrate} and batch calibration~\citep{zhou2024batch} subtract a prior that, for a binary question,
+is a constant of the unit and rank-inert. Candidate-conditioned priors (the no-history prompt, in the spirit of PMI
+scoring~\citep{holtzman2021surface}; the swap prior $\hat\pi$) and second readouts of the pair (a mirrored or paraphrased
+question) are item-dependent: for $s'=s-\lambda b(i)$ a pair with $s_i>s_j$ is exchanged or tied exactly when
+$s_i-s_j\le\lambda(b_i-b_j)$. Reordering is not improving, so each such correction is compared with an equal-compute control.
+Across units the lemma is silent: per-user offsets change pooled AUC, thresholds and selective serving, and training changes $f$.

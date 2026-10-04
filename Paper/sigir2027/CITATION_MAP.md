@@ -184,3 +184,72 @@ None. Every requested paper resolved to a fetched CrossRef, venue or arXiv recor
 1. `ravikumar2026hallucinating`: replace with the CIKM'26 DOI once it is published.
 2. `ahn2025prin`: the COLM'25 acceptance comes only from the arXiv comment.
 3. `yan2026evirank`: no venue; keep it as a preprint.
+
+## Added 2026-10-04 (text integration)
+
+Verified on the web on 2026-10-04 by two verification passes (CrossRef JSON/BibTeX, publisher pages, JSTOR, PubMed, arXiv;
+DBLP and OpenReview were not used: anti-bot challenge). Only formatting was normalised (same rules as above). The first block is
+cited in the draft; the second block was verified for the MISSING_REF notes of the section writers but is **not cited** in the
+current draft (no room within the 9-page budget) and is kept so that it can be cited later without re-verification.
+
+**Counts after this addition: 92 entries in `references.bib` (70 + `kweon2024perk` + 21 added); 0 `[VERIFY]` entries.**
+
+### Cited in the draft
+
+| Key | Supports (one line) | Venue (year) | Source URL used |
+|---|---|---|---|
+| `kweon2024perk` | PerK (Top-Personalized-K): user-specific list size chosen by expected user utility from calibrated interaction probabilities (cited for list truncation by confidence). Key existed; row was missing. Pages 3388--3399 and DOI confirmed. | Proceedings of the ACM Web Conference 2024 (2024) | https://api.crossref.org/works/10.1145/3589334.3645417 |
+| `krichene2020sampled` | Sampled metrics are inconsistent with exact metrics and need not preserve the order of two systems (scope of same-candidate evaluation). | Proceedings of the 26th ACM SIGKDD Conference (KDD '20) (2020) | https://api.crossref.org/works/10.1145/3394486.3403226/transform/application/x-bibtex |
+| `holm1979simple` | Holm's sequentially rejective multiple test procedure (family-wise error control). No DOI resolves (10.2307/4615733 returns 404). | Scandinavian Journal of Statistics 6(2) (1979) | https://www.jstor.org/citation/ris/4615733 |
+| `platt2000probabilities` | Platt scaling: a fitted sigmoid maps classifier scores to probabilities. Chapter title as registered by the publisher. | Advances in Large-Margin Classifiers, MIT Press (2000) | https://api.crossref.org/works/10.7551/mitpress/1113.003.0008 |
+| `zadrozny2002transforming` | Calibration of ranking scores into probabilities, including isotonic regression (the isotonic attribution is from Niculescu-Mizil and Caruana, ICML 2005; full text not reached). | Proceedings of the 8th ACM SIGKDD Conference (KDD '02) (2002) | https://api.crossref.org/works/10.1145/775047.775151 |
+| `harper2015movielens` | MovieLens datasets: history, use and limitations (ML-1M panel). | ACM Transactions on Interactive Intelligent Systems 5(4) (2015; issue dated Jan 2016) | https://api.crossref.org/works/10.1145/2827872 |
+| `hou2024bridging` | Introduces the Amazon Reviews 2023 dataset (and BLaIR); arXiv v1. | arXiv preprint (2024) | https://arxiv.org/abs/2403.03952v1 |
+| `kang2023llmrating` | Zero-shot and few-shot LLMs trail interaction-trained models on rating prediction; fine-tuned LLMs match them with a fraction of the data (basis of prompt variants V1, V4, V5). | arXiv preprint (2023) | https://arxiv.org/bibtex/2305.06474 |
+| `koren2009matrix` | Biased matrix factorisation (user and item biases), the temporal MF reference row. | Computer 42(8) (2009) | https://api.crossref.org/works/10.1109/MC.2009.263 |
+| `ferraridacrema2019progress` | Neural recommenders often fail to beat simple, well-tuned non-neural baselines (need for non-LLM references). | Proceedings of the 13th ACM Conference on Recommender Systems (RecSys '19) (2019) | https://api.crossref.org/works/10.1145/3298689.3347058 |
+| `nogueira2020document` | Pointwise relevance ranking by the probability of the ``true'' token (IR counterpart of yes/no scoring). | Findings of EMNLP 2020 (2020) | https://aclanthology.org/2020.findings-emnlp.63/ |
+| `jones2021selective` | Confidence-based abstention can raise average accuracy while widening accuracy gaps between groups (niche-user coverage). | International Conference on Learning Representations (2021) | https://iclr.cc/virtual/2021/poster/3060 + arXiv 2010.14134 |
+| `spearman1910correlation` | Spearman--Brown prophecy formula (with `brown1910experimental`), used for the reliability $r_8$. | British Journal of Psychology 3(3) (1910) | https://api.crossref.org/works/10.1111/j.2044-8295.1910.tb00206.x |
+| `brown1910experimental` | Spearman--Brown prophecy formula (independent derivation). | British Journal of Psychology 3(3) (1910) | https://api.crossref.org/works/10.1111/j.2044-8295.1910.tb00207.x |
+
+### Verified, not cited in the current draft
+
+| Key | Supports (one line) | Venue (year) | Source URL used |
+|---|---|---|---|
+| `tian2023justask` | For RLHF models, verbalised confidence is often better calibrated than conditional token probabilities. | Proceedings of EMNLP 2023 (2023) | https://aclanthology.org/2023.emnlp-main.330/ |
+| `kapoor2024taught` | Fine-tuning on about 1,000 graded examples yields better calibrated uncertainty than prompting alone. | Advances in NeurIPS 37 (2024) | https://api.crossref.org/works/10.52202/079017-2729 |
+| `zhuang2024beyond` | Pointwise yes/no LLM rankers improve with fine-grained relevance labels. | NAACL 2024, Volume 2 (Short Papers) (2024) | https://aclanthology.org/2024.naacl-short.31/ |
+| `thomas2024searcher` | LLM relevance labels agree with searcher preferences about as well as human labellers. | Proceedings of SIGIR 2024 (2024) | https://api.crossref.org/works/10.1145/3626772.3657707 |
+| `lichtenberg2024popularity` | A prompted LLM recommender showed less popularity bias than traditional recommenders, without mitigation. | arXiv preprint; Gen-IR@SIGIR24 workshop per arXiv comments (2024) | https://arxiv.org/bibtex/2406.01285 |
+| `mozafari2026pretraining` | LLM popularity judgements align more with pretraining exposure than with page views. | Proceedings of SIGIR 2026 (2026) | https://api.crossref.org/works/10.1145/3805712.3809958 |
+| `ni2026popular` | LLM confidence tracks the popularity of the generated answer, even when wrong (title of arXiv v2). | arXiv preprint; EMNLP 2026 Main per arXiv comments (2026) | https://arxiv.org/bibtex/2505.17537 |
+| `hanley1982roc` | AUC as the probability that a positive is ranked above a negative, with its standard error (support for the binormal proposition, which was cut). | Radiology 143(1) (1982) | https://api.crossref.org/works/10.1148/radiology.143.1.7063747 |
+
+### Discrepancies found in this pass
+
+| Key | Notes said | Fetched record says | Action |
+|---|---|---|---|
+| `platt2000probabilities` | "Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods", 1999 | MIT Press chapter "Probabilities for SV Machines", pp. 61--74, book year 2000; the familiar title is the 1999 preprint, which could not be fetched | Publisher record used |
+| `hou2024bridging` | arXiv 2403.03952 | v1 (2024) introduces Amazon Reviews 2023; v2 (Apr 2026) adds a subtitle and an author and is published at ACL 2026 (DOI 10.18653/v1/2026.acl-long.147, pp. 3251--3265) | v1 cited (it introduces the dataset); switching to the ACL 2026 record is an open decision |
+| `harper2015movielens` | TiiS 5(4), 2015 | online Dec 2015, issue Jan 2016; article 19 | key keeps 2015; pages written 19:1--19:19 as the GroupLens README asks |
+| `holm1979simple` | -- | no working DOI | JSTOR stable URL |
+| `kapoor2024taught` | "... Do Not Know" | "... Don't Know"; CrossRef lists "Andrew Wilson", the PDF byline "Andrew Gordon Wilson" | published title used |
+| `mozafari2026pretraining` | "... in LLMs", SIGIR 2026 short | "... in Large Language Models"; short-paper status not confirmed (ACM page 403) | published title used |
+| `ni2026popular` | arXiv 2505.17537 (2025) | v1 (2025) had a different title; v2 (2026) carries this title | arXiv year 2026 |
+| `nogueira2020document` | "monoT5" | the paper says "T5 reranker" | the name monoT5 is not used in the draft |
+| `jones2021selective` | -- | no DOI or pages; OpenReview not fetched | URL of the iclr.cc poster page |
+
+### Check of the G9 anchor (no new entry)
+
+`zhang2025collm` (CoLLM, TKDE 2025; author order Zhang, Feng, Zhang, Bao, Wang, He as in the existing entry), Table 2 read from
+arXiv HTML v1--v3: ML-1M UAUC of MF 0.6361, TALLRec 0.6818 and ICL 0.5268 (AUC 0.6482, 0.7097, 0.5320). Labels: ratings above 3
+are positive and all others, 3 stars included, negative; split by timestamp over the last 20 months (10 / 5 / 5 for
+train / validation / test). This supports the protocol text "published ML-1M UAUCs of MF (0.636) and fine-tuned TALLRec (0.682)
+under harder labels (3 stars as negatives)".
+
+### Not cited (cannot be verified)
+
+- The C-CRP paper and the benchmark protocol it defines (MISSING_REF of the related-work and results writers): no anonymous or public
+  record can be cited without de-anonymising; the draft names C-CRP and "an existing same-candidate benchmark protocol" in the third
+  person only.

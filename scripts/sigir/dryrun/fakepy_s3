@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# PYTHON for the sandbox runs of the REAL scripts/sigir/run_gatefix_stage3.sh (run_s3.sh). Exactly fakepy (the fake
+# scorer, fake_gatefix, fake_bcp, the probes it answers; every call it handles is appended to $SIMLOG), except
+#   -m src.confrec.gatefix_stage3   -> fake_stage3.py (the G7 scale constants re-derived for the sandbox; logged here)
+DRY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ "${1:-} ${2:-}" = "-m src.confrec.gatefix_stage3" ]; then
+  echo "$*" >> "${SIMLOG:-/dev/null}"
+  REALPY="${REALPY:-$(command -v python || command -v python3)}"
+  shift 2
+  exec "$REALPY" "$DRY/fake_stage3.py" "$@"
+fi
+exec bash "$DRY/fakepy" "$@"

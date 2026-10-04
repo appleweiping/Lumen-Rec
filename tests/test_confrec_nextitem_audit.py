@@ -1,14 +1,16 @@
 """Tests of the full-scale next-item audit (src/confrec/nextitem_audit.py, scripts/sigir/export_ref_exposure.py).
 
-WIP name on purpose (does not match the glob test_confrec_*.py); the orchestrator renames it later.
 Synthetic fixtures with known answers for every section of docs/sigir/NEXTITEM_AUDIT_SPEC.md; every bootstrap engine is
-checked against stats / metrics / pilot_mirror on explicit resamples.
+checked against stats / metrics / pilot_mirror on explicit resamples. The Z2 tests (second backbone on a subsample,
+Amendment 3 section 4: `run --segments single`, `--test_role` / `--valid_role`, `restrict`) and the pin of the default
+output (a digest of the pre-Z2 module's output on the existing fixtures) are at the end of the end-to-end section.
 """
 from __future__ import annotations
 
 import ast
 import csv
 import gzip
+import hashlib
 import importlib.util
 import json
 import math
@@ -31,16 +33,6 @@ def _load_export():
 
 
 # ============================================================================================ synthetic fixtures
-_GROUP_CACHE: dict = {}
-
-
-def _by_group(item_group, g):
-    key = (id(item_group), g)
-    if key not in _GROUP_CACHE:
-        _GROUP_CACHE[key] = np.flatnonzero(item_group == g)
-    return _GROUP_CACHE[key]
-
-
 def synth_arrays(E=400, N=21, seed=0, signal=2.0, head_bias=0.0, sure_spread=0.6, grid=1 / 16, p_head=0.6, p_mid=0.25):
     """(L, groups, pos, sure): logit = sure_e * (z + signal * [c == pos]) + head_bias * [head], on a coarse grid (ties)."""
     rng = np.random.default_rng(seed)
@@ -72,11 +64,12 @@ def make_panel_rows(E, N, seed, pos, grp, n_items=None, hist_max=6, domain="d", 
     rng = np.random.default_rng(seed + 11)
     n_items = n_items or max(60, E * N // 3)
     item_group = rng.choice(3, n_items, p=[0.6, 0.25, 0.15])
+    by_group = [np.flatnonzero(item_group == g) for g in range(3)]      # per call: fixtures never depend on test order
     rows = []
     for e in range(E):
         cand, used = [], set()
         for c in range(N):
-            pool = _by_group(item_group, int(grp[e, c]))
+            pool = by_group[int(grp[e, c])]
             j = int(pool[rng.integers(0, len(pool))])
             for _ in range(60):
                 if j not in used:
@@ -203,6 +196,24 @@ def run_sections(qv, profile=None, n_boot=60, n_bias=40, m=None):
            "E": na.sec_E(batch, boot, qv, m, n_bias)}
     batch.run()
     return na.resolve(out)
+
+
+def canonical_digest(doc) -> str:
+    """sha256 of a run / summary document made comparable across runs and machines: `timing_s` dropped, the values of
+    `inputs` (temporary paths) nulled with their keys kept, every float rounded to 6 decimals (0.0 for -0.0), key ORDER and
+    int / float TYPES kept (so a changed layout, a new key or a changed type changes the digest)."""
+    def canon(x):
+        if isinstance(x, dict):
+            return {k: canon(v) for k, v in x.items() if k != "timing_s"}
+        if isinstance(x, list):
+            return [canon(v) for v in x]
+        if isinstance(x, float):
+            return None if math.isnan(x) else round(x, 6) + 0.0
+        return x
+    doc = dict(doc)
+    if isinstance(doc.get("inputs"), dict):
+        doc["inputs"] = {k: None for k in doc["inputs"]}
+    return hashlib.sha256(json.dumps(canon(doc), allow_nan=False).encode("utf-8")).hexdigest()
 
 
 # =============================================================================================== bootstrap engines

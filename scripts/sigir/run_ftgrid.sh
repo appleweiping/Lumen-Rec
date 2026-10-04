@@ -8,7 +8,7 @@
 #          VARIANT   default gate_ft_prompt of outputs/confrec/gatefix/dev/selection.json; any other value is refused
 #                    (section 2: no other variant)
 #          STAGES    comma list of 0-6, all (= 0-6) and perm (default all; perm is never implied)
-#          KNOCKOUT_SPORTS=1  also the Sports knockout (section 5: run unless cut at the 2026-10-22 checkpoint)
+#          KNOCKOUT_SPORTS=0  cut the Sports knockout (section 5: it runs unless cut at the 2026-10-22 checkpoint; default 1)
 #          PYTHON    interpreter (skips the conda activation);  DRY_RUN=1  CPU rehearsal, see below
 #   stage 0  data (CPU): panel_all = the h20 rated panel of D (ml1m / toys: the frozen gate-fix DEV panel followed by
 #            the CONFIRM panel, byte for byte, both checked against the gate-fix manifest; games / sports: all eligible
@@ -25,14 +25,14 @@
 #            like pass is stage 3's (FT-C's endpoints are like-pass UAUCs)
 #   stage 2  freeze check `ftgrid_freeze --check --stage core` (section 0: the bound code and the four registered
 #            ftgrid_split.json; under another OUT_ROOT also that root's split). Success writes OUT_ROOT/freeze/D.core.ok
-#            (the printed record). Stages 3-5 refuse (exit 4) unless stage 2 passed in this run or that marker equals
+#            (the printed record). Stages 3-6 refuse (exit 4) unless stage 2 passed in this run or that marker equals
 #            the current record (a bound file or split changed since the check: refused).
 #   stage 3  like on panels/D/eval.jsonl (CAL and TEST rows) for zeroshot, s0-s2 and p0 / p1 once trained. ML-1M on
 #            the Gate-FT backbone: an identical earlier pass (zeroshot: gate-fix stage 2, else Gate-FT stage C; s0-s2:
 #            Gate-FT stage C) is reused when pyes_scorer accepts its report.json as this run (section 4)
 #   stage 4  decomposition arms on eval_sd_test.jsonl for zeroshot and s0-s2: swap (--swap_k 8), nohist (--hist_len 0),
 #            starperm0, starperm1
-#   stage 5  knockout arms pseudo, placebo (toys, games; sports with KNOCKOUT_SPORTS=1) for zeroshot and s0-s2
+#   stage 5  knockout arms pseudo, placebo (toys, games; sports unless KNOCKOUT_SPORTS=0) for zeroshot and s0-s2
 #   stage 6  ftgrid_report -> OUT_ROOT/report/D.json (and its tables)
 # Conditionality (section 0): adapters, their scoring and the knockout run only after outputs/confrec/gateft/gate_ft.json
 # records GATE_FT_PASS; otherwise only the zero-shot panels of section 4 run (like + decomposition arms). Any scoring also
@@ -117,7 +117,7 @@ else
   N_TRAIN=1500; N_EVAL=3000; S_MAX=1000; N_BOOT=2000     # A3 section 1 / 3 constants
 fi
 KO=0                                 # section 5 knockout domain
-if [ "$D" = toys ] || [ "$D" = games ] || { [ "$D" = sports ] && [ "${KNOCKOUT_SPORTS:-0}" = 1 ]; }; then KO=1; fi
+if [ "$D" = toys ] || [ "$D" = games ] || { [ "$D" = sports ] && [ "${KNOCKOUT_SPORTS:-1}" = 1 ]; }; then KO=1; fi
 ADOPT=""
 FREEZE_OK=0
 
@@ -144,7 +144,8 @@ step() {
   mkdir -p "$DONE"; touch "$mark"
 }
 adapter_done() { [ -f "$1/train_config.json" ] && ls "$1"/adapter_model.* >/dev/null 2>&1; }
-# e1_ok DIR: section 2 / E1 on the main prompts of a finished scorer run
+# e1_ok DIR: section 2 / E1 of a finished scorer run: censored-2 share <= 0.5%, no overlength prompt, mean Yes+No mass
+# >= 0.95 on the main prompts; a swap run's donor prompts also need the censored-2 share and no overlength prompt
 e1_ok() {
   "$PY" - "$1/report.json" <<'PY'
 import json, sys
@@ -152,6 +153,10 @@ r = json.load(open(sys.argv[1], encoding="utf-8"))
 n = int(r["n_main_prompts"])
 ok = n > 0 and int(r["censored_main"].get("2", 0)) <= 0.005 * n and int(r["n_overlength"]) == 0 \
     and float(r["mean_yes_no_mass"]) >= 0.95
+if "censored_swap" in r:
+    ns = int(r["swap_prompts"])
+    ok = ok and int(r["censored_swap"].get("2", 0)) <= 0.005 * ns and int(r["censored_swap"].get("3", 0)) == 0 \
+        and int(r.get("swap_n_overlength") or 0) == 0
 sys.exit(0 if ok else 1)
 PY
 }
@@ -560,13 +565,11 @@ def scorer(argv) -> None:
 
 
 def train_parser():
-    """(the module, its real ArgumentParser): main() is stopped at parse_args. Without torch (a CPU box) stand-in
-    modules let the module import; its parser and panel check need none of it."""
-    try:
-        import torch  # noqa: F401
-    except ImportError:
-        for name in ("torch", "torch.utils", "torch.utils.data", "torch.nn", "torch.nn.functional"):
-            sys.modules.setdefault(name, types.ModuleType(name))
+    """(the module, its real ArgumentParser): main() is stopped at parse_args. torch is never imported here: stand-in
+    modules let the module import (its parser and panel check need none of torch; this process trains nothing)."""
+    for name in ("torch", "torch.utils", "torch.utils.data", "torch.nn", "torch.nn.functional"):
+        sys.modules.setdefault(name, types.ModuleType(name))
+    if not hasattr(sys.modules["torch.utils.data"], "Dataset"):
         sys.modules["torch.utils.data"].Dataset = object
     from src.confrec import train_lora_yesno as tl
     got = {}
@@ -745,7 +748,7 @@ if want 2; then
   fi
   if ! freeze_check core; then
     echo "stage 2: the full Amendment-3 record is not in $PILOT_LOG; record the lines of" \
-      "'python -m src.confrec.ftgrid_freeze --print --stage core' and rerun (data and adapters are kept)" >&2
+      "'python -m src.confrec.ftgrid_freeze --print --stage core ${CORE_SPLITS[*]}' and rerun (data and adapters are kept)" >&2
     exit 4
   fi
   REC=$("$PY" -m src.confrec.ftgrid_freeze --print --stage core "${CORE_SPLITS[@]}")
@@ -782,7 +785,7 @@ fi
 if want 5; then
   echo "== stage 5: knockout arms ($D)"
   if [ "$KO" != 1 ]; then
-    echo "[stage 5] not run: no knockout on $D (section 5: toys, games; sports with KNOCKOUT_SPORTS=1)"
+    echo "[stage 5] not run: no knockout on $D (section 5: toys, games; sports only if KNOCKOUT_SPORTS=0 cut it)"
   elif [ "$FT_OK" != 1 ]; then
     echo "[stage 5] not run: Gate-FT decision $GATE_DECISION (section 0: section 5 runs only after GATE_FT_PASS)"
   else
@@ -798,12 +801,13 @@ fi
 # ================= stage 6: report (CPU) =================
 if want 6; then
   echo "== stage 6: report ($D)"
+  require_freeze 6 || exit 4                         # the report is bound code too: it runs on the recorded files only
   MLIST=$(like_models | tr ' ' ',')
   RDEPS=("$SPLIT" src/confrec/ftgrid_report.py)
   for f in "$S"/*/*/report.json; do if [ -f "$f" ]; then RDEPS+=("$f"); fi; done
   mkdir -p "$(dirname "$REP")"
   step "$REP" "${RDEPS[@]}" -- \
-    "$PY" -m src.confrec.ftgrid_report --domain "$D" --split "$SPLIT" --panels "$P" --scores_root "$S" \
+    "$PY" -m src.confrec.ftgrid_report --domain "$D" --split "$SPLIT" --panels "$P" --scores_root "$OUT_ROOT/scores" \
       --models "$MLIST" --raw "$RAW" --out "$REP" --n_boot "$N_BOOT" --seed 0
 fi
 echo "run_ftgrid $D: done (stages:$STAGES)"

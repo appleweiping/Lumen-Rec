@@ -23,12 +23,15 @@ Endpoints (A3 section 3; TEST rows unless stated; regimes ZS = zeroshot, FT = s0
   E-A  UAUC per model and seed and the seed mean, with the references q-hat (shrunk, k = 5), all-time popularity, the
        temporal biased MF (forensics.cf_references with the explicit cutoff T of the split, evaluated on TEST rows) and its
        personal residual p_u.q_i (= MF - mu - b_u - b_i; mu is a constant, so every per-user AUC is that of
-       MF - b_u - b_i); secondary: all-rows UAUC (CAL u TEST) and the seen / unseen split (item in train.jsonl).
+       MF - b_u - b_i); the lemma checks (reported, not tested): max_abs_dAUC_user under the CAL-fit Platt map and the
+       user-centred logit, dAUC_pooled_offset_removal; secondary: all-rows UAUC (CAL u TEST) and the seen / unseen split
+       (item in train.jsonl).
   E-B  dUAUC_s = UAUC(FT seed s) - UAUC(ZS), each seed and the mean over seeds with its CI and p, sigma_seed.
   E-C  global Platt map fit on ALL CAL rows of the EVAL users, applied to TEST: ECE (metrics.ece, 10 adaptive bins),
        Brier, Brier skill over the CAL base rate, Platt slope, the 10-bin reliability table; the per-user top-k error
        anatomy (c_u = midpoint of the k-th and (k+1)-th largest TEST logits, margin tertiles over all TEST pairs).
-  E-D  on S_d's TEST rows: UAUC of pi, L_nohist, e-hat = L - pi and L; r_c, r8c, rho, item-prior and non-prior shares
+  E-D  on S_d's TEST rows: UAUC of pi, L_nohist, e-hat = L - pi and L; the corrections dUAUC_nohist_minus_raw =
+       UAUC(L - L_nohist) - UAUC(L) and dUAUC_evidence_minus_raw = UAUC(e-hat) - UAUC(L); r_c, r8c, rho, item-prior and non-prior shares
        (re-estimated in every user resample, unclipped, 'uninterpretable' when r8c < 0.7); cross-fitted stackers M0-M3,
        G = dUAUC(M2 - M1), G_CF = dUAUC(M3 - M0), G/G_CF only when G_CF's CI excludes 0; star permutation.
   E-E  partial Spearman (forensics.partial_spearman, the popularity_partial estimator) of L and pi with log1p(all-time
@@ -56,7 +59,7 @@ import numpy as np
 from src.confrec import forensics as fx
 from src.confrec import pilot_pseudonym as pps
 from src.confrec.metrics import auroc, bias_index, brier, ece, reliability_bins
-from src.confrec.stats import percentile_ci, platt_fit, rank_bins, sigmoid, strict_json, user_halves
+from src.confrec.stats import percentile_ci, platt_fit, rank_bins, rankdata_avg, sigmoid, strict_json, user_halves
 
 NAN = float("nan")
 SPEC = "idea-stage/PREREG_AMENDMENT_3.md sections 1, 3, 5, 9, 11; docs/sigir/FTGRID_IMPL_SPEC.md"
@@ -117,6 +120,10 @@ OPERATIONALIZATIONS = (
     "non-candidate events strictly before the user's first candidate; cold pairs keep residual 0 on the identical rows, "
     "the warm-pair residual UAUC is the forensics convention (secondary)",
     "seen = the candidate's item occurs among the candidates of train.jsonl (after the cap)",
+    "E-A lemma checks (reported, not tested): on the regime's TEST rows, max over users of |AUC_u(sigmoid(a L + b)) - "
+    "AUC_u(L)| with the E-C CAL-fit Platt map and of |AUC_u(L - the user's mean over those rows) - AUC_u(L)|; "
+    "max_abs_dAUC_user = the larger; dAUC_pooled_offset_removal = pooled AUC (metrics.auroc over every TEST row) after "
+    "minus before removing the user means",
     "E-C: Platt = stats.platt_fit on every CAL row of the regime's rows; Brier skill = 1 - Brier / Brier(CAL base rate) on "
     "TEST; reliability: the 10 equal-mass bins of the adaptive ECE (sum of share x |gap| = ECE) and metrics."
     "reliability_bins with 10 equal-width bins; anatomy on TEST rows of users with both classes: k = TEST likes, c_u = "
@@ -249,12 +256,23 @@ class Clusters:
         off = np.repeat(np.cumsum(ln) - ln, ln)
         return self.order[np.repeat(self.starts[pick], ln) + np.arange(int(ln.sum())) - off]
 
-    def draws(self, n_boot: int, seed: int):
+    def picks(self, n_boot: int, seed: int):
+        """The resampled cluster indices (0..n-1, np.unique order) of each resample."""
         if not self.n:
             return
         rng = np.random.default_rng(seed)
         for _ in range(n_boot):
-            yield self.rows(rng.integers(0, self.n, self.n))
+            yield rng.integers(0, self.n, self.n)
+
+    def draws(self, n_boot: int, seed: int):
+        for pick in self.picks(n_boot, seed):
+            yield self.rows(pick)
+
+    def unit_of_row(self) -> np.ndarray:
+        """Cluster index (np.unique order) of every row."""
+        out = np.empty(int(self.lens.sum()), int)
+        out[self.order] = np.repeat(np.arange(self.n), self.lens)
+        return out
 
 
 def unit_draws(n_units: int, n_boot: int, seed: int):
@@ -580,21 +598,52 @@ def load_refs(path: Path, ident: dict, cx) -> tuple[dict | None, str | None]:
 
 
 # ---------------------------------------------------------------- E-C
-def platt_point(L, y, cal_rows, test_rows) -> dict:
-    """The CAL-fit Platt map applied to TEST: slope, intercept, ECE, Brier, Brier skill; NaN when CAL has one class."""
-    xc, yc = L[cal_rows], y[cal_rows]
-    out = {"platt_slope": NAN, "platt_intercept": NAN, "ECE": NAN, "Brier": NAN, "Brier_skill": NAN,
-           "base_rate_cal": float(yc.mean()) if len(yc) else NAN}
-    xt, yt = L[test_rows], y[test_rows]
-    if len(yc) < 2 or not 0 < yc.sum() < len(yc) or not len(yt):
-        return out
-    a, b = platt_fit(xc, yc)
-    p = sigmoid(a * xt + b)
+def platt_batch(score, label, W, w0, iters: int = 100, l2: float = 1e-4, tol: float = 1e-9) -> np.ndarray:
+    """(B, 2) Platt fits for the B rows of the weight matrix W (B x n resample counts of the rows): stats.platt_fit's
+    regularised objective on the resampled (expanded) rows, i.e. sum_rows w (log loss) + l2/2 |(a, b)|^2, solved by
+    Newton from w0 for every resample at once (the objective is strictly convex: the same optimum as platt_fit on the
+    expanded rows, to the step tolerance). A resample whose rows hold a single class gets NaN."""
+    x, y, W = np.asarray(score, float), np.asarray(label, float), np.asarray(W, float)
+    B = len(W)
+    a, c = np.full(B, float(w0[0])), np.full(B, float(w0[1]))
+    xx = x * x
+    for _ in range(iters):
+        p = 0.5 * (1.0 + np.tanh(0.5 * (a[:, None] * x[None, :] + c[:, None])))    # the logistic function
+        r = W * (p - y[None, :])
+        g0, g1 = r @ x + l2 * a, r.sum(1) + l2 * c
+        h = W * (p * (1 - p))
+        h00, h01, h11 = h @ xx + l2, h @ x, h.sum(1) + l2
+        det = h00 * h11 - h01 * h01
+        da, dc = (h11 * g0 - h01 * g1) / det, (h00 * g1 - h01 * g0) / det
+        a, c = a - da, c - dc
+        if not (np.isfinite(da).all() and np.isfinite(dc).all()) or max(np.abs(da).max(), np.abs(dc).max()) < tol:
+            break
+    pos, tot = W @ y, W.sum(1)
+    bad = ~((pos > 0) & (pos < tot))
+    a[bad], c[bad] = NAN, NAN
+    return np.column_stack([a, c])
+
+
+def calib_metrics(a: float, b: float, xt, yt, base: float) -> list:
+    """[ECE (metrics.ece, 10 adaptive bins), Brier, Brier skill over the CAL base rate] of sigmoid(a x + b) on TEST."""
+    if not (math.isfinite(a) and math.isfinite(b)) or not len(yt):
+        return [NAN, NAN, NAN]
+    p = sigmoid(a * np.asarray(xt, float) + b)
     bs = brier(p, yt)
-    ref = float(np.mean((out["base_rate_cal"] - yt) ** 2))
-    out.update(platt_slope=a, platt_intercept=b, ECE=ece(p, yt, ECE_BINS, adaptive=True), Brier=bs,
-               Brier_skill=1 - bs / ref if ref > 0 else NAN)
-    return out
+    ref = float(np.mean((base - yt) ** 2))
+    return [ece(p, yt, ECE_BINS, adaptive=True), bs, 1 - bs / ref if ref > 0 else NAN]
+
+
+def platt_point(L, y, cal_rows, test_rows) -> dict:
+    """The CAL-fit Platt map (stats.platt_fit) applied to TEST: slope, intercept, ECE, Brier, Brier skill; NaN when
+    the CAL rows hold one class."""
+    xc, yc = L[cal_rows], y[cal_rows]
+    base = float(yc.mean()) if len(yc) else NAN
+    a = b = NAN
+    if len(yc) >= 2 and 0 < yc.sum() < len(yc):
+        a, b = platt_fit(xc, yc)
+    e, bs, bss = calib_metrics(a, b, L[test_rows], y[test_rows], base)
+    return {"platt_slope": a, "platt_intercept": b, "ECE": e, "Brier": bs, "Brier_skill": bss, "base_rate_cal": base}
 
 
 def reliability_equal_mass(p, y, n_bins: int = ECE_BINS) -> list:
@@ -638,22 +687,31 @@ ANATOMY_KEYS = ("P_wrong_bottom", "P_wrong_middle", "P_wrong_top", "share_errors
 
 
 def anatomy_stats(margin, correct) -> np.ndarray:
+    """P(wrong | margin tertile) bottom / middle / top (stats.rank_bins(margin, 3)), the share of all errors in the top
+    tertile, the share of all correct decisions in the bottom tertile, AUROC(margin, correct), AURC, error rate."""
     m, c = np.asarray(margin, float), np.asarray(correct, float)
-    if len(m) < 3:
+    n = len(m)
+    if n < 3:
         return np.full(len(ANATOMY_KEYS), NAN)
-    t = rank_bins(m, 3)
+    r = rankdata_avg(m)                                    # one ranking serves both:
+    t = np.minimum((3 * (r - 0.5) / n).astype(int), 2)     # = stats.rank_bins(m, 3)
     w = 1 - c
+    n1 = c.sum()
+    auc = (r[c == 1].sum() - n1 * (n1 + 1) / 2) / (n1 * (n - n1)) if 0 < n1 < n else NAN   # = metrics.auroc(m, c)
     pw = [float(w[t == b].mean()) if (t == b).any() else NAN for b in range(3)]
     se = float(w[t == 2].sum() / w.sum()) if w.sum() > 0 else NAN
-    sc = float(c[t == 0].sum() / c.sum()) if c.sum() > 0 else NAN
-    return np.array(pw + [se, sc, auroc(m, c.astype(int)), aurc(m, c), float(w.mean())], float)
+    sc = float(c[t == 0].sum() / n1) if n1 > 0 else NAN
+    return np.array(pw + [se, sc, auc, aurc(m, c), float(w.mean())], float)
 
 
 EC_KEYS = ("platt_slope", "platt_intercept", "ECE", "Brier", "Brier_skill") + ANATOMY_KEYS
+PLATT_CHUNK = 32                     # resamples per batched Platt refit
 
 
 def ec_block(cx, L: dict, n_boot: int, seed: int, n_reg: int) -> dict:
-    """E-C for the models of one regime on identical rows (CAL u TEST rows finite for every model)."""
+    """E-C for the models of one regime on identical rows (CAL u TEST rows finite for every model). Every user resample
+    refits the Platt map on its CAL rows (platt_batch: the same optimum as stats.platt_fit on the resampled rows) and
+    recuts the margin tertiles; the regime's models share the resamples."""
     models = list(L)
     R = (cx.cal | cx.test).copy()
     for m in models:
@@ -662,18 +720,29 @@ def ec_block(cx, L: dict, n_boot: int, seed: int, n_reg: int) -> dict:
     aok = R & cx.test & np.isfinite(anat[models[0]][0])
     ridx = np.flatnonzero(R)
     cl = Clusters(cx.uc[ridx])
+    calp = np.flatnonzero(cx.cal[ridx])
+    ucal = cl.unit_of_row()[calp]
+    ycal = cx.y[ridx[calp]].astype(float)
 
-    def stat(m, rows):
-        cal_r, test_r = rows[cx.cal[rows]], rows[cx.test[rows]]
-        pt = platt_point(L[m], cx.y, cal_r, test_r)
-        ar = rows[aok[rows]]
-        return np.r_[[pt[k] for k in EC_KEYS[:5]], anatomy_stats(anat[m][0][ar], anat[m][1][ar])]
+    def stat(m, rows, ab, base):
+        test_r, ar = rows[cx.test[rows]], rows[aok[rows]]
+        return np.r_[ab, calib_metrics(ab[0], ab[1], L[m][test_r], cx.y[test_r], base),
+                     anatomy_stats(anat[m][0][ar], anat[m][1][ar])]
 
-    est = np.array([stat(m, ridx) for m in models])
+    pts = {m: platt_point(L[m], cx.y, ridx[calp], np.flatnonzero(R & cx.test)) for m in models}
+    est = np.array([stat(m, ridx, (pts[m]["platt_slope"], pts[m]["platt_intercept"]), pts[m]["base_rate_cal"])
+                    for m in models]).reshape(len(models), len(EC_KEYS))
     draws = np.full((n_boot, len(models), len(EC_KEYS)), NAN)
-    for b, pos in enumerate(cl.draws(n_boot, seed)):
-        rows = ridx[pos]
-        draws[b] = [stat(m, rows) for m in models]
+    picks = list(cl.picks(n_boot, seed))
+    for s0 in range(0, len(picks), PLATT_CHUNK):
+        chunk = picks[s0:s0 + PLATT_CHUNK]
+        W = np.stack([np.bincount(p, minlength=cl.n) for p in chunk])[:, ucal].astype(float)
+        base = (W @ ycal) / np.maximum(W.sum(1), 1)
+        fits = {m: platt_batch(L[m][ridx[calp]], ycal, W, (pts[m]["platt_slope"], pts[m]["platt_intercept"]))
+                if math.isfinite(pts[m]["platt_slope"]) else np.full((len(chunk), 2), NAN) for m in models}
+        for k, p in enumerate(chunk):
+            rows = ridx[cl.rows(p)]
+            draws[s0 + k] = [stat(m, rows, fits[m][k], base[k]) for m in models]
     n_test = len(np.unique(cx.uc[R & cx.test]))
     n_anat = len(np.unique(cx.uc[aok]))
     n_pairs_test, n_pairs_anat = int((R & cx.test).sum()), int(aok.sum())
@@ -681,28 +750,119 @@ def ec_block(cx, L: dict, n_boot: int, seed: int, n_reg: int) -> dict:
     def nn(k):
         return (n_anat, n_pairs_anat) if k in ANATOMY_KEYS else (n_test, n_pairs_test)
     per = {}
+    tr = np.flatnonzero(R & cx.test)
     for j, m in enumerate(models):
-        pt = platt_point(L[m], cx.y, ridx[cx.cal[ridx]], ridx[cx.test[ridx]])
-        tr = np.flatnonzero(R & cx.test)
-        p_test = sigmoid(pt["platt_slope"] * L[m][tr] + pt["platt_intercept"]) if math.isfinite(pt["platt_slope"]) \
-            else np.full(len(tr), NAN)
+        pt = pts[m]
+        p_test = (sigmoid(pt["platt_slope"] * L[m][tr] + pt["platt_intercept"]) if math.isfinite(pt["platt_slope"])
+                  else None)
         per[m] = {k: rec(est[j, i], draws[:, j, i], *nn(k)) for i, k in enumerate(EC_KEYS)}
         per[m]["base_rate_cal"] = pt["base_rate_cal"]
-        per[m]["n_cal_rows"] = int((R & cx.cal).sum())
-        per[m]["reliability_equal_mass"] = reliability_equal_mass(p_test, cx.y[tr]) if np.isfinite(p_test).all() else []
+        per[m]["n_cal_rows"] = int(len(calp))
+        per[m]["reliability_equal_mass"] = reliability_equal_mass(p_test, cx.y[tr]) if p_test is not None else []
         per[m]["reliability_equal_width"] = [
             {"lo": lo, "hi": hi, "n": n, "mean_p": mp, "frac_like": fy}
-            for lo, hi, n, mp, fy in (reliability_bins(p_test, cx.y[tr], ECE_BINS) if np.isfinite(p_test).all() else [])]
+            for lo, hi, n, mp, fy in (reliability_bins(p_test, cx.y[tr], ECE_BINS) if p_test is not None else [])]
     mean = {k: rec(est[:, i].mean(), draws[:, :, i].mean(1), *nn(k)) for i, k in enumerate(EC_KEYS)}
     return {"rows": {"n_users_test": n_test, "n_pairs_test": n_pairs_test, "n_users_anatomy": n_anat,
-                     "n_pairs_anatomy": n_pairs_anat, "n_pairs_cal": int((R & cx.cal).sum())},
+                     "n_pairs_anatomy": n_pairs_anat, "n_pairs_cal": int(len(calp))},
             "per_model": per, "mean_over_seeds": mean,
             "seeds": {k: seed_summary([per[m][k]["est"] for m in models], n_reg) for k in ("ECE", "Brier_skill",
                                                                                           "AUROC_margin_correct")},
-            "platt": {m: (per[m]["platt_slope"]["est"], per[m]["platt_intercept"]["est"]) for m in models}}
+            "platt": {m: (pts[m]["platt_slope"], pts[m]["platt_intercept"]) for m in models}}
+
+
+def user_centred(x, users, rows) -> np.ndarray:
+    """x minus the user's mean over the user's `rows` (NaN outside them)."""
+    x, rows = np.asarray(x, float), np.asarray(rows, bool)
+    out = np.full(len(x), NAN)
+    idx = np.flatnonzero(rows)
+    if len(idx):
+        _, inv = np.unique(np.asarray(users)[idx], return_inverse=True)
+        inv = inv.reshape(-1)
+        out[idx] = x[idx] - (np.bincount(inv, x[idx]) / np.bincount(inv))[inv]
+    return out
+
+
+def invariance_block(cx, L: dict, platt: dict) -> dict:
+    """A3 section 3, E-A invariance checks of the lemma (reported, not tested), per model on the regime's TEST rows:
+    the largest per-user |AUC_u(f(L)) - AUC_u(L)| for f = the CAL-fit Platt map (E-C) and f = the user-centred logit
+    (expected 0 up to 1e-12), and the change of the pooled AUC when the user offsets (each user's mean logit over these
+    rows) are removed: dAUC_pooled_offset_removal = AUC_pooled(L - user mean) - AUC_pooled(L), a cross-user effect."""
+    models = list(L)
+    R = cx.test.copy()
+    for m in models:
+        R &= np.isfinite(L[m])
+    per = {}
+    for m in models:
+        x = L[m]
+        base = user_aucs(x, cx.y, cx.uc, R)
+        a, b = platt.get(m, (NAN, NAN))
+        xc = user_centred(x, cx.uc, R)
+
+        def worst(alt):
+            d = [abs(alt[u] - base[u]) for u in base if u in alt]
+            return float(max(d)) if d else NAN
+        d_pl = worst(user_aucs(sigmoid(a * x + b), cx.y, cx.uc, R)) if math.isfinite(a) and math.isfinite(b) else NAN
+        d_c = worst(user_aucs(xc, cx.y, cx.uc, R))
+        pooled, pooled_c = auroc(x[R], cx.y[R]), auroc(xc[R], cx.y[R])
+        per[m] = {"max_abs_dAUC_user": float(np.nanmax([d_pl, d_c])) if np.isfinite([d_pl, d_c]).any() else NAN,
+                  "max_abs_dAUC_user_platt": d_pl, "max_abs_dAUC_user_centred": d_c,
+                  "dAUC_pooled_offset_removal": pooled_c - pooled, "AUC_pooled": pooled,
+                  "AUC_pooled_offset_removed": pooled_c, "platt_slope": a, "n_users": len(base), "n_pairs": int(R.sum())}
+    return {"definition": "lemma checks (A3 section 3, reported, not tested): max over users of |AUC_u(Platt(L)) - "
+                          "AUC_u(L)| (CAL-fit map of E-C) and of |AUC_u(L - user mean) - AUC_u(L)|; max_abs_dAUC_user = "
+                          "the larger of the two (expected 0 up to 1e-12; a negative Platt slope reverses every user); "
+                          "dAUC_pooled_offset_removal = pooled AUC over the TEST rows after minus before removing each "
+                          "user's mean logit over those rows",
+            "per_model": per,
+            "max_abs_dAUC_user_over_models": float(np.nanmax([v["max_abs_dAUC_user"] for v in per.values()]))
+            if per and np.isfinite([v["max_abs_dAUC_user"] for v in per.values()]).any() else NAN,
+            "dAUC_pooled_offset_removal_mean_over_seeds": float(np.mean([v["dAUC_pooled_offset_removal"]
+                                                                         for v in per.values()])) if per else NAN}
 
 
 # ---------------------------------------------------------------- E-D
+def holm(pvals: dict) -> dict:
+    """Holm step-down adjusted p-values over the members that carry a p-value (A3 section 11); a member without one
+    (descriptive by the minimum-n rule, or not computed) is outside the family and gets None."""
+    items = sorted((p, k) for k, p in pvals.items() if _fin(p))
+    out, run, m = {k: None for k in pvals}, 0.0, len(items)
+    for j, (p, k) in enumerate(items):
+        run = max(run, min(1.0, (m - j) * p))
+        out[k] = run
+    return out
+
+
+def ed_holm_family(ed: dict, regime: str) -> dict:
+    """A3 section 11, Holm family E-D = {G, star-permutation dUAUC} per domain and regime (the seed means); confirmed =
+    Holm p < 0.05 and, for the fine-tuned regime, the sigma_seed rule."""
+    ig, sp = ed.get("information_gain") or {}, ed.get("star_permutation") or {}
+    p = {"G": (ig.get("G_mean_over_seeds") or {}).get("p"), "star_permutation": (sp.get("dUAUC_mean_over_seeds") or {})
+         .get("p")}
+    rule = {"G": (ig.get("seeds") or {}).get("sigma_seed_rule"), "star_permutation": (sp.get("seeds") or {})
+            .get("sigma_seed_rule")}
+    adj = holm(p)
+    return {"members": ["G (G_mean_over_seeds)", "star-permutation dUAUC (dUAUC_mean_over_seeds)"], "p": p, "p_holm": adj,
+            "confirmed": {k: bool(adj[k] is not None and adj[k] < 0.05 and (regime == "ZS" or rule[k] is True))
+                          for k in adj},
+            "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"}
+
+
+def corrections_block(cx, L: dict, NH: dict, PI: dict, rows, m_nohist: list, m_swap: list, n_boot: int, seed: int,
+                      n_reg: int) -> dict:
+    """A3 section 3, E-D: the two item-dependent corrections relative to L, paired per user on identical rows (`rows`
+    and finite in every score): dUAUC_nohist_minus_raw = UAUC(L - L_nohist) - UAUC(L) and dUAUC_evidence_minus_raw =
+    UAUC(e-hat) - UAUC(L), e-hat = L - pi; per model, the mean over seeds, CIs and p (contrast_models)."""
+    return {"definition": "the item-dependent corrections relative to L on S_d's TEST rows: dUAUC_nohist_minus_raw = "
+                          "UAUC(L - L_nohist) - UAUC(L), dUAUC_evidence_minus_raw = UAUC(e-hat) - UAUC(L)",
+            "dUAUC_nohist_minus_raw": (contrast_models({m: (L[m] - NH[m], L[m]) for m in m_nohist}, cx.y, cx.uc, rows,
+                                                       n_boot, seed, n_registered=n_reg) if m_nohist
+                                       else _na("no usable nohist arm")),
+            "dUAUC_evidence_minus_raw": (contrast_models({m: (L[m] - PI[m], L[m]) for m in m_swap}, cx.y, cx.uc, rows,
+                                                         n_boot, seed, n_registered=n_reg) if m_swap
+                                         else _na("no usable swap arm"))}
+
+
 def logit_fit(X, y, l2: float = 1e-4, iters: int = 100):
     """Logistic regression with intercept by Newton steps; features standardised on the fitting rows, L2 on the slopes
     only (stats.platt_fit's regulariser). Returns (mean, sd, w) for logit_eta."""
@@ -911,6 +1071,31 @@ def _item_means(values, inv, n_items) -> np.ndarray:
     return np.divide(s, c, out=np.full(n_items, NAN), where=c > 0)
 
 
+def partial_spearman_shared(xs: list, y, Z) -> list:
+    """forensics.partial_spearman(x, y, Z) for every x of `xs` on the same complete rows (all inputs finite): the ranks
+    of y and Z, y's residual and the projection on the column space of [1, ranks of Z] (lstsq's, rank-deficient
+    controls included) are computed once; equal to it up to floating-point rounding (used for the resamples)."""
+    y, Z = np.asarray(y, float), np.asarray(Z, float).reshape(len(y), -1)
+    n = len(y)
+    if n < Z.shape[1] + 3:
+        return [NAN] * len(xs)
+    R = np.column_stack([np.ones(n)] + [rankdata_avg(Z[:, j]) for j in range(Z.shape[1])])
+    U, s, _ = np.linalg.svd(R, full_matrices=False)
+    Q = U[:, s > np.finfo(float).eps * max(R.shape) * s[0]]
+
+    def resid(v):
+        r = rankdata_avg(v)
+        return r - Q @ (Q.T @ r)
+    ey = resid(y)
+    syy = float((ey * ey).sum())
+    out = []
+    for x in xs:
+        ex = resid(np.asarray(x, float))
+        den = math.sqrt(float((ex * ex).sum()) * syy)
+        out.append(float((ex * ey).sum() / den) if den > 1e-12 else NAN)
+    return out
+
+
 def partial_pair_block(cx, models, L: dict, Z, rows, n_boot: int, seed: int) -> dict:
     """Pair-level partial Spearman of each model's L with log1p(pop) given Z, user-cluster CI (shared draws)."""
     ok = np.asarray(rows, bool) & np.isfinite(cx.lpop) & np.isfinite(Z).all(1)
@@ -922,7 +1107,7 @@ def partial_pair_block(cx, models, L: dict, Z, rows, n_boot: int, seed: int) -> 
     if len(idx) >= Z.shape[1] + 3:
         for b, pos in enumerate(Clusters(cx.uc[idx]).draws(n_boot, seed)):
             r = idx[pos]
-            draws[b] = [fx.partial_spearman(L[m][r], cx.lpop[r], Z[r]) for m in models]
+            draws[b] = partial_spearman_shared([L[m][r] for m in models], cx.lpop[r], Z[r])
     nu = len(np.unique(cx.uc[idx]))
     per = {m: rec(est[j], draws[:, j], nu, len(idx)) for j, m in enumerate(models)}
     return {"per_model": per, "mean_over_seeds": rec(np.mean(est) if est else NAN, draws.mean(1) if models else None,
@@ -940,10 +1125,32 @@ def partial_item_block(items, models, X: dict, lpop_i, Zi, n_boot: int, seed: in
     if len(idx) >= Zi.shape[1] + 3:
         for b, pick in enumerate(unit_draws(len(idx), n_boot, seed)):
             r = idx[pick]
-            draws[b] = [fx.partial_spearman(X[m][r], lpop_i[r], Zi[r]) for m in models]
+            draws[b] = partial_spearman_shared([X[m][r] for m in models], lpop_i[r], Zi[r])
     per = {m: rec(est[j], draws[:, j], n_users, None, n_items=int(len(idx))) for j, m in enumerate(models)}
     return {"per_model": per, "mean_over_seeds": rec(np.mean(est) if est else NAN, draws.mean(1) if models else None,
                                                      n_users, None, n_items=int(len(idx)))}
+
+
+def bias_index_fast(conf, correct, group, n_bins: int = BI_BINS, adjust: bool = True, min_count: int = 20) -> dict:
+    """metrics.bias_index vectorised over (group, bin) cells: the same stats.rank_bins confidence bins, the same
+    min_count cells and weights; equal to it up to floating-point rounding (used for the bootstrap resamples)."""
+    conf, correct = np.asarray(conf, float), np.asarray(correct, float)
+    if not len(conf):
+        return {}
+    b = rank_bins(conf, n_bins)
+    resid = correct - conf if adjust else correct
+    gu, gi = np.unique(np.asarray(group), return_inverse=True)
+    gi = gi.reshape(-1)
+    cell = gi * n_bins + b
+    n_cell = np.bincount(cell, minlength=len(gu) * n_bins).reshape(len(gu), n_bins)
+    s_cell = np.bincount(cell, resid, minlength=len(gu) * n_bins).reshape(len(gu), n_bins)
+    n_bin, s_bin = np.bincount(b, minlength=n_bins), np.bincount(b, resid, minlength=n_bins)
+    mean_bin = s_bin / np.maximum(n_bin, 1)
+    use = n_cell >= min_count
+    with np.errstate(divide="ignore", invalid="ignore"):
+        gap = np.where(use, n_cell * (s_cell / n_cell - mean_bin[None, :]), 0.0)
+    num, den = gap.sum(1), np.where(use, n_cell, 0).sum(1)
+    return {str(g): (float(num[k] / den[k]) if den[k] else NAN) for k, g in enumerate(gu.tolist())}
 
 
 def bias_index_block(cx, models, L: dict, platt: dict, rows, n_boot: int, seed: int) -> dict:
@@ -955,15 +1162,15 @@ def bias_index_block(cx, models, L: dict, platt: dict, rows, n_boot: int, seed: 
     grp = np.where(cx.head, "head", np.where(cx.tail, "tail", "mid"))
     conf = {m: sigmoid(platt[m][0] * L[m] + platt[m][1]) for m in models}
 
-    def one(m, r):
-        bi = bias_index(conf[m][r], cx.y[r], grp[r], BI_BINS, True)
+    def one(m, r, fn=bias_index):
+        bi = fn(conf[m][r], cx.y[r], grp[r], BI_BINS, True)
         h, t = bi.get("head", NAN), bi.get("tail", NAN)
         return np.array([h, t, h - t], float)
     est = np.array([one(m, idx) for m in models]).reshape(len(models), 3)
     draws = np.full((n_boot, len(models), 3), NAN)
     if len(idx):
         for b, pos in enumerate(Clusters(cx.uc[idx]).draws(n_boot, seed)):
-            draws[b] = [one(m, idx[pos]) for m in models]
+            draws[b] = [one(m, idx[pos], bias_index_fast) for m in models]
     nu = len(np.unique(cx.uc[idx]))
     names = ("head", "tail", "head_minus_tail")
     per = {m: {k: rec(est[j, i], draws[:, j, i], nu, len(idx), contrast=(k == "head_minus_tail"))
@@ -1269,12 +1476,9 @@ def build(a) -> dict:
         rs = runs[m]["swap"]
         if rs["status"] == "OK" and m in L:
             pos = rs["swap"]["pos"]
-            pi, pa, pb = (np.full(cx.n, NAN) for _ in range(3))
-            for j in np.flatnonzero(cx.sd_test):
-                v = pos.get(cx.item[j])
-                if v:
-                    pi[j], pa[j], pb[j] = _fmean(v), _fmean(v[fx.HALF_A]), _fmean(v[fx.HALF_B])
-            PI[m], PA[m], PB[m] = pi, pa, pb
+            per_item = {i: (_fmean(v), _fmean(v[fx.HALF_A]), _fmean(v[fx.HALF_B])) for i, v in pos.items() if v}
+            got = [per_item.get(i, (NAN, NAN, NAN)) for i in cx.item.tolist()]
+            PI[m], PA[m], PB[m] = (np.where(cx.sd_test, np.array([g[k] for g in got], float), NAN) for k in range(3))
             own, joins[m]["swap"] = to_pairs(rs["sc"], cx, expected["swap"])
             both = np.isfinite(own) & np.isfinite(L[m])
             consistency[m] = {"n_pairs": int(both.sum()),
@@ -1351,6 +1555,7 @@ def build(a) -> dict:
         ec = {**hdr, **ec_block(cx, Lr, *boot, nreg)}
         platt = ec.pop("platt")
         res["E_C"][reg] = ec
+        ea["invariance"] = invariance_block(cx, Lr, platt)        # E-A lemma checks need E-C's CAL-fit Platt map
         # E-D
         ed = {**hdr}
         msw = [m for m in ms if m in PI]
@@ -1378,10 +1583,13 @@ def build(a) -> dict:
             mnh = [m for m in ms if m in NH]
             ed["UAUC"]["L_nohist"] = (uauc_models({m: NH[m] for m in mnh}, cx.y, cx.uc, D, *boot,
                                                   n_registered=nreg) if mnh else _na("no usable nohist arm"))
+            ed["corrections"] = corrections_block(cx, L, NH, PI, D, mnh, msw, *boot, nreg)
             mlp = [m for m in ms if m in LP]
             ed["star_permutation"] = (starperm_block(cx, mlp, L, LP, cx.sd_test, *boot, nreg) if mlp
                                       else _na("no usable starperm0 and starperm1 arms"))
             ed["models_per_sub_block"] = {"swap": msw, "nohist": mnh, "star_permutation": mlp}
+            if reg in ("ZS", "FT"):            # FT-C (PERM) is descriptive and in no Holm family (A3 section 9)
+                ed["holm_family_E_D"] = ed_holm_family(ed, reg)
         res["E_D"][reg] = ed
         # E-E
         res["E_E"][reg] = {**hdr, **ee_block(cx, a.domain, ms, Lr, PI if all(m in PI for m in ms) else None, refs,
@@ -1472,6 +1680,10 @@ def table_rows(res: dict) -> list:
             add("E-A", reg, "reference", f"UAUC_TEST_{x}", r, "same users and rows as the regime's models")
         for k, blk in ea["secondary"].items():
             models_and_mean("E-A", reg, k, blk)
+        for m, v in ((ea.get("invariance") or {}).get("per_model") or {}).items():
+            for k in ("max_abs_dAUC_user", "dAUC_pooled_offset_removal"):
+                add("E-A", reg, m, k, {"est": v[k], "n_users": v["n_users"], "n_pairs": v["n_pairs"]},
+                    "lemma check: reported, not tested")
     eb = res["E_B"]
     if eb.get("per_seed"):
         for s, r in eb["per_seed"].items():
@@ -1491,6 +1703,12 @@ def table_rows(res: dict) -> list:
             continue
         for k, blk in (ed.get("UAUC") or {}).items():
             models_and_mean("E-D", reg, f"UAUC_{k}", blk)
+        for k in ("dUAUC_nohist_minus_raw", "dUAUC_evidence_minus_raw"):
+            blk = (ed.get("corrections") or {}).get(k)
+            if isinstance(blk, dict) and blk.get("per_seed"):
+                for m, r in blk["per_seed"].items():
+                    add("E-D", reg, m, k, r)
+                add("E-D", reg, "mean_over_seeds", k, blk["mean_over_seeds"])
         sh = ed.get("shares") or {}
         for m, blk in (sh.get("per_model") or {}).items():
             for k in SHARE_KEYS:

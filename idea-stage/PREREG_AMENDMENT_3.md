@@ -17,7 +17,9 @@ and section 4 included, additionally waits for the full record**, written by `py
 - the sha1 of every file of the FREEZE `core` list (section 11), all of which must exist and be unit-tested;
 - the `ftgrid_split.json` of each of the four domains (sha1, T, counts, power facts, sha1 of every user-id list).
 Two later lists are recorded before their runs: FREEZE `prune` before any S6 run (section 6) and FREEZE `method` before
-any slot run (section 7). `run_gateft.sh` and `run_ftgrid.sh` check this with `ftgrid_freeze --check --stage ...`.
+any slot run (section 7). The Llama program writes its own splits (the length audit depends on the tokenizer) under its own
+output root, and a Llama job additionally needs that root's `ftgrid_split.json` of the domain in the record. `run_gateft.sh`
+and `run_ftgrid.sh` check all this with `ftgrid_freeze --check --stage ...`.
 
 **Conditionality.**
 - Sections 1–3 and 5–9 run **only after a recorded GATE_FT_PASS** (Amendment 2 G9). On GATE_FT_FAIL or INCOMPLETE they do
@@ -122,6 +124,9 @@ TEST rows unless stated. Per (domain, backbone, regime) the summary is the mean 
   popularity, and the temporal biased MF with item parameters fit on ratings with ts < T_d and user fold-in on the user's
   pre-candidate events (`forensics.cf_references` with an explicit cutoff T_d, restricted to TEST rows); its **personal
   residual** (MF − b_u − b_i) is the CF personal-signal reference.
+- Invariance checks of the lemma (reported, not tested): the largest per-user absolute change of AUC_u when the logit is replaced by
+  its CAL-fit Platt map and by its user-centred version (expected 0 up to 1e-12), and the change of the pooled AUC when the user
+  offsets are removed (a cross-user effect that the lemma does not cover).
 - Secondary: (i) all-rows UAUC on CAL ∪ TEST rows of the EVAL users (user-disjoint from TRAIN); (ii) UAUC split by whether the
   candidate's item has a TRAIN example (seen) or not (unseen). Each carries its own n and the minimum-n rule.
 
@@ -141,7 +146,8 @@ the user-bootstrap CI of that mean; every ΔUAUC_s listed; σ_seed = SD of the �
   draft are dropped: they are functions of the base rate and of the AUC.
 
 **E-D Decomposition** (S_d, TEST rows). L = the `like` logit; L_nohist = the no-history logit; π(i) = the 8-donor swap prior of
-Amendment 1 P1.6 (donors in S_d); ê = L − π. UAUC of π alone, L_nohist alone, ê and L.
+Amendment 1 P1.6 (donors in S_d); ê = L − π. UAUC of π alone, L_nohist alone, ê and L, and the two item-dependent corrections
+relative to L: dUAUC(L − L_nohist, the no-history correction) and dUAUC(ê) = UAUC(ê) − UAUC(L).
 - **Reliability and shares.** r_c = the pooled within-user Pearson correlation of the user-centred donor-half means of π
   (donors 1–4 vs 5–8) on the same pairs; r₈c = 2 r_c / (1 + r_c). ρ = the pooled within-user Pearson correlation of centred L and
   centred π. **Item-prior share** = ρ² / r₈c; **non-prior share** = 1 − item-prior share, an upper bound on the personal share
@@ -175,9 +181,12 @@ least one Amazon domain. Everything else in this amendment is secondary.
   scoring when its run key is identical (same prompt, panel and model); otherwise it is scored once. E-A (without FT), E-C, E-D and
   E-E are reported. These are the "pre-declared descriptive endpoints" of Amendment 2 G8; none of them is a gate.
 - **Z2 next-item second backbone.** Llama-3.1-8B-Instruct, frozen V0, questions `next` and `like`, `hist_len` 5, fp16, on TEST
-  events 1,001–3,000 of each of sports, toys, home and tools (2,000 events each; sports events 1–1000 stay quarantined). The Qwen
-  audit restricted to the same events is the paired comparison for the static-exposure endpoints of
-  `docs/sigir/NEXTITEM_AUDIT_SPEC.md` (sections B, D, E). It exists so that an S3 finding can meet Amendment 2 F.
+  events 1,001–3,000 of each of sports, toys, home and tools (2,000 events each; sports events 1–1000 stay quarantined) **and on
+  the first 500 VALID events of each domain, used only to fit that backbone's list temperature**. The Qwen audit restricted to the
+  same TEST events is the paired comparison for the endpoints of `docs/sigir/NEXTITEM_AUDIT_SPEC.md` (sections A–E; each backbone's
+  temperature is fit on its own VALID sample: Qwen 2,000 events, Llama 500). The Z2 sample is analysed as one segment per domain
+  (the sports quarantine segmentation does not apply: it starts at event 1,001). It exists so that an S1–S3 finding can meet
+  Amendment 2 F.
 
 ## 5. Pseudonym knockout (FT-K)
 
@@ -271,8 +280,8 @@ A Llama result never overrides a Qwen failure; a Llama-only result is explorator
 prompts): about 1.7 h per ML-1M seed, about 1.1 h per Amazon seed. Whole-EVAL `like` passes: ML-1M 6 min, Amazon 16–18 min per
 model. Decomposition arms are per item, not per pair: about 25 min per ML-1M model and about 22 min per Amazon model (TEST rows
 of S_d). Totals: Amazon Qwen FT grid ≈ 13; Llama FT ≈ 10; decomposition ≈ 9; knockouts ≈ 7 (+ 2 for Sports); FT-C ≈ 4; S6 ≈ 18
-(+ 7 for P3); Z2 ≈ 6; the slot ≈ 10 for ML-1M and Toys, ≈ 18 for all four. The program is ≈ 67 without P3, the Sports knockout
-and the slot, ≈ 76 with P3 and the Sports knockout, ≈ 86–94 with the slot. The backlog before it (audit, gate-fix, Gate-FT) is
+(+ 7 for P3); Z2 ≈ 7.5 (6 for the TEST events, 1.5 for the VALID sample); the slot ≈ 10 for ML-1M and Toys, ≈ 18 for all four. The
+program is ≈ 69 without P3, the Sports knockout and the slot, ≈ 78 with P3 and the Sports knockout, ≈ 88–96 with the slot. The backlog before it (audit, gate-fix, Gate-FT) is
 about 40; the planning pessimum (3.5 h per seed, 25% vLLM-LoRA overhead, 10% reruns) is about 2× these figures and still fits.
 
 **Checkpoints and cut rules** (decided on GPU-hours remaining alone, recorded in PILOT_LOG with the date, never after a result they
@@ -318,8 +327,10 @@ src/confrec/gateft_eval.py
 src/confrec/forensics.py
 src/confrec/pilot_pseudonym.py
 src/confrec/pseudonymize.py
+src/confrec/diag_battery.py
 src/confrec/metrics.py
 src/confrec/stats.py
+scripts/sigir/starperm_panel.py
 scripts/sigir/run_gateft.sh
 scripts/sigir/run_ftgrid.sh
 scripts/sigir/run_llama_nextitem.sh

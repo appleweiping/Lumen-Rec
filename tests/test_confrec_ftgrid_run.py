@@ -34,6 +34,7 @@ import subprocess
 import sys
 import types
 from collections import defaultdict
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -75,6 +76,7 @@ def main(argv=None) -> dict:
     a = ap.parse_args(argv)
     split = json.loads(Path(a.split).read_text(encoding="utf-8"))
     root, models = Path(a.scores_root), a.models.split(",")
+    root = root / a.domain if (root / a.domain).is_dir() else root      # scores/ (or scores/<d>/), as F2 reads it
     found = {m: sorted(p.name for p in (root / m).iterdir() if (p / "report.json").is_file() and "." not in p.name)
              if (root / m).is_dir() else [] for m in models}
     out = {"stub": True, "domain": a.domain, "split_domain": split["domain"], "models": models, "arms_found": found,
@@ -314,23 +316,51 @@ def _spec_parser(module: str):
     return ap
 
 
-def _parser(target: str, monkeypatch):
-    """The real argparse parser of 'src.confrec.x' or 'scripts/sigir/y.py'."""
+@contextmanager
+def stub_torch():
+    """train_lora_yesno imports torch at module level, its argparse parser needs none of it (and these tests must not
+    need torch). Inside the block torch resolves to stand-in modules and train_lora_yesno / lora_trainer are imported
+    afresh against them; sys.modules and the package attributes are restored afterwards."""
+    import src.confrec as pkg
+    mods = ("src.confrec.train_lora_yesno", "src.confrec.lora_trainer")
+    torch_names = ("torch", "torch.utils", "torch.utils.data", "torch.nn", "torch.nn.functional")
+    saved = {k: sys.modules.get(k) for k in mods + torch_names}
+    attrs = {m.rsplit(".", 1)[1]: getattr(pkg, m.rsplit(".", 1)[1], None) for m in mods}
+    try:
+        for k in torch_names:
+            sys.modules[k] = types.ModuleType(k)
+        sys.modules["torch.utils.data"].Dataset = object
+        for k in mods:
+            sys.modules.pop(k, None)
+        yield
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                sys.modules.pop(k, None)
+            else:
+                sys.modules[k] = v
+        for a, v in attrs.items():
+            if v is not None:
+                setattr(pkg, a, v)
+            elif hasattr(pkg, a):
+                delattr(pkg, a)
+
+
+def _parser(target: str):
+    """The real argparse parser of 'src.confrec.x' or 'scripts/sigir/y.py' (the spec's documented CLI for an entry
+    point that does not exist yet)."""
     if target.endswith(".py"):
         spec = importlib.util.spec_from_file_location("audit_" + Path(target).stem, ROOT / target)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
     elif not (ROOT / (target.replace(".", "/") + ".py")).exists():
         return _spec_parser(target)
+    elif target == "src.confrec.train_lora_yesno":
+        with stub_torch():
+            mod = importlib.import_module(target)
+            return _capture([lambda: mod.main()])
     else:
-        try:
-            mod = importlib.import_module(target)
-        except ImportError:          # train_lora_yesno without torch: its parser needs none of it
-            for name in ("torch", "torch.utils", "torch.utils.data", "torch.nn", "torch.nn.functional"):
-                monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
-            sys.modules["torch.utils.data"].Dataset = object
-            sys.modules.pop(target, None)
-            mod = importlib.import_module(target)
+        mod = importlib.import_module(target)
     p = _capture([lambda: mod.main(), lambda: mod.parse_args(), lambda: mod.main([])])
     assert p is not None, f"no argparse parser captured for {target}"
     return p
@@ -398,12 +428,13 @@ def invocations(text: str) -> list:
     return calls
 
 
-def audit(text: str, monkeypatch) -> tuple[list, dict]:
+def audit(text: str) -> tuple[list, dict]:
     problems, parsers, count = [], {}, defaultdict(int)
     for target, flags, line in invocations(text):
         count[target] += 1
         if target not in parsers:
-            parsers[target] = _parser(target, monkeypatch)
+            parsers[target] = _parser(target)
+            assert parsers[target] is not None, f"no argparse parser captured for {target}"
         acts = {s: a for a in parsers[target]._actions for s in a.option_strings}
         used = {f for f, _ in flags}
         if used - set(acts):
@@ -425,8 +456,8 @@ def audit(text: str, monkeypatch) -> tuple[list, dict]:
     return problems, dict(count)
 
 
-def test_every_flag_the_script_passes_exists_in_the_real_argparse(monkeypatch):
-    problems, count = audit(SCRIPT.read_text(encoding="utf-8"), monkeypatch)
+def test_every_flag_the_script_passes_exists_in_the_real_argparse():
+    problems, count = audit(SCRIPT.read_text(encoding="utf-8"))
     assert not problems, "\n".join(problems)
     # every entry point of the chain was seen (an audit that finds nothing cannot pass)
     for target, n in {"src.confrec.pyes_scorer": 8, "src.confrec.train_lora_yesno": 1, "src.confrec.ftgrid_data": 1,
@@ -436,12 +467,13 @@ def test_every_flag_the_script_passes_exists_in_the_real_argparse(monkeypatch):
         assert count.get(target, 0) >= n, (target, count)
 
 
-def test_the_flag_audit_catches_a_wrong_flag_and_a_wrong_value(monkeypatch):
+def test_the_flag_audit_catches_a_wrong_flag_and_a_wrong_value():
     bad = SCRIPT.read_text(encoding="utf-8").replace("--swap_k 8", "--swapk 8").replace(
         "--source amazon", "--source amazn").replace('--dev_users_sha1 "$DEV_SHA"', '--dev_user_sha1 "$DEV_SHA"')
-    problems, _ = audit(bad, monkeypatch)
+    bad = bad.replace("--max_len \"$MAXLEN\"", "--maxlen \"$MAXLEN\"")
+    problems, _ = audit(bad)
     assert any("--swapk" in p for p in problems) and any("'amazn'" in p for p in problems)
-    assert any("--dev_user_sha1" in p for p in problems)
+    assert any("--dev_user_sha1" in p for p in problems) and any("--maxlen" in p for p in problems)
 
 
 def test_the_integration_audit_of_test_confrec_contracts_accepts_the_script():
@@ -449,7 +481,8 @@ def test_the_integration_audit_of_test_confrec_contracts_accepts_the_script():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert SCRIPT in sorted((ROOT / "scripts" / "sigir").glob("*.sh"))   # found by its glob: no registration needed
-    mod.test_every_script_flag_exists_in_the_real_argparse(SCRIPT)
+    with stub_torch():                                                   # its train_lora_yesno parser, without torch
+        mod.test_every_script_flag_exists_in_the_real_argparse(SCRIPT)
 
 
 # ---------------------------------------------------------------- 3. the DRY_RUN stand-ins
@@ -763,8 +796,8 @@ def test_a_second_backbone_needs_its_own_output_root(guard_repo):
 
 @needs_chain
 def test_stage_order_refusals(tmp_path):
-    """Stage 3 refuses without stage 2 (no marker); after stage 2 a bound file changes and stages 3-5 refuse again (the
-    marker no longer equals the record). Nothing is scored."""
+    """Stage 3 refuses without stage 2 (no marker); after stage 2 a bound file changes and stages 3-6 refuse again (the
+    marker no longer equals the record). Nothing is scored or reported."""
     repo = make_repo(tmp_path / "repo")
     root = repo / DRY_ROOT
     r = run_script(repo, "games", STAGES="3")
@@ -774,10 +807,10 @@ def test_stage_order_refusals(tmp_path):
     assert (root / "freeze" / "games.core.ok").is_file()
     bound = repo / "src" / "confrec" / "metrics.py"
     bound.write_text(bound.read_text(encoding="utf-8") + "\n# changed after the freeze check\n", encoding="utf-8")
-    for stage in ("3", "4", "5"):
+    for stage in ("3", "4", "5", "6"):
         r = run_script(repo, "games", STAGES=stage)
         assert r.returncode == 4 and f"stage {stage} refused" in r.stderr and "no longer equals" in r.stderr, tail(r)
-    assert not (root / "scores").exists()
+    assert not (root / "scores").exists() and not (root / "report").exists()
 
 
 @needs_chain

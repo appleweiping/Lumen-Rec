@@ -5,6 +5,11 @@ idea-stage/PREREG_AMENDMENT_2.md section N and the judge's action 7).
         --ref_ranks docs/sigir/ref_ranks/sports --ref_exposure docs/sigir/ref_exposure/sports --out <dir>/sports.json \
         [--n_boot 2000] [--seed 0] [--questions next,like] [--quarantine_n N]
     python -m src.confrec.nextitem_audit summarize --inputs <dir>/sports.json,<dir>/toys.json,... --out <dir>/summary.json
+    # second backbone on a subsample (Amendment 3 section 4, Z2; item 9 below)
+    python -m src.confrec.nextitem_audit restrict --domain sports --audit_dir <qwen audit root> \
+        --panel_subset <the 2,000-event panel file> --out_dir <dir>/qwen_restricted
+    python -m src.confrec.nextitem_audit run --domain sports --audit_dir <audit root> --panel_test <the 2,000-event panel file> \
+        --panel_valid P --segments single [--test_role test1001_3000 --valid_role valid500 --first_event 1001] --out <dir>/sports.json
 
 Inputs per domain d: <audit_dir>/<d>_test/scores.csv.gz and <d>_valid2k/scores.csv.gz (pyes_scorer contract), the
 test / valid panel JSONL (streamed; only source_event_id, user_id, history_item_ids, candidate_item_ids,
@@ -68,6 +73,16 @@ spec leaves a detail open the MOST CONSERVATIVE option was taken:
     min_count 20) in an event-cluster bootstrap of min(500, n_boot) resamples drawn from the same stream as
     metrics.bias_index_ci (identical estimates/intervals; the replicates are kept for the head-minus-tail difference).
 
+ 9. Second backbone on a subsample (Amendment 3 section 4, Z2). `run --segments single` analyses the WHOLE supplied panel as
+    ONE segment (role "all", named after --test_role; no sports quarantine split, which assumes the panel starts at event 1;
+    --first_event labels the position of its first event in the full test panel and, for sports, must not straddle events
+    1-1000); --test_role / --valid_role pick <audit_dir>/<d>_<role>/scores.csv.gz (defaults test / valid2k; the Llama layout
+    is test1001_3000 / valid500). Every panel-derived quantity (pool, item -> group map, profile quintiles) is that of the
+    supplied panel, and each backbone's temperature is fitted on its own VALID sample. `restrict` keeps the verbatim score
+    lines of the events of a panel subset in <out_dir>/<d>_<test_role>/ and copies the VALID scores unchanged, so `run` can be
+    pointed at the result (the Qwen side of the paired comparison). None of this changes an estimator, an endpoint or any
+    default output.
+
 Everything is numpy + stdlib. The weighted bootstraps (AUROC, AURC / risk-coverage curve / served share, pooled AUROC,
 ECE, bias_index, Gini / coverage) are exact re-expressions of resampling events with replacement in terms of per-event
 multiplicities (one resample matrix per segment, drawn from the stream of stats.cluster_bootstrap); at run time the
@@ -82,12 +97,17 @@ from __future__ import annotations
 import argparse
 import csv
 import gzip
+import hashlib
+import io
 import json
 import math
+import os
 import re
+import shutil
 import sys
 import time
 from collections import Counter
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -1308,6 +1328,31 @@ def make_segments(domain: str, E: int, quarantine_n) -> list[dict]:
     return [{"name": "all", "role": "all", "lo": 0, "hi": E}]
 
 
+def _check_segment_options(segments, quarantine_n, first_event) -> None:
+    """Option combinations of `run` / `analyze_domain`; the defaults (auto, None, None) are always valid."""
+    if segments not in ("auto", "single"):
+        raise ValueError(f"segments must be 'auto' or 'single', got {segments!r}")
+    if segments == "single" and quarantine_n is not None:
+        raise ValueError("quarantine_n belongs to the 'auto' segmentation: with segments='single' the whole panel is one "
+                         "segment")
+    if segments == "auto" and first_event is not None:
+        raise ValueError("first_event is only meaningful with segments='single'")
+    if first_event is not None and int(first_event) < 1:
+        raise ValueError(f"first_event is a 1-based event number, got {first_event!r}")
+
+
+def make_single_segment(domain: str, E: int, name=None, first_event=None) -> list[dict]:
+    """`segments="single"` (Amendment 3, Z2): the WHOLE supplied panel is ONE segment of role "all" named `name`. No quarantine
+    split is applied. When the caller states where the panel starts (`first_event`, 1-based in the full test panel) a panel
+    that straddles the domain's quarantine boundary (sports events 1-1000) is refused: quarantined events are never pooled."""
+    if first_event is not None:
+        fe, q = int(first_event), QUARANTINE.get(domain, 0)
+        if fe <= q < fe + E - 1:
+            raise ValueError(f"the panel (events {fe}-{fe + E - 1}) straddles the {domain} quarantine boundary (events 1-{q} are "
+                             f"reported separately): supply the events after it, or use segments='auto'")
+    return [{"name": name or "all", "role": "all", "lo": 0, "hi": E}]
+
+
 def discover_methods(directory) -> dict:
     d = Path(directory) if directory else None
     if d is None or not d.is_dir():
@@ -1325,11 +1370,14 @@ def _data_diag(panel: Panel, qa: dict) -> dict:
 
 
 def analyze_domain(domain: str, panel: Panel, L_test: dict, valid: dict, refs_rank: dict, refs_expo: dict,
-                   questions=QUESTIONS, n_boot: int = 2000, seed: int = 0, quarantine_n=None, load_diag=None) -> dict:
+                   questions=QUESTIONS, n_boot: int = 2000, seed: int = 0, quarantine_n=None, load_diag=None,
+                   segments: str = "auto", segment_name=None, first_event=None) -> dict:
     """The whole per-domain analysis from loaded inputs. `valid` = {question: (S_valid (Ev, Nv) masked scores,
     pos_valid)}, refs_rank = {method: (rank array aligned to panel, diag)}, refs_expo = {method: dict from
-    load_ref_exposure}."""
+    load_ref_exposure}. segments="auto" (default) is the registered segmentation (make_segments); segments="single"
+    analyses the whole panel as ONE segment named `segment_name` (role "all"; make_single_segment)."""
     t0 = time.time()
+    _check_segment_options(segments, quarantine_n, first_event)
     E = panel.E
     if E == 0:
         raise ValueError("empty test panel")
@@ -1361,13 +1409,25 @@ def analyze_domain(domain: str, panel: Panel, L_test: dict, valid: dict, refs_ra
                        "ref_ranks": {m: d for m, (_, d) in refs_rank.items()},
                        "ref_exposure": {m: d["diag"] for m, d in refs_expo.items()}},
               "temperature": Tinfo, "segments": {}}
+    plan = make_segments(domain, E, quarantine_n) if segments == "auto" else \
+        make_single_segment(domain, E, segment_name, first_event)
+    fe = 1 if first_event is None else int(first_event)           # number of the first event (1 = start of the panel)
+    if segments == "single":
+        result["segment_mode"] = {
+            "mode": "single", "segment": plan[0]["name"], "role": "all", "n_events": E, "first_event": first_event,
+            "event_range_basis": ("positions in the supplied panel" if first_event is None
+                                  else "events of the full test panel (first_event given by the caller)"),
+            "definition": "the whole supplied panel is analysed as ONE segment (role all); the sports quarantine split is not "
+                          "applied; the pool, the item -> group map, the profile quintiles and every other panel-derived "
+                          "quantity are those of the supplied panel; the temperature is the one fitted on this backbone's own "
+                          "VALID sample"}
     methods = sorted(set(refs_rank) | set(refs_expo))
-    for seg in make_segments(domain, E, quarantine_n):
+    for seg in plan:
         sl = slice(seg["lo"], seg["hi"])
         n = seg["hi"] - seg["lo"]
         boot = EventBoot(n, n_boot, seed)
         batch = LinearBatch(boot)
-        S: dict = {"role": seg["role"], "event_range": [seg["lo"] + 1, seg["hi"]], "n_events": n, "questions": {},
+        S: dict = {"role": seg["role"], "event_range": [fe + seg["lo"], fe - 1 + seg["hi"]], "n_events": n, "questions": {},
                    "reference": {}}
         prof_seg = profile[sl]
         for q in questions:
@@ -1432,11 +1492,17 @@ def analyze_domain(domain: str, panel: Panel, L_test: dict, valid: dict, refs_ra
 
 
 def run_domain(domain: str, audit_dir, panel_test, panel_valid, ref_ranks=None, ref_exposure=None,
-               questions=QUESTIONS, n_boot: int = 2000, seed: int = 0, quarantine_n=None, out=None) -> dict:
+               questions=QUESTIONS, n_boot: int = 2000, seed: int = 0, quarantine_n=None, out=None,
+               segments: str = "auto", test_role: str = "test", valid_role: str = "valid2k", first_event=None) -> dict:
+    """Analyse one domain. The scores are <audit_dir>/<domain>_<test_role>/scores.csv.gz (TEST) and
+    <audit_dir>/<domain>_<valid_role>/scores.csv.gz (VALID, temperature only); the defaults are the registered layout
+    (test / valid2k). `segments`, `test_role`, `valid_role`, `first_event`: the second-backbone subsample (module docstring,
+    item 9); every default reproduces the registered behaviour and output exactly."""
     t0 = time.time()
+    _check_segment_options(segments, quarantine_n, first_event)
     audit = Path(audit_dir)
-    s_test = audit / f"{domain}_test" / "scores.csv.gz"
-    s_valid = audit / f"{domain}_valid2k" / "scores.csv.gz"
+    s_test = audit / f"{domain}_{test_role}" / "scores.csv.gz"
+    s_valid = audit / f"{domain}_{valid_role}" / "scores.csv.gz"
     for p in (s_test, s_valid, Path(panel_test), Path(panel_valid)):
         if not Path(p).exists():
             raise FileNotFoundError(p)
@@ -1453,7 +1519,8 @@ def run_domain(domain: str, audit_dir, panel_test, panel_valid, ref_ranks=None, 
     rr = {m: align_ref_ranks(p, panel) for m, p in discover_methods(ref_ranks).items()}
     rx = {m: load_ref_exposure(p, panel) for m, p in discover_methods(ref_exposure).items()}
     pool_json = Path(ref_exposure) / "_pool.json" if ref_exposure else None
-    res = analyze_domain(domain, panel, L_test, valid, rr, rx, questions, n_boot, seed, quarantine_n, diag)
+    res = analyze_domain(domain, panel, L_test, valid, rr, rx, questions, n_boot, seed, quarantine_n, diag,
+                         segments=segments, segment_name=test_role, first_event=first_event)
     res["data"]["scores_valid"] = vdiag
     res["data"]["valid_events"] = vpanel.E
     if pool_json is not None and pool_json.exists():
@@ -1463,11 +1530,135 @@ def run_domain(domain: str, audit_dir, panel_test, panel_valid, ref_ranks=None, 
     res["inputs"] = {"audit_dir": str(audit), "panel_test": str(panel_test), "panel_valid": str(panel_valid),
                      "ref_ranks": str(ref_ranks) if ref_ranks else None,
                      "ref_exposure": str(ref_exposure) if ref_exposure else None}
+    if segments != "auto" or (test_role, valid_role) != ("test", "valid2k"):       # recorded only off the registered layout
+        res["inputs"].update(segments=segments, test_role=test_role, valid_role=valid_role)
+        if first_event is not None:
+            res["inputs"]["first_event"] = int(first_event)
     res["timing_s"] = round(time.time() - t0, 1)
     if out:
         Path(out).parent.mkdir(parents=True, exist_ok=True)
         Path(out).write_text(json.dumps(strict_json(res), indent=1, allow_nan=False), encoding="utf-8")
     return res
+
+
+# ------------------------------------------------------------------------ second-backbone subsample: restrict (Z2)
+def read_event_ids(path) -> list:
+    """Ordered source_event_ids of a panel JSONL (one JSON object per line; the id is read from the line prefix when
+    source_event_id is the first key) or of a plain list (one id per line). A repeated id is an error."""
+    ids, seen = [], set()
+    with open(path, encoding="utf-8") as f:
+        for ln, line in enumerate(f, 1):
+            t = line.strip()
+            if not t:
+                continue
+            if t[0] == "{":
+                m = _EV_RE.match(line)
+                ev = m.group(1) if m is not None else str(json.loads(t)["source_event_id"])
+            else:
+                ev = t
+            if ev in seen:
+                raise ValueError(f"{path}:{ln}: duplicated source_event_id {ev}")
+            seen.add(ev)
+            ids.append(ev)
+    return ids
+
+
+def _event_of(line: str, idx: int) -> str:
+    """source_event_id (column idx) of one raw CSV line."""
+    if idx == 0 and line[:1] != '"':
+        j = line.find(",")
+        return line[:j] if j >= 0 else line.rstrip("\r\n")
+    return next(csv.reader([line]))[idx]
+
+
+@contextmanager
+def _gz_text_writer(path):
+    """Level-9 gzip text stream with a zero mtime (byte-reproducible); lines are written verbatim (newline='')."""
+    with open(path, "wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as gz:
+            with io.TextIOWrapper(gz, encoding="utf-8", newline="") as txt:
+                yield txt
+
+
+def _sha1_file(path) -> str:
+    h = hashlib.sha1()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def restrict_scores(src, dst, ids, allow_missing: bool = False) -> dict:
+    """Write to `dst` the header and the VERBATIM lines of the score file `src` whose source_event_id is in `ids` (file order
+    kept). Without allow_missing, an id without any score row is an error and nothing is written."""
+    keep, dst = set(ids), Path(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dst.with_name(dst.name + ".tmp")
+    n_rows = n_kept = 0
+    found: set = set()
+    try:
+        with _open_text(src) as fin, _gz_text_writer(tmp) as fout:
+            header = fin.readline()
+            if not header:
+                raise ValueError(f"{src}: empty scores file")
+            cols = next(csv.reader([header]))
+            if "source_event_id" not in cols:
+                raise ValueError(f"{src}: missing column source_event_id")
+            idx = cols.index("source_event_id")
+            fout.write(header)
+            for line in fin:
+                if not line.strip():
+                    continue
+                n_rows += 1
+                ev = _event_of(line, idx)
+                if ev in keep:
+                    fout.write(line)
+                    n_kept += 1
+                    found.add(ev)
+        missing = [e for e in ids if e not in found]
+        if missing and not allow_missing:
+            raise ValueError(f"{len(missing)} of {len(ids)} requested events have no score row in {src}, e.g. {missing[:3]}")
+        os.replace(tmp, dst)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+    return {"n_rows_in": n_rows, "n_rows_kept": n_kept, "n_events_found": len(found), "n_events_missing": len(missing),
+            "missing_examples": missing[:5]}
+
+
+def restrict_audit(domain: str, audit_dir, panel_subset, out_dir, test_role: str = "test", valid_role: str = "valid2k",
+                   allow_missing: bool = False) -> dict:
+    """Restrict an audit scores directory to the events of `panel_subset` (a panel JSONL or an id list): writes
+    <out_dir>/<domain>_<test_role>/scores.csv.gz with the score lines of those events, copies
+    <audit_dir>/<domain>_<valid_role>/scores.csv.gz UNCHANGED (byte copy: the temperature stays the one fitted on the full
+    VALID sample) and a manifest <out_dir>/<domain>_restrict.json, so that `run --audit_dir <out_dir>` can be pointed at it."""
+    audit, out = Path(audit_dir), Path(out_dir)
+    if audit.resolve() == out.resolve():
+        raise ValueError("out_dir must differ from audit_dir (the source scores are never overwritten)")
+    s_test = audit / f"{domain}_{test_role}" / "scores.csv.gz"
+    s_valid = audit / f"{domain}_{valid_role}" / "scores.csv.gz"
+    for p in (s_test, s_valid, Path(panel_subset)):
+        if not Path(p).exists():
+            raise FileNotFoundError(p)
+    ids = read_event_ids(panel_subset)
+    if not ids:
+        raise ValueError(f"{panel_subset}: no source_event_id")
+    d_test = out / f"{domain}_{test_role}" / "scores.csv.gz"
+    d_valid = out / f"{domain}_{valid_role}" / "scores.csv.gz"
+    rep = restrict_scores(s_test, d_test, ids, allow_missing)
+    d_valid.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(s_valid, d_valid)
+    manifest = {
+        "schema": "nextitem_audit_restrict_v1", "domain": domain, "test_role": test_role, "valid_role": valid_role,
+        "panel_subset": str(panel_subset), "n_events_requested": len(ids),
+        "ids_sha1": hashlib.sha1("\n".join(ids).encode("utf-8")).hexdigest(), "allow_missing": bool(allow_missing),
+        "source_test": {"path": str(s_test), "sha1": _sha1_file(s_test)},
+        "restricted_test": {"path": str(d_test), "sha1": _sha1_file(d_test), "bytes": d_test.stat().st_size, **rep},
+        "valid_copy": {"source": str(s_valid), "path": str(d_valid), "sha1": _sha1_file(d_valid),
+                       "bytes": d_valid.stat().st_size}}
+    (out / f"{domain}_restrict.json").write_text(json.dumps(strict_json(manifest), indent=1, allow_nan=False),
+                                                 encoding="utf-8")
+    return manifest
 
 
 # -------------------------------------------------------------------------------------------------- summarize
@@ -1652,7 +1843,8 @@ def main(argv=None) -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="per-domain analysis")
     r.add_argument("--domain", required=True)
-    r.add_argument("--audit_dir", required=True, help="holds <domain>_test/scores.csv.gz and <domain>_valid2k/scores.csv.gz")
+    r.add_argument("--audit_dir", required=True, help="holds <domain>_<test_role>/scores.csv.gz and "
+                   "<domain>_<valid_role>/scores.csv.gz (defaults test / valid2k)")
     r.add_argument("--panel_test", required=True)
     r.add_argument("--panel_valid", required=True)
     r.add_argument("--ref_ranks", default=None)
@@ -1663,14 +1855,42 @@ def main(argv=None) -> None:
     r.add_argument("--questions", default="next,like")
     r.add_argument("--quarantine_n", type=int, default=None, help="events held out as the quarantine segment "
                    "(default: 1000 for sports, none otherwise)")
+    r.add_argument("--segments", choices=("auto", "single"), default="auto",
+                   help="auto: the registered segmentation (sports quarantine split); single: the whole supplied panel is ONE "
+                   "segment named after --test_role (second-backbone subsample, Amendment 3 Z2)")
+    r.add_argument("--test_role", default="test", help="TEST scores directory suffix: <audit_dir>/<domain>_<test_role> "
+                   "(Llama Z2: test1001_3000)")
+    r.add_argument("--valid_role", default="valid2k", help="VALID scores directory suffix (temperature only; Llama Z2: valid500)")
+    r.add_argument("--first_event", type=int, default=None, help="with --segments single: number of the panel's first event in "
+                   "the full test panel (e.g. 1001); labels event_range and guards the sports quarantine")
+    t = sub.add_parser("restrict", help="restrict an audit scores directory to the events of a panel subset (Z2)")
+    t.add_argument("--domain", required=True)
+    t.add_argument("--audit_dir", required=True, help="holds <domain>_<test_role>/ and <domain>_<valid_role>/ scores")
+    t.add_argument("--panel_subset", required=True, help="panel JSONL (or a list of source_event_ids, one per line) of the "
+                   "events to keep")
+    t.add_argument("--out_dir", required=True, help="written: <domain>_<test_role>/scores.csv.gz (restricted), an unchanged copy "
+                   "of <domain>_<valid_role>/scores.csv.gz and <domain>_restrict.json")
+    t.add_argument("--test_role", default="test")
+    t.add_argument("--valid_role", default="valid2k")
+    t.add_argument("--allow_missing", action="store_true", help="keep going when requested events have no score row (counted "
+                   "in the manifest); by default that is an error")
     s = sub.add_parser("summarize", help="cross-domain summary of per-domain run outputs")
     s.add_argument("--inputs", required=True, help="comma-separated per-domain JSON files")
     s.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     if a.cmd == "run":
         res = run_domain(a.domain, a.audit_dir, a.panel_test, a.panel_valid, a.ref_ranks, a.ref_exposure,
-                         tuple(x for x in a.questions.split(",") if x), a.n_boot, a.seed, a.quarantine_n, a.out)
+                         tuple(x for x in a.questions.split(",") if x), a.n_boot, a.seed, a.quarantine_n, a.out,
+                         segments=a.segments, test_role=a.test_role, valid_role=a.valid_role, first_event=a.first_event)
         print(f"wrote {a.out} ({res['timing_s']}s, segments {list(res['segments'])})")
+    elif a.cmd == "restrict":
+        try:
+            man = restrict_audit(a.domain, a.audit_dir, a.panel_subset, a.out_dir, a.test_role, a.valid_role, a.allow_missing)
+        except ValueError as e:
+            raise SystemExit(f"restrict: {e}") from None
+        rt = man["restricted_test"]
+        print(f"wrote {rt['path']} ({rt['n_rows_kept']} rows, {rt['n_events_found']} of {man['n_events_requested']} events) "
+              f"and the unchanged {a.valid_role} copy in {a.out_dir}")
     else:
         docs = [json.loads(Path(p).read_text(encoding="utf-8")) for p in a.inputs.split(",") if p]
         res = summarize(docs)

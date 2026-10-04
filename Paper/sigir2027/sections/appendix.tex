@@ -1,13 +1,14 @@
 % =====================================================================================================================
-% Appendix (owner: results). Compact skeleton, about 1.5 pages when filled. Same fill rules and file aliases as
+% Appendix (owner: results). Compact skeleton, measured at about 1.7 pages with every slot replaced by a typical cell (about 1.5 after
+% the cut order below). Same fill rules and file aliases as
 % sections/experiments.tex (sel, gate, gft, cpu, grid, aud, aud2q, aud2l, ko, prn, corr, mir, slot; plus diag = outputs/confrec/diag/diag.json,
 % the diagnosis battery, interpretive only). No URLs; no number is typed by hand: every slot is filled from a committed result file.
 % Sections: app:prompts, app:sensitivity, app:prereg, app:battery, app:pseudonym, app:repro, app:tables.
 % Every float is single-column with the specifier p (!tbp): a float with only t/b that is still queued at the end of the document is
 % lost, and so is a single-column float queued behind a deferred table*.
-% If the appendix exceeds its budget, cut in this order: the prose of app:battery, tab:app-seeds (keep the FT-C rows), tab:serving
-% (keep block A), the Platt-slope and ECE rows of tab:app-llama, tab:app-z2 only if the second-backbone clause of claim admission is
-% dropped from the paper.
+% If the appendix exceeds its budget, cut in this order: the prose of app:battery, then tab:app-battery itself, tab:app-seeds (keep the
+% FT-C rows), the share and ECE rows of tab:app-llama, the baseline rows of tab:serving, tab:app-z2 only if the second-backbone clause of
+% claim admission is dropped from the paper.
 % Fine-tuned items (LoRA columns, per-seed table, FT-C rows) exist only after a recorded GATE_FT_PASS (Amendment 3 section 0); blocks
 % between "% BRANCH-GATEFT-BEGIN" and "% BRANCH-GATEFT-END" are deleted otherwise.
 % =====================================================================================================================
@@ -31,7 +32,7 @@ and are scored only after the zero-shot gate (Table~\ref{tab:app-bank}).
 
 \begin{table}[!tbp]
 \caption{Registered prompt-variant bank (rated panels; no variant uses collaborative statistics, the user's mean rating, few-shot
-examples, thinking or a digit readout; V6, semantic retrieval of history items, was dropped before any scoring).}
+examples, thinking or a digit readout; V6 was dropped before scoring).}
 \label{tab:app-bank}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
@@ -57,9 +58,9 @@ V7 & V1 + V3 + V4 + V5 & 20 & combined\\
 Table~\ref{tab:app-sens} publishes all $7\times2$ development UAUCs of the registered remedy round (burned users, like question).
 
 \begin{table}[!tbp]
-\caption{Prompt sensitivity (G5): like-question UAUC of the seven registered variants on the two development panels (1,500 burned
-users each). E1: censored rows $\le0.5\%$, no overlength prompt, mean Yes$+$No mass $\ge0.95$ (both panels); E2: Toys UAUC $\ge$ V0
-$-0.010$; Tied: within 0.005 of the best eligible ML-1M UAUC.}
+\caption{Prompt sensitivity (G5): like-question UAUC of the seven variants on the two development panels (1,500 burned users each).
+E1: censored rows $\le0.5\%$, no overlength prompt, Yes$+$No mass $\ge0.95$; E2: Toys UAUC $\ge$ V0 $-0.010$; Tied: within 0.005 of the
+best eligible ML-1M UAUC.}
 \label{tab:app-sens}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS: V0, V1, V2, V3, V4, V5, V7. COLUMNS (alias sel; table[V][panel]): UAUC (ml1m), UAUC (toys), E1 (both panels: yes/no),
@@ -104,7 +105,7 @@ split or contingency (the star-permutation reading is re-tested in Table~\ref{ta
 prior-only item mean) and a digit readout (``What star rating from 1 to 5 \ldots{}?'').
 
 \begin{table}[!tbp]
-\caption{Diagnosis battery on burned users with the registered reading of each probe (95\% user-bootstrap intervals). Interpretive only.}
+\caption{Diagnosis battery on burned users with the registered reading of each probe (interpretive only).}
 \label{tab:app-battery}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS and sources (alias diag = outputs/confrec/diag/diag.json): T0 diag:T0.spearman and diag:T0.like_rho; T1 diag:T1.UAUC; T2
@@ -165,9 +166,9 @@ by confidence; Table~\ref{tab:app-seeds} lists every seed of the fine-tuned grid
 compares the two backbones on the next-item panels.
 
 \begin{table}[!tbp]
-\caption{Corrections against their controls. Row 0: raw UAUC and references; rows 1--2: invariance checks on stored scores; rows 3--4:
-priors on $S_d$; rows 5--7: the two-view contrast, scored only after the zero-shot gate is passed. 2nd rated:
-\DATANEEDED{mir:second\_rated\_domain}; Sports: validation events 1--1000.}
+\caption{Corrections against their controls: raw UAUC and references (0), invariance checks on stored scores (1--2), priors on $S_d$
+(3--4), the two-view contrast, scored only after the zero-shot gate is passed (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain};
+Sports: validation events 1--1000.}
 \label{tab:corrections}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS and sources. 0: one cell "raw / item mean / MF" = grid:UAUC; cpu:UAUC_item_mean_prior; cpu:UAUC_mf_temporal (zero-shot,
@@ -198,7 +199,7 @@ priors on $S_d$; rows 5--7: the two-view contrast, scored only after the zero-sh
 
 % METHOD-SLOT-BEGIN (appendix)
 \begin{table}[!tbp]
-\caption{Nested method slot: TEST UAUC (seed mean, s.d.); last row before the references: paired difference offset minus stacking.}
+\caption{Nested method slot: TEST UAUC (seed mean, s.d.) and the paired difference offset minus stacking.}
 \label{tab:slot}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS: SFT with b = 0 (the main-grid adapters; context), post-hoc stacking, prior-offset LoRA, difference, references.
@@ -222,9 +223,8 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 % METHOD-SLOT-END (appendix)
 
 \begin{table}[!tbp]
-\caption{Second backbone, Llama-3.1-8B-Instruct, ML-1M and Toys (key rows of Tables~\ref{tab:reliability} and~\ref{tab:decomp}, same cells;
-decomposition on $S_d$; P1 and the LoRA columns only after a Gate-FT pass). A cell reads ``not run'' only where the registered cut rule
-applies.}
+\caption{Second backbone, Llama-3.1-8B-Instruct, ML-1M and Toys (key rows of Tables~\ref{tab:reliability} and~\ref{tab:decomp}, same
+cells; decomposition on $S_d$; P1 and the LoRA columns only after a Gate-FT pass; ``not run'' only under a registered cut rule).}
 \label{tab:app-llama}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % COLUMNS and ROW sources exactly as tab:reliability and tab:decomp (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, report root
@@ -257,9 +257,8 @@ P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{g
 \end{table}
 
 \begin{table}[!tbp]
-\caption{Selective serving by confidence (RQ3), Qwen3-8B, question \textsf{next} (estimates). Gain: NDCG@10 of the served half (50\%
-coverage) minus full coverage; share: served share of niche- minus mainstream-quintile users at 50\% coverage. Baselines: range over the
-baselines' own score margins where a score column exists.}
+\caption{Selective serving (RQ3), Qwen3-8B, question \textsf{next} (estimates). Gain: NDCG@10 of the served half (50\% coverage) minus
+full coverage; share: served share of niche- minus mainstream-quintile users. Baselines: range of their own score margins, if exported.}
 \label{tab:serving}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS: gain and share for the signals p_max and random, and for the baselines' own margin. COLUMNS: S1k, S10k, Toys, Home, Tools. Sources
@@ -286,9 +285,8 @@ Share, baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEE
 
 % BRANCH-GATEFT-BEGIN
 \begin{table}[!tbp]
-\caption{Every LoRA seed (Qwen3-8B, seeds 0 / 1 / 2) on TEST rows, and the within-item label-permutation control (FT-C; ML-1M, seeds 0 and
-1). All rows: CAL $\cup$ TEST rows of the evaluation users (the robustness split of Amendment 3). The ML-1M UAUC seeds equal those of
-Table~\ref{tab:gate-outcomes}.}
+\caption{Every LoRA seed (Qwen3-8B) on TEST rows and the within-item label-permutation control (FT-C; ML-1M, seeds 0, 1). All rows: CAL
+$\cup$ TEST rows of the evaluation users. The ML-1M seeds equal those of Table~\ref{tab:gate-outcomes}.}
 \label{tab:app-seeds}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS: the four rated domains and three FT-C rows. COLUMNS (alias grid): UAUC and UAUC_all_rows per seed (E-A and its secondary (i); one cell
@@ -315,8 +313,8 @@ ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minu
 % BRANCH-GATEFT-END
 
 \begin{table}[!tbp]
-\caption{Second backbone on the next-item panels (RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on the same 2,000 events (1,001--3,000) of
-each domain, question \textsf{next}, prompt V0; Sports events 1--1000 stay quarantined. Cells: Qwen / Llama.}
+\caption{Second backbone on the next-item panels (RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on the same 2,000 events (1,001--3,000)
+of each domain, question \textsf{next}, prompt V0. Cells: Qwen / Llama.}
 \label{tab:app-z2}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 % ROWS: the endpoints of sections B, D, E of the next-item audit (Amendment 3 section 4, Z2). COLUMNS: Sports, Toys, Home, Tools. Cell:

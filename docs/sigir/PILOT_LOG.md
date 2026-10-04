@@ -1,5 +1,34 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 recorded (enables the training of the Gate-FT adapters; scoring still waits for the full record)
+
+`idea-stage/PREREG_AMENDMENT_3.md` sha1 = 4db1b62f30399c4d2d06fae205cfc0a52db8a419 (the fine-tuned program; section 0 of that file:
+training needs this line, scoring of any adapter or of the zero-shot panels of section 4 needs in addition the sha1 of every file of
+its FREEZE `core` list and of the `ftgrid_split.json` of each domain, to be written by
+`python -m src.confrec.ftgrid_freeze --print --stage core`). Gate-FT training runs under the prompt of `selection.json`
+(`gate_ft_prompt`, see the next entry). Written before any adapter existed; no outcome statistic of an adapter exists.
+
+## 2026-10-04 · G3–G5 dev selection result (registered stage 1; `outputs/confrec/gatefix/dev/selection.json`, burned dev users)
+
+**FIX_FOUND, V\* = V1** (the label-aligned threshold question "Will this user rate the candidate item 4 stars or higher (on a 1-5
+scale)?"). Gate-FT is trained under V1 (`gate_ft_prompt = V1`). Dev UAUC of the `like` question, 1,500 users per panel; every variant is
+eligible (E1 and E2 hold for all seven):
+
+| variant | ML-1M dev | Toys dev |
+|---|---|---|
+| V0 (registered control) | 0.5875 | 0.5397 |
+| **V1** | **0.6122** | 0.5442 |
+| V2 (TALLRec layout) | 0.6110 | 0.5434 |
+| V3 (20 events) | 0.5984 | 0.5409 |
+| V4 (genre metadata) | 0.5401 | 0.5465 |
+| V5 (system message) | 0.5952 | 0.5397 |
+| V7 (V1+V3+V4+V5) | 0.5845 | 0.5440 |
+
+V1 and V2 are within 0.005 of the maximum; the tie rule (higher Toys dev UAUC, then the simplicity order) selects V1. UAUC(V1) −
+UAUC(V0) on ML-1M dev = +0.0247, paired one-sided user-bootstrap lower bound +0.0197 > 0 (level 0.9917, 2,000 resamples), so a fix
+is found and stage 2 (the one confirmatory gate on the fresh ML-1M users: UAUC(V1) ≥ 0.60) runs. These dev numbers are on users that
+were burned in Pilot 1 and carry a winner's curse; the confirmation decides.
+
 ## 2026-10-04 · Amendment-2 FREEZE record (G-round: prompt-fix, diagnosis battery; before any such GPU job)
 
 Produced by `scripts/sigir/run_gatefix.sh` stage 0 on the server repo (`/root/autodl-tmp/lumen-rec` at commit 6da7ae4), file

@@ -325,6 +325,36 @@ def test_aurc_matches_metrics_risk_coverage():
     assert fr.aurc(c, u) == pytest.approx(risk_coverage(c, u)[2], abs=1e-12)
 
 
+def test_resample_twins_equal_the_registered_estimators():
+    """The vectorised bootstrap twins reproduce metrics.bias_index, stats.platt_fit on the resampled rows and
+    forensics.partial_spearman (resampled rows carry duplicates; a constant control is rank-deficient)."""
+    rng = np.random.default_rng(3)
+    n = 3000
+    users = np.repeat(np.arange(300), 10)
+    conf = np.round(rng.random(n), 2)
+    y = (rng.random(n) < conf).astype(int)
+    grp = rng.choice(["head", "mid", "tail"], n)
+    cl = fr.Clusters(users)
+    for pos in list(cl.draws(5, 1)):
+        a, b = fr.bias_index_fast(conf[pos], y[pos], grp[pos]), bias_index(conf[pos], y[pos], grp[pos], 10, True)
+        assert a.keys() == b.keys() and all(a[k] == pytest.approx(b[k], abs=1e-12, nan_ok=True) for k in a)
+    x = rng.normal(0, 2, n)
+    yy = (rng.random(n) < sigmoid(0.7 * x - 0.3)).astype(int)
+    picks = list(cl.picks(4, 2))
+    W = np.stack([np.bincount(p, minlength=cl.n) for p in picks])[:, cl.unit_of_row()].astype(float)
+    fits = fr.platt_batch(x, yy, W, platt_fit(x, yy))
+    for k, p in enumerate(picks):
+        rows = cl.rows(p)
+        assert fits[k] == pytest.approx(platt_fit(x[rows], yy[rows]), abs=1e-7)
+    assert np.isnan(fr.platt_batch(x, np.ones(n), W[:1], (0.5, 0.0))).all()     # one class: no fit
+    Z = np.column_stack([rng.normal(0, 1, n), np.ones(n)])                       # second control constant
+    xs = [rng.normal(0, 1, n) + 0.3 * Z[:, 0] for _ in range(3)]
+    yv = rng.normal(0, 1, n) + Z[:, 0]
+    for z in (Z[:, :1], Z):
+        shared = fr.partial_spearman_shared(xs, yv, z)
+        assert shared == pytest.approx([fx.partial_spearman(v, yv, z) for v in xs], abs=1e-10)
+
+
 # ---------------------------------------------------------------- forensics: the explicit cutoff
 def test_cf_references_explicit_cutoff_never_sees_ratings_at_or_after_it(tmp_path):
     w = make_world(tmp_path, "ml1m", seed=3, n_eval=150, n_bg=80)
@@ -535,6 +565,54 @@ def test_item_prior_share_recovers_the_planted_share_and_reliability():
     assert noisy["item_prior_share"]["est"] == pytest.approx(share, abs=0.15)
 
 
+def test_lemma_invariance_checks_per_user_zero_and_pooled_offset_change():
+    rng = np.random.default_rng(14)
+    n_users, n = 300, 10
+    users = np.repeat([f"u{k:03d}" for k in range(n_users)], n)
+    off = np.repeat(rng.normal(0, 2, n_users), n)
+    e = rng.normal(0, 1, len(users))
+    y = (rng.random(len(users)) < sigmoid(off + 1.5 * e)).astype(int)   # the user offset carries the user's base rate
+    L = off + e + rng.normal(0, 0.5, len(users))
+    cx = _ctx(users, y, test=np.ones(len(users), bool))
+    out = fr.invariance_block(cx, {"m": L, "flip": L}, {"m": (0.7, -0.2), "flip": (-0.5, 0.1)})
+    m = out["per_model"]["m"]
+    assert m["max_abs_dAUC_user_platt"] <= 1e-12 and m["max_abs_dAUC_user_centred"] <= 1e-12
+    assert m["max_abs_dAUC_user"] <= 1e-12 and m["n_users"] == len(fr.user_aucs(L, y, users))
+    xc = L - np.repeat([L[users == u].mean() for u in sorted(set(users))], n)
+    assert m["dAUC_pooled_offset_removal"] == pytest.approx(auroc(xc, y) - auroc(L, y))
+    assert m["dAUC_pooled_offset_removal"] < -0.05          # the offsets carried cross-user (base-rate) information
+    assert out["per_model"]["flip"]["max_abs_dAUC_user_platt"] > 0.1    # a decreasing map reverses each user
+    # offsets unrelated to the labels: removing them helps the pooled AUC, the per-user AUCs still do not move
+    y2 = (rng.random(len(users)) < sigmoid(1.5 * e)).astype(int)
+    o2 = fr.invariance_block(_ctx(users, y2, test=np.ones(len(users), bool)), {"m": L}, {"m": (0.7, -0.2)})
+    assert o2["per_model"]["m"]["dAUC_pooled_offset_removal"] > 0.05 and o2["per_model"]["m"]["max_abs_dAUC_user"] <= 1e-12
+
+
+def test_item_dependent_corrections_are_paired_contrasts_against_raw_L():
+    rng = np.random.default_rng(15)
+    n_users, n, n_items = 400, 10, 300
+    users = np.repeat([f"u{k:03d}" for k in range(n_users)], n)
+    items = rng.integers(0, n_items, len(users))
+    prior = rng.normal(0, 2, n_items)[items]                 # a strong item prior unrelated to the labels
+    e = rng.normal(0, 1, len(users))
+    y = (e + rng.normal(0, 1, len(users)) > 0).astype(int)
+    L = {"m": prior + e + rng.normal(0, 0.5, len(users))}
+    NH = {"m": prior + rng.normal(0, 0.05, len(users))}      # no-history logit: the item prior alone
+    PI = {"m": prior + rng.normal(0, 0.3, len(users))}       # 8-donor swap prior
+    cx = _ctx(users, y)
+    rows = np.ones(len(users), bool)
+    out = fr.corrections_block(cx, L, NH, PI, rows, ["m"], ["m"], 200, 0, 1)
+    nh, ev = out["dUAUC_nohist_minus_raw"], out["dUAUC_evidence_minus_raw"]
+    raw = fr.user_aucs(L["m"], y, users)
+    for blk, corr in ((nh, L["m"] - NH["m"]), (ev, L["m"] - PI["m"])):
+        c = fr.user_aucs(corr, y, users)
+        assert blk["per_seed"]["m"]["est"] == pytest.approx(np.mean([c[u] - raw[u] for u in raw]))
+        assert blk["per_seed"]["m"]["est"] > 0.05 and blk["per_seed"]["m"]["lo"] > 0 and blk["per_seed"]["m"]["p"] < 0.05
+        assert blk["per_seed"]["m"]["UAUC_b"] == pytest.approx(np.mean(list(raw.values())))
+    none = fr.corrections_block(cx, L, NH, PI, rows, [], [], 10, 0, 1)
+    assert none["dUAUC_nohist_minus_raw"]["available"] is False and none["dUAUC_evidence_minus_raw"]["available"] is False
+
+
 def _stack_world(gamma, cf_signal, n_users=600, n_rows=10, seed=7):
     rng = np.random.default_rng(seed)
     users = np.repeat([f"u{k:04d}" for k in range(n_users)], n_rows)
@@ -632,6 +710,17 @@ def test_partial_spearman_and_bias_index_blocks_use_the_registered_estimators():
 
 
 # ---------------------------------------------------------------- knockout labels
+def test_holm_family_e_d_and_confirmation_rule():
+    adj = fr.holm({"G": 0.01, "star_permutation": 0.04, "absent": None})
+    assert adj == {"G": pytest.approx(0.02), "star_permutation": pytest.approx(0.04), "absent": None}
+    assert fr.holm({"a": 0.03, "b": 0.02}) == {"a": pytest.approx(0.04), "b": pytest.approx(0.04)}
+    ed = {"information_gain": {"G_mean_over_seeds": {"p": 0.01}, "seeds": {"sigma_seed_rule": False}},
+          "star_permutation": {"dUAUC_mean_over_seeds": {"p": 0.2}, "seeds": {"sigma_seed_rule": True}}}
+    zs, ft = fr.ed_holm_family(ed, "ZS"), fr.ed_holm_family(ed, "FT")
+    assert zs["confirmed"] == {"G": True, "star_permutation": False}
+    assert ft["confirmed"]["G"] is False                   # Holm p < 0.05 but the sigma_seed rule fails
+
+
 def test_decide_labels_are_mapped_by_the_closed_hole_rule():
     nan = float("nan")
     ci = lambda e, lo, hi: {"est": e, "lo": lo, "hi": hi}  # noqa: E731
@@ -701,8 +790,16 @@ def test_report_schema_strict_json_tables_and_meta(ml1m):
               ("E-B", "dUAUC_FT_minus_ZS"), ("E-C", "ECE"), ("E-C", "share_errors_top"), ("E-D", "item_prior_share"),
               ("E-D", "G"), ("E-D", "G_CF"), ("E-D", "starperm_dUAUC"), ("E-E", "partial_spearman_L_pair"),
               ("E-E", "bias_index_head_minus_tail"), ("P1", "G_FT_minus_G_ZS"),
-              ("FT-C", "dUAUC_real_minus_permuted_TEST")]:
+              ("FT-C", "dUAUC_real_minus_permuted_TEST"), ("E-A", "max_abs_dAUC_user"),
+              ("E-A", "dAUC_pooled_offset_removal"), ("E-D", "dUAUC_nohist_minus_raw"),
+              ("E-D", "dUAUC_evidence_minus_raw")]:
         assert e in ends, e
+    inv = res["E_A"]["ZS"]["invariance"]["per_model"]["zeroshot"]
+    assert inv["max_abs_dAUC_user"] <= 1e-12 and inv["platt_slope"] > 0 and inv["dAUC_pooled_offset_removal"] is not None
+    cor = res["E_D"]["FT"]["corrections"]
+    for k in ("dUAUC_nohist_minus_raw", "dUAUC_evidence_minus_raw"):
+        assert set(cor[k]["per_seed"]) == {"s0", "s1", "s2"} and cor[k]["mean_over_seeds"]["est"] < 0   # an informative
+        assert cor[k]["rows"]["n_users"] == res["E_D"]["FT"]["UAUC"]["L"]["rows"]["n_users"]          # prior removed
 
 
 def test_report_is_deterministic_and_reuses_the_refs_cache(ml1m):

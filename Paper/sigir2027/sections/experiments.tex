@@ -41,8 +41,9 @@
 %     GATE_FT_FAIL or INCOMPLETE delete the fine-tuned items and every statement about the fine-tuned regime, and keep the zero-shot
 %     columns of Z1 (Qwen: four rated panels with the decomposition arms on S_d; Llama: ML-1M and Toys), Z2 and the whole Qwen
 %     next-item audit.
-%  5. Page budget (3 pages when filled, about 2.9 without the optional method slot). If exceeded, move to the appendix in this order:
-%     the ECE/Brier columns of tab:anatomy, the APLT block of tab:exposure, the guide column "Actionable via".
+%  5. Page budget: measured at about 3.1 pages with every slot replaced by a typical cell (title block excluded), about 3.0 without the
+%     optional method slot; the brief allows 3. If exceeded, move to the appendix in this order: the ECE/Brier columns of tab:anatomy, the
+%     APLT block of tab:exposure, the "Actionable via" column of tab:guide, the P1 and star-permutation rows' details of tab:decomp.
 %  6. LaTeX note: a table* that is still deferred at the end of the document makes any single-column float queued behind it
 %     vanish (acmart end-of-document flush), and a float with only the specifiers t/b that is still queued at the end is lost. All
 %     floats therefore carry the specifier p (tp, !tbp), and the appendix uses single-column floats only.
@@ -152,27 +153,31 @@ decisions in the bottom margin tertile is \DATANEEDED{grid:share\_correct\_botto
 \DATANEEDED{grid:share\_correct\_bottom\_tertile} (LoRA).
 
 \begin{table*}[tp]
-\caption{Next-item error anatomy and list-normalised calibration (RQ1, RQ2, RQ4): Qwen3-8B, zero-shot, V0, question \textsf{next}.
+\caption{Next-item error anatomy, calibration and pointwise quality (RQ1, RQ2, RQ4): Qwen3-8B, zero-shot, V0, question \textsf{next}.
 Tertiles of $p_{\max}$; accuracy = top-1 correctness; ``errors in high'' = share of top-1 errors in the top tertile (one third if
-uninformative); ECE: 15 equal-width bins; sports events 1--1000 quarantined.}
+uninformative); ECE~\citep{naeini2015ece}: 15 equal-width bins; AUROC($\ell$): pooled over candidate rows; UAUC: mean per-event AUC.
+Sports events 1--1000 quarantined.}
 \label{tab:anatomy}
 \centering\scriptsize\setlength{\tabcolsep}{4pt}
 % ROWS: the five panels (sports segments events_1_1000 and events_1001_10000; toys, home, tools: segment all). COLUMNS (alias aud,
 % question next): T = temperature[next].T; ECE = C.list_normalised.ece; Brier = C.list_normalised.brier; acc_low =
 % C.error_anatomy.unsure_correct_rate (accuracy of the bottom tertile); acc_high = C.error_anatomy.tertiles[2].accuracy; errors in
-% high = C.error_anatomy.share_errors_in_top_tertile; AUROC = C.auroc_discrimination.top1.auroc.p_max. The random-signal AUROC
-% (C.auroc_discrimination.top1.pmax_minus_random) and the paired differences (C.error_anatomy.acc_top_minus_bottom_tertile) are
-% used in the text, not in cells.
+% high = C.error_anatomy.share_errors_in_top_tertile; AUROC($p_max$) = C.auroc_discrimination.top1.auroc.p_max; AUROC(l) =
+% C.pointwise.pooled_auroc (S4, pooled over scored candidate rows); UAUC = C.pointwise.uauc (mean per-event AUC); NDCG@10 =
+% A_ranking.ranking.ndcg10 (the Sports 1-1000 value is the quantity of the registered gate, 0.2093 under the pilot scoring; context).
+% The random-signal AUROC (C.auroc_discrimination.top1.pmax_minus_random), the paired differences
+% (C.error_anatomy.acc_top_minus_bottom_tertile) are used in the text, not in cells; HR@10, MRR and the paired differences to C-CRP and the
+% eight baselines (A_ranking.vs_reference) stay in the released files as context.
 \resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lccccccc@{}}
+\begin{tabular}{@{}lcccccccccc@{}}
 \toprule
-Panel & $T$ & ECE & Brier & $\mathrm{acc}_{\rm low}$ & $\mathrm{acc}_{\rm high}$ & errors in high & AUROC($p_{\max}$)\\
+Panel & $T$ & ECE & Brier & $\mathrm{acc}_{\rm low}$ & $\mathrm{acc}_{\rm high}$ & errors in high & AUROC($p_{\max}$) & AUROC($\ell$) & UAUC & NDCG@10\\
 \midrule
-Sports, events 1--1000 & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1}\\
-Sports, events 1001--10000 & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1}\\
-Toys & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1}\\
-Home & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1}\\
-Tools & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1}\\
+Sports, events 1--1000 & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1} & \DATANEEDED{aud:C.pointwise.pooled\_auroc} & \DATANEEDED{aud:C.pointwise.uauc} & \DATANEEDED{aud:A.ranking.ndcg10}\\
+Sports, events 1001--10000 & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1} & \DATANEEDED{aud:C.pointwise.pooled\_auroc} & \DATANEEDED{aud:C.pointwise.uauc} & \DATANEEDED{aud:A.ranking.ndcg10}\\
+Toys & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1} & \DATANEEDED{aud:C.pointwise.pooled\_auroc} & \DATANEEDED{aud:C.pointwise.uauc} & \DATANEEDED{aud:A.ranking.ndcg10}\\
+Home & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1} & \DATANEEDED{aud:C.pointwise.pooled\_auroc} & \DATANEEDED{aud:C.pointwise.uauc} & \DATANEEDED{aud:A.ranking.ndcg10}\\
+Tools & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{aud:C.brier} & \DATANEEDED{aud:C.unsure\_correct\_rate} & \DATANEEDED{aud:C.tertile2\_accuracy} & \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud:C.auroc\_p\_max\_top1} & \DATANEEDED{aud:C.pointwise.pooled\_auroc} & \DATANEEDED{aud:C.pointwise.uauc} & \DATANEEDED{aud:A.ranking.ndcg10}\\
 \bottomrule
 \end{tabular}}
 \end{table*}
@@ -189,10 +194,10 @@ the time (share \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile}); on rated pa
 high-confidence / mostly high-confidence}.
 
 \begin{table*}[tp]
-\caption{Reliability of token confidence on rated panels (RQ1, RQ2, RQ4), Qwen3-8B (Llama-3.1-8B-Instruct: Table~\ref{tab:app-llama}).
-ZS: zero-shot under the Gate-FT prompt; LoRA: seed mean (s.d.); TEST rows. ECE: 10 equal-mass bins and slope of the Platt map fitted on
-CAL. Tertile shares and AUROC / AURC: of the margin of the per-user top-$k$ decision (Section~\ref{sec:tools}; the shares are one
-third if the margin is uninformative). References: non-LLM context. Holm family E-B: the regime contrast over the four domains.}
+\caption{Reliability of token confidence on rated panels (RQ1, RQ2, RQ4), Qwen3-8B (Llama: Table~\ref{tab:app-llama}). ZS: zero-shot,
+Gate-FT prompt; LoRA: seed mean (s.d.); TEST rows. ECE and slope: of the Platt map fitted on CAL (10 equal-mass bins). Shares and
+AUROC / AURC: of the margin of the per-user top-$k$ decision (Section~\ref{sec:tools}; one third if uninformative). References:
+non-LLM context. Holm family E-B: the regime contrast over the four domains.}
 \label{tab:reliability}
 \centering\scriptsize\setlength{\tabcolsep}{4pt}
 % COLUMNS: rated panels ML-1M, Toys, Video Games, Sports x {ZS, LoRA}; EVAL users of each panel, TEST rows. ROWS and sources
@@ -292,7 +297,8 @@ RLMRec~\citep{ren2024rlmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ4 (S4): what does yes/no confidence track?}\label{sec:exp-rq4}
 \emph{Endpoint} (Table~\ref{tab:rq}, RQ4): UAUC, the regime contrast, ECE and the Platt slope on TEST rows (Tables~\ref{tab:gate-outcomes},
-\ref{tab:reliability}) and, on the decomposition subset $S_d$ (Section~\ref{sec:tools}), the quantities of Table~\ref{tab:decomp}.
+\ref{tab:reliability}); the pooled AUROC, per-event AUC and NDCG@10 of the next-item panels (Table~\ref{tab:anatomy}); and, on the
+decomposition subset $S_d$ (Section~\ref{sec:tools}), the quantities of Table~\ref{tab:decomp}.
 Wording rules fixed in advance: the shares are uninterpretable if $r_8<0.7$; $\mathcal G/\mathcal G_{\rm CF}$ is reported only if the interval
 of $\mathcal G_{\rm CF}$ excludes 0; a temporal-MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of
 consumed-item panels.
@@ -301,9 +307,10 @@ A control adapter trained on labels permuted within each item (ML-1M, seeds 0 an
 personal evidence; its UAUC against the real adapter's is descriptive (Table~\ref{tab:app-seeds}).
 % BRANCH-GATEFT-END
 Further registered views (seen/unseen-item UAUC, Brier skill, margin-tertile errors) stay in the released files.
-\emph{Reading template.} In the zero-shot regime $\mathrm{UAUC}(\ell)$ is \DATANEEDED{above / indistinguishable from / below} the
-prior-only item mean on \DATANEEDED{k of 4} panels and after LoRA \DATANEEDED{above / indistinguishable from / below} it (paired
-difference \DATANEEDED{grid:UAUC minus cpu:UAUC\_item\_mean\_prior}); the non-prior share is \DATANEEDED{grid:non\_prior\_share} (zero-shot)
+\emph{Reading template.} On the next-item panels the per-event AUC of $\ell$ is \DATANEEDED{aud:C.pointwise.uauc}. On rated panels in the
+zero-shot regime $\mathrm{UAUC}(\ell)$ is \DATANEEDED{above / indistinguishable from / below} the prior-only item mean on
+\DATANEEDED{k of 4} panels and after LoRA \DATANEEDED{above / indistinguishable from / below} it (paired difference
+\DATANEEDED{grid:UAUC minus cpu:UAUC\_item\_mean\_prior}); the non-prior share is \DATANEEDED{grid:non\_prior\_share} (zero-shot)
 and \DATANEEDED{grid:non\_prior\_share} (LoRA), and the information gain $\mathcal G$ is \DATANEEDED{above / not distinguishable from} 0
 (\DATANEEDED{grid:G}) against a reference gain $\mathcal G_{\rm CF}$ of \DATANEEDED{grid:G\_CF}; fine-tuning \DATANEEDED{raises / leaves /
 lowers} UAUC (paired difference \DATANEEDED{grid:dUAUC\_ft\_minus\_zs}), and P1 \DATANEEDED{holds / does not hold} (mean
@@ -494,14 +501,16 @@ otherwise it stays direction-free.
 % fresh Amazon domain; replicated on the second backbone). Fill from the tables, never from memory. Second-backbone evidence: rated
 % findings (S1, S2, S4, S5) use the Llama arms of Z1 (tab:app-llama); S3 and the next-item part of S5 use Z2 (tab:app-z2, sections B, D,
 % E); no Llama run exists for the next-item calibration and error anatomy (section C), so an S1 or S2 claim that rests on the next-item
-% panels alone cannot meet the second-backbone clause. S6 and the method slot are single-backbone (Amendment 3 section 11).
+% panels alone cannot meet the second-backbone clause. S6 and the method slot are single-backbone (Amendment 3 section 11). On
+% GATE_FT_FAIL the S6 row reads "not run (registered: fine-tuned program only after a Gate-FT pass)" and the P1 and knockout parts of S4
+% and S5 are deleted.
 \begin{tabular}{@{}p{0.16\textwidth}p{0.22\textwidth}p{0.20\textwidth}p{0.21\textwidth}p{0.09\textwidth}@{}}
 \toprule
 Seed question & Registered endpoint (table) & Answer & Actionable via (control) & Admitted\\
 \midrule
-S1 Is the model sure when it is right? & $\mathrm{acc}_{\rm high}$ vs.\ $\mathrm{acc}_{\rm low}$, AUROC($p_{\max}$), correct decisions in the bottom margin tertile (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{cross-user serving vs.\ random signal (Table~\ref{tab:serving}A)} & \DATANEEDED{admitted: yes / no}\\
-S2 When it is wrong, was it unsure? & error share in the high tertile, margin AUROC / AURC (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{selective serving (Table~\ref{tab:serving}A); not per-user maps (Lemma~\ref{lem:invariance}; Table~\ref{tab:corrections}, rows 1--2)} & \DATANEEDED{admitted: yes / no}\\
-S3 Does serving confident items concentrate exposure on head items? (static) & $\Delta_{\rm head}$, Gini, APLT, niche served share, second backbone (Tables~\ref{tab:exposure}, \ref{tab:serving}B, \ref{tab:app-z2}) & \DATANEEDED{one clause from Tables~\ref{tab:exposure}, \ref{tab:serving}} & \DATANEEDED{exposure-aware serving vs.\ random signal (Table~\ref{tab:serving}B)} & \DATANEEDED{admitted: yes / no}\\
+S1 Is the model sure when it is right? & $\mathrm{acc}_{\rm high}$ vs.\ $\mathrm{acc}_{\rm low}$, AUROC($p_{\max}$), correct decisions in the bottom margin tertile (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{cross-user serving vs.\ random signal (Table~\ref{tab:serving})} & \DATANEEDED{admitted: yes / no}\\
+S2 When it is wrong, was it unsure? & error share in the high tertile, margin AUROC / AURC (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{selective serving (Table~\ref{tab:serving}); not per-user maps (Lemma~\ref{lem:invariance}; Table~\ref{tab:corrections}, rows 1--2)} & \DATANEEDED{admitted: yes / no}\\
+S3 Does serving confident items concentrate exposure on head items? (static) & $\Delta_{\rm head}$, Gini, APLT, niche served share, second backbone (Tables~\ref{tab:exposure}, \ref{tab:serving}, \ref{tab:app-z2}) & \DATANEEDED{one clause from Tables~\ref{tab:exposure}, \ref{tab:serving}} & \DATANEEDED{exposure-aware serving vs.\ random signal (Table~\ref{tab:serving})} & \DATANEEDED{admitted: yes / no}\\
 S4 How does yes/no confidence track the labels, and what is it made of? & UAUC vs.\ references, ECE, non-prior share, $\mathcal G$ vs.\ $\mathcal G_{\rm CF}$, star permutation, P1 (Tables~\ref{tab:reliability}, \ref{tab:decomp}) & \DATANEEDED{one clause from Tables~\ref{tab:reliability}, \ref{tab:decomp}} & \DATANEEDED{item-dependent corrections vs.\ controls (Table~\ref{tab:corrections}, rows 3--7)} & \DATANEEDED{admitted: yes / no}\\
 S5 Are popular items endorsed more confidently, and is that warranted? & level, matched-confidence gap, quality-partialled link, knockout label (Tables~\ref{tab:popularity}, \ref{tab:decomp}) & \DATANEEDED{one clause from Tables~\ref{tab:popularity}, \ref{tab:decomp}} & \DATANEEDED{knockout vs.\ real-brand placebo (Table~\ref{tab:popularity}B)} & \DATANEEDED{admitted: yes / no}\\
 S6 Can uncertainty prune noisy training data? & $\Delta$UAUC P2 $-$ P1 over 5 seeds (Table~\ref{tab:pruning}) & \DATANEEDED{one clause from Table~\ref{tab:pruning}} & \DATANEEDED{training-time only; control: random pruning P1 (Table~\ref{tab:pruning})} & \DATANEEDED{admitted: yes / no}\\

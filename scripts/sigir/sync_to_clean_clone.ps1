@@ -35,7 +35,7 @@ git add -A -- docs/sigir idea-stage src/confrec scripts/sigir Paper/sigir2027 ou
 if ($LASTEXITCODE -ne 0) { throw "git add failed ($LASTEXITCODE)" }
 $staged = git diff --cached --name-only
 if (-not $staged) { Write-Output "nothing to commit"; exit 0 }
-git commit -q -m "$Message" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -q -m "$Message" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 if ($LASTEXITCODE -ne 0) { throw "git commit failed ($LASTEXITCODE)" }
 git log --oneline -1
 if (-not $NoPush) {

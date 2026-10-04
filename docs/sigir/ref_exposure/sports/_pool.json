@@ -1,0 +1,147 @@
+{
+  "domain": "sports",
+  "n_pool_items": 230396,
+  "n_events": 10000,
+  "n_candidates_per_event_hist": {
+    "101": 10000
+  },
+  "n_pool_items_by_group": {
+    "head": 62455,
+    "mid": 99936,
+    "tail": 68005
+  },
+  "n_pool_items_with_conflicting_group": 0,
+  "pool_items_sha1": "04a49a62f9ebc34aa71e5b792f830b8e9c1cc1bb",
+  "panel_refs": "docs/sigir/panel_refs/sports_test.json",
+  "topk": 10,
+  "columns": [
+    "source_event_id",
+    "user_id",
+    "positive_rank",
+    "positive_group",
+    "top10_item_ids",
+    "top10_groups",
+    "n_head_pool",
+    "n_mid_pool",
+    "n_tail_pool"
+  ],
+  "methods": {
+    "ccrp_v3": {
+      "n_events": 10000,
+      "bytes": 1034285,
+      "source": "D:\\Research\\Lumen\\outputs\\sports_large10000_100neg_ccrp_v3_qwen3base_pointwise_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "elmrec_graph": {
+      "n_events": 10000,
+      "bytes": 1024085,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_elmrec_graph_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "irllrec_intent": {
+      "n_events": 10000,
+      "bytes": 949534,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_irllrec_intent_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llm2rec_sasrec": {
+      "n_events": 10000,
+      "bytes": 938914,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_llm2rec_sasrec_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llmemb": {
+      "n_events": 10000,
+      "bytes": 1008622,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_llmemb_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llmesr_sasrec": {
+      "n_events": 10000,
+      "bytes": 892872,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_llmesr_sasrec_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "proex_profile": {
+      "n_events": 10000,
+      "bytes": 950497,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_proex_profile_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "promax_profile": {
+      "n_events": 10000,
+      "bytes": 948063,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_promax_profile_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "rlmrec_graphcl": {
+      "n_events": 10000,
+      "bytes": 923088,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\sports_large10000_100neg_rlmrec_graphcl_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    }
+  }
+}

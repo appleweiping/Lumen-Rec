@@ -1,0 +1,99 @@
+{
+  "n_users": 1500,
+  "n_prompts": 111367,
+  "n_main_prompts": 88095,
+  "censored_main": {
+    "0": 88095,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "n_overlength": 0,
+  "mean_yes_no_mass": 0.9999994292527302,
+  "inference_time_s": 1278.5804207324982,
+  "prompts_sent_this_run": 111367,
+  "prompts_per_s": 87.10206897756021,
+  "chunk_users": 100,
+  "chunks": 15,
+  "chunks_resumed": 0,
+  "data_path": "outputs/confrec/panels/ml1m_rated.jsonl",
+  "data_sha1": "985494c7b44d010bec4b11ec62f35ad274dfe91f",
+  "model": "/root/autodl-tmp/lumen/models/Qwen3-8B",
+  "backbone": "Qwen3-8B",
+  "questions": [
+    "like",
+    "dislike",
+    "like_para"
+  ],
+  "hist_len": 10,
+  "seed": 0,
+  "lora": null,
+  "dtype": "float16",
+  "topk_logprobs": 50,
+  "max_model_len": 3072,
+  "vllm_version": "0.30.0",
+  "yes_ids": [
+    7414,
+    9454,
+    9693,
+    9834,
+    14004,
+    14080
+  ],
+  "no_ids": [
+    902,
+    2152,
+    2308,
+    2753,
+    5664,
+    8996,
+    72104
+  ],
+  "censored1_side_slack_nats": {
+    "yes": 1.791759469228055,
+    "no": 1.9459101490553132
+  },
+  "probe_ids_sha1": "84c67710d47d41c04e39c07810fa468f8c11189b",
+  "scorer": "token_pyes_multiq_v2",
+  "swap_k": 8,
+  "swap_items": 2909,
+  "swap_prompts": 23272,
+  "censored_swap": {
+    "0": 23272,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "swap_n_overlength": 0,
+  "chunk_items": 1000,
+  "swap_chunks": 3,
+  "swap_chunks_resumed": 0,
+  "swap_donors_mean": 8.0,
+  "swap_donors_min": 8,
+  "swap_items_fewer_than_k": 0,
+  "swap_excluded_users_mean": 14.728772774149192,
+  "swap_excluded_users_max": 227,
+  "config": {
+    "data_sha1": "985494c7b44d010bec4b11ec62f35ad274dfe91f",
+    "n_records": 1500,
+    "n_users": null,
+    "model": "/root/autodl-tmp/lumen/models/Qwen3-8B",
+    "lora": null,
+    "questions": [
+      "like",
+      "dislike",
+      "like_para"
+    ],
+    "hist_len": 10,
+    "swap_k": 8,
+    "seed": 0,
+    "dtype": "float16",
+    "topk_logprobs": 50,
+    "max_model_len": 3072,
+    "chunk_users": 100,
+    "chunk_items": 1000,
+    "scorer": "token_pyes_multiq_v2",
+    "prompts_sha1": "12e83c4fcca40db398ac58acbba2a7eb9c770524",
+    "swap_prompts_sha1": "e12ff9c33139abb033d5528b0fff53c03fb0f1bf"
+  }
+}

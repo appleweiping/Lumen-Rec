@@ -1,8 +1,29 @@
 # Experiment Plan — SIGIR 2027 (ARIS Workflow 1.5 input)
 
-> Status: **CONDITIONAL on Pilot 1** (`idea-stage/triage_verdict.md` §3.1). Branch A = MIRROR passes; Branch B =
-> fallback (B9/A9 evidence decomposition). Verdicts are same-family/provisional. Old pre-SIGIR plans:
-> `refine-logs/archive_pre_sigir_2026-05/`.
+> **Status (2026-10-02): re-framed by `idea-stage/PREREG_AMENDMENT_2.md` §P after the pilots.**
+> - Pilot 1: GATE_FAIL (ML-1M UAUC 0.587 < 0.60).
+> - Pilot 2: NULL (KuaiRec UAUC 0.469).
+>
+> The paper is now a **pre-registered audit of what a yes/no LLM recommender's confidence knows**, comparing the
+> zero-shot and fine-tuned regimes:
+> - C1 protocol;
+> - C2 decomposition (item prior vs personal evidence; star permutation; quality-partialled popularity; pseudonym
+>   knockout in the fine-tuned regime);
+> - C3 actionability (rank-inertness lemma; item-dependent corrections vs placebo and ensemble null; cross-user
+>   selective serving and exposure at 10k scale; S6 pruning vs matched random);
+> - C4 a guide answering S1–S6.
+>
+> **MIRROR** is retired as the flagship. It stays a registered arm, evaluated only after GATE_PASS (Amendment 2 G7).
+>
+> **The single remaining zero-shot remedy** is Amendment 2 G1–G8: 7 prompt variants, dev on burned users, one confirm
+> gate on 1,683 fresh ML-1M users.
+>
+> **Gate-FT** (LoRA, 3 seeds, mean UAUC ≥ 0.65) is registered and runs in every branch.
+>
+> **One nested method slot** (prior-offset LoRA) has a hard kill date of 2026-11-30.
+>
+> The blocks below are kept for traceability. Where they conflict with Amendment 2, Amendment 2 wins. Verdicts are
+> same-family/provisional. Old pre-SIGIR plans: `refine-logs/archive_pre_sigir_2026-05/`.
 
 **Problem.** A yes/no LLM recommender's confidence P(Yes) mixes *what it knows about the item* (familiarity,
 popularity, acquiescence) with *what it knows about the user*. Only the second is a recommendation signal; the

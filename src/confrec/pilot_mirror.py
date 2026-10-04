@@ -16,6 +16,18 @@ Rows whose logit is non-finite or flagged censored 2/3 are dropped and counted p
 rows (one side imputed with the smallest top-k logprob, the logit is a bound) are kept.
 Rated panels: per-user UAUC, paired user-bootstrap dUAUC (primary: mirror - placebo, on rows where both arms are
 finite), acquiescence/valence/prior estimands (P1.1), calibration (P1.2), confident-error detection (P1.3).
+Correlation-matched ensemble null (idea-stage/PREREG_AMENDMENT_2.md G7, A4), block `ensemble_null`: mirror is the
+two-view ensemble like + (-dislike), so it is compared with the UAUC a pure ensemble of those two views is predicted
+to reach. Per user (rows finite in both views, both classes present): AUC_1, AUC_2 and the pooled within-class
+Pearson correlation rho of the two logits; binormal (equal-variance) d'_k = sqrt(2) Phi^-1(AUC_k), clipped half a
+pair inside (0, 1); predicted AUC of the equal-weight standardized sum = Phi(((d'_1 + d'_2) / sqrt(2 + 2 rho)) /
+sqrt(2)). Reported: mean predicted UAUC, the observed arm's UAUC on the same users, and the paired user-bootstrap
+dUAUC(mirror - ensemble_null) (the key pilot1_gate.py gates on); the same construction for the placebo pair (like,
+like_para) is the sanity check (observed placebo should sit on its prediction). The empirical within-user z-sums
+(their UAUC, paired dUAUC(arm - z-sum) and dUAUC(z-sum mirror - z-sum placebo)) are reported as context only.
+ensemble_null.caveats (ENSEMBLE_NULL_CAVEATS) records the known properties: the null absorbs acquiescence
+cancellation (it enters as a negative within-class rho), and at ~20 candidates per user the per-user prediction is
+biased about 0.001-0.003 high for a pure ensemble (conservative against MIRROR).
 Next-item panels (rows carry positive_item_index): NDCG@10 / HR@10 / MRR per user at the tie-aware expected rank
 (C1) and, as *_tie_exact, their exact expectation over the positive's tie group; paired dNDCG@10 between arms with
 both arms ranked on the candidates finite in both (as for dUAUC); C-CRP reference ranks joined on source_event_id
@@ -27,8 +39,10 @@ import argparse
 import csv
 import gzip
 import json
+import math
 from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import NormalDist
 
 import numpy as np
 
@@ -46,6 +60,23 @@ METRICS = ("NDCG@10", "HR@10", "MRR")
 EXACT = tuple(f"{m}_tie_exact" for m in METRICS)
 PLATT_ARMS = ("raw", "raw_like", "mirror", "placebo", "evidence", "pmi_nohist")
 RAW_SCALE_ARMS = ("raw", "raw_like", "mirror_half", "placebo")
+_NORMAL = NormalDist()
+SQRT2 = math.sqrt(2.0)
+# Known properties of the registered binormal ensemble null, recorded next to the gated key (ensemble_null.caveats).
+ENSEMBLE_NULL_CAVEATS = [
+    "Construction: per-user binormal prediction (contract item 4b). Amendment 2 G7 also words the null as 'the "
+    "within-user z-sum of like and -dislike, compared with like + like_para'; that reading is reported as context "
+    "(z_sum_UAUC, dUAUC_mirror_minus_zsum_null, dUAUC_zsum_mirror_minus_zsum_placebo) and never gates.",
+    "Acquiescence absorption: a shared item-level yes-saying term a enters both views with opposite signs after "
+    "negating dislike, so it shows up as a negative within-class correlation rho and the null already credits the "
+    "two-view sum with its cancellation. With Gaussian views mirror - null is about 0 by construction; mirror beats "
+    "the null only through unequal effective weighting or non-Gaussian structure. A POSITIVE that requires lo > 0 is "
+    "therefore hard to reach by design (conservative).",
+    "Small-sample bias: with about 20 candidates per user the per-user prediction overstates a pure two-view "
+    "ensemble by about 0.001-0.003 UAUC (simulated on the Pilot-1 label designs; the placebo pair at rho about 0.95 "
+    "is unbiased). It never produces a spurious lo > 0, but a pure ensemble can sit significantly below its null "
+    "(hi < 0): read hi < 0 as 'not above a two-view ensemble', not as a loss.",
+]
 
 
 def _num(x) -> float:
@@ -223,6 +254,89 @@ def item_variance(values, items) -> dict:
     return out
 
 
+def binormal_ensemble_auc(auc1: float, auc2: float, rho: float) -> float:
+    """Binormal (equal-variance) AUC of the equal-weight sum of two standardized views with AUCs auc1, auc2 in (0, 1)
+    and within-class correlation rho: d'_k = sqrt(2) Phi^-1(AUC_k), AUC = Phi(((d'_1 + d'_2) / sqrt(2 + 2 rho)) /
+    sqrt(2)). rho = 1 with equal AUCs returns that AUC (a duplicated view adds nothing)."""
+    d = SQRT2 * (_NORMAL.inv_cdf(auc1) + _NORMAL.inv_cdf(auc2))
+    v = 2.0 + 2.0 * rho
+    if v <= 0:  # rho = -1: the sum is constant within each class
+        return 1.0 if d > 0 else 0.0 if d < 0 else 0.5
+    return float(_NORMAL.cdf(d / math.sqrt(v) / SQRT2))
+
+
+def within_class_corr(x1, x2, y) -> float:
+    """Pooled within-class Pearson correlation of x1 and x2 (residuals from each class's means); NaN when either view
+    is constant within every class (no within-class variation to correlate)."""
+    x1, x2, y = np.asarray(x1, float), np.asarray(x2, float), np.asarray(y, int)
+    r1, r2, var1, var2 = np.empty(len(y)), np.empty(len(y)), False, False
+    for c in (0, 1):
+        m = y == c
+        if not m.any():
+            continue
+        p1, p2 = bool(np.ptp(x1[m]) > 0), bool(np.ptp(x2[m]) > 0)
+        var1, var2 = var1 or p1, var2 or p2
+        # a constant class contributes exact zeros (its mean need not reproduce the value bit for bit)
+        r1[m] = x1[m] - x1[m].mean() if p1 else 0.0
+        r2[m] = x2[m] - x2[m].mean() if p2 else 0.0
+    if not (var1 and var2):
+        return NAN
+    return float(np.clip((r1 * r2).sum() / math.sqrt((r1 * r1).sum() * (r2 * r2).sum()), -1.0, 1.0))
+
+
+def _zsum(x1, x2) -> np.ndarray | None:
+    """Within-user z-scores (ddof 0) of both views, summed; None if a view is constant for the user."""
+    s1, s2 = x1.std(), x2.std()
+    if not (s1 > 0 and s2 > 0):
+        return None
+    return (x1 - x1.mean()) / s1 + (x2 - x2.mean()) / s2
+
+
+def ensemble_null_pair(x1, x2, observed, label, users, mask, boot) -> dict:
+    """Binormal ensemble-null prediction per user for the two views x1, x2 against the observed arm (rank-equivalent
+    to x1 + x2) on the rows in `mask`; users need both classes and a defined within-class correlation. Context: the
+    empirical within-user z-sum of the two views and the paired dUAUC(observed - z-sum) on the users with both."""
+    pred, obs, obs_all, a1s, a2s, rhos, zs = {}, {}, {}, {}, {}, {}, {}
+    n_both_classes = n_rho_undefined = n_clipped = 0
+    for u, idx in users.items():
+        idx = idx[mask[idx]]
+        y = label[idx]
+        n_pos = int(y.sum())
+        n_neg = len(y) - n_pos
+        if n_pos == 0 or n_neg == 0:
+            continue
+        n_both_classes += 1
+        v1, v2 = x1[idx], x2[idx]
+        obs_all[u] = auroc(observed[idx], y)
+        z = _zsum(v1, v2)
+        if z is not None:
+            zs[u] = auroc(z, y)
+        rho = within_class_corr(v1, v2, y)
+        if not np.isfinite(rho):
+            n_rho_undefined += 1
+            continue
+        a1, a2 = auroc(v1, y), auroc(v2, y)
+        eps = 0.5 / (n_pos * n_neg)  # half a pair inside (0, 1): Phi^-1 is infinite at 0 and 1
+        c1, c2 = min(max(a1, eps), 1 - eps), min(max(a2, eps), 1 - eps)
+        n_clipped += int(c1 != a1 or c2 != a2)
+        pred[u], obs[u] = binormal_ensemble_auc(c1, c2, rho), obs_all[u]
+        a1s[u], a2s[u], rhos[u] = a1, a2, rho
+    r = np.array(list(rhos.values()), float)
+    d = paired_bootstrap(obs, pred, **boot)
+    d["note"] = "observed arm minus its binormal ensemble-null prediction, paired over users"
+    dz = paired_bootstrap(obs_all, zs, **boot)
+    dz["note"] = ("context, not gating: observed arm minus the empirical within-user z-sum of the two views, paired "
+                  "over users")
+    return {"n_rows": int(mask.sum()), "n_users_both_classes": n_both_classes, "n_users": len(pred),
+            "n_users_rho_undefined": n_rho_undefined, "n_users_auc_clipped": n_clipped,
+            "UAUC_view1": _mean(a1s), "UAUC_view2": _mean(a2s),
+            "rho_within_class": {"mean": float(r.mean()) if len(r) else NAN,
+                                 "median": float(np.median(r)) if len(r) else NAN},
+            "predicted_UAUC": _mean(pred), "observed_UAUC": _mean(obs),
+            "z_sum_UAUC": _mean(zs), "n_users_z_sum": len(zs), "dUAUC_observed_minus_predicted": d,
+            "dUAUC_observed_minus_z_sum": dz, "_z_sum_per_user": zs}
+
+
 def analyze(sc: dict, panel_rows: list, swap: dict | None = None, nohist: dict | None = None,
             ref_ranks: dict | None = None, base_q: str | None = None, n_boot: int = 2000, seed: int = 0) -> dict:
     keys, user, item, label, Lq = sc["keys"], sc["user"], sc["item"], sc["label"], sc["L"]
@@ -335,6 +449,33 @@ def analyze(sc: dict, panel_rows: list, swap: dict | None = None, nohist: dict |
             d = paired_bootstrap(_uauc(arms[x], label, users, m), _uauc(arms[y], label, users, m), **boot)
             d["n_rows"] = int(m.sum())
             res[f"dUAUC_{x}_minus_{y}"] = d
+
+    # --- amendment 2 G7: correlation-matched ensemble null for mirror (sanity check: the placebo pair) ---
+    if "mirror" in arms:
+        en = {"definition": "per user (rows finite in both views, both classes): AUC_k of each view, rho = pooled "
+                            "within-class Pearson correlation of the two logits; d'_k = sqrt(2) Phi^-1(AUC_k) with "
+                            "AUC_k clipped to [0.5/(n_pos n_neg), 1 - 0.5/(n_pos n_neg)]; predicted UAUC of the "
+                            "equal-weight standardized sum = Phi(((d'_1 + d'_2) / sqrt(2 + 2 rho)) / sqrt(2)); "
+                            "users with an undefined rho (a view constant within both classes) are dropped and "
+                            "counted. dUAUC = observed arm - prediction, paired user bootstrap. z_sum_UAUC: UAUC of "
+                            "the empirical within-user z-sum of the two views (context, not gating)",
+              "gating_key": "dUAUC_mirror_minus_ensemble_null (scripts/sigir/pilot1_gate.py reads its lo)",
+              "caveats": ENSEMBLE_NULL_CAVEATS,
+              "mirror_pair": ensemble_null_pair(L("like"), -L("dislike"), arms["mirror"], label, users,
+                                                finite["mirror"], boot)}
+        en["mirror_pair"]["views"] = ["like", "-dislike"]
+        en["dUAUC_mirror_minus_ensemble_null"] = en["mirror_pair"]["dUAUC_observed_minus_predicted"]
+        en["dUAUC_mirror_minus_zsum_null"] = en["mirror_pair"]["dUAUC_observed_minus_z_sum"]   # context
+        z_m = en["mirror_pair"].pop("_z_sum_per_user")
+        if "placebo" in arms:
+            en["placebo_pair"] = ensemble_null_pair(L("like"), L("like_para"), arms["placebo"], label, users,
+                                                    finite["placebo"], boot)
+            en["placebo_pair"]["views"] = ["like", "like_para"]
+            en["dUAUC_placebo_minus_ensemble_null"] = en["placebo_pair"]["dUAUC_observed_minus_predicted"]
+            en["dUAUC_placebo_minus_zsum_null"] = en["placebo_pair"]["dUAUC_observed_minus_z_sum"]   # context
+            z_p = en["placebo_pair"].pop("_z_sum_per_user")
+            en["dUAUC_zsum_mirror_minus_zsum_placebo"] = paired_bootstrap(z_m, z_p, **boot)
+        res["ensemble_null"] = en
 
     if next_item:
         _next_item(res, keys, user, label, arms, head, panel, ref_ranks, boot)

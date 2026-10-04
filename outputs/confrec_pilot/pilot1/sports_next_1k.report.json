@@ -1,0 +1,83 @@
+{
+  "n_users": 1000,
+  "n_prompts": 404000,
+  "n_main_prompts": 404000,
+  "censored_main": {
+    "0": 404000,
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "n_overlength": 0,
+  "mean_yes_no_mass": 1.0,
+  "inference_time_s": 2310.734078168869,
+  "prompts_sent_this_run": 404000,
+  "prompts_per_s": 174.83621495734724,
+  "chunk_users": 100,
+  "chunks": 10,
+  "chunks_resumed": 0,
+  "data_path": "outputs/confrec/panels/sports_next_1k.jsonl",
+  "data_sha1": "a47f50168b928dbddc6dbf36f5a137e2424caa27",
+  "model": "/root/autodl-tmp/lumen/models/Qwen3-8B",
+  "backbone": "Qwen3-8B",
+  "questions": [
+    "next",
+    "like",
+    "dislike",
+    "like_para"
+  ],
+  "hist_len": 5,
+  "seed": 0,
+  "lora": null,
+  "dtype": "float16",
+  "topk_logprobs": 50,
+  "max_model_len": 3072,
+  "vllm_version": "0.30.0",
+  "yes_ids": [
+    7414,
+    9454,
+    9693,
+    9834,
+    14004,
+    14080
+  ],
+  "no_ids": [
+    902,
+    2152,
+    2308,
+    2753,
+    5664,
+    8996,
+    72104
+  ],
+  "censored1_side_slack_nats": {
+    "yes": 1.791759469228055,
+    "no": 1.9459101490553132
+  },
+  "probe_ids_sha1": "2a2e21d6ad16c4ade8cf39070dab0900bf5060d0",
+  "scorer": "token_pyes_multiq_v2",
+  "config": {
+    "data_sha1": "a47f50168b928dbddc6dbf36f5a137e2424caa27",
+    "n_records": 1000,
+    "n_users": null,
+    "model": "/root/autodl-tmp/lumen/models/Qwen3-8B",
+    "lora": null,
+    "questions": [
+      "next",
+      "like",
+      "dislike",
+      "like_para"
+    ],
+    "hist_len": 5,
+    "swap_k": 0,
+    "seed": 0,
+    "dtype": "float16",
+    "topk_logprobs": 50,
+    "max_model_len": 3072,
+    "chunk_users": 100,
+    "chunk_items": 1000,
+    "scorer": "token_pyes_multiq_v2",
+    "prompts_sha1": "81a2106b0cc22f5f47c15d838be4a710ec7c1088",
+    "swap_prompts_sha1": null
+  }
+}

@@ -1,8 +1,35 @@
+% Conclusion (owner: intro). Pre-results draft: the only unconditional statements are the two data-independent ones (decomposition
+% and invariance lemma); everything empirical is a \DATANEEDED slot and must come from committed result files and satisfy the
+% registered claim-admission rule (otherwise direction-free wording). The sentences "each such route was tested against its own
+% control" and the first sentence describe the registered grid: re-verify them against what was actually run (cut rules).
+% Cross-references: sec:prelim, tab:guide (one-table guide).
 \section{Conclusion}
 \label{sec:conclusion}
-\DATANEEDED{3--4 sentences restating the decomposition finding, \method{}'s gains, and the honest limits.}
 
-\paragraph{Limitations.} Same-candidate next-item evaluation with sampled negatives is not full-catalog ranking;
-rated labels exist only for explicit-feedback domains; the fully observed validity check covers one dataset;
-pre-training contamination of item text cannot be excluded for public catalogs; all models are 8B-scale.
-\DATANEEDED{any further limitation surfaced by the review loop.}
+We audited what the token confidence of yes/no LLM recommenders knows, with labels that match the question and a protocol
+registered before the confirmatory data were scored. Two statements do not depend on the data: the confidence decomposes into
+a user offset, an item prior and personal evidence, and no strictly increasing per-user map of the scores can change per-user
+AUC or within-user NDCG (Section~\ref{sec:prelim}).
+\DATANEEDED{2--3 sentences from the decomposition tables only: personal share and information gain over the prior-only item
+mean by regime and backbone, and the quality-partialled popularity link of the prior, each with its confirmation-user CI;
+direction-free unless the claim-admission rule is met}
+The lemma leaves open item-dependent corrections, cross-user decisions and training; each was tested against its own control.
+\DATANEEDED{1--2 sentences from the actionability tables only: which of item-dependent corrections, cross-user selective serving,
+static exposure and pruning beat their placebo, ensemble null, random or matched-random control, with effect size and CI, or
+that none did}
+\DATANEEDED{branch: one sentence restating the registered gate outcomes (zero-shot remedy, fine-tuning gate) as the branch that
+occurred}
+Table~\ref{tab:guide} condenses the answers to the six practitioner questions into one table.
+\DATANEEDED{one sentence of practitioner guidance drawn only from the admitted rows of that table}
+
+\paragraph{Limitations.}
+Every claim is scoped to same-candidate evaluation with popularity-sampled negatives, which is not full-catalogue ranking
+and can order systems differently from it.
+% MISSING_REF: Krichene and Rendle, KDD 2020, sampled metrics (support for the last clause); see paper_missing_refs.txt
+Rated labels exist only for explicit-feedback datasets and for users with enough likes and dislikes, and the untouched users
+available for confirmation are limited by the data (\DATANEEDED{confirmation users per rated panel, from the split file}). Zero-shot
+confidence depends on the prompt; we report the registered prompt and a single remedy round, not a prompt search. Exposure is
+analysed statically: the registered fully observed validity check was not met in the zero-shot regime, so no feedback loop is
+simulated and no claim about echo-chamber dynamics is made. Item text of public catalogues may have been seen in pre-training.
+Only two 8B backbones (the second on \DATANEEDED{panels run}) and one LoRA configuration are covered, and the registration is
+a dated document written by the team that ran the experiments, not a public-registry entry.

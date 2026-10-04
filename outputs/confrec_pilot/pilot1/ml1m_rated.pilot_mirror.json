@@ -1,0 +1,472 @@
+{
+  "panel_type": "rated",
+  "base_question": "like",
+  "questions": [
+    "dislike",
+    "like",
+    "like_para"
+  ],
+  "n_rows": 29365,
+  "n_users": 1500,
+  "n_items": 2909,
+  "n_boot": 2000,
+  "seed": 0,
+  "censoring": {
+    "scores": {
+      "dislike": {
+        "n": 29365,
+        "0": 29365
+      },
+      "like": {
+        "n": 29365,
+        "0": 29365
+      },
+      "like_para": {
+        "n": 29365,
+        "0": 29365
+      }
+    },
+    "swap": {
+      "like": {
+        "n": 23272,
+        "0": 23272
+      }
+    },
+    "nohist": {
+      "like": {
+        "n": 29365,
+        "0": 29365
+      }
+    }
+  },
+  "panel_join": {},
+  "arms": {
+    "raw": {
+      "UAUC": 0.5874475521977115,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.5966061748076017,
+      "n_rows": 29365
+    },
+    "raw_like": {
+      "UAUC": 0.5874475521977115,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.5966061748076017,
+      "n_rows": 29365
+    },
+    "mirror": {
+      "UAUC": 0.6162775928560364,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.6292768710552477,
+      "n_rows": 29365
+    },
+    "placebo": {
+      "UAUC": 0.5977648056758964,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.6059467339506021,
+      "n_rows": 29365
+    },
+    "evidence": {
+      "UAUC": 0.50730444744707,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.5189260605488059,
+      "n_rows": 29365
+    },
+    "pmi_nohist": {
+      "UAUC": 0.546599594981997,
+      "n_users_uauc": 1500,
+      "AUC_global": 0.5612391377867046,
+      "n_rows": 29365
+    }
+  },
+  "swap": {
+    "n_items_with_prior": 2909,
+    "n_panel_items_without_prior": 0,
+    "donors_per_item_min": 8,
+    "donors_per_item_mean": 8.0
+  },
+  "nohist": {
+    "n_panel_items_without_prior": 0
+  },
+  "primary_endpoint": "dUAUC_mirror_minus_placebo",
+  "dUAUC_mirror_minus_placebo": {
+    "est": 0.018512787180140124,
+    "lo": 0.013303261801141397,
+    "hi": 0.02356781195131348,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_mirror_minus_raw_like": {
+    "est": 0.028830040658324976,
+    "lo": 0.023445803061283757,
+    "hi": 0.03394203190468754,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_evidence_minus_raw_like": {
+    "est": -0.08014310475064151,
+    "lo": -0.08860551006346593,
+    "hi": -0.07151916137825728,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_pmi_nohist_minus_raw_like": {
+    "est": -0.04084795721571457,
+    "lo": -0.04847248775413267,
+    "hi": -0.03333985365766677,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_mirror_minus_raw": {
+    "est": 0.028830040658324976,
+    "lo": 0.023445803061283757,
+    "hi": 0.03394203190468754,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_placebo_minus_raw_like": {
+    "est": 0.010317253478184853,
+    "lo": 0.008163747078176001,
+    "hi": 0.012566122573765649,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_evidence_minus_placebo": {
+    "est": -0.09046035822882637,
+    "lo": -0.09924844229395331,
+    "hi": -0.08145726798306088,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_mirror_minus_evidence": {
+    "est": 0.10897314540896648,
+    "lo": 0.09872687515660401,
+    "hi": 0.11896753778286437,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "dUAUC_mirror_minus_pmi_nohist": {
+    "est": 0.06967799787403953,
+    "lo": 0.0600890071024201,
+    "hi": 0.07866893226758943,
+    "n": 1500,
+    "n_rows": 29365
+  },
+  "acquiescence": {
+    "definition": "a(u,i) = (L_like + L_dislike)/2 centred within user; SD_pair = sqrt(mean a_c^2) over pairs of users with >= 2 finite a (pooled within-user SD, gating; biased low by sqrt(1 - 1/n_u)); SD_pair_df = sqrt(sum a_c^2 / (N - U)), the df-corrected pooled SD (reported; gate sensitivity); SD_item_corrected = method-of-moments between-item SD on items with n_i >= 2 (reported, not gating)",
+    "n_pairs": 29365,
+    "n_users_ge2": 1500,
+    "n_per_user": {
+      "min": 9,
+      "median": 20.0,
+      "mean": 19.576666666666668,
+      "max": 20
+    },
+    "global_mean_a": -0.7765747382087519,
+    "SD_pair": 2.2810272215965797,
+    "SD_pair_ci": {
+      "lo": 2.2250113631416766,
+      "hi": 2.3400524346687823
+    },
+    "SD_pair_df": 2.3416174563991983,
+    "SD_pair_df_ci": {
+      "lo": 2.2841894982353104,
+      "hi": 2.4019995443341235
+    },
+    "n_items": 2909,
+    "n_items_ge2": 2432,
+    "SD_item_corrected": 1.341368030225374,
+    "var_item_means_ge2": 2.406233368887831,
+    "mean_within_var_over_n_ge2": 0.6069651763771304,
+    "SD_item_raw": 1.689880316282483,
+    "item_support": {
+      "n1": 477,
+      "n2": 357,
+      "n3_4": 487,
+      "n5plus": 1588
+    },
+    "popularity": "log1p(candidate_popularity): all-time category event count",
+    "corr_a_logpop": {
+      "est": 0.0067368346374204946,
+      "lo": -0.008284429177974516,
+      "hi": 0.021994370625637846,
+      "n_clusters": 1500,
+      "n_boot": 2000,
+      "n": 29365
+    },
+    "corr_a_logpop_item": {
+      "est": 0.11777331432617034,
+      "lo": 0.08151276338286899,
+      "hi": 0.15319675898299584,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    }
+  },
+  "valence": {
+    "definition": "v(u,i) = (L_like - L_dislike)/2 (not centred)",
+    "global_mean_v": 3.412327866933424,
+    "corr_v_logpop": {
+      "est": 0.3028955627362412,
+      "lo": 0.2822005472551701,
+      "hi": 0.323841854148328,
+      "n_clusters": 1500,
+      "n_boot": 2000,
+      "n": 29365
+    },
+    "corr_v_logpop_item": {
+      "est": 0.42371315325755293,
+      "lo": 0.39327694392123175,
+      "hi": 0.4534837046632506,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    }
+  },
+  "prior": {
+    "definition": "pi(i) = mean finite like-logit of item i under the swap donors' histories",
+    "corr_pi_logpop": {
+      "est": 0.4281718995069998,
+      "lo": 0.39797292109335264,
+      "hi": 0.4575847109247298,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    }
+  },
+  "popularity_prior_robustness": {
+    "popularity": "log1p(candidate_popularity_prior): events on the item strictly before the candidate",
+    "corr_a_logpop": {
+      "est": 0.005374111123097609,
+      "lo": -0.007012892390965206,
+      "hi": 0.01785903326173282,
+      "n_clusters": 1500,
+      "n_boot": 2000,
+      "n": 29365
+    },
+    "corr_a_logpop_item": {
+      "est": 0.11591531218177453,
+      "lo": 0.0783746613817597,
+      "hi": 0.15284398867953508,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    },
+    "corr_v_logpop": {
+      "est": 0.20769994667568006,
+      "lo": 0.17905545491329358,
+      "hi": 0.23619845521501848,
+      "n_clusters": 1500,
+      "n_boot": 2000,
+      "n": 29365
+    },
+    "corr_v_logpop_item": {
+      "est": 0.4124163174215617,
+      "lo": 0.38135013144510016,
+      "hi": 0.44186902811163475,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    },
+    "corr_pi_logpop": {
+      "est": 0.3985019497816851,
+      "lo": 0.36706526497536984,
+      "hi": 0.42892432116951096,
+      "n_clusters": 2909,
+      "n_boot": 2000,
+      "n": 2909
+    }
+  },
+  "calibration": {
+    "applicable": true,
+    "raw_scale": {
+      "raw": {
+        "ECE": 0.3028998197785236,
+        "ECE_adaptive": 0.30267363242898976,
+        "Brier": 0.32878972499831766,
+        "n": 29365
+      },
+      "raw_like": {
+        "ECE": 0.3028998197785236,
+        "ECE_adaptive": 0.30267363242898976,
+        "Brier": 0.32878972499831766,
+        "n": 29365
+      },
+      "mirror_half": {
+        "ECE": 0.25778445344766887,
+        "ECE_adaptive": 0.25883138128610417,
+        "Brier": 0.28798114630279165,
+        "n": 29365
+      },
+      "placebo": {
+        "ECE": 0.3418973732469728,
+        "ECE_adaptive": 0.34114172339644616,
+        "Brier": 0.3635990552419721,
+        "n": 29365
+      }
+    },
+    "platt": {
+      "raw": {
+        "a": 0.06202607773569669,
+        "b": 0.5067032845784591,
+        "n_fit": 15141,
+        "ECE": 0.015846597298714238,
+        "ECE_adaptive": 0.019618190128520133,
+        "Brier": 0.21862961718386914,
+        "n": 14224
+      },
+      "raw_like": {
+        "a": 0.06202607773569669,
+        "b": 0.5067032845784591,
+        "n_fit": 15141,
+        "ECE": 0.015846597298714238,
+        "ECE_adaptive": 0.019618190128520133,
+        "Brier": 0.21862961718386914,
+        "n": 14224
+      },
+      "mirror": {
+        "a": 0.06259330432284699,
+        "b": 0.2636781630490691,
+        "n_fit": 15141,
+        "ECE": 0.006440106658609635,
+        "ECE_adaptive": 0.013649549597326179,
+        "Brier": 0.21422025978099243,
+        "n": 14224
+      },
+      "placebo": {
+        "a": 0.06193011447173423,
+        "b": 0.6491400990602405,
+        "n_fit": 15141,
+        "ECE": 0.01479951419121662,
+        "ECE_adaptive": 0.01574985167125024,
+        "Brier": 0.21728103026728346,
+        "n": 14224
+      },
+      "evidence": {
+        "a": 0.01217165703353054,
+        "b": 0.6214019818796124,
+        "n_fit": 15141,
+        "ECE": 0.005863998163971819,
+        "ECE_adaptive": 0.014257025423857133,
+        "Brier": 0.2233786007295378,
+        "n": 14224
+      },
+      "pmi_nohist": {
+        "a": 0.032344724692643184,
+        "b": 0.4768760675298178,
+        "n_fit": 15141,
+        "ECE": 0.013022730525004775,
+        "ECE_adaptive": 0.016969849339021365,
+        "Brier": 0.22123978793771928,
+        "n": 14224
+      }
+    },
+    "platt_split": {
+      "n_users_fit": 773,
+      "n_users_eval": 727,
+      "seed": 0
+    }
+  },
+  "confident_error": {
+    "applicable": true,
+    "target": "(sigmoid(L_like) >= 0.5) != label, identical for every detector",
+    "scoring": "AUROC(error score, is_error): error score = -|x| for magnitude detectors, disagree as is (higher = better); AURC = metrics.risk_coverage(conf = |x| or 1 - disagree, 1 - is_error) (lower = better); deltas = detector - mag_raw on the same rows, user-cluster bootstrap",
+    "n_rows": 29365,
+    "n_errors": 11228,
+    "error_rate": 0.38235995232419545,
+    "detectors": {
+      "mag_raw": {
+        "n_rows": 29365,
+        "n_errors": 11228,
+        "AUROC": 0.5835374887555251,
+        "AURC": 0.32082792083085443
+      },
+      "mag_mirror": {
+        "n_rows": 29365,
+        "n_errors": 11228,
+        "AUROC": 0.6524168345902468,
+        "AURC": 0.2734658014870213,
+        "dAUROC_vs_mag_raw": {
+          "est": 0.06887934583472166,
+          "lo": 0.060898307649134176,
+          "hi": 0.07662761100509194,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        },
+        "dAURC_vs_mag_raw": {
+          "est": -0.04736211934383311,
+          "lo": -0.05397714448694063,
+          "hi": -0.04136938613819394,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        }
+      },
+      "mag_evidence": {
+        "n_rows": 29365,
+        "n_errors": 11228,
+        "AUROC": 0.505968501544051,
+        "AURC": 0.3782600518613677,
+        "dAUROC_vs_mag_raw": {
+          "est": -0.0775689872114741,
+          "lo": -0.08530478615488708,
+          "hi": -0.06950524115575372,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        },
+        "dAURC_vs_mag_raw": {
+          "est": 0.057432131030513256,
+          "lo": 0.05067091547371065,
+          "hi": 0.06375247347251081,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        }
+      },
+      "mag_placebo": {
+        "n_rows": 29365,
+        "n_errors": 11228,
+        "AUROC": 0.5032617374128616,
+        "AURC": 0.36896784065473653,
+        "dAUROC_vs_mag_raw": {
+          "est": -0.08027575134266351,
+          "lo": -0.08771903686347987,
+          "hi": -0.07282978849477477,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        },
+        "dAURC_vs_mag_raw": {
+          "est": 0.048139919823882105,
+          "lo": 0.043497064843286026,
+          "hi": 0.05250906473844203,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        }
+      },
+      "disagree": {
+        "n_rows": 29365,
+        "n_errors": 11228,
+        "AUROC": 0.5798055689194063,
+        "AURC": 0.341566789791616,
+        "dAUROC_vs_mag_raw": {
+          "est": -0.003731919836118869,
+          "lo": -0.012469312506024774,
+          "hi": 0.005362419816206537,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        },
+        "dAURC_vs_mag_raw": {
+          "est": 0.020738868960761547,
+          "lo": 0.01359945746794557,
+          "hi": 0.027402195395805174,
+          "n_clusters": 1500,
+          "n_boot": 2000
+        }
+      }
+    }
+  },
+  "inputs": {
+    "scores": "outputs/confrec/pilot1_mirror/ml1m_rated/scores.csv.gz",
+    "panel": "outputs/confrec/panels/ml1m_rated.jsonl",
+    "swap": "outputs/confrec/pilot1_mirror/ml1m_rated/swap_prior.csv.gz",
+    "nohist": "outputs/confrec/pilot1_mirror/ml1m_rated_nohist/scores.csv.gz",
+    "ref_ranks": null
+  }
+}

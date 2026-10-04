@@ -343,6 +343,110 @@ def test_sd_pair_df_removes_the_small_user_bias(tmp_path):
     assert acq["SD_pair_df_ci"]["lo"] < acq["SD_pair_df"] < acq["SD_pair_df_ci"]["hi"]
 
 
+def test_binormal_ensemble_auc_closed_forms():
+    from statistics import NormalDist
+    nd = NormalDist()
+    assert abs(pm.binormal_ensemble_auc(0.7, 0.7, 1.0) - 0.7) < 1e-12           # a duplicated view adds nothing
+    # independent equal views: d' grows by sqrt(2) -> Phi(sqrt(2) Phi^-1(0.7))
+    assert abs(pm.binormal_ensemble_auc(0.7, 0.7, 0.0) - nd.cdf(math.sqrt(2) * nd.inv_cdf(0.7))) < 1e-12
+    assert abs(pm.binormal_ensemble_auc(0.5, 0.5, 0.3) - 0.5) < 1e-12
+    # an uninformative view dilutes: (0, d') / sqrt(2) -> Phi(Phi^-1(0.8) / sqrt(2)) < 0.8
+    assert abs(pm.binormal_ensemble_auc(0.5, 0.8, 0.0) - nd.cdf(nd.inv_cdf(0.8) / math.sqrt(2))) < 1e-12
+    assert pm.binormal_ensemble_auc(0.6, 0.7, -1.0) == 1.0 and pm.binormal_ensemble_auc(0.4, 0.3, -1.0) == 0.0
+    a = pm.binormal_ensemble_auc(0.62, 0.58, 0.35)
+    assert abs(a - pm.binormal_ensemble_auc(0.58, 0.62, 0.35)) < 1e-15 and a > 0.62  # symmetric; diversity helps
+
+
+def test_within_class_corr_pools_residuals_from_class_means():
+    y = np.array([1, 1, 1, 0, 0, 0])
+    x1 = np.array([3.0, 4.0, 5.0, 0.0, 1.0, 2.0])
+    assert abs(pm.within_class_corr(x1, 2 * x1 + 7 * y, y) - 1) < 1e-12     # a class shift does not count
+    assert abs(pm.within_class_corr(x1, -x1, y) + 1) < 1e-12
+    assert math.isnan(pm.within_class_corr(x1, 5.0 * y, y))                  # second view constant in each class
+    x2 = np.array([1.0, 0.0, 2.0, 5.0, 5.0, 5.0])                           # varies in one class only
+    r1, r2 = x1 - np.where(y == 1, 4.0, 1.0), np.where(y == 1, x2 - 1.0, 0.0)
+    assert abs(pm.within_class_corr(x1, x2, y) - (r1 @ r2) / math.sqrt((r1 @ r1) * (r2 @ r2))) < 1e-12
+
+
+def _binormal_rows(n_users, n_cand, sep, sep2, scale2, rho, rho_para, seed):
+    """Per user n_cand/2 positives: like = sep*y + e1, -dislike = scale2*(sep2*y + e2), like_para = sep*y + e3,
+    with (e1, e2, e3) jointly normal (unit variances, corr(e1, e2) = rho, corr(e1, e3) = rho_para)."""
+    rng = np.random.default_rng(seed)
+    cov = [[1, rho, rho_para], [rho, 1, rho * rho_para], [rho_para, rho * rho_para, 1]]
+    rows, panel = [], []
+    for u in range(n_users):
+        ev, y = f"u{u}::0", np.array([1] * (n_cand // 2) + [0] * (n_cand - n_cand // 2))
+        ids = [f"u{u}i{c}" for c in range(n_cand)]
+        panel.append({"source_event_id": ev, "user_id": f"u{u}", "candidate_item_ids": ids,
+                      "candidate_labels": y.tolist()})
+        e = rng.multivariate_normal([0, 0, 0], cov, n_cand)
+        for c in range(n_cand):
+            for q, lg in (("like", sep * y[c] + e[c, 0]), ("dislike", -scale2 * (sep2 * y[c] + e[c, 1])),
+                          ("like_para", sep * y[c] + e[c, 2])):
+                rows.append(_row(ev, f"u{u}", ids[c], c, y[c], q, lg))
+    return rows, panel
+
+
+def test_ensemble_null_tracks_a_pure_two_view_ensemble(tmp_path):
+    # mirror = like + (-dislike) with equal scales IS the equal-weight standardized sum: no excess over the null
+    rows, panel = _binormal_rows(400, 40, sep=0.5, sep2=0.5, scale2=1.0, rho=0.3, rho_para=0.9, seed=11)
+    res = pm.analyze(pm.load_scores(_write_scores(tmp_path / "s.csv.gz", rows)), panel, n_boot=60)
+    en = res["ensemble_null"]
+    mp, pp = en["mirror_pair"], en["placebo_pair"]
+    assert mp["views"] == ["like", "-dislike"] and pp["views"] == ["like", "like_para"]
+    assert mp["n_users"] == pp["n_users"] == 400 and mp["n_users_rho_undefined"] == 0
+    assert abs(mp["UAUC_view1"] - mp["UAUC_view2"]) < 0.02 and mp["UAUC_view2"] > 0.6    # -dislike is informative
+    assert abs(mp["rho_within_class"]["mean"] - 0.3) < 0.03 and abs(pp["rho_within_class"]["mean"] - 0.9) < 0.02
+    assert abs(mp["observed_UAUC"] - res["arms"]["mirror"]["UAUC"]) < 1e-12           # same users, same rows
+    assert abs(pp["observed_UAUC"] - res["arms"]["placebo"]["UAUC"]) < 1e-12
+    d, s = en["dUAUC_mirror_minus_ensemble_null"], en["dUAUC_placebo_minus_ensemble_null"]
+    assert d is mp["dUAUC_observed_minus_predicted"] and d["n"] == 400
+    assert abs(d["est"]) < 0.004 and d["lo"] < 0.002 and abs(s["est"]) < 0.002          # null reproduces both
+    assert mp["predicted_UAUC"] - pp["predicted_UAUC"] > 0.02     # the less correlated pair is predicted higher
+    assert abs(mp["z_sum_UAUC"] - mp["observed_UAUC"]) < 0.005 and "_z_sum_per_user" not in mp
+    assert set(en["dUAUC_zsum_mirror_minus_zsum_placebo"]) >= {"est", "lo", "hi", "n"}
+    # z-sum reading of G7 (context): equal scales -> mirror IS its z-sum up to the per-user scale estimates
+    z = en["dUAUC_mirror_minus_zsum_null"]
+    assert z is mp["dUAUC_observed_minus_z_sum"] and z["n"] == 400 and abs(z["est"]) < 0.003
+    assert en["dUAUC_placebo_minus_zsum_null"]["n"] == 400 and abs(en["dUAUC_placebo_minus_zsum_null"]["est"]) < 0.003
+    assert abs(z["est"] - (mp["observed_UAUC"] - mp["z_sum_UAUC"])) < 1e-12        # same 400 users on both sides
+    # the known properties of the gated null are recorded next to it
+    assert en["gating_key"].startswith("dUAUC_mirror_minus_ensemble_null") and len(en["caveats"]) == 3
+    assert any("Acquiescence absorption" in c for c in en["caveats"])
+    assert any("Small-sample bias" in c for c in en["caveats"])
+
+
+def test_ensemble_null_is_beaten_when_mirror_outweighs_an_equal_weight_ensemble(tmp_path):
+    # like is uninformative; -dislike is informative and 10x larger, so like - dislike ~ -dislike alone, while the
+    # equal-weight standardized ensemble of the two views is diluted: the observed mirror exceeds the null
+    rows, panel = _binormal_rows(300, 40, sep=0.0, sep2=0.7, scale2=10.0, rho=0.0, rho_para=0.9, seed=12)
+    sc = pm.load_scores(_write_scores(tmp_path / "s.csv.gz", rows))
+    L, users, boot = sc["L"], pm._groups(sc["user"]), dict(n_boot=300, seed=0)
+    ok = np.isfinite(L["like"]) & np.isfinite(L["dislike"])
+    mp = pm.ensemble_null_pair(L["like"], -L["dislike"], L["like"] - L["dislike"], sc["label"], users, ok, boot)
+    d = mp["dUAUC_observed_minus_predicted"]
+    assert d["n"] == 300 and d["lo"] > 0.03 and mp["observed_UAUC"] > mp["predicted_UAUC"] + 0.03
+    dz = mp["dUAUC_observed_minus_z_sum"]                     # the equal-weight z-sum is diluted the same way
+    assert dz["n"] == 300 and dz["lo"] > 0.03 and abs(dz["est"] - d["est"]) < 0.02
+    pp = pm.ensemble_null_pair(L["like"], L["like_para"], L["like"] + L["like_para"], sc["label"], users, ok, boot)
+    assert abs(pp["dUAUC_observed_minus_predicted"]["est"]) < 0.003
+
+
+def test_ensemble_null_per_user_rules():
+    # user a: AUC 1 in a view -> clipped half a pair inside; user b: a view constant within both classes -> dropped;
+    # user c: one class only -> not counted
+    user = np.array(["a"] * 4 + ["b"] * 4 + ["c"] * 2, dtype=object)
+    y = np.array([1, 1, 0, 0, 1, 1, 0, 0, 1, 1])
+    x1 = np.array([5.0, 4.0, 1.0, 0.0, 1.0, 2.0, 0.5, 0.0, 1.0, 2.0])
+    x2 = np.array([0.3, 0.1, 0.2, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0])
+    out = pm.ensemble_null_pair(x1, x2, x1 + x2, y, pm._groups(user), np.ones(10, bool), dict(n_boot=10, seed=0))
+    assert out["n_users_both_classes"] == 2 and out["n_users"] == 1 and out["n_users_rho_undefined"] == 1
+    assert out["n_users_auc_clipped"] == 1 and out["UAUC_view1"] == 1.0
+    rho = pm.within_class_corr(x1[:4], x2[:4], y[:4])
+    exp = pm.binormal_ensemble_auc(1 - 0.5 / 4, 0.75, rho)
+    assert abs(out["predicted_UAUC"] - exp) < 1e-12 and out["dUAUC_observed_minus_predicted"]["n"] == 1
+
+
 def test_cli_writes_strict_json(tmp_path):
     sp, pp, sw, nh, _ = _planted(tmp_path, n_users=60, seed=3)
     out = tmp_path / "res.json"
@@ -356,4 +460,7 @@ def test_cli_writes_strict_json(tmp_path):
     for arm in ("raw", "raw_like", "mirror", "placebo", "evidence", "pmi_nohist"):
         assert "UAUC" in res["arms"][arm]
     assert {"est", "lo", "hi", "n"} <= set(res["dUAUC_mirror_minus_placebo"])
+    assert {"est", "lo", "hi", "n"} <= set(res["ensemble_null"]["dUAUC_mirror_minus_ensemble_null"])  # gate reads it
+    assert {"est", "lo", "hi", "n"} <= set(res["ensemble_null"]["dUAUC_mirror_minus_zsum_null"])
+    assert res["ensemble_null"]["caveats"] == pm.ENSEMBLE_NULL_CAVEATS
     assert res["inputs"]["swap"] == str(sw)

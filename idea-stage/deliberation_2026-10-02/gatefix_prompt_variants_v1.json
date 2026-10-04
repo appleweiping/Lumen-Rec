@@ -1,0 +1,83 @@
+{
+  "id": "AMENDMENT_2_DRAFT gate-fix prompt candidate set v1 (gate-fix methodologist lens, 2026-10-02)",
+  "status": "DRAFT input for idea-stage/PREREG_AMENDMENT_2.md; freeze (hash rendered prompts) BEFORE any new GPU run",
+  "invariants": {
+    "backbone_for_selection": "Qwen3-8B, fp16, chat template, enable_thinking=False, prefill-only, Yes/No read by token id (amendment C0 unchanged)",
+    "max_model_len": 4096,
+    "title_cap_chars": 200,
+    "candidate_desc": "\"\\nDescription: \" + text[:200] if text else \"\"  (unchanged from prompting.build_prompt)",
+    "answer_suffix": " Answer with only Yes or No.",
+    "forbidden_in_any_variant": [
+      "item average rating, item popularity counts or any collaborative statistic (would inject a CF label proxy into the 'LLM channel')",
+      "user profile / user mean rating (UAUC-inert: constant within user)",
+      "few-shot demonstrations (adds an uncontrolled demo-selection degree of freedom; Kang et al. 2023 report <=0.014 AUC gain)",
+      "thinking on, verbalized confidence, rating-digit expected value (different channels, not a prompt fix)",
+      "answer-option order changes (global bias, rank-inert)"
+    ],
+    "V0_byte_identity_test": "V0 rendering of the pilot ML-1M panel must reproduce report.json config.prompts_sha1 12e83c4fcca40db398ac58acbba2a7eb9c770524 for questions like,dislike,like_para"
+  },
+  "question_sets": {
+    "like_family": {
+      "like": "Would this user like the candidate item?",
+      "dislike": "Would this user dislike the candidate item?",
+      "like_para": "Is the candidate item a good match for this user's taste?",
+      "dislike_para": "Would this user be disappointed by the candidate item?",
+      "next": "Will this user purchase the candidate item next?"
+    },
+    "threshold_family": {
+      "like": "Will this user rate the candidate item 4 stars or higher (on a 1-5 scale)?",
+      "dislike": "Will this user rate the candidate item 2 stars or lower (on a 1-5 scale)?",
+      "like_para": "Will this user's star rating for the candidate item be 4 or 5?",
+      "dislike_para": "Will this user's star rating for the candidate item be 1 or 2?",
+      "next": "Will this user purchase the candidate item next?"
+    }
+  },
+  "system_messages": {
+    "rated_movie": "You are a movie recommender. You predict how a specific user will rate movies from that user's past ratings. Ratings range from 1 to 5 stars; 4-5 stars means the user liked the movie and 1-2 stars means the user disliked it.",
+    "rated_product": "You are a product recommender. You predict how a specific user will rate products from that user's past ratings. Ratings range from 1 to 5 stars; 4-5 stars means the user liked the product and 1-2 stars means the user disliked it.",
+    "next_product": "You are a product recommender. You predict a specific user's preferences from that user's purchase history."
+  },
+  "user_templates": {
+    "T_chrono": "You are an expert recommendation system.\n\nUser history (oldest to newest):\n{hist_lines}\n\nCandidate item:\nTitle: {cand_title}{cand_desc}\n\n{question} Answer with only Yes or No.",
+    "T_chrono_nopersona": "User history (oldest to newest):\n{hist_lines}\n\nCandidate item:\nTitle: {cand_title}{cand_desc}\n\n{question} Answer with only Yes or No.",
+    "T_split": "You are an expert recommendation system.\n\nItems this user liked (rated 4-5 stars), oldest to newest:\n{liked_lines}\n\nItems this user disliked (rated 1-3 stars), oldest to newest:\n{disliked_lines}\n\nCandidate item:\nTitle: {cand_title}{cand_desc}\n\n{question} Answer with only Yes or No.",
+    "T_relevant": "You are an expert recommendation system.\n\nUser history (most relevant to the candidate, oldest to newest):\n{hist_lines}\n\nCandidate item:\nTitle: {cand_title}{cand_desc}\n\n{question} Answer with only Yes or No."
+  },
+  "history_line_formats": {
+    "L_rated": "- {title} (rated {r}/5)",
+    "L_rated_meta": "- {title} [{meta}] (rated {r}/5)",
+    "L_plain": "- {title}",
+    "L_plain_meta": "- {title} [{meta}]",
+    "L_split": "- {title}   (empty list -> '- (none)'; liked = rating > 3, disliked = rating <= 3, TALLRec rule)",
+    "meta_ml1m": "Genres: {genres joined by ', '}  (movies.dat)",
+    "meta_amazon": "Categories: {categories string[:80]}  (meta_*.jsonl.gz 'categories'; no description)"
+  },
+  "variants": {
+    "V0": {"grounding": "registered pilot-1 prompt (control)",
+           "rated": {"system": null, "user": "T_chrono", "line": "L_rated", "hist": "last 10 events before first candidate", "q": "like_family"},
+           "next_item": {"system": null, "user": "T_chrono", "line": "L_plain", "hist": "last 5", "q": "like_family"}},
+    "V1": {"grounding": "label-aligned star-threshold question (registered label: >=4 like, <=2 dislike); rating framing of Kang et al. 2023",
+           "rated": {"system": null, "user": "T_chrono", "line": "L_rated", "hist": "last 10", "q": "threshold_family"},
+           "next_item": {"system": null, "user": "T_chrono", "line": "L_plain", "hist": "last 5", "q": "threshold_family (next unchanged)"}},
+    "V2": {"grounding": "TALLRec (RecSys'23) liked/disliked split",
+           "rated": {"system": null, "user": "T_split", "line": "L_split", "hist": "same last 10 events, partitioned", "q": "like_family"},
+           "next_item": {"note": "no ratings -> renders identically to V0 (declared, not distinct on next-item panels)"}},
+    "V3": {"grounding": "longer history (ReLLa WWW'24 Fig. 6: zero-shot AUC peaks near K=15 on ML-1M; 20 is inside the tested range)",
+           "rated": {"system": null, "user": "T_chrono", "line": "L_rated", "hist": "last 20", "q": "like_family"},
+           "next_item": {"system": null, "user": "T_chrono", "line": "L_plain", "hist": "last 20 (tools: 10)", "q": "like_family"}},
+    "V4": {"grounding": "history item metadata, Kang et al. 2023 'Title, Genres, Rating' history format",
+           "rated": {"system": null, "user": "T_chrono", "line": "L_rated_meta", "hist": "last 10", "q": "like_family"},
+           "next_item": {"system": null, "user": "T_chrono", "line": "L_plain_meta", "hist": "last 5", "q": "like_family"}},
+    "V5": {"grounding": "system role + explicit rating scale (Kang et al. 2023 'Ratings range from 1.0 to 5.0'); chat system slot",
+           "rated": {"system": "rated_movie | rated_product", "user": "T_chrono_nopersona", "line": "L_rated", "hist": "last 10", "q": "like_family"},
+           "next_item": {"system": "next_product", "user": "T_chrono_nopersona", "line": "L_plain", "hist": "last 5", "q": "like_family"}},
+    "V6": {"grounding": "ReLLa (WWW'24) semantic user-behavior retrieval (SUBR)",
+           "rated": {"system": null, "user": "T_relevant", "line": "L_rated", "hist": "10 of the last 50 pre-candidate events with highest cosine to the candidate (Qwen3-8B mean-pooled last-layer state of 'Title: {title}. {text[:200]}', PCA-512 fit on panel items), printed chronologically; ties -> more recent", "q": "like_family"},
+           "next_item": {"note": "falls back to the V0 next-item rendering (per-candidate histories defeat prefix caching; projected M2 cost would exceed E4)"}},
+    "V7": {"grounding": "combined Kang-style: V1 + V3 + V4 + V5",
+           "rated": {"system": "rated_movie | rated_product", "user": "T_chrono_nopersona", "line": "L_rated_meta", "hist": "last 20", "q": "threshold_family"},
+           "next_item": {"system": "next_product", "user": "T_chrono_nopersona", "line": "L_plain_meta", "hist": "last 20 (tools: 10)", "q": "threshold_family (next unchanged)"}}
+  },
+  "simplicity_order_for_ties": ["V0", "V1", "V5", "V3", "V4", "V2", "V6", "V7"],
+  "dev_scoring_is_MIRROR_blind": "rated dev panels: score ONLY question 'like' per variant; next-item dev: ONLY 'next' per distinct rendering. dislike, like_para, dislike_para, swap prior, no-history prior are NOT scored on dev for any variant."
+}

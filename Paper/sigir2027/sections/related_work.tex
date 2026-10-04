@@ -1,60 +1,83 @@
+% Section "Related Work" (owner: related; audit framing). No result appears here.
+% Cited keys exist in references.bib; each work is described only as far as CITATION_MAP.md supports.
+% Cross-reference used from another section: lem:invariance (preliminaries.tex).
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{LLM-based recommendation.}
-LLMs are used as recommenders in two main forms. \emph{Discriminative} recommenders pose a binary question about
-a user--item pair and score the item by the probability of answering \emph{Yes}; TALLRec~\citep{bao2023tallrec}
-instruction-tunes an LLM on such questions, CoLLM~\citep{zhang2025collm} and BinLLM~\citep{zhang2024binllm}
-inject collaborative signals into the same yes/no formulation, and LLaRA~\citep{liao2024llara} aligns sequential
-representations with the language space. These works evaluate \py{} only as a discriminative score (AUC or
-per-user UAUC); none reports its calibration, and none asks what the probability is made of. \emph{Generative}
-recommenders produce item identifiers or titles directly~\citep{geng2022p5,bao2025bigrec}, with decoding
-corrections~\citep{bao2024d3} and preference-optimisation objectives~\citep{chen2024sdpo}; SPRec and
-Flower show that SFT and DPO amplify popularity bias in such models~\citep{gao2025sprec,gao2025flower}. We build
-on the discriminative formulation because its output is an explicit probability, and we revisit the same-candidate
-next-item protocol and baseline set of our earlier controlled study.
+\paragraph{LLM-based recommendation and yes/no scoring.}
+Pointwise LLM recommenders ask a binary question about a user--item pair and score the item by the probability of the
+answer \emph{Yes}. \mbox{TALLRec}~\citep{bao2023tallrec} tunes an LLM with LoRA on such questions, CoLLM~\citep{zhang2025collm}
+and \mbox{BinLLM}~\citep{zhang2024binllm} add collaborative information to the same formulation, and
+ReLLa~\citep{lin2024rella} retrieves behaviours for CTR-style prediction. TALLRec, CoLLM and BinLLM evaluate \py{} by AUC
+or its per-user average (UAUC), and we are not aware of an analysis of what the probability encodes. Other LLM
+recommenders generate or select items~\citep{geng2022p5,liao2024llara,kim2024allmrec,bao2025bigrec};
+D3~\citep{bao2024d3} shows that ghost tokens and length normalisation distort their sequence-level confidence, which a
+single \texttt{Yes}/\texttt{No} answer position avoids, and S-DPO~\citep{chen2024sdpo} trains them with a softmax
+preference loss over several negatives.
+% METHOD-SLOT-BEGIN
+Unlike CoLLM and BinLLM, the optional prior-offset LoRA adds a stop-gradient item-prior offset to the logit.
+% METHOD-SLOT-END
+We audit this pointwise family, zero-shot and LoRA-tuned, against labels that match the question and with non-LLM
+reference rows in every table.
 
-\paragraph{Uncertainty in LLM recommenders.}
-UQRec~\citep{kweon2025uqrec} quantifies the predictive uncertainty of list-wise LLM recommendation from a
-single inference, decomposes it into recommendation and prompt uncertainty, and uses it to choose prompts.
-UGR~\citep{fan2026ugr} trains generative recommenders with an uncertainty-weighted reward that penalises
-confident errors and uses confidence tokens for request rejection and list truncation. EviRank~\citep{yan2026evirank}
-estimates position-level confidence for LLM ranking lists. Ravikumar~\citep{ravikumar2026hallucinating} audits
-the verbalized confidence of zero-shot LLM recommenders against catalog membership, stratified by item
-popularity. KnowSA~\citep{lee2026knowsa} estimates what an LLM knows about each item and augments prompts only
-for low-knowledge items, finding popularity a poor proxy for that knowledge. Our work differs in its object and
-its question: we analyse token-level yes/no confidence of zero-shot \emph{and fine-tuned} personalised recommenders
-against labels that match the question, decompose it into an item term and a personal-evidence term, and use the
-decomposition to change rankings.
+\paragraph{Confidence and calibration.}
+Black-box elicitation finds LLMs overconfident when they verbalise confidence and separates calibration from failure
+prediction~\citep{xiong2024llmuncertainty}; token probabilities of language models are fairly calibrated on
+multiple-choice questions~\citep{kadavath2022language}; Conf\-Tuner trains verbalised confidence with a tokenised Brier score, a proper
+scoring rule~\citep{li2025conftuner}; and proximity-informed calibration finds low-density samples more overconfident at
+matched confidence~\citep{xiong2023procal}. Reliability is summarised by the expected calibration error
+(ECE)~\citep{naeini2015ece}; temperature scaling~\citep{guo2017calibration} is strictly increasing and cannot reorder one
+user's candidates (Lemma~\ref{lem:invariance}). For LLM recommenders, UQRec~\citep{kweon2025uqrec} decomposes list-wise
+predictive uncertainty into recommendation and prompt uncertainty and adapts prompts; UGR~\citep{fan2026ugr} penalises
+confident errors in training and uses confidence tokens for user rejection and item truncation in generative
+recommendation; EviRank~\citep{yan2026evirank} estimates position-level confidence for LLM ranking. An audit of verbalised
+confidence in zero-shot LLM recommenders is stratified by popularity and scored against catalogue
+membership~\citep{ravikumar2026hallucinating}; KnowSA~\citep{lee2026knowsa} finds popularity and uncertainty poor
+proxies of what an LLM knows about an item; a workshop study finds request-level selective escalation to an LLM
+unhelpful in a sparse fixed-candidate setting~\citep{zhou2026routerec}. We instead audit token-level yes/no confidence of
+pointwise recommenders under a registered protocol with matched labels, non-LLM references and fresh-user
+confirmation, and test serving the most confident requests (selective classification~\citep{geifman2017selective}) against
+random coverage.
 
-\paragraph{Confidence and calibration of LLMs.}
-Black-box confidence elicitation shows that verbalized confidence of LLMs is concentrated at high values and
-only weakly separates correct from incorrect answers~\citep{xiong2024llmuncertainty}; LLMs nevertheless ``mostly
-know what they know'' when asked to evaluate their own answers~\citep{kadavath2022language}, and sampling-based
-measures such as semantic entropy detect confabulations~\citep{farquhar2024semantic}. ConfTuner trains verbal
-confidence with a tokenized Brier score~\citep{li2025conftuner}. Proximity-informed calibration shows that
-samples in low-density regions are more over-confident at matched confidence and introduces a matched-confidence
-bias index~\citep{xiong2023procal}; we adopt that index for item popularity. For binary judgments, LLMs are
-miscalibrated and less reliable on low-frequency entities~\citep{li2025mkj}. Calibration methods for
-classifiers---temperature scaling~\citep{guo2017calibration} and binning~\citep{naeini2015ece}---are
-monotone and therefore cannot reorder a single user's candidates, a point we make explicit in
-Section~\ref{sec:prelim}.
+\paragraph{Yes-bias, answer priors and item familiarity.}
+Binary answers of language models carry input-independent biases: contextual calibration estimates the answer prior
+from content-free inputs and removes it~\citep{zhao2021calibrate}, domain-conditional PMI counters surface-form
+competition by dividing out an answer's prior~\citep{holtzman2021surface}, and batch calibration estimates the label
+prior from a batch~\citep{zhou2024batch}. Yes/no studies report a global lean toward \emph{no} rather than human-like
+acquiescence~\citep{braun2025acquiescence}, a framing asymmetry between positive and negative
+formulations~\citep{zhang2025yesharder}, and an order- and wording-driven bias with idiosyncratic per-item
+residuals~\citep{huang2026yesno}. Contrast-consistent search combines the probability of a statement with that of its
+negation~\citep{burns2023ccs}; a two-view contrast of a question and its mirror belongs to this family and is not
+claimed as new: it enters only as a registered arm (\method{}) that must beat a paraphrase placebo and a
+correlation-matched ensemble null. LLMs also prefer recognised brands over fictional ones with identical
+specifications~\citep{chu2026incumbent}. These works characterise a bias of the answer or of a brand; we ask how much of
+a \emph{personalised} recommender's \py{} is a user-independent item prior rather than personal evidence, via a
+reliability-corrected personal share, information gain over a prior-only item mean and a pseudonym knockout.
 
-\paragraph{Yes/no bias and prompt symmetrization.}
-Language models' binary answers carry prompt- and label-dependent biases. Contextual calibration subtracts the
-prediction for a content-free input~\citep{zhao2021calibrate}, domain-conditional PMI subtracts the prior of the
-answer surface form~\citep{holtzman2021surface}, and batch calibration estimates the bias from a batch of
-inputs~\citep{zhou2024batch}. Contrast-consistent search scores a statement by combining the probability of the
-statement and of its negation~\citep{burns2023ccs}, and crossed symmetrization models framing artifacts that a
-mirrored prompt cancels~\citep{huang2026yesno}. Recent studies find the yes/no bias of LLMs largely
-global~\citep{braun2025acquiescence,zhang2025yesharder}. \method{} uses the mirrored-question estimator; what is new is the
-finding that, in personalised recommendation, the cancelled artifact is item-specific and popularity-graded and
-that cancelling it changes within-user rankings beyond what item-prior subtraction achieves.
+\paragraph{Popularity, calibrated recommendation and feedback loops.}
+Popularity bias~\citep{abdollahpouri2017controlling} has causal treatments that subtract or deconfound the
+item-popularity effect~\citep{wei2021macr,zhang2021pda}; in LLM recommenders, SFT and DPO amplify
+it~\citep{gao2025flower,gao2025sprec}. Calibrated recommendation~\citep{steck2018calibrated} matches the genre mix of a
+list to a user's history; the probability calibration used here instead follows work on calibrating ranking-model
+scores under missing-not-at-random feedback~\citep{kweon2022calibrated}. Feedback loops raise
+homogeneity~\citep{chaney2018feedback} and amplify popularity bias~\citep{mansoury2020feedback}, and LLM-agent
+simulators support filter-bubble studies~\citep{zhang2024agent4rec}. Whereas these works concern the exposure produced by
+a ranking score, we ask whether the confidence attached to a score is itself popularity-linked (its level and its
+matched-confidence calibration gap, with popularity partialled on item quality), and we measure exposure statically on
+same-candidate next-item panels, an existing benchmark protocol on which C-CRP, a verbalised-probability pointwise
+reranker, and eight published LLM-enhanced recommenders serve as context rows only; no closed loop is simulated.
 
-\paragraph{Popularity, exposure, and calibration in recommendation.}
-Popularity bias~\citep{abdollahpouri2017controlling} and its causal treatments~\citep{wei2021macr,zhang2021pda}
-are long-standing concerns, as are feedback loops that homogenise exposure~\citep{chaney2018feedback,mansoury2020feedback}.
-Calibrated probabilities for recommendation must account for missing-not-at-random feedback~\citep{kweon2022calibrated},
-which fully observed data such as KuaiRec~\citep{gao2022kuairec} makes testable; calibrated probabilities also
-support per-user list sizes~\citep{kweon2024perk}. Data selection for LLM-recommender fine-tuning~\citep{lin2024dealrec,mei2025goracs}
-and denoising of implicit feedback~\citep{wang2021tce} motivate our appendix study of confidence-based pruning.
+\paragraph{Exposure-biased evaluation.}
+Logged feedback is missing not at random: propensity-based debiasing was introduced with the Coat test
+set~\citep{schnabel2016treatments}, Yahoo!\ R3 supplies a randomly exposed test set~\citep{marlin2009collaborative}, and
+KuaiRec a fully observed matrix~\citep{gao2022kuairec}. We avoid the missing-as-negative convention in calibration by
+using explicit ratings whose threshold matches the question (rating $\ge4$ versus $\le2$). The zero-shot pilot
+on KuaiRec missed its registered bar, so fully observed labels are not an endpoint; next-item panels, with sampled
+negatives, are used only under same-candidate scope.
+
+\paragraph{Data pruning for LLM-based recommendation.}
+Data selection for LLM-recommender fine-tuning uses influence and effort scores~\citep{lin2024dealrec} or
+optimal-transport coresets, where gradient- and loss-based scores fall below random selection on TALLRec-style CTR
+tuning~\citep{mei2025goracs}; instruction tuning has cut claims the model is unfamiliar with at an uncertainty
+quantile~\citep{wu2025unit}. We ask whether a recommender's own confidence identifies noisy training pairs, against
+matched-random pruning over five seeds, and report the answer either way.

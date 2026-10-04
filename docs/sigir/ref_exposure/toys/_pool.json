@@ -1,0 +1,147 @@
+{
+  "domain": "toys",
+  "n_pool_items": 212347,
+  "n_events": 10000,
+  "n_candidates_per_event_hist": {
+    "101": 10000
+  },
+  "n_pool_items_by_group": {
+    "head": 55543,
+    "mid": 94121,
+    "tail": 62683
+  },
+  "n_pool_items_with_conflicting_group": 0,
+  "pool_items_sha1": "9cbd9b21ea78942fadc8b53b2d9a56ac6a0176c1",
+  "panel_refs": "docs/sigir/panel_refs/toys_test.json",
+  "topk": 10,
+  "columns": [
+    "source_event_id",
+    "user_id",
+    "positive_rank",
+    "positive_group",
+    "top10_item_ids",
+    "top10_groups",
+    "n_head_pool",
+    "n_mid_pool",
+    "n_tail_pool"
+  ],
+  "methods": {
+    "ccrp_v3": {
+      "n_events": 10000,
+      "bytes": 1032823,
+      "source": "D:\\Research\\Lumen\\outputs\\toys_large10000_100neg_ccrp_v3_qwen3base_pointwise_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "elmrec_graph": {
+      "n_events": 10000,
+      "bytes": 1028340,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_elmrec_graph_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "irllrec_intent": {
+      "n_events": 10000,
+      "bytes": 951513,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_irllrec_intent_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llm2rec_sasrec": {
+      "n_events": 10000,
+      "bytes": 983986,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_llm2rec_sasrec_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llmemb": {
+      "n_events": 10000,
+      "bytes": 1022015,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_llmemb_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "llmesr_sasrec": {
+      "n_events": 10000,
+      "bytes": 904372,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_llmesr_sasrec_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "proex_profile": {
+      "n_events": 10000,
+      "bytes": 951831,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_proex_profile_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "promax_profile": {
+      "n_events": 10000,
+      "bytes": 956696,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_promax_profile_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    },
+    "rlmrec_graphcl": {
+      "n_events": 10000,
+      "bytes": 931104,
+      "source": "D:\\Research\\Lumen\\outputs\\baselines\\official_adapters\\toys_large10000_100neg_rlmrec_graphcl_official_qwen3base_same_candidate\\tables\\ranking_eval_records.csv",
+      "n_rows_read": 10000,
+      "n_rows_other_split": 0,
+      "rank_vs_position_mismatch": 0,
+      "positive_group_column_mismatch": 0,
+      "positive_not_in_prediction": 0,
+      "n_candidates_hist": {
+        "101": 10000
+      }
+    }
+  }
+}

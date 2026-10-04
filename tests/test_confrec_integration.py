@@ -229,7 +229,8 @@ def test_pilot1_chain_gate_reads_everything_pilot_mirror_writes(tmp_path, monkey
                                                  "reference_SD_pair_df", "reference_corr_a_logpop_prior_pop"))
     assert math.isfinite(dec["gate"]["ccrp_same_events_NDCG@10"]) and "dNDCG@10_placebo_minus_ccrp" in \
         dec["next_item_no_loss"]
-    assert dec["decision"] in ("POSITIVE", "NEGATIVE", "NULL", "AMBIGUOUS", "GATE_FAIL_UNINTERPRETABLE")
+    # every label the gate can emit (amendment 2 closes the table with INDETERMINATE; INCOMPLETE = undetermined input)
+    assert dec["decision"] in gate.LABELS and dec["decision"] != "INCOMPLETE" and dec["missing_inputs"] == []
 
 
 # ------------------------------------------------------------------ pilot 3 (+ split_panel)

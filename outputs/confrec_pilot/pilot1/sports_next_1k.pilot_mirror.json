@@ -1,0 +1,334 @@
+{
+  "panel_type": "next_item",
+  "base_question": "next",
+  "questions": [
+    "dislike",
+    "like",
+    "like_para",
+    "next"
+  ],
+  "n_rows": 101000,
+  "n_users": 1000,
+  "n_items": 61212,
+  "n_boot": 2000,
+  "seed": 0,
+  "censoring": {
+    "scores": {
+      "dislike": {
+        "n": 101000,
+        "0": 101000
+      },
+      "like": {
+        "n": 101000,
+        "0": 101000
+      },
+      "like_para": {
+        "n": 101000,
+        "0": 101000
+      },
+      "next": {
+        "n": 101000,
+        "0": 101000
+      }
+    }
+  },
+  "panel_join": {},
+  "arms": {
+    "raw": {
+      "UAUC": 0.7192350000000001,
+      "n_users_uauc": 1000,
+      "AUC_global": 0.70964556,
+      "n_rows": 101000,
+      "NDCG@10": 0.20934006726080595,
+      "HR@10": 0.364,
+      "MRR": 0.18427241800862862,
+      "NDCG@10_tie_exact": 0.20965351352758094,
+      "HR@10_tie_exact": 0.3648333333333333,
+      "MRR_tie_exact": 0.18437527461411893,
+      "n_events": 1000,
+      "n_events_positive_unscored": 0,
+      "n_events_negative_unscored": 0,
+      "top10_head_share": 0.7453166666666667
+    },
+    "raw_like": {
+      "UAUC": 0.72112,
+      "n_users_uauc": 1000,
+      "AUC_global": 0.70984436,
+      "n_rows": 101000,
+      "NDCG@10": 0.2123331093944711,
+      "HR@10": 0.369,
+      "MRR": 0.18645965979099066,
+      "NDCG@10_tie_exact": 0.21249212973197362,
+      "HR@10_tie_exact": 0.3695,
+      "MRR_tie_exact": 0.18647960215280032,
+      "n_events": 1000,
+      "n_events_positive_unscored": 0,
+      "n_events_negative_unscored": 0,
+      "top10_head_share": 0.7440500000000001
+    },
+    "mirror": {
+      "UAUC": 0.70465,
+      "n_users_uauc": 1000,
+      "AUC_global": 0.694181215,
+      "n_rows": 101000,
+      "NDCG@10": 0.1784948013736796,
+      "HR@10": 0.332,
+      "MRR": 0.15545257831270629,
+      "NDCG@10_tie_exact": 0.1786402199305196,
+      "HR@10_tie_exact": 0.3325,
+      "MRR_tie_exact": 0.15545491196043776,
+      "n_events": 1000,
+      "n_events_positive_unscored": 0,
+      "n_events_negative_unscored": 0,
+      "top10_head_share": 0.7580500000000001
+    },
+    "placebo": {
+      "UAUC": 0.72294,
+      "n_users_uauc": 1000,
+      "AUC_global": 0.711136595,
+      "n_rows": 101000,
+      "NDCG@10": 0.21868123523940103,
+      "HR@10": 0.374,
+      "MRR": 0.19318402809661803,
+      "NDCG@10_tie_exact": 0.21868379128966592,
+      "HR@10_tie_exact": 0.374,
+      "MRR_tie_exact": 0.19318745778309876,
+      "n_events": 1000,
+      "n_events_positive_unscored": 0,
+      "n_events_negative_unscored": 0,
+      "top10_head_share": 0.7431
+    },
+    "ccrp": {
+      "NDCG@10": 0.23099683987255373,
+      "HR@10": 0.364,
+      "MRR": 0.21149810421162402,
+      "n_events": 1000
+    }
+  },
+  "primary_endpoint": "dUAUC_mirror_minus_placebo",
+  "dUAUC_mirror_minus_placebo": {
+    "est": -0.01829,
+    "lo": -0.024270250000000004,
+    "hi": -0.012360000000000001,
+    "n": 1000,
+    "n_rows": 101000
+  },
+  "dUAUC_mirror_minus_raw_like": {
+    "est": -0.016470000000000002,
+    "lo": -0.022255125000000004,
+    "hi": -0.010695000000000003,
+    "n": 1000,
+    "n_rows": 101000
+  },
+  "dUAUC_mirror_minus_raw": {
+    "est": -0.014584999999999999,
+    "lo": -0.020737374999999995,
+    "hi": -0.008134875,
+    "n": 1000,
+    "n_rows": 101000
+  },
+  "dUAUC_placebo_minus_raw_like": {
+    "est": 0.0018200000000000007,
+    "lo": -0.00047062500000000034,
+    "hi": 0.004265249999999998,
+    "n": 1000,
+    "n_rows": 101000
+  },
+  "next_item": {
+    "rank": "expected 1-based rank under uniformly random tie-breaking (stats.tie_aware_rank); per arm, an unscored positive ranks last and unscored negatives below the positive; *_tie_exact = exact expectation over the positive's tie group",
+    "paired": "dNDCG@10 between arms ranks both arms on the candidates finite in both (as dUAUC); events whose positive is unscored in either arm are dropped and counted",
+    "n_events": 1000
+  },
+  "dNDCG@10_mirror_minus_raw": {
+    "est": -0.030845265887126338,
+    "lo": -0.042315200424343564,
+    "hi": -0.019778032618127536,
+    "n": 1000,
+    "n_events": 1000,
+    "n_events_positive_unscored_dropped": 0,
+    "n_events_with_candidates_dropped": 0,
+    "tie_exact": {
+      "est": -0.03101329359706133,
+      "lo": -0.04254569520042362,
+      "hi": -0.01991364806162505,
+      "n": 1000
+    }
+  },
+  "dNDCG@10_mirror_minus_raw_like": {
+    "est": -0.03383830802079144,
+    "lo": -0.04376507618257192,
+    "hi": -0.024058704231646823,
+    "n": 1000,
+    "n_events": 1000,
+    "n_events_positive_unscored_dropped": 0,
+    "n_events_with_candidates_dropped": 0,
+    "tie_exact": {
+      "est": -0.03385190980145403,
+      "lo": -0.04382275702289177,
+      "hi": -0.02403327391524642,
+      "n": 1000
+    }
+  },
+  "dNDCG@10_mirror_minus_placebo": {
+    "est": -0.04018643386572139,
+    "lo": -0.05131493542468435,
+    "hi": -0.029535717034529962,
+    "n": 1000,
+    "n_events": 1000,
+    "n_events_positive_unscored_dropped": 0,
+    "n_events_with_candidates_dropped": 0,
+    "tie_exact": {
+      "est": -0.04004357135914631,
+      "lo": -0.051179812814272176,
+      "hi": -0.029349754003163014,
+      "n": 1000
+    }
+  },
+  "ref_ranks": {
+    "n_ref_rows": 10000,
+    "n_scored_panel_events": 1000,
+    "n_joined": 1000,
+    "ref_events_not_in_scored_panel": 9000,
+    "num_candidates_mismatch": 0,
+    "user_id_mismatch": 0,
+    "arms_on_joined_events": {
+      "raw": {
+        "NDCG@10": 0.20934006726080595,
+        "HR@10": 0.364,
+        "MRR": 0.18427241800862862,
+        "NDCG@10_tie_exact": 0.20965351352758094,
+        "HR@10_tie_exact": 0.3648333333333333,
+        "MRR_tie_exact": 0.18437527461411893
+      },
+      "raw_like": {
+        "NDCG@10": 0.2123331093944711,
+        "HR@10": 0.369,
+        "MRR": 0.18645965979099066,
+        "NDCG@10_tie_exact": 0.21249212973197362,
+        "HR@10_tie_exact": 0.3695,
+        "MRR_tie_exact": 0.18647960215280032
+      },
+      "mirror": {
+        "NDCG@10": 0.1784948013736796,
+        "HR@10": 0.332,
+        "MRR": 0.15545257831270629,
+        "NDCG@10_tie_exact": 0.1786402199305196,
+        "HR@10_tie_exact": 0.3325,
+        "MRR_tie_exact": 0.15545491196043776
+      },
+      "placebo": {
+        "NDCG@10": 0.21868123523940103,
+        "HR@10": 0.374,
+        "MRR": 0.19318402809661803,
+        "NDCG@10_tie_exact": 0.21868379128966592,
+        "HR@10_tie_exact": 0.374,
+        "MRR_tie_exact": 0.19318745778309876
+      }
+    }
+  },
+  "dNDCG@10_raw_minus_ccrp": {
+    "est": -0.021656772611747775,
+    "lo": -0.035153023947538733,
+    "hi": -0.007798272170517157,
+    "n": 1000,
+    "n_events": 1000,
+    "tie_exact": {
+      "est": -0.021343326344972793,
+      "lo": -0.03482691650193177,
+      "hi": -0.007543423618467694,
+      "n": 1000
+    }
+  },
+  "dNDCG@10_raw_like_minus_ccrp": {
+    "est": -0.018663730478082667,
+    "lo": -0.03234635649442726,
+    "hi": -0.004431277753249685,
+    "n": 1000,
+    "n_events": 1000,
+    "tie_exact": {
+      "est": -0.018504710140580093,
+      "lo": -0.032238605961920144,
+      "hi": -0.004361801952844264,
+      "n": 1000
+    }
+  },
+  "dNDCG@10_mirror_minus_ccrp": {
+    "est": -0.052502038498874117,
+    "lo": -0.06879699974615014,
+    "hi": -0.036093736738824926,
+    "n": 1000,
+    "n_events": 1000,
+    "tie_exact": {
+      "est": -0.05235661994203412,
+      "lo": -0.06877678228521322,
+      "hi": -0.03597848064433715,
+      "n": 1000
+    }
+  },
+  "dNDCG@10_placebo_minus_ccrp": {
+    "est": -0.012315604633152729,
+    "lo": -0.02487208601775113,
+    "hi": 0.0002614661365078463,
+    "n": 1000,
+    "n_events": 1000,
+    "tie_exact": {
+      "est": -0.01231304858288781,
+      "lo": -0.024871487016428266,
+      "hi": 0.0002652263671389724,
+      "n": 1000
+    }
+  },
+  "acquiescence": {
+    "definition": "a(u,i) = (L_like + L_dislike)/2 centred within user; SD_pair = sqrt(mean a_c^2) over pairs of users with >= 2 finite a (pooled within-user SD, gating; biased low by sqrt(1 - 1/n_u)); SD_pair_df = sqrt(sum a_c^2 / (N - U)), the df-corrected pooled SD (reported; gate sensitivity); SD_item_corrected = method-of-moments between-item SD on items with n_i >= 2 (reported, not gating)",
+    "n_pairs": 101000,
+    "n_users_ge2": 1000,
+    "n_per_user": {
+      "min": 101,
+      "median": 101.0,
+      "mean": 101.0,
+      "max": 101
+    },
+    "global_mean_a": -10.531974938118811,
+    "SD_pair": 4.357564111406392,
+    "SD_pair_ci": {
+      "lo": 4.308501333693205,
+      "hi": 4.404491518997747
+    },
+    "SD_pair_df": 4.379297733069441,
+    "SD_pair_df_ci": {
+      "lo": 4.329990251705019,
+      "hi": 4.426459194020918
+    },
+    "n_items": 61212,
+    "n_items_ge2": 16416,
+    "SD_item_corrected": 2.5199105487749414,
+    "var_item_means_ge2": 11.307811715853203,
+    "mean_within_var_over_n_ge2": 4.9578625420259765,
+    "SD_item_raw": 4.030059837338951,
+    "item_support": {
+      "n1": 44796,
+      "n2": 9339,
+      "n3_4": 4524,
+      "n5plus": 2553
+    }
+  },
+  "valence": {
+    "definition": "v(u,i) = (L_like - L_dislike)/2 (not centred)",
+    "global_mean_v": -2.321787438118812
+  },
+  "calibration": {
+    "applicable": false,
+    "reason": "next-item panel: 1-of-N labels are not a calibration target"
+  },
+  "confident_error": {
+    "applicable": false,
+    "reason": "next-item panel: 1-of-N labels are not a calibration target"
+  },
+  "inputs": {
+    "scores": "outputs/confrec/pilot1_mirror/sports_next_1k/scores.csv.gz",
+    "panel": "outputs/confrec/panels/sports_next_1k.jsonl",
+    "swap": null,
+    "nohist": null,
+    "ref_ranks": "docs/sigir/ref_ranks/sports/ccrp_v3.csv.gz"
+  }
+}

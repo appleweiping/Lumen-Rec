@@ -1,0 +1,2141 @@
+{
+  "label": "exploratory",
+  "status": "EXPLORATORY ONLY (amendment 2 section A): hypothesis-generating, never cited as evidence, never a gate or an input to G1-G9",
+  "spec": "idea-stage/PREREG_AMENDMENT_2.md section A; A1 is produced by the panel builders",
+  "inputs": {
+    "pilot_dir": "/root/autodl-tmp/lumen-rec/outputs/confrec/pilot1_mirror",
+    "panels": "/root/autodl-tmp/lumen-rec/outputs/confrec/panels",
+    "raw": "/root/autodl-tmp/lumen-rec/data/raw",
+    "names": "ml1m_rated,toys_rated,sports_next_1k",
+    "ccrp_head_share": null,
+    "sports_first_n": 1000,
+    "sports_panel": "/root/autodl-tmp/lumen-rec/outputs/confrec/panels/sports_next_1k.jsonl",
+    "out": "/root/autodl-tmp/a2_forensics/out/forensics.json",
+    "n_boot": 2000,
+    "seed": 0,
+    "shrink_k": 5.0,
+    "mf_dim": 32,
+    "mf_iters": 15,
+    "mf_lambda": 0.05,
+    "mf_lambda_bias": 5.0,
+    "mf_cutoff_quantile": 0.8,
+    "null_sim_reps": 50
+  },
+  "panels": {
+    "ml1m_rated": {
+      "label": "exploratory",
+      "A9_throughput": {
+        "label": "exploratory",
+        "registered_reconciled_prompts_per_s": 87.1,
+        "main": {
+          "prompts_per_s": 87.10206897756021,
+          "n_prompts": 111367,
+          "n_main_prompts": 88095,
+          "swap_prompts": 23272,
+          "prompts_sent_this_run": 111367,
+          "inference_time_s": 1278.5804207324982,
+          "chunks_resumed": 0
+        },
+        "nohist": {
+          "prompts_per_s": 202.41249294296802,
+          "n_prompts": 29365,
+          "n_main_prompts": 29365,
+          "prompts_sent_this_run": 29365,
+          "inference_time_s": 145.07503747940063,
+          "chunks_resumed": 0
+        }
+      },
+      "panel_kind": "rated",
+      "source": "ml1m",
+      "panel_identity": {
+        "panel": "/root/autodl-tmp/lumen-rec/outputs/confrec/panels/ml1m_rated.jsonl",
+        "panel_sha1": "985494c7b44d010bec4b11ec62f35ad274dfe91f",
+        "main": {
+          "report_data_sha1": "985494c7b44d010bec4b11ec62f35ad274dfe91f",
+          "report_data_path": "outputs/confrec/panels/ml1m_rated.jsonl",
+          "match": true
+        },
+        "nohist": {
+          "report_data_sha1": "985494c7b44d010bec4b11ec62f35ad274dfe91f",
+          "report_data_path": "outputs/confrec/panels/ml1m_rated.jsonl",
+          "match": true
+        },
+        "consistent": true
+      },
+      "n_pairs": 29365,
+      "n_users": 1500,
+      "n_duplicate_pairs": 0,
+      "questions": [
+        "dislike",
+        "like",
+        "like_para"
+      ],
+      "censoring": {
+        "dislike": {
+          "n": 29365,
+          "0": 29365
+        },
+        "like": {
+          "n": 29365,
+          "0": 29365
+        },
+        "like_para": {
+          "n": 29365,
+          "0": 29365
+        }
+      },
+      "panel_join": {},
+      "A2_prior": {
+        "label": "exploratory",
+        "pi": {
+          "definition": "pi(i) = mean finite like-logit of item i over its swap donors (pilot_mirror); halves = donor rows 1-4 vs 5-8 of the item in swap_prior.csv.gz file order",
+          "n_panel_items": 2909,
+          "n_panel_items_without_prior": 0,
+          "donor_rows_per_item": {
+            "8": 2909
+          },
+          "UAUC_pi": {
+            "est": 0.6025657300197986,
+            "lo": 0.5942447537678824,
+            "hi": 0.6109199695059276,
+            "n_users": 1500,
+            "n_pairs": 29365
+          }
+        },
+        "split_half": {
+          "definition": "Spearman r over panel items of mean(donors 1-4) vs mean(donors 5-8), item bootstrap (r = reliability of a 4-donor pi); spearman_brown_8 = 2r/(1+r) = split-half reliability of the 8-donor pi the evidence arm uses (read by the wording flag; raw r is its sensitivity)",
+          "spearman_r": {
+            "est": 0.6768399234313015,
+            "lo": 0.6553616816222675,
+            "hi": 0.6981999874668828,
+            "n": 2909,
+            "n_boot": 2000
+          },
+          "spearman_brown_8": 0.8072803062158617,
+          "spearman_brown_8_ci": {
+            "lo": 0.7918048229556792,
+            "hi": 0.822282407984647
+          },
+          "n_items": 2909
+        },
+        "evidence": {
+          "definition": "evidence = L_like - pi; UAUC with the 8-donor pi and each 4-donor half; projection to a perfectly reliable pi = U8 + (U8 - U4)/r (linear in reliability: rho_4 = r, rho_8 = 2r/(1+r), rho = 1), reported only for r >= 0.2 and clipped to [0, 1]; also at the item-bootstrap CI bounds of r (instability range)",
+          "UAUC_8_donor": {
+            "est": 0.50730444744707,
+            "lo": 0.49707865219184183,
+            "hi": 0.5177666750959077,
+            "n_users": 1500,
+            "n_pairs": 29365
+          },
+          "UAUC_4_donor_half_1_4": {
+            "est": 0.5065907075463572,
+            "lo": 0.49704118569129446,
+            "hi": 0.516303823737843,
+            "n_users": 1500,
+            "n_pairs": 29365
+          },
+          "UAUC_4_donor_half_5_8": {
+            "est": 0.5036111359732316,
+            "lo": 0.4932996358766393,
+            "hi": 0.514157892307935,
+            "n_users": 1500,
+            "n_pairs": 29365
+          },
+          "UAUC_4_donor_mean": 0.5051009217597944,
+          "projection_reliable_pi": 0.5105600557689088,
+          "projection_unclipped": 0.5105600557689088,
+          "projection_clipped": false,
+          "projection_note": null,
+          "projection_min_r": 0.2,
+          "projection_at_r_ci": {
+            "r_lo": 0.5106667521851517,
+            "r_hi": 0.5104604567951513
+          }
+        },
+        "L_nohist": {
+          "definition": "item mean of the hist_len-0 like-logit (the prompt depends on the item only; as pilot_mirror's pmi_nohist prior)",
+          "UAUC_L_nohist": {
+            "est": 0.5455030110929375,
+            "lo": 0.5362889310804936,
+            "hi": 0.5550920094634849,
+            "n_users": 1500,
+            "n_pairs": 29365
+          }
+        },
+        "swap_censoring": {
+          "n": 23272,
+          "0": 23272,
+          "dropped_nonfinite": 0
+        },
+        "nohist_join": {},
+        "nohist_censoring": {
+          "like": {
+            "n": 29365,
+            "0": 29365
+          }
+        },
+        "nohist_like_finite_pairs": 29365
+      },
+      "A4_ensemble_null": {
+        "label": "exploratory",
+        "definition": "per user (rows finite in both views, both classes): AUC_k of each view clipped to [0.5/(n_pos n_neg), 1 - 0.5/(n_pos n_neg)], rho = pooled within-class Pearson correlation, predicted AUC of the equal-weight standardised sum Phi(((d_1 + d_2) / sqrt(2 + 2 rho)) / sqrt(2)), d_k = sqrt(2) Phi^-1(AUC_k) (= pilot_mirror ensemble_null, the decision group's definition). PRIMARY (wording flag): dUAUC_mirror_minus_ensemble_null = observed MIRROR - prediction, paired user bootstrap. Secondary: the placebo pair (sanity check), the difference in gaps (MIRROR - null) - (placebo - null), the raw-weight prediction of the unstandardised sum, the empirical within-user z-sums, the pooled back-of-envelope (judge.md) and the parametric null-bias correction (null_bias_sim); see caveats",
+        "caveats": [
+          "The per-user binormal null is a plug-in estimate: with about 20 candidates per user the transform of noisy per-user AUCs over-predicts an exact equal-weight two-view ensemble, so dUAUC(MIRROR - null) is biased below 0 under an exact Gaussian ensemble (a placebo pair at rho ~0.95 is nearly unbiased).",
+          "Exact Gaussian two-view nulls at the Pilot-1 ML-1M size (1,500 users x 20 candidates, 13 likes, AUC ~0.59, within-class rho 0.35, 300-500 bootstrap resamples), three independent probes: mean dUAUC(MIRROR - null) -0.0007 to -0.0015; the 95% CI lay wholly BELOW 0 in 1/6, 3/6 and 3/12 runs (nominal 2.5%) and never above 0. Hence the wording flag is one-sided (lo <= 0) and the literal two-sided reading is a sensitivity.",
+          "null_bias_parametric re-estimates that bias on the data's own design (per-user labels, fitted d_k and rho); dUAUC_bias_corrected bootstraps observed - (null + per-user bias) (secondary). Validation: over 12 exact Gaussian nulls of 1,000 users x 20 candidates (rho 0.35, AUC ~0.59) the realised mean dUAUC was -0.00169 (se 0.00023) and the parametric estimate -0.00147 (se 0.00008)."
+        ],
+        "mirror_pair": {
+          "views": [
+            "like",
+            "-dislike"
+          ],
+          "n_rows": 29365,
+          "users_both_classes": 1500,
+          "users_auc_clipped": 16,
+          "n_users": 1500,
+          "UAUC_view1": 0.5874475521977115,
+          "UAUC_view2": 0.5921223295472683,
+          "rho_within_class": {
+            "mean": 0.1258689422249749,
+            "median": 0.15331513435249172
+          },
+          "predicted_UAUC": 0.6210993383501717,
+          "observed_UAUC": 0.6162775928560364,
+          "z_sum_UAUC": 0.6169907518244283,
+          "n_users_z_sum": 1500,
+          "dUAUC_observed_minus_predicted": {
+            "est": -0.004821745494135231,
+            "lo": -0.008848171491161842,
+            "hi": -0.0008692271255147734,
+            "n": 1500
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.6165286671600563,
+            "dUAUC_observed_minus_predicted": {
+              "est": -0.0002510743040198485,
+              "lo": -0.002711781634954127,
+              "hi": 0.0022469082943429117,
+              "n": 1500
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1500,
+            "mean_bias": -0.000943914172060665,
+            "dUAUC_bias_corrected": {
+              "est": -0.0038778313220745654,
+              "lo": -0.008026292938198966,
+              "hi": 0.00013309802287663657,
+              "n": 1500
+            }
+          }
+        },
+        "placebo_pair": {
+          "views": [
+            "like",
+            "like_para"
+          ],
+          "n_rows": 29365,
+          "users_both_classes": 1500,
+          "users_auc_clipped": 11,
+          "n_users": 1500,
+          "UAUC_view1": 0.5874475521977115,
+          "UAUC_view2": 0.603966160030964,
+          "rho_within_class": {
+            "mean": 0.9406239723739085,
+            "median": 0.9509870753570712
+          },
+          "predicted_UAUC": 0.5972427078430413,
+          "observed_UAUC": 0.5977648056758964,
+          "z_sum_UAUC": 0.5963281647065716,
+          "n_users_z_sum": 1500,
+          "dUAUC_observed_minus_predicted": {
+            "est": 0.0005220978328549908,
+            "lo": -0.0004487873725436746,
+            "hi": 0.001491763042962035,
+            "n": 1500
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.5983704457122958,
+            "dUAUC_observed_minus_predicted": {
+              "est": -0.0006056400363993599,
+              "lo": -0.0015121965777336085,
+              "hi": 0.0003029999328018413,
+              "n": 1500
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1500,
+            "mean_bias": -4.543872924462908e-05,
+            "dUAUC_bias_corrected": {
+              "est": 0.0005675365620996198,
+              "lo": -0.0004287894833439503,
+              "hi": 0.001527888202052602,
+              "n": 1500
+            }
+          }
+        },
+        "dUAUC_mirror_minus_ensemble_null": {
+          "est": -0.004821745494135231,
+          "lo": -0.008848171491161842,
+          "hi": -0.0008692271255147734,
+          "n": 1500
+        },
+        "dUAUC_placebo_minus_ensemble_null": {
+          "est": 0.0005220978328549908,
+          "lo": -0.0004487873725436746,
+          "hi": 0.001491763042962035,
+          "n": 1500
+        },
+        "dUAUC_mirror_minus_ensemble_null_bias_corrected": {
+          "est": -0.0038778313220745654,
+          "lo": -0.008026292938198966,
+          "hi": 0.00013309802287663657,
+          "n": 1500
+        },
+        "gap_residual": {
+          "definition": "per user (MIRROR - its null) - (placebo - its null), i.e. the observed MIRROR - placebo gap minus the gap the null predicts (the skeptic's residual), user bootstrap",
+          "est": -0.00534384332699022,
+          "lo": -0.009461041751263034,
+          "hi": -0.0011890057330841651,
+          "n_users": 1500
+        },
+        "dUAUC_zsum_mirror_minus_zsum_placebo": {
+          "est": 0.020662587117856727,
+          "lo": 0.01364784494746811,
+          "hi": 0.027814835188617666,
+          "n": 1500
+        },
+        "pooled_back_of_envelope": {
+          "definition": "deliberation arithmetic (lens_skeptic A7 / judge.md): binormal_sum_auc of the mean per-user AUCs with the pooled pair-level Spearman correlation, vs the observed UAUCs",
+          "rho_like_negdislike_pooled": 0.35547296780050414,
+          "rho_like_para_pooled": 0.952902044444346,
+          "pred_mirror": 0.6086231431395495,
+          "pred_placebo": 0.5968529684024655,
+          "observed_gap": 0.018512787180140045,
+          "predicted_gap": 0.011770174737083972,
+          "residual": 0.006742612443056073
+        }
+      },
+      "A5_calibration": {
+        "label": "exploratory",
+        "definition": "fit on the stats.user_halves(seed) half, ECE (15 equal-width bins) / adaptive ECE / Brier on the other half: raw sigmoid(x); intercept-only sigmoid(x + b); temperature-only sigmoid(x/T); Platt sigmoid(a x + b); user-centred Platt on x - mean_user(x)",
+        "split": {
+          "n_users_fit": 773,
+          "n_users_eval": 727,
+          "seed": 0
+        },
+        "arms": {
+          "like": {
+            "raw": {
+              "ECE": 0.3048630331035936,
+              "ECE_adaptive": 0.30444160807737164,
+              "Brier": 0.3289832792742067,
+              "n": 14224
+            },
+            "intercept_only": {
+              "b": -0.4310369667874341,
+              "ECE": 0.30752256768740643,
+              "ECE_adaptive": 0.30636848607989803,
+              "Brier": 0.33240952920333994,
+              "n": 14224
+            },
+            "temperature_only": {
+              "a": 0.09522740796625656,
+              "T": 10.501178403956411,
+              "ECE": 0.10273836182749468,
+              "ECE_adaptive": 0.10180735518878326,
+              "Brier": 0.231759247850252,
+              "n": 14224
+            },
+            "platt": {
+              "a": 0.06202607773569667,
+              "b": 0.5067032845784593,
+              "ECE": 0.015846597298714217,
+              "ECE_adaptive": 0.019618190128520105,
+              "Brier": 0.21862961718386914,
+              "n": 14224
+            },
+            "user_centred_platt": {
+              "a": 0.06376136681089478,
+              "b": 0.6584169753848057,
+              "ECE": 0.013479096733552933,
+              "ECE_adaptive": 0.020379908428932055,
+              "Brier": 0.21962873504784808,
+              "n": 14224
+            },
+            "label_rate_eval": 0.6628937007874016
+          },
+          "mirror_half": {
+            "raw": {
+              "ECE": 0.2583615474354981,
+              "ECE_adaptive": 0.2591346822651705,
+              "Brier": 0.2873230637478518,
+              "n": 14224
+            },
+            "intercept_only": {
+              "b": -1.7742593934242565,
+              "ECE": 0.25328467483414474,
+              "ECE_adaptive": 0.2511833622144135,
+              "Brier": 0.2930685887826993,
+              "n": 14224
+            },
+            "temperature_only": {
+              "a": 0.1600146531792182,
+              "T": 6.2494276626028045,
+              "ECE": 0.03778101308277772,
+              "ECE_adaptive": 0.03811436788077731,
+              "Brier": 0.21689994613013824,
+              "n": 14224
+            },
+            "platt": {
+              "a": 0.12518660843730114,
+              "b": 0.2636781636408279,
+              "ECE": 0.006440106628807186,
+              "ECE_adaptive": 0.013649549583111669,
+              "Brier": 0.21422025977819856,
+              "n": 14224
+            },
+            "user_centred_platt": {
+              "a": 0.14671665234530515,
+              "b": 0.6663894418629971,
+              "ECE": 0.01538386947639635,
+              "ECE_adaptive": 0.020824579715374124,
+              "Brier": 0.2166719835678435,
+              "n": 14224
+            },
+            "label_rate_eval": 0.6628937007874016
+          },
+          "placebo": {
+            "raw": {
+              "ECE": 0.3391350355146698,
+              "ECE_adaptive": 0.3375606860719735,
+              "Brier": 0.36182732371813037,
+              "n": 14224
+            },
+            "intercept_only": {
+              "b": 2.310379016694121,
+              "ECE": 0.3126344595190039,
+              "ECE_adaptive": 0.3111610764056931,
+              "Brier": 0.3339424459014511,
+              "n": 14224
+            },
+            "temperature_only": {
+              "a": 0.06176604233864576,
+              "T": 16.19012587073788,
+              "ECE": 0.15510086175275167,
+              "ECE_adaptive": 0.155073610700322,
+              "Brier": 0.241377239246201,
+              "n": 14224
+            },
+            "platt": {
+              "a": 0.06193011447173422,
+              "b": 0.6491400990602404,
+              "ECE": 0.01479951419121666,
+              "ECE_adaptive": 0.01574985167125022,
+              "Brier": 0.21728103026728351,
+              "n": 14224
+            },
+            "user_centred_platt": {
+              "a": 0.06464644172272893,
+              "b": 0.6623284515905578,
+              "ECE": 0.015350201957537366,
+              "ECE_adaptive": 0.01770321417506823,
+              "Brier": 0.21849506309424604,
+              "n": 14224
+            },
+            "label_rate_eval": 0.6628937007874016
+          }
+        }
+      },
+      "A6_error_targets": {
+        "label": "exploratory",
+        "base_arm": "like",
+        "definition": "AUROC(-confidence, is_error) pooled over pairs with a user-cluster bootstrap CI; detectors mag_<arm> = |x|, platt_margin_<arm> = |a x + b| (the arm's own Platt fit on the fit half), topk_margin_<arm> = |x - thr_u| (the arm's own per-user top-k threshold)",
+        "raw_decision_reference": {
+          "error_rate": 0.38235995232419545,
+          "always_like_error_rate": 0.3403030819002214,
+          "AUROC_mag_like": 0.5835374887555251
+        },
+        "after_platt": {
+          "definition": "eval-half errors of the like decision sigmoid(a L + b) >= 0.5 (Platt fit on the other half)",
+          "platt": {
+            "a": 0.06202607773569667,
+            "b": 0.5067032845784593
+          },
+          "error_rate": 0.34301181102362205,
+          "n_rows": 14224,
+          "n_errors": 4879,
+          "majority_class_error_rate": 0.33710629921259844,
+          "detectors": {
+            "mag_like": {
+              "est": 0.5481847219567465,
+              "lo": 0.5339611286149156,
+              "hi": 0.5624081455379325,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "platt_margin_like": {
+              "est": 0.6056047850765409,
+              "lo": 0.5921490765454136,
+              "hi": 0.619082452848957,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "mag_mirror": {
+              "est": 0.6025582280048221,
+              "lo": 0.5889208985219856,
+              "hi": 0.6161624719737898,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "platt_margin_mirror": {
+              "est": 0.6298776677017751,
+              "lo": 0.616026135740555,
+              "hi": 0.6435464912417359,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "mag_placebo": {
+              "est": 0.5022089296118557,
+              "lo": 0.48828715052832283,
+              "hi": 0.5163939615690232,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "platt_margin_placebo": {
+              "est": 0.6150785115361573,
+              "lo": 0.6015831347642457,
+              "hi": 0.6285344987942109,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "mag_evidence": {
+              "est": 0.5044266432251169,
+              "lo": 0.4895793972565125,
+              "hi": 0.5191630662229922,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            },
+            "platt_margin_evidence": {
+              "est": 0.531014170535301,
+              "lo": 0.5157304288990258,
+              "hi": 0.545940710327067,
+              "n_users": 727,
+              "n": 14224,
+              "n_errors": 4879
+            }
+          }
+        },
+        "per_user_topk": {
+          "definition": "per user, the top-k like-logit candidates are predicted likes, k = the user's number of likes (ties at the boundary broken by a seeded random order); errors = FP + FN (FP = FN per user)",
+          "n_rows": 29365,
+          "n_errors": 10048,
+          "error_rate": 0.34217605993529715,
+          "n_users_tie_at_boundary": 37,
+          "detectors": {
+            "mag_like": {
+              "est": 0.5580540526660619,
+              "lo": 0.5486929565415966,
+              "hi": 0.5671627945203517,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "topk_margin_like": {
+              "est": 0.6213953424246951,
+              "lo": 0.6134574241956239,
+              "hi": 0.6285566656745702,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "mag_mirror": {
+              "est": 0.5971129281936738,
+              "lo": 0.58807800504817,
+              "hi": 0.60543981177624,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "topk_margin_mirror": {
+              "est": 0.6449471382423125,
+              "lo": 0.6375160899975577,
+              "hi": 0.6522683176016193,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "mag_placebo": {
+              "est": 0.5136485857684842,
+              "lo": 0.5046060720783632,
+              "hi": 0.5223946507643913,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "topk_margin_placebo": {
+              "est": 0.6422618240954059,
+              "lo": 0.6343547422013548,
+              "hi": 0.6496619132009255,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "mag_evidence": {
+              "est": 0.512647115968938,
+              "lo": 0.5037583599670004,
+              "hi": 0.520971021774445,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            },
+            "topk_margin_evidence": {
+              "est": 0.5361603769731556,
+              "lo": 0.5276780272851206,
+              "hi": 0.5445100401251544,
+              "n_users": 1500,
+              "n": 29365,
+              "n_errors": 10048
+            }
+          }
+        }
+      },
+      "A3_cf_references": {
+        "label": "exploratory",
+        "candidate_timestamps": "panel candidate_timestamps",
+        "n_pairs": 29365,
+        "n_users": 1500,
+        "n_pairs_without_timestamp": 0,
+        "n_raw_events": 1000209,
+        "n_first_events": 1000209,
+        "n_candidate_pairs_not_in_raw": 0,
+        "item_mean_prior": {
+          "definition": "mean of other users' first ratings of the item strictly before the candidate timestamp (leave-user-out, prior-only); pairs with no such rating are NaN and drop out of UAUC",
+          "UAUC": {
+            "est": 0.7529564707035582,
+            "lo": 0.7438090581768148,
+            "hi": 0.7612792707992277,
+            "n_users": 1500,
+            "n_pairs": 29269
+          },
+          "share_pairs_without_prior_rating": 0.0032691980248594765,
+          "n_prior_median": 268.0
+        },
+        "item_mean_prior_shrunk": {
+          "definition": "(sum + k g) / (n + k), k = 5.0, g = mean of all other users' first ratings strictly before the candidate timestamp (full coverage)",
+          "UAUC": {
+            "est": 0.7522618818889898,
+            "lo": 0.7430719970897272,
+            "hi": 0.7604088340564098,
+            "n_users": 1500,
+            "n_pairs": 29365
+          }
+        },
+        "item_mean_loo_alltime_reference": {
+          "definition": "TRANSDUCTIVE ceiling, reference only: other users' first ratings of the item at any time (diag_rated_baselines item_mean_loo)",
+          "UAUC": {
+            "est": 0.7596567923552483,
+            "lo": 0.7505422762598921,
+            "hi": 0.7676509870253431,
+            "n_users": 1500,
+            "n_pairs": 29362
+          }
+        },
+        "mf_temporal": {
+          "definition": "PRIMARY (amendment 2 A3 'temporal biased MF'): item parameters (mu, b_i, q_i) trained on every first (user, item) rating with ts < T, except all panel users' candidate events; T = numpy linear 0.8-quantile of all panel candidate timestamps (amendment 1 D, split_panel --time_split); each panel user's (b_u, p_u) folded in (fold_in_user) from the user's own non-candidate first events strictly before the user's first candidate (users who joined after T have no ts < T rating). residual = MF - mu - b_u - b_i = p_u.q_i; UAUCs over warm pairs (item with a ts < T rating, user with a fold-in event on such an item). test_pairs_t_ge_T (the wording flag) = pairs with t >= T: non-transductive (no other user's rating at or after T is used; the user's own events predate the candidates). all_pairs_sensitivity adds the pairs before T (their items' parameters see other users' ratings in [t, T)); test_pairs_t_ge_T_no_fold_in keeps the ts < T fit's own user parameters",
+          "cutoff": {
+            "quantile": 0.8,
+            "T": 977256920.6,
+            "n_panel_pairs_t_ge_T": 5873,
+            "n_users_with_pairs_t_ge_T": 369
+          },
+          "solver": "CCD++ (fit_biased_mf)",
+          "dim": 32,
+          "iters": 15,
+          "lambda": 0.05,
+          "lambda_bias": 5.0,
+          "seed": 0,
+          "n_train": 857714,
+          "n_users_train": 5878,
+          "n_items_train": 3672,
+          "train_rmse": 0.671329810134862,
+          "fold_in": {
+            "n_panel_users": 1500,
+            "n_users_warm": 1462,
+            "events_per_user_median": 80.0,
+            "n_users_without_events": 38
+          },
+          "test_pairs_t_ge_T": {
+            "n_pairs": 5873,
+            "n_pairs_warm": 5848,
+            "n_pairs_cold_item": 7,
+            "n_pairs_cold_user": 18,
+            "heldout_candidate_rmse": 1.057781783085631,
+            "UAUC_mf": {
+              "est": 0.8039247300562661,
+              "lo": 0.7841773918018812,
+              "hi": 0.823130844186706,
+              "n_users": 333,
+              "n_pairs": 5848
+            },
+            "UAUC_personal_residual": {
+              "est": 0.67689480859824,
+              "lo": 0.6542995335789454,
+              "hi": 0.69711865595587,
+              "n_users": 333,
+              "n_pairs": 5848
+            },
+            "UAUC_item_bias": {
+              "est": 0.7757884328921911,
+              "lo": 0.7536296214184286,
+              "hi": 0.7968912501577943,
+              "n_users": 333,
+              "n_pairs": 5848
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.6759051631107162,
+              "lo": 0.6545747539357449,
+              "hi": 0.6964217015290297,
+              "n_users": 335,
+              "n_pairs": 5873
+            }
+          },
+          "all_pairs_sensitivity": {
+            "n_pairs": 29365,
+            "n_pairs_warm": 28743,
+            "n_pairs_cold_item": 10,
+            "n_pairs_cold_user": 613,
+            "heldout_candidate_rmse": 1.1147405617778603,
+            "UAUC_mf": {
+              "est": 0.7885095646526653,
+              "lo": 0.7802004288035522,
+              "hi": 0.7965672711018945,
+              "n_users": 1462,
+              "n_pairs": 28743
+            },
+            "UAUC_personal_residual": {
+              "est": 0.6474343459109745,
+              "lo": 0.6373850013489879,
+              "hi": 0.6573063323143731,
+              "n_users": 1462,
+              "n_pairs": 28743
+            },
+            "UAUC_item_bias": {
+              "est": 0.7565734983713479,
+              "lo": 0.7471664446776565,
+              "hi": 0.7654427347045499,
+              "n_users": 1462,
+              "n_pairs": 28743
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.6436668410556401,
+              "lo": 0.6337761247556909,
+              "hi": 0.6531633115260511,
+              "n_users": 1500,
+              "n_pairs": 29365
+            }
+          },
+          "test_pairs_t_ge_T_no_fold_in": {
+            "n_pairs": 5873,
+            "n_pairs_warm": 5120,
+            "n_pairs_cold_item": 7,
+            "n_pairs_cold_user": 746,
+            "heldout_candidate_rmse": 1.064412605830939,
+            "UAUC_mf": {
+              "est": 0.7949691797026356,
+              "lo": 0.7723857392570629,
+              "hi": 0.8170966181893343,
+              "n_users": 296,
+              "n_pairs": 5120
+            },
+            "UAUC_personal_residual": {
+              "est": 0.6605705908325394,
+              "lo": 0.6387203134867426,
+              "hi": 0.6844467058892609,
+              "n_users": 296,
+              "n_pairs": 5120
+            },
+            "UAUC_item_bias": {
+              "est": 0.7789979916450505,
+              "lo": 0.7548303642039855,
+              "hi": 0.8025143111011677,
+              "n_users": 296,
+              "n_pairs": 5120
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.6418290785361681,
+              "lo": 0.6208365191062596,
+              "hi": 0.6634299451970654,
+              "n_users": 335,
+              "n_pairs": 5873
+            }
+          }
+        },
+        "mf_transductive_reference": {
+          "definition": "TRANSDUCTIVE reference only: leave-candidates-out biased MF trained on every first (user, item) rating of the raw data except all panel users' candidate events (other users' later ratings are included, so it is not temporal); residual = MF - mu - b_u - b_i = p_u.q_i",
+          "solver": "CCD++ (fit_biased_mf)",
+          "dim": 32,
+          "iters": 15,
+          "lambda": 0.05,
+          "lambda_bias": 5.0,
+          "seed": 0,
+          "n_train": 970844,
+          "n_users_train": 6040,
+          "n_items_train": 3703,
+          "train_rmse": 0.684586681665888,
+          "n_pairs": 29365,
+          "n_pairs_warm": 29362,
+          "n_pairs_cold_item": 3,
+          "n_pairs_cold_user": 0,
+          "heldout_candidate_rmse": 1.1113203600710158,
+          "UAUC_mf": {
+            "est": 0.7926758917661858,
+            "lo": 0.7841990308652858,
+            "hi": 0.8005085521196985,
+            "n_users": 1500,
+            "n_pairs": 29362
+          },
+          "UAUC_personal_residual": {
+            "est": 0.6379955630924994,
+            "lo": 0.6278494528822213,
+            "hi": 0.648339266361294,
+            "n_users": 1500,
+            "n_pairs": 29362
+          },
+          "UAUC_item_bias": {
+            "est": 0.7580538839283446,
+            "lo": 0.748738299233401,
+            "hi": 0.7662367432318951,
+            "n_users": 1500,
+            "n_pairs": 29362
+          },
+          "UAUC_personal_residual_incl_cold": {
+            "est": 0.6380973363809394,
+            "lo": 0.6279511790326141,
+            "hi": 0.6483405009291952,
+            "n_users": 1500,
+            "n_pairs": 29365
+          }
+        },
+        "history_star_mean": {
+          "definition": "pooled (global) AUC of the mean of the panel row's history_ratings; constant within a user, so it measures user leniency only",
+          "AUC_global": {
+            "est": 0.594105459305718,
+            "lo": 0.5829468300264466,
+            "hi": 0.6045632457817499,
+            "n_users": 1500,
+            "n_pairs": 29365
+          },
+          "usable": true
+        }
+      },
+      "A7_popularity_partial": {
+        "label": "exploratory",
+        "definition": "partial Spearman (rank residuals on [1, control ranks]) against log1p(popularity); primary = all-time popularity, controls = prior-only item mean + release_year; pair level (v, user-cluster CI) and item level (pi, item-mean v; controls item-averaged, item bootstrap)",
+        "controls": [
+          "item_mean_prior",
+          "release_year"
+        ],
+        "popularity_all_time": {
+          "control_item_mean_prior": {
+            "v_pair": {
+              "n": 29269,
+              "spearman_zero_order": 0.30188000082687405,
+              "partial": 0.21314983479423874,
+              "partial_ci": {
+                "lo": 0.19340814641270343,
+                "hi": 0.2323501516061686
+              }
+            },
+            "v_item": {
+              "n": 2885,
+              "spearman_zero_order": 0.421973264359668,
+              "partial": 0.3484633031094101,
+              "partial_ci": {
+                "lo": 0.31204996845931526,
+                "hi": 0.3820139881606593
+              }
+            },
+            "pi_item": {
+              "n": 2885,
+              "spearman_zero_order": 0.42456336042308934,
+              "partial": 0.3610935103457623,
+              "partial_ci": {
+                "lo": 0.3279170038908083,
+                "hi": 0.3926497826520192
+              }
+            }
+          },
+          "control_item_mean_prior_shrunk": {
+            "v_pair": {
+              "n": 29365,
+              "spearman_zero_order": 0.3028955627362412,
+              "partial": 0.21510036067024807
+            },
+            "v_item": {
+              "n": 2909,
+              "spearman_zero_order": 0.42371315325755293,
+              "partial": 0.3615783212226289
+            },
+            "pi_item": {
+              "n": 2909,
+              "spearman_zero_order": 0.4281718995069998,
+              "partial": 0.3738015502653157
+            }
+          }
+        },
+        "popularity_prior_count": {
+          "control_item_mean_prior": {
+            "v_pair": {
+              "n": 29269,
+              "spearman_zero_order": 0.20689081463877165,
+              "partial": 0.12046025656442719
+            },
+            "v_item": {
+              "n": 2885,
+              "spearman_zero_order": 0.41134133017775343,
+              "partial": 0.33499255055420235
+            },
+            "pi_item": {
+              "n": 2885,
+              "spearman_zero_order": 0.3948546745659287,
+              "partial": 0.32649978139587776
+            }
+          },
+          "control_item_mean_prior_shrunk": {
+            "v_pair": {
+              "n": 29365,
+              "spearman_zero_order": 0.20769994667568006,
+              "partial": 0.12235817729919313
+            },
+            "v_item": {
+              "n": 2909,
+              "spearman_zero_order": 0.4124163228340335,
+              "partial": 0.34912233663530884
+            },
+            "pi_item": {
+              "n": 2909,
+              "spearman_zero_order": 0.398502371373196,
+              "partial": 0.3412170266133236
+            }
+          }
+        },
+        "release_year_source": "parsed from candidate_titles '(YYYY)'"
+      }
+    },
+    "toys_rated": {
+      "label": "exploratory",
+      "A9_throughput": {
+        "label": "exploratory",
+        "registered_reconciled_prompts_per_s": 35.0,
+        "main": {
+          "prompts_per_s": 34.97646134227799,
+          "n_prompts": 187962,
+          "n_main_prompts": 57066,
+          "swap_prompts": 130896,
+          "prompts_sent_this_run": 187962,
+          "inference_time_s": 5373.957020998001,
+          "chunks_resumed": 0
+        },
+        "nohist": {
+          "prompts_per_s": 57.45986235596087,
+          "n_prompts": 19022,
+          "n_main_prompts": 19022,
+          "prompts_sent_this_run": 19022,
+          "inference_time_s": 331.04847836494446,
+          "chunks_resumed": 0
+        }
+      },
+      "panel_kind": "rated",
+      "source": "toys",
+      "panel_identity": {
+        "panel": "/root/autodl-tmp/lumen-rec/outputs/confrec/panels/toys_rated.jsonl",
+        "panel_sha1": "69252b4806bb4ffe05101967ea2a1d94ada57dee",
+        "main": {
+          "report_data_sha1": "69252b4806bb4ffe05101967ea2a1d94ada57dee",
+          "report_data_path": "outputs/confrec/panels/toys_rated.jsonl",
+          "match": true
+        },
+        "nohist": {
+          "report_data_sha1": "69252b4806bb4ffe05101967ea2a1d94ada57dee",
+          "report_data_path": "outputs/confrec/panels/toys_rated.jsonl",
+          "match": true
+        },
+        "consistent": true
+      },
+      "n_pairs": 19022,
+      "n_users": 1500,
+      "n_duplicate_pairs": 0,
+      "questions": [
+        "dislike",
+        "like",
+        "like_para"
+      ],
+      "censoring": {
+        "dislike": {
+          "n": 19022,
+          "0": 19022
+        },
+        "like": {
+          "n": 19022,
+          "0": 19022
+        },
+        "like_para": {
+          "n": 19022,
+          "0": 19022
+        }
+      },
+      "panel_join": {},
+      "A2_prior": {
+        "label": "exploratory",
+        "pi": {
+          "definition": "pi(i) = mean finite like-logit of item i over its swap donors (pilot_mirror); halves = donor rows 1-4 vs 5-8 of the item in swap_prior.csv.gz file order",
+          "n_panel_items": 16362,
+          "n_panel_items_without_prior": 0,
+          "donor_rows_per_item": {
+            "8": 16362
+          },
+          "UAUC_pi": {
+            "est": 0.5115981615536657,
+            "lo": 0.5012797392105929,
+            "hi": 0.5217921381318619,
+            "n_users": 1500,
+            "n_pairs": 19022
+          }
+        },
+        "split_half": {
+          "definition": "Spearman r over panel items of mean(donors 1-4) vs mean(donors 5-8), item bootstrap (r = reliability of a 4-donor pi); spearman_brown_8 = 2r/(1+r) = split-half reliability of the 8-donor pi the evidence arm uses (read by the wording flag; raw r is its sensitivity)",
+          "spearman_r": {
+            "est": 0.6724845947569548,
+            "lo": 0.6626099244935307,
+            "hi": 0.6822872149679362,
+            "n": 16362,
+            "n_boot": 2000
+          },
+          "spearman_brown_8": 0.8041743366308018,
+          "spearman_brown_8_ci": {
+            "lo": 0.7970720187964437,
+            "hi": 0.8111423648677498
+          },
+          "n_items": 16362
+        },
+        "evidence": {
+          "definition": "evidence = L_like - pi; UAUC with the 8-donor pi and each 4-donor half; projection to a perfectly reliable pi = U8 + (U8 - U4)/r (linear in reliability: rho_4 = r, rho_8 = 2r/(1+r), rho = 1), reported only for r >= 0.2 and clipped to [0, 1]; also at the item-bootstrap CI bounds of r (instability range)",
+          "UAUC_8_donor": {
+            "est": 0.525330715036727,
+            "lo": 0.5149642182894298,
+            "hi": 0.5358943389251258,
+            "n_users": 1500,
+            "n_pairs": 19022
+          },
+          "UAUC_4_donor_half_1_4": {
+            "est": 0.5245756236631535,
+            "lo": 0.5144950038228707,
+            "hi": 0.5347562256019993,
+            "n_users": 1500,
+            "n_pairs": 19022
+          },
+          "UAUC_4_donor_half_5_8": {
+            "est": 0.5249474503825099,
+            "lo": 0.514528694208485,
+            "hi": 0.5353708928060703,
+            "n_users": 1500,
+            "n_pairs": 19022
+          },
+          "UAUC_4_donor_mean": 0.5247615370228317,
+          "projection_reliable_pi": 0.5261770957840823,
+          "projection_unclipped": 0.5261770957840823,
+          "projection_clipped": false,
+          "projection_note": null,
+          "projection_min_r": 0.2,
+          "projection_at_r_ci": {
+            "r_lo": 0.526189709133941,
+            "r_hi": 0.5261649355840402
+          }
+        },
+        "L_nohist": {
+          "definition": "item mean of the hist_len-0 like-logit (the prompt depends on the item only; as pilot_mirror's pmi_nohist prior)",
+          "UAUC_L_nohist": {
+            "est": 0.4883415881327926,
+            "lo": 0.4778350746668649,
+            "hi": 0.49850472628447423,
+            "n_users": 1500,
+            "n_pairs": 19022
+          }
+        },
+        "swap_censoring": {
+          "n": 130896,
+          "0": 130896,
+          "dropped_nonfinite": 0
+        },
+        "nohist_join": {},
+        "nohist_censoring": {
+          "like": {
+            "n": 19022,
+            "0": 19022
+          }
+        },
+        "nohist_like_finite_pairs": 19022
+      },
+      "A4_ensemble_null": {
+        "label": "exploratory",
+        "definition": "per user (rows finite in both views, both classes): AUC_k of each view clipped to [0.5/(n_pos n_neg), 1 - 0.5/(n_pos n_neg)], rho = pooled within-class Pearson correlation, predicted AUC of the equal-weight standardised sum Phi(((d_1 + d_2) / sqrt(2 + 2 rho)) / sqrt(2)), d_k = sqrt(2) Phi^-1(AUC_k) (= pilot_mirror ensemble_null, the decision group's definition). PRIMARY (wording flag): dUAUC_mirror_minus_ensemble_null = observed MIRROR - prediction, paired user bootstrap. Secondary: the placebo pair (sanity check), the difference in gaps (MIRROR - null) - (placebo - null), the raw-weight prediction of the unstandardised sum, the empirical within-user z-sums, the pooled back-of-envelope (judge.md) and the parametric null-bias correction (null_bias_sim); see caveats",
+        "caveats": [
+          "The per-user binormal null is a plug-in estimate: with about 20 candidates per user the transform of noisy per-user AUCs over-predicts an exact equal-weight two-view ensemble, so dUAUC(MIRROR - null) is biased below 0 under an exact Gaussian ensemble (a placebo pair at rho ~0.95 is nearly unbiased).",
+          "Exact Gaussian two-view nulls at the Pilot-1 ML-1M size (1,500 users x 20 candidates, 13 likes, AUC ~0.59, within-class rho 0.35, 300-500 bootstrap resamples), three independent probes: mean dUAUC(MIRROR - null) -0.0007 to -0.0015; the 95% CI lay wholly BELOW 0 in 1/6, 3/6 and 3/12 runs (nominal 2.5%) and never above 0. Hence the wording flag is one-sided (lo <= 0) and the literal two-sided reading is a sensitivity.",
+          "null_bias_parametric re-estimates that bias on the data's own design (per-user labels, fitted d_k and rho); dUAUC_bias_corrected bootstraps observed - (null + per-user bias) (secondary). Validation: over 12 exact Gaussian nulls of 1,000 users x 20 candidates (rho 0.35, AUC ~0.59) the realised mean dUAUC was -0.00169 (se 0.00023) and the parametric estimate -0.00147 (se 0.00008)."
+        ],
+        "mirror_pair": {
+          "views": [
+            "like",
+            "-dislike"
+          ],
+          "n_rows": 19022,
+          "users_both_classes": 1500,
+          "users_auc_clipped": 89,
+          "n_users": 1500,
+          "UAUC_view1": 0.539624516361647,
+          "UAUC_view2": 0.5196141484469339,
+          "rho_within_class": {
+            "mean": 0.13403687964153552,
+            "median": 0.1661250602154533
+          },
+          "predicted_UAUC": 0.5391568345853198,
+          "observed_UAUC": 0.5370557818203039,
+          "z_sum_UAUC": 0.5315959982238168,
+          "n_users_z_sum": 1500,
+          "dUAUC_observed_minus_predicted": {
+            "est": -0.0021010527650159438,
+            "lo": -0.007751791957330787,
+            "hi": 0.0033531861208658427,
+            "n": 1500
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.5425738209450441,
+            "dUAUC_observed_minus_predicted": {
+              "est": -0.005518039124740213,
+              "lo": -0.009252009569625408,
+              "hi": -0.001967270776651422,
+              "n": 1500
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1500,
+            "mean_bias": 0.0015055281758667718,
+            "dUAUC_bias_corrected": {
+              "est": -0.0036065809408827166,
+              "lo": -0.009552697882092799,
+              "hi": 0.0021784495774653076,
+              "n": 1500
+            }
+          }
+        },
+        "placebo_pair": {
+          "views": [
+            "like",
+            "like_para"
+          ],
+          "n_rows": 19022,
+          "users_both_classes": 1500,
+          "users_auc_clipped": 66,
+          "n_users": 1500,
+          "UAUC_view1": 0.539624516361647,
+          "UAUC_view2": 0.5465135432747951,
+          "rho_within_class": {
+            "mean": 0.9037459376881521,
+            "median": 0.9284585776644336
+          },
+          "predicted_UAUC": 0.5441032482119491,
+          "observed_UAUC": 0.5440922643595122,
+          "z_sum_UAUC": 0.5428694272104075,
+          "n_users_z_sum": 1500,
+          "dUAUC_observed_minus_predicted": {
+            "est": -1.098385243695188e-05,
+            "lo": -0.0021316577596030175,
+            "hi": 0.0020684540394259304,
+            "n": 1500
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.5440512491190297,
+            "dUAUC_observed_minus_predicted": {
+              "est": 4.101524048258372e-05,
+              "lo": -0.0019462373056620054,
+              "hi": 0.0020159622240383903,
+              "n": 1500
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1500,
+            "mean_bias": 0.0007903708672829107,
+            "dUAUC_bias_corrected": {
+              "est": -0.0008013547197198627,
+              "lo": -0.0029503044559857057,
+              "hi": 0.0013022812337312752,
+              "n": 1500
+            }
+          }
+        },
+        "dUAUC_mirror_minus_ensemble_null": {
+          "est": -0.0021010527650159438,
+          "lo": -0.007751791957330787,
+          "hi": 0.0033531861208658427,
+          "n": 1500
+        },
+        "dUAUC_placebo_minus_ensemble_null": {
+          "est": -1.098385243695188e-05,
+          "lo": -0.0021316577596030175,
+          "hi": 0.0020684540394259304,
+          "n": 1500
+        },
+        "dUAUC_mirror_minus_ensemble_null_bias_corrected": {
+          "est": -0.0036065809408827166,
+          "lo": -0.009552697882092799,
+          "hi": 0.0021784495774653076,
+          "n": 1500
+        },
+        "gap_residual": {
+          "definition": "per user (MIRROR - its null) - (placebo - its null), i.e. the observed MIRROR - placebo gap minus the gap the null predicts (the skeptic's residual), user bootstrap",
+          "est": -0.002090068912578993,
+          "lo": -0.0076976749667301905,
+          "hi": 0.0035219715519409604,
+          "n_users": 1500
+        },
+        "dUAUC_zsum_mirror_minus_zsum_placebo": {
+          "est": -0.011273428986590752,
+          "lo": -0.020749411462924333,
+          "hi": -0.0020243550398338695,
+          "n": 1500
+        },
+        "pooled_back_of_envelope": {
+          "definition": "deliberation arithmetic (lens_skeptic A7 / judge.md): binormal_sum_auc of the mean per-user AUCs with the pooled pair-level Spearman correlation, vs the observed UAUCs",
+          "rho_like_negdislike_pooled": 0.3893858016277622,
+          "rho_like_para_pooled": 0.9151618239827147,
+          "pred_mirror": 0.5355336909067122,
+          "pred_placebo": 0.5440104900328142,
+          "observed_gap": -0.0070364825392083,
+          "predicted_gap": -0.008476799126101997,
+          "residual": 0.0014403165868936973
+        }
+      },
+      "A5_calibration": {
+        "label": "exploratory",
+        "definition": "fit on the stats.user_halves(seed) half, ECE (15 equal-width bins) / adaptive ECE / Brier on the other half: raw sigmoid(x); intercept-only sigmoid(x + b); temperature-only sigmoid(x/T); Platt sigmoid(a x + b); user-centred Platt on x - mean_user(x)",
+        "split": {
+          "n_users_fit": 750,
+          "n_users_eval": 750,
+          "seed": 0
+        },
+        "arms": {
+          "like": {
+            "raw": {
+              "ECE": 0.3641317420028213,
+              "ECE_adaptive": 0.3641317420028212,
+              "Brier": 0.37409878035486,
+              "n": 9500
+            },
+            "intercept_only": {
+              "b": -0.584848562635248,
+              "ECE": 0.368128806077172,
+              "ECE_adaptive": 0.36688804697104527,
+              "Brier": 0.378180111340319,
+              "n": 9500
+            },
+            "temperature_only": {
+              "a": 0.047631423327678904,
+              "T": 20.994543730522828,
+              "ECE": 0.12345764085481267,
+              "ECE_adaptive": 0.12345764085481269,
+              "Brier": 0.23872224085451507,
+              "n": 9500
+            },
+            "platt": {
+              "a": 0.022192237507442387,
+              "b": 0.6656867565074019,
+              "ECE": 0.02442331106139134,
+              "ECE_adaptive": 0.02811049229961863,
+              "Brier": 0.22028513406932637,
+              "n": 9500
+            },
+            "user_centred_platt": {
+              "a": 0.01723599958128104,
+              "b": 0.7451048283304316,
+              "ECE": 0.012827184118223933,
+              "ECE_adaptive": 0.026995920676661036,
+              "Brier": 0.22123487836909284,
+              "n": 9500
+            },
+            "label_rate_eval": 0.6677894736842105
+          },
+          "mirror_half": {
+            "raw": {
+              "ECE": 0.315118752942546,
+              "ECE_adaptive": 0.310858133517007,
+              "Brier": 0.32645477287289326,
+              "n": 9500
+            },
+            "intercept_only": {
+              "b": -5.4542564689637185,
+              "ECE": 0.33475773772937367,
+              "ECE_adaptive": 0.33176390400986,
+              "Brier": 0.3538839217806546,
+              "n": 9500
+            },
+            "temperature_only": {
+              "a": 0.07659395287726753,
+              "T": 13.055860971196749,
+              "ECE": 0.03849821441691129,
+              "ECE_adaptive": 0.04496536444281958,
+              "Brier": 0.223083489960698,
+              "n": 9500
+            },
+            "platt": {
+              "a": 0.039489651037667224,
+              "b": 0.44347306840729284,
+              "ECE": 0.014918238660471383,
+              "ECE_adaptive": 0.01905024422886286,
+              "Brier": 0.21961381958057752,
+              "n": 9500
+            },
+            "user_centred_platt": {
+              "a": 0.03158153470212067,
+              "b": 0.7453716737841303,
+              "ECE": 0.011439306444820208,
+              "ECE_adaptive": 0.02707750132951741,
+              "Brier": 0.22108934667786162,
+              "n": 9500
+            },
+            "label_rate_eval": 0.6677894736842105
+          },
+          "placebo": {
+            "raw": {
+              "ECE": 0.3807285340274126,
+              "ECE_adaptive": 0.3759978125972124,
+              "Brier": 0.39455063514932803,
+              "n": 9500
+            },
+            "intercept_only": {
+              "b": 2.3784538149499355,
+              "ECE": 0.3649341938463547,
+              "ECE_adaptive": 0.3643147229841185,
+              "Brier": 0.37732902168428123,
+              "n": 9500
+            },
+            "temperature_only": {
+              "a": 0.03304816358971771,
+              "T": 30.25886740378913,
+              "ECE": 0.15631583046930414,
+              "ECE_adaptive": 0.15631583046930417,
+              "Brier": 0.24494817675599634,
+              "n": 9500
+            },
+            "platt": {
+              "a": 0.024370685164174045,
+              "b": 0.7181473684147661,
+              "ECE": 0.028535752124630803,
+              "ECE_adaptive": 0.02861915108447181,
+              "Brier": 0.22000288677243673,
+              "n": 9500
+            },
+            "user_centred_platt": {
+              "a": 0.02000075416356716,
+              "b": 0.7462726171893804,
+              "ECE": 0.015076941796000451,
+              "ECE_adaptive": 0.0277955403308006,
+              "Brier": 0.22094509126500805,
+              "n": 9500
+            },
+            "label_rate_eval": 0.6677894736842105
+          }
+        }
+      },
+      "A6_error_targets": {
+        "label": "exploratory",
+        "base_arm": "like",
+        "definition": "AUROC(-confidence, is_error) pooled over pairs with a user-cluster bootstrap CI; detectors mag_<arm> = |x|, platt_margin_<arm> = |a x + b| (the arm's own Platt fit on the fit half), topk_margin_<arm> = |x - thr_u| (the arm's own per-user top-k threshold)",
+        "raw_decision_reference": {
+          "error_rate": 0.40758069603616864,
+          "always_like_error_rate": 0.32730522552833563,
+          "AUROC_mag_like": 0.5708957743230211
+        },
+        "after_platt": {
+          "definition": "eval-half errors of the like decision sigmoid(a L + b) >= 0.5 (Platt fit on the other half)",
+          "platt": {
+            "a": 0.022192237507442387,
+            "b": 0.6656867565074019
+          },
+          "error_rate": 0.33221052631578946,
+          "n_rows": 9500,
+          "n_errors": 3156,
+          "majority_class_error_rate": 0.33221052631578946,
+          "detectors": {
+            "mag_like": {
+              "est": 0.5504601665475957,
+              "lo": 0.5375312605930159,
+              "hi": 0.5645647428114728,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "platt_margin_like": {
+              "est": 0.5602223171860241,
+              "lo": 0.5470283832638833,
+              "hi": 0.573845771799365,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "mag_mirror": {
+              "est": 0.5622580370942195,
+              "lo": 0.5492498370372628,
+              "hi": 0.5766346028017366,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "platt_margin_mirror": {
+              "est": 0.5646573131983436,
+              "lo": 0.5510036969118622,
+              "hi": 0.5787663392866315,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "mag_placebo": {
+              "est": 0.5392596489482593,
+              "lo": 0.525932666683417,
+              "hi": 0.5530400852178525,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "platt_margin_placebo": {
+              "est": 0.5630952552195462,
+              "lo": 0.5497492971469577,
+              "hi": 0.5767698877178475,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "mag_evidence": {
+              "est": 0.542304450818873,
+              "lo": 0.5286347689740322,
+              "hi": 0.5570722849827238,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            },
+            "platt_margin_evidence": {
+              "est": 0.5478501936702164,
+              "lo": 0.5332625831375062,
+              "hi": 0.562645777885913,
+              "n_users": 750,
+              "n": 9500,
+              "n_errors": 3156
+            }
+          }
+        },
+        "per_user_topk": {
+          "definition": "per user, the top-k like-logit candidates are predicted likes, k = the user's number of likes (ties at the boundary broken by a seeded random order); errors = FP + FN (FP = FN per user)",
+          "n_rows": 19022,
+          "n_errors": 7270,
+          "error_rate": 0.3821890442645358,
+          "n_users_tie_at_boundary": 20,
+          "detectors": {
+            "mag_like": {
+              "est": 0.5548407575917892,
+              "lo": 0.5450206154584721,
+              "hi": 0.5648405218541681,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "topk_margin_like": {
+              "est": 0.5820616912758213,
+              "lo": 0.5729992428828222,
+              "hi": 0.5912658085949922,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "mag_mirror": {
+              "est": 0.6031362100091483,
+              "lo": 0.5942804585402952,
+              "hi": 0.6124537765114264,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "topk_margin_mirror": {
+              "est": 0.5855373325199469,
+              "lo": 0.5768494126847857,
+              "hi": 0.5946876599034245,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "mag_placebo": {
+              "est": 0.5208300755737792,
+              "lo": 0.510868416419019,
+              "hi": 0.5312437526408884,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "topk_margin_placebo": {
+              "est": 0.5978957545813853,
+              "lo": 0.5892983700824223,
+              "hi": 0.6069280430996127,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "mag_evidence": {
+              "est": 0.5596282361842124,
+              "lo": 0.5505562322072582,
+              "hi": 0.568122999974213,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            },
+            "topk_margin_evidence": {
+              "est": 0.5638108951340075,
+              "lo": 0.5546666899776829,
+              "hi": 0.5730392448262761,
+              "n_users": 1500,
+              "n": 19022,
+              "n_errors": 7270
+            }
+          }
+        }
+      },
+      "A3_cf_references": {
+        "label": "exploratory",
+        "candidate_timestamps": "panel candidate_timestamps",
+        "n_pairs": 19022,
+        "n_users": 1500,
+        "n_pairs_without_timestamp": 0,
+        "n_raw_events": 16260104,
+        "n_first_events": 16052140,
+        "n_candidate_pairs_not_in_raw": 0,
+        "item_mean_prior": {
+          "definition": "mean of other users' first ratings of the item strictly before the candidate timestamp (leave-user-out, prior-only); pairs with no such rating are NaN and drop out of UAUC",
+          "UAUC": {
+            "est": 0.6927073150659157,
+            "lo": 0.6818366339294283,
+            "hi": 0.7025589466271912,
+            "n_users": 1496,
+            "n_pairs": 17749
+          },
+          "share_pairs_without_prior_rating": 0.06692251077699507,
+          "n_prior_median": 35.0
+        },
+        "item_mean_prior_shrunk": {
+          "definition": "(sum + k g) / (n + k), k = 5.0, g = mean of all other users' first ratings strictly before the candidate timestamp (full coverage)",
+          "UAUC": {
+            "est": 0.6994423568678961,
+            "lo": 0.6897662209356096,
+            "hi": 0.7091377833055134,
+            "n_users": 1500,
+            "n_pairs": 19022
+          }
+        },
+        "item_mean_loo_alltime_reference": {
+          "definition": "TRANSDUCTIVE ceiling, reference only: other users' first ratings of the item at any time (diag_rated_baselines item_mean_loo)",
+          "UAUC": {
+            "est": 0.7115371890114481,
+            "lo": 0.7010891803737908,
+            "hi": 0.7223751598805965,
+            "n_users": 1499,
+            "n_pairs": 18576
+          }
+        },
+        "mf_temporal": {
+          "definition": "PRIMARY (amendment 2 A3 'temporal biased MF'): item parameters (mu, b_i, q_i) trained on every first (user, item) rating with ts < T, except all panel users' candidate events; T = numpy linear 0.8-quantile of all panel candidate timestamps (amendment 1 D, split_panel --time_split); each panel user's (b_u, p_u) folded in (fold_in_user) from the user's own non-candidate first events strictly before the user's first candidate (users who joined after T have no ts < T rating). residual = MF - mu - b_u - b_i = p_u.q_i; UAUCs over warm pairs (item with a ts < T rating, user with a fold-in event on such an item). test_pairs_t_ge_T (the wording flag) = pairs with t >= T: non-transductive (no other user's rating at or after T is used; the user's own events predate the candidates). all_pairs_sensitivity adds the pairs before T (their items' parameters see other users' ratings in [t, T)); test_pairs_t_ge_T_no_fold_in keeps the ts < T fit's own user parameters",
+          "cutoff": {
+            "quantile": 0.8,
+            "T": 1642348406582.8,
+            "n_panel_pairs_t_ge_T": 3805,
+            "n_users_with_pairs_t_ge_T": 885
+          },
+          "solver": "CCD++ (fit_biased_mf)",
+          "dim": 32,
+          "iters": 15,
+          "lambda": 0.05,
+          "lambda_bias": 5.0,
+          "seed": 0,
+          "n_train": 13270145,
+          "n_users_train": 6925009,
+          "n_items_train": 717625,
+          "train_rmse": 0.10624923919083064,
+          "fold_in": {
+            "n_panel_users": 1500,
+            "n_users_warm": 1496,
+            "events_per_user_median": 3.0,
+            "n_users_without_events": 0
+          },
+          "test_pairs_t_ge_T": {
+            "n_pairs": 3805,
+            "n_pairs_warm": 2343,
+            "n_pairs_cold_item": 1454,
+            "n_pairs_cold_user": 52,
+            "heldout_candidate_rmse": 1.9939740101710552,
+            "UAUC_mf": {
+              "est": 0.5536146780395246,
+              "lo": 0.5130096719274249,
+              "hi": 0.5925544150237403,
+              "n_users": 326,
+              "n_pairs": 2343
+            },
+            "UAUC_personal_residual": {
+              "est": 0.49691801892722137,
+              "lo": 0.458085075392399,
+              "hi": 0.5359266678064608,
+              "n_users": 326,
+              "n_pairs": 2343
+            },
+            "UAUC_item_bias": {
+              "est": 0.6460771902489694,
+              "lo": 0.6071140363059458,
+              "hi": 0.6851283942071902,
+              "n_users": 326,
+              "n_pairs": 2343
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.5012481166067132,
+              "lo": 0.47097864371696774,
+              "hi": 0.5304958129302394,
+              "n_users": 448,
+              "n_pairs": 3805
+            }
+          },
+          "all_pairs_sensitivity": {
+            "n_pairs": 19022,
+            "n_pairs_warm": 17214,
+            "n_pairs_cold_item": 1800,
+            "n_pairs_cold_user": 52,
+            "heldout_candidate_rmse": 1.765148196215946,
+            "UAUC_mf": {
+              "est": 0.591069449685258,
+              "lo": 0.5797623301940351,
+              "hi": 0.6024405561640608,
+              "n_users": 1467,
+              "n_pairs": 17214
+            },
+            "UAUC_personal_residual": {
+              "est": 0.49024518794610555,
+              "lo": 0.4789507586904617,
+              "hi": 0.5015058900859324,
+              "n_users": 1467,
+              "n_pairs": 17214
+            },
+            "UAUC_item_bias": {
+              "est": 0.6969154367223429,
+              "lo": 0.686833116199784,
+              "hi": 0.7073216418885238,
+              "n_users": 1467,
+              "n_pairs": 17214
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.49297982063772156,
+              "lo": 0.4823964029960647,
+              "hi": 0.5029280097681215,
+              "n_users": 1500,
+              "n_pairs": 19022
+            }
+          },
+          "test_pairs_t_ge_T_no_fold_in": {
+            "n_pairs": 3805,
+            "n_pairs_warm": 2192,
+            "n_pairs_cold_item": 1454,
+            "n_pairs_cold_user": 370,
+            "heldout_candidate_rmse": 1.9765795189179658,
+            "UAUC_mf": {
+              "est": 0.5580608386755928,
+              "lo": 0.513516596487908,
+              "hi": 0.6003326285887761,
+              "n_users": 305,
+              "n_pairs": 2192
+            },
+            "UAUC_personal_residual": {
+              "est": 0.506494117600675,
+              "lo": 0.46276883146452813,
+              "hi": 0.5517002898816423,
+              "n_users": 305,
+              "n_pairs": 2192
+            },
+            "UAUC_item_bias": {
+              "est": 0.6511232544019429,
+              "lo": 0.610746064765532,
+              "hi": 0.6911586621484163,
+              "n_users": 305,
+              "n_pairs": 2192
+            },
+            "UAUC_personal_residual_incl_cold": {
+              "est": 0.5018562534491993,
+              "lo": 0.4719466124764694,
+              "hi": 0.5317055874585684,
+              "n_users": 448,
+              "n_pairs": 3805
+            }
+          }
+        },
+        "mf_transductive_reference": {
+          "definition": "TRANSDUCTIVE reference only: leave-candidates-out biased MF trained on every first (user, item) rating of the raw data except all panel users' candidate events (other users' later ratings are included, so it is not temporal); residual = MF - mu - b_u - b_i = p_u.q_i",
+          "solver": "CCD++ (fit_biased_mf)",
+          "dim": 32,
+          "iters": 15,
+          "lambda": 0.05,
+          "lambda_bias": 5.0,
+          "seed": 0,
+          "n_train": 16033118,
+          "n_users_train": 8116103,
+          "n_items_train": 890184,
+          "train_rmse": 0.10864643180303737,
+          "n_pairs": 19022,
+          "n_pairs_warm": 18576,
+          "n_pairs_cold_item": 446,
+          "n_pairs_cold_user": 0,
+          "heldout_candidate_rmse": 1.7504960218973826,
+          "UAUC_mf": {
+            "est": 0.5868424413101047,
+            "lo": 0.5765248298047763,
+            "hi": 0.59743980416276,
+            "n_users": 1499,
+            "n_pairs": 18576
+          },
+          "UAUC_personal_residual": {
+            "est": 0.491141625711062,
+            "lo": 0.4801381836022519,
+            "hi": 0.5020325406893843,
+            "n_users": 1499,
+            "n_pairs": 18576
+          },
+          "UAUC_item_bias": {
+            "est": 0.699517878863603,
+            "lo": 0.6894460487418587,
+            "hi": 0.7099050716463768,
+            "n_users": 1499,
+            "n_pairs": 18576
+          },
+          "UAUC_personal_residual_incl_cold": {
+            "est": 0.4907286780616158,
+            "lo": 0.48000620821310586,
+            "hi": 0.5011852213487732,
+            "n_users": 1500,
+            "n_pairs": 19022
+          }
+        },
+        "history_star_mean": {
+          "definition": "pooled (global) AUC of the mean of the panel row's history_ratings; constant within a user, so it measures user leniency only",
+          "AUC_global": {
+            "est": 0.5493709159835224,
+            "lo": 0.5398074828888976,
+            "hi": 0.5592086870010573,
+            "n_users": 1500,
+            "n_pairs": 19022
+          },
+          "usable": true
+        }
+      },
+      "A7_popularity_partial": {
+        "label": "exploratory",
+        "definition": "partial Spearman (rank residuals on [1, control ranks]) against log1p(popularity); primary = all-time popularity, controls = prior-only item mean + desc_len, has_store; pair level (v, user-cluster CI) and item level (pi, item-mean v; controls item-averaged, item bootstrap)",
+        "controls": [
+          "item_mean_prior",
+          "desc_len",
+          "has_store"
+        ],
+        "popularity_all_time": {
+          "control_item_mean_prior": {
+            "v_pair": {
+              "n": 17749,
+              "spearman_zero_order": 0.07351278713359827,
+              "partial": 0.08178214392440121,
+              "partial_ci": {
+                "lo": 0.059031431472592585,
+                "hi": 0.10351192753781525
+              }
+            },
+            "v_item": {
+              "n": 15103,
+              "spearman_zero_order": 0.054363025168500424,
+              "partial": 0.06546724553452932,
+              "partial_ci": {
+                "lo": 0.05026489799652041,
+                "hi": 0.08060433605801065
+              }
+            },
+            "pi_item": {
+              "n": 15103,
+              "spearman_zero_order": 0.24823425963429516,
+              "partial": 0.24833299817676197,
+              "partial_ci": {
+                "lo": 0.23387800360072095,
+                "hi": 0.26268360642876415
+              }
+            }
+          },
+          "control_item_mean_prior_shrunk": {
+            "v_pair": {
+              "n": 19022,
+              "spearman_zero_order": 0.08676649624415664,
+              "partial": 0.07991051802186752
+            },
+            "v_item": {
+              "n": 16362,
+              "spearman_zero_order": 0.06978453379994246,
+              "partial": 0.06606863949684214
+            },
+            "pi_item": {
+              "n": 16362,
+              "spearman_zero_order": 0.28299567718525237,
+              "partial": 0.28268852426882796
+            }
+          }
+        },
+        "popularity_prior_count": {
+          "control_item_mean_prior": {
+            "v_pair": {
+              "n": 17749,
+              "spearman_zero_order": 0.05993286712547726,
+              "partial": 0.07064706711287415
+            },
+            "v_item": {
+              "n": 15103,
+              "spearman_zero_order": 0.04208552553918899,
+              "partial": 0.05543083366881926
+            },
+            "pi_item": {
+              "n": 15103,
+              "spearman_zero_order": 0.21656831298547138,
+              "partial": 0.21612484629603682
+            }
+          },
+          "control_item_mean_prior_shrunk": {
+            "v_pair": {
+              "n": 19022,
+              "spearman_zero_order": 0.07580215105119344,
+              "partial": 0.06936229255722674
+            },
+            "v_item": {
+              "n": 16362,
+              "spearman_zero_order": 0.06049301940260555,
+              "partial": 0.05688647283013823
+            },
+            "pi_item": {
+              "n": 16362,
+              "spearman_zero_order": 0.2521274979534599,
+              "partial": 0.25128871111098233
+            }
+          }
+        },
+        "desc_len_source": "raw meta description",
+        "n_items_desc_from_raw": 16362
+      }
+    },
+    "sports_next_1k": {
+      "label": "exploratory",
+      "A9_throughput": {
+        "label": "exploratory",
+        "registered_reconciled_prompts_per_s": 174.8,
+        "main": {
+          "prompts_per_s": 174.83621495734724,
+          "n_prompts": 404000,
+          "n_main_prompts": 404000,
+          "prompts_sent_this_run": 404000,
+          "inference_time_s": 2310.734078168869,
+          "chunks_resumed": 0
+        }
+      },
+      "panel_kind": "next_item",
+      "source": "",
+      "panel_identity": {
+        "panel": "/root/autodl-tmp/lumen-rec/outputs/confrec/panels/sports_next_1k.jsonl",
+        "panel_sha1": "a47f50168b928dbddc6dbf36f5a137e2424caa27",
+        "main": {
+          "report_data_sha1": "a47f50168b928dbddc6dbf36f5a137e2424caa27",
+          "report_data_path": "outputs/confrec/panels/sports_next_1k.jsonl",
+          "match": true
+        },
+        "nohist": {
+          "report_data_sha1": null,
+          "report_data_path": null,
+          "match": null
+        },
+        "consistent": true
+      },
+      "n_pairs": 101000,
+      "n_users": 1000,
+      "n_duplicate_pairs": 0,
+      "questions": [
+        "dislike",
+        "like",
+        "like_para",
+        "next"
+      ],
+      "censoring": {
+        "dislike": {
+          "n": 101000,
+          "0": 101000
+        },
+        "like": {
+          "n": 101000,
+          "0": 101000
+        },
+        "like_para": {
+          "n": 101000,
+          "0": 101000
+        },
+        "next": {
+          "n": 101000,
+          "0": 101000
+        }
+      },
+      "panel_join": {},
+      "A2_prior": {
+        "label": "exploratory",
+        "skipped": "next-item panel, or no swap_prior.csv.gz / _nohist scores"
+      },
+      "A4_ensemble_null": {
+        "label": "exploratory",
+        "definition": "per user (rows finite in both views, both classes): AUC_k of each view clipped to [0.5/(n_pos n_neg), 1 - 0.5/(n_pos n_neg)], rho = pooled within-class Pearson correlation, predicted AUC of the equal-weight standardised sum Phi(((d_1 + d_2) / sqrt(2 + 2 rho)) / sqrt(2)), d_k = sqrt(2) Phi^-1(AUC_k) (= pilot_mirror ensemble_null, the decision group's definition). PRIMARY (wording flag): dUAUC_mirror_minus_ensemble_null = observed MIRROR - prediction, paired user bootstrap. Secondary: the placebo pair (sanity check), the difference in gaps (MIRROR - null) - (placebo - null), the raw-weight prediction of the unstandardised sum, the empirical within-user z-sums, the pooled back-of-envelope (judge.md) and the parametric null-bias correction (null_bias_sim); see caveats",
+        "caveats": [
+          "The per-user binormal null is a plug-in estimate: with about 20 candidates per user the transform of noisy per-user AUCs over-predicts an exact equal-weight two-view ensemble, so dUAUC(MIRROR - null) is biased below 0 under an exact Gaussian ensemble (a placebo pair at rho ~0.95 is nearly unbiased).",
+          "Exact Gaussian two-view nulls at the Pilot-1 ML-1M size (1,500 users x 20 candidates, 13 likes, AUC ~0.59, within-class rho 0.35, 300-500 bootstrap resamples), three independent probes: mean dUAUC(MIRROR - null) -0.0007 to -0.0015; the 95% CI lay wholly BELOW 0 in 1/6, 3/6 and 3/12 runs (nominal 2.5%) and never above 0. Hence the wording flag is one-sided (lo <= 0) and the literal two-sided reading is a sensitivity.",
+          "null_bias_parametric re-estimates that bias on the data's own design (per-user labels, fitted d_k and rho); dUAUC_bias_corrected bootstraps observed - (null + per-user bias) (secondary). Validation: over 12 exact Gaussian nulls of 1,000 users x 20 candidates (rho 0.35, AUC ~0.59) the realised mean dUAUC was -0.00169 (se 0.00023) and the parametric estimate -0.00147 (se 0.00008)."
+        ],
+        "mirror_pair": {
+          "views": [
+            "like",
+            "-dislike"
+          ],
+          "n_rows": 101000,
+          "users_both_classes": 1000,
+          "users_auc_clipped": 109,
+          "n_users": 1000,
+          "UAUC_view1": 0.72112,
+          "UAUC_view2": 0.5333600000000001,
+          "rho_within_class": {
+            "mean": 0.35247839238465734,
+            "median": 0.371847100625353
+          },
+          "predicted_UAUC": 0.6711347055006979,
+          "observed_UAUC": 0.70465,
+          "z_sum_UAUC": 0.67747,
+          "n_users_z_sum": 1000,
+          "dUAUC_observed_minus_predicted": {
+            "est": 0.03351529449930214,
+            "lo": 0.027030331434373812,
+            "hi": 0.039898143110935015,
+            "n": 1000
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.7020109286757702,
+            "dUAUC_observed_minus_predicted": {
+              "est": 0.0026390713242299374,
+              "lo": 5.536966497070956e-05,
+              "hi": 0.005096079338008555,
+              "n": 1000
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1000,
+            "mean_bias": 0.008155054800094331,
+            "dUAUC_bias_corrected": {
+              "est": 0.025360239699207813,
+              "lo": 0.018819810656959236,
+              "hi": 0.031992989839562905,
+              "n": 1000
+            }
+          }
+        },
+        "placebo_pair": {
+          "views": [
+            "like",
+            "like_para"
+          ],
+          "n_rows": 101000,
+          "users_both_classes": 1000,
+          "users_auc_clipped": 127,
+          "n_users": 1000,
+          "UAUC_view1": 0.72112,
+          "UAUC_view2": 0.7219650000000001,
+          "rho_within_class": {
+            "mean": 0.9585629675232056,
+            "median": 0.9618328491154556
+          },
+          "predicted_UAUC": 0.7223270054889847,
+          "observed_UAUC": 0.72294,
+          "z_sum_UAUC": 0.7230800000000001,
+          "n_users_z_sum": 1000,
+          "dUAUC_observed_minus_predicted": {
+            "est": 0.0006129945110153451,
+            "lo": -0.00022351027444984182,
+            "hi": 0.0014464500327184555,
+            "n": 1000
+          },
+          "sensitivity_raw_weight": {
+            "predicted_UAUC": 0.7223145302235178,
+            "dUAUC_observed_minus_predicted": {
+              "est": 0.0006254697764822205,
+              "lo": -0.00018386741793749797,
+              "hi": 0.0014408448992209812,
+              "n": 1000
+            }
+          },
+          "null_bias_parametric": {
+            "definition": "per user, mean over draws of (AUC of an exact Gaussian two-view ensemble - its binormal null) on the user's own labels with the fitted d_k and rho (null_bias_sim); dUAUC_bias_corrected = paired user bootstrap of observed - (null + per-user bias)",
+            "reps": 50,
+            "seed": 0,
+            "n_users": 1000,
+            "mean_bias": 0.0010199029654166004,
+            "dUAUC_bias_corrected": {
+              "est": -0.0004069084544012564,
+              "lo": -0.0012694467434273776,
+              "hi": 0.000481887320876718,
+              "n": 1000
+            }
+          }
+        },
+        "dUAUC_mirror_minus_ensemble_null": {
+          "est": 0.03351529449930214,
+          "lo": 0.027030331434373812,
+          "hi": 0.039898143110935015,
+          "n": 1000
+        },
+        "dUAUC_placebo_minus_ensemble_null": {
+          "est": 0.0006129945110153451,
+          "lo": -0.00022351027444984182,
+          "hi": 0.0014464500327184555,
+          "n": 1000
+        },
+        "dUAUC_mirror_minus_ensemble_null_bias_corrected": {
+          "est": 0.025360239699207813,
+          "lo": 0.018819810656959236,
+          "hi": 0.031992989839562905,
+          "n": 1000
+        },
+        "gap_residual": {
+          "definition": "per user (MIRROR - its null) - (placebo - its null), i.e. the observed MIRROR - placebo gap minus the gap the null predicts (the skeptic's residual), user bootstrap",
+          "est": 0.0329022999882868,
+          "lo": 0.026328788989934307,
+          "hi": 0.03934273374805737,
+          "n_users": 1000
+        },
+        "dUAUC_zsum_mirror_minus_zsum_placebo": {
+          "est": -0.04561,
+          "lo": -0.05612175,
+          "hi": -0.0354395,
+          "n": 1000
+        },
+        "pooled_back_of_envelope": {
+          "definition": "deliberation arithmetic (lens_skeptic A7 / judge.md): binormal_sum_auc of the mean per-user AUCs with the pooled pair-level Spearman correlation, vs the observed UAUCs",
+          "rho_like_negdislike_pooled": 0.4644946248954909,
+          "rho_like_para_pooled": 0.9594515056478581,
+          "pred_mirror": 0.6522572796100582,
+          "pred_placebo": 0.7235691318902175,
+          "observed_gap": -0.01829000000000003,
+          "predicted_gap": -0.07131185228015935,
+          "residual": 0.05302185228015932
+        }
+      },
+      "A3_cf_references": {
+        "label": "exploratory",
+        "skipped": "rated panels only"
+      },
+      "A5_calibration": {
+        "label": "exploratory",
+        "skipped": "rated panels only"
+      },
+      "A6_error_targets": {
+        "label": "exploratory",
+        "skipped": "rated panels only"
+      },
+      "A7_popularity_partial": {
+        "label": "exploratory",
+        "skipped": "rated panels only"
+      }
+    }
+  },
+  "wording_flags": {
+    "label": "exploratory: amendment 2 A decision use changes wording only, never a gate",
+    "rules": {
+      "pi_split_half_reliability_lt_0p7": "A2 'pi split-half reliability < 0.7': the evidence collapse is labelled uninterpretable. Read on the Spearman-Brown corrected split-half reliability 2r/(1+r), i.e. the reliability of the 8-donor pi the evidence arm subtracts (the conventional split-half coefficient; the skeptic's ~0.9 expectation is an 8-donor reliability)",
+      "mf_personal_residual_uauc_le_0p55": "A3 MF personal-residual UAUC <= 0.55: 'no personal signal' is stated as a property of consumed-item panels. Read on the TEMPORAL biased MF (item parameters from ts < T ratings, T = 0.8-quantile of the panel candidate timestamps; user parameters folded in from the user's own pre-candidate events) on the warm pairs with t >= T (non-transductive, amendment 2 A3)",
+      "ensemble_null_residual_lo_le_0": "A4 'ensemble-null residual CI covers 0' (rule stated for ML-1M): MIRROR's edge is attributed to two-view diversity. Read one-sided on dUAUC(MIRROR - ensemble null): attributed unless the CI lower bound is > 0 (the complement of pilot1_gate's ensemble_null_lo_gt_0). A CI wholly below 0 leaves no edge beyond diversity either, and the per-user binormal null over-predicts a pure ensemble at ~20 candidates per user (see A4 caveats), so the literal two-sided reading would withhold the attribution exactly when MIRROR sits below the diversity-only prediction"
+    },
+    "sensitivity_rules": {
+      "pi_split_half_raw_r_lt_0p7": "the raw half correlation r of the 1-4 vs 5-8 donor means (the reliability of a 4-donor pi) < 0.7",
+      "mf_temporal_all_pairs_residual_uauc_le_0p55": "temporal MF residual UAUC on ALL panel pairs (pairs before T see other users' ratings in [t, T)) <= 0.55",
+      "mf_temporal_no_fold_in_residual_uauc_le_0p55": "temporal MF residual UAUC on the t >= T pairs with the ts < T fit's own user parameters (users without a ts < T rating are cold and drop out) <= 0.55",
+      "mf_transductive_reference_residual_uauc_le_0p55": "leave-candidates-out (transductive) MF residual UAUC <= 0.55",
+      "ensemble_null_residual_ci_covers_0_two_sided": "literal two-sided reading: lo <= 0 <= hi on dUAUC(MIRROR - null)",
+      "ensemble_null_residual_bias_corrected_lo_le_0": "dUAUC(MIRROR - (null + per-user parametric null bias)) has CI lo <= 0",
+      "ensemble_null_gap_residual_lo_le_0": "the skeptic's residual (MIRROR - null) - (placebo - null) has CI lo <= 0"
+    },
+    "ml1m_rated": {
+      "pi_split_half_reliability_lt_0p7": false,
+      "mf_personal_residual_uauc_le_0p55": false,
+      "ensemble_null_residual_lo_le_0": true,
+      "sensitivity": {
+        "pi_split_half_raw_r_lt_0p7": true,
+        "mf_temporal_all_pairs_residual_uauc_le_0p55": false,
+        "mf_temporal_no_fold_in_residual_uauc_le_0p55": false,
+        "mf_transductive_reference_residual_uauc_le_0p55": false,
+        "ensemble_null_residual_ci_covers_0_two_sided": false,
+        "ensemble_null_residual_bias_corrected_lo_le_0": true,
+        "ensemble_null_gap_residual_lo_le_0": true
+      }
+    },
+    "toys_rated": {
+      "pi_split_half_reliability_lt_0p7": false,
+      "mf_personal_residual_uauc_le_0p55": true,
+      "ensemble_null_residual_lo_le_0": true,
+      "sensitivity": {
+        "pi_split_half_raw_r_lt_0p7": true,
+        "mf_temporal_all_pairs_residual_uauc_le_0p55": true,
+        "mf_temporal_no_fold_in_residual_uauc_le_0p55": true,
+        "mf_transductive_reference_residual_uauc_le_0p55": true,
+        "ensemble_null_residual_ci_covers_0_two_sided": true,
+        "ensemble_null_residual_bias_corrected_lo_le_0": true,
+        "ensemble_null_gap_residual_lo_le_0": true
+      }
+    },
+    "sports_next_1k": {
+      "pi_split_half_reliability_lt_0p7": null,
+      "mf_personal_residual_uauc_le_0p55": null,
+      "ensemble_null_residual_lo_le_0": false,
+      "sensitivity": {
+        "pi_split_half_raw_r_lt_0p7": null,
+        "mf_temporal_all_pairs_residual_uauc_le_0p55": null,
+        "mf_temporal_no_fold_in_residual_uauc_le_0p55": null,
+        "mf_transductive_reference_residual_uauc_le_0p55": null,
+        "ensemble_null_residual_ci_covers_0_two_sided": false,
+        "ensemble_null_residual_bias_corrected_lo_le_0": false,
+        "ensemble_null_gap_residual_lo_le_0": false
+      }
+    }
+  }
+}

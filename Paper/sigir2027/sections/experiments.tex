@@ -103,7 +103,7 @@ V$^\star$, with the gap to V0 reported as prompt sensitivity / descriptive, labe
 confirmation users}, and Gate-FT \DATANEEDED{branch: passed, so the fine-tuned regime is the main object / failed, so the rated-panel
 method line is closed} (mean post-$T$ UAUC \DATANEEDED{gft:UAUC\_post\_T\_mean\_over\_seeds} against 0.65).
 
-\begin{table}[t]
+\begin{table}[tp]
 \caption{Registered gates and the prompt remedy (pilot: 1,500 ML-1M users, 1,000 sports events, 300 KuaiRec users; $n$ fresh
 ML-1M users: \DATANEEDED{gate:n\_users}). Rows 1--3: registered outcomes under V0. Gate-FT: post-$T$ rows of the confirmation users.}
 \label{tab:gate-outcomes}
@@ -148,7 +148,7 @@ below} $\mathrm{acc}_{\rm low}$ (difference \DATANEEDED{aud:C.acc\_top\_minus\_b
 decisions in the bottom margin tertile is \DATANEEDED{grid:share\_correct\_bottom\_tertile} (zero-shot) and
 \DATANEEDED{grid:share\_correct\_bottom\_tertile} (LoRA).
 
-\begin{table*}[t]
+\begin{table*}[tp]
 \caption{Next-item error anatomy and list-normalised calibration (RQ1, RQ2, RQ4): Qwen3-8B, zero-shot, V0, question \textsf{next}.
 Tertiles of $p_{\max}$; accuracy = top-1 correctness; ``errors in high'' = share of top-1 errors in the top tertile (one third if
 uninformative); ECE: 15 equal-width bins; sports events 1--1000 quarantined.}
@@ -186,7 +186,7 @@ the time (share \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile}); on rated pa
 \DATANEEDED{grid:auroc\_margin\_correct}), so wrong answers are \DATANEEDED{mostly low-confidence / no more often low- than
 high-confidence / mostly high-confidence}.
 
-\begin{table*}[t]
+\begin{table*}[tp]
 \caption{Reliability of token confidence on rated panels (RQ1, RQ2, RQ4), Qwen3-8B (Llama-3.1-8B-Instruct: Table~\ref{tab:app-llama}).
 ZS: zero-shot under the Gate-FT prompt; LoRA: seed mean (s.d.); TEST rows. ECE: 10 equal-mass bins and slope of the Platt map fitted on
 CAL. Decision: each user's top-$k$ cut ($k$ = number of TEST likes) at the midpoint of the $k$-th and $(k{+}1)$-th largest logits;
@@ -252,7 +252,7 @@ difference \DATANEEDED{aud:B.head\_share\_top10\_llm\_minus\_ref}); serving the 
 \DATANEEDED{aud:D.gain\_at\_50\_vs\_full} and the niche-minus-mainstream served share by
 \DATANEEDED{aud:D.niche\_minus\_mainstream\_served\_share} relative to the random signal.
 
-\begin{table*}[t]
+\begin{table*}[tp]
 \caption{Static exposure on next-item panels (RQ3). $\Delta_{\rm head}$: top-10 head share minus pool head share; Gini: of the top-10
 exposure counts. LLM: Qwen3-8B token confidence (V0). C-CRP (a verbalised-probability pointwise reranker) and the eight baselines ran
 on the same frozen panels under an existing same-candidate benchmark protocol (context, not competitors). S1k, S10k: sports events
@@ -316,7 +316,7 @@ UAUC (paired difference \DATANEEDED{grid:dUAUC\_ft\_minus\_zs}), and P1 \DATANEE
 \DATANEEDED{n of 3} seeds positive), so \DATANEEDED{branch: supervision raises the personal information gain / there is no evidence that
 supervision adds personal evidence}.
 
-\begin{table*}[t]
+\begin{table*}[tp]
 \caption{Decomposition of the token confidence on rated panels (RQ4, RQ5), Qwen3-8B (Llama: Table~\ref{tab:app-llama}); layout as
 Table~\ref{tab:reliability}; subset $S_d$. $\hat\pi$: item prior (mean over $K{=}8$ donor histories); $r_8$: Spearman--Brown reliability;
 non-prior share $1-\rho^2/r_8$; $G$, $G_{\rm CF}$: cross-fitted information gains (RQ4 text); star permutation: UAUC change when displayed
@@ -394,7 +394,7 @@ $\hat\pi$ is \DATANEEDED{above / indistinguishable from / below} 0 (\DATANEEDED{
 \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} (drop \DATANEEDED{ko:head\_minus\_tail.delta}, placebo \DATANEEDED{ko:placebo.delta}),
 so the confidence is \DATANEEDED{branch: familiarity-linked / popularity-linked}.
 
-\begin{table}[t]
+\begin{table}[tp]
 \caption{Popularity axes (RQ5). A: next-item, Qwen3-8B zero-shot, top-10 candidates: head minus tail mean $p$, Bias Index at matched
 confidence, share of head top-1 (S1k, S10k: sports events 1--1000, 1001--10000). B: pseudonym knockout (Qwen3-8B), real minus pseudonym
 on store-in-title candidates, zero-shot and LoRA (seed mean; labels of seeds 0 / 1 / 2); placebo: real-brand swap.}
@@ -448,7 +448,7 @@ are fixed; a gain is scoped to this signal, domain and backbone.
 uncertain examples is \DATANEEDED{better than / worse than / about equal to / inconclusive against} random pruning for this signal,
 domain and backbone.
 
-\begin{table}[t]
+\begin{table}[tp]
 \caption{Pruning by uncertainty vs.\ random pruning (RQ6), ML-1M, Qwen3-8B LoRA, five seeds, TEST UAUC, 25\% of each label class removed
 per pruned arm. UAUC: mean (seed s.d.); $\Delta$: seed-averaged contrast with its interval; $>0$: positive paired differences of 5.}
 \label{tab:pruning}
@@ -506,7 +506,7 @@ Table~\ref{tab:guide} answers the six seed questions in one place, each written 
 abstract only if it is confirmed on untouched users, has the same sign on a fresh Amazon domain and replicates on the second backbone;
 otherwise it stays direction-free.
 
-\begin{table*}[t]
+\begin{table*}[tp]
 \caption{One-table guide to S1--S6 (same-candidate scope; no full-catalogue claim). ``Admitted'': the registered claim-admission rule.}
 \label{tab:guide}
 \centering\footnotesize

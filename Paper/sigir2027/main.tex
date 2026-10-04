@@ -1,6 +1,6 @@
 % SIGIR 2027 full paper (9 pages incl. appendix, references unlimited; double-anonymous).
 % Results are filled ONLY from committed result files; every unfilled slot is \DATANEEDED{...}.
-\documentclass[sigconf,review,anonymous,natbib=true]{acmart}
+\documentclass[sigconf,natbib=true,anonymous=true]{acmart}
 
 \usepackage{booktabs}
 \usepackage{amsmath}  % acmart already loads newtxmath; amssymb would clash (\Bbbk)
@@ -19,8 +19,8 @@
 
 \begin{document}
 
-\title{Yes Because It Knows the Item, or Because It Knows the User?\\
-Decomposing the Confidence of LLM Recommenders}
+\title{What Does a Yes/No LLM Recommender's Confidence Know?\\
+Item Priors versus Personal Evidence, and When Uncertainty Is Actionable}
 
 \author{Anonymous Author(s)}
 \affiliation{\institution{Anonymous Institution}\country{Anonymous}}
@@ -36,7 +36,7 @@ Decomposing the Confidence of LLM Recommenders}
 </ccs2012>
 \end{CCSXML}
 \ccsdesc[500]{Information systems~Recommender systems}
-\keywords{LLM-based recommendation, uncertainty, calibration, popularity bias}
+\keywords{LLM-based recommendation, confidence and calibration, item prior, popularity bias, pre-registration}
 
 \maketitle
 
@@ -48,10 +48,12 @@ Decomposing the Confidence of LLM Recommenders}
 \input{sections/experiments}
 \input{sections/conclusion}
 
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{references}
-
+% The appendix counts toward the 9 pages (SIGIR rule: everything except references), so it comes before the bibliography:
+% the pages before the references are the budgeted pages.
 \appendix
 \input{sections/appendix}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
 
 \end{document}

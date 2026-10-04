@@ -706,7 +706,7 @@ def cf_references(P, groups, events: dict, *, shrink_k=5.0, mf_dim=32, mf_iters=
                         [scan["own"].get((u, i), (NAN, NAN))[1] for u, i in zip(users, items)])
         every = np.ones(P["n"], bool)
         # temporal biased MF (primary): first ratings with ts < T, all panel candidate events excluded
-        T = mf_cutoff(times, mf_cutoff_q)
+        T = mf_cutoff(times, mf_cutoff_q) if cutoff is None else float(cutoff)
         if math.isfinite(T):
             tr = scan["mf_t"] < T
             print(f"[forensics]   A3: temporal biased MF on {int(tr.sum())} ratings with ts < T = {T} (dim {mf_dim}, "
@@ -762,6 +762,16 @@ def cf_references(P, groups, events: dict, *, shrink_k=5.0, mf_dim=32, mf_iters=
                 "all_pairs_sensitivity": _mf_pair_block(mf_fold, ui_f, ii_t, y, groups, held, every, n_boot, seed),
                 "test_pairs_t_ge_T_no_fold_in": _mf_pair_block(mf_tm, ui_t, ii_t, y, groups, held, test, n_boot,
                                                                seed)}
+            if cutoff is not None:
+                out["mf_temporal"]["cutoff"]["explicit"] = True   # T given by the caller, not the quantile
+            if pairs_out is not None:
+                s_fold = mf_pair_scores(mf_fold, ui_f, ii_t)
+                ku = ui_f >= 0
+                pairs_out.update(T=T, test=test, mf_score=s_fold["score"], mf_residual=s_fold["residual"],
+                                 mf_item_bias=s_fold["item_bias"],
+                                 mf_user_bias=np.where(ku, mf_fold["bu"][np.maximum(ui_f, 0)], 0.0)
+                                 if len(mf_fold["bu"]) else np.zeros(len(ui_f)),
+                                 mf_warm=ku & (ii_t >= 0))
         else:
             out["mf_temporal"] = {"skipped": "no finite candidate timestamp to place the temporal cutoff"}
         # leave-candidates-out biased MF: transductive reference

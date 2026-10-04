@@ -10,12 +10,14 @@
 #          STAGES    comma list of 0-6, all (= 0-6) and perm (default all; perm is never implied)
 #          KNOCKOUT_SPORTS=1  also the Sports knockout (section 5: run unless cut at the 2026-10-22 checkpoint)
 #          PYTHON    interpreter (skips the conda activation);  DRY_RUN=1  CPU rehearsal, see below
-#   stage 0  data (CPU): the full h20 rated panel of D in row order (ml1m / toys: the frozen gate-fix DEV + CONFIRM
-#            panels joined, which their manifest records as a prefix split of the rebuilt panel; games / sports:
-#            build_rated_panels --hist_len 20 --gatefix_fields with build_confirm_panels.py's arguments)
-#            -> ftgrid_data -> panels/D/; then the K = 2 star-permuted S_d panels (starperm_panel.py) and, for toys /
-#            games, pseudonymize.py's pseudo / placebo panels of eval.jsonl, made next to the category-wide brand
-#            popularity sidecar as in Pilot 3 (toys: the Pilot-1 panel's; games / sports: stage 0's build's)
+#   stage 0  data (CPU): panel_all = the h20 rated panel of D (ml1m / toys: the frozen gate-fix DEV panel followed by
+#            the CONFIRM panel, byte for byte, both checked against the gate-fix manifest; games / sports: all eligible
+#            users with build_rated_panels --hist_len 20 --gatefix_fields and build_confirm_panels.py's arguments)
+#            -> ftgrid_data (--tokenizer MODEL for the TRAIN length rule; ml1m / toys: --dev_users_sha1 of the
+#            manifest's DEV list; ml1m: --gateft_split) -> panels/D/; then the K = 2 star-permuted S_d panels
+#            (starperm_panel.py) and, for toys / games, pseudonymize.py's pseudo / placebo panels of eval.jsonl, made
+#            next to the category-wide brand popularity sidecar as in Pilot 3 (toys: the Pilot-1 panel's; games /
+#            sports: stage 0's build's). Both derived builders are seeded (seed 0), so their panels are reproducible.
 #   stage 1  LoRA seeds 0-2 on panels/D/train.jsonl with micro_bsz, grad_accum and max_len_used of ftgrid_split.json
 #            (micro-batch x accumulation = 32); ML-1M on the Gate-FT backbone: the Gate-FT adapters, linked and scored
 #            by their path, never retrained. An adapter with train_config.json and weights is never retrained.
@@ -45,7 +47,8 @@
 # outputs/confrec/ftgrid_dryrun (the registered roots are refused); the inputs live in OUT_ROOT/_dry (synthetic raw files,
 # gate-fix panels and decisions, the Gate-FT context, a temporary pilot log); pyes_scorer and train_lora_yesno are
 # replaced by stand-ins (OUT_ROOT/_dry/ftgrid_fakes.py: their real argparse, the real scorer code with a fake model, a
-# placeholder adapter); every other step is the real code. Stage 2 first shows that an empty pilot log fails the check
+# placeholder adapter; ftgrid_data gets the stand-in character tokenizer); every other step is the real code, the
+# freeze check included (on a temporary pilot log). Stage 2 first shows that an empty pilot log fails the check
 # and that stage 3 then refuses. DRY_GATE=GATE_FT_FAIL rehearses the zero-shot-only branch, DRY_E1_FAIL=<text> makes the
 # runs whose output dir contains <text> fail E1.
 # Exit codes: 0 done; 1 error; 2 usage or refused input; 4 refused by the freeze / stage-order / gate rules.
@@ -152,18 +155,21 @@ ok = n > 0 and int(r["censored_main"].get("2", 0)) <= 0.005 * n and int(r["n_ove
 sys.exit(0 if ok else 1)
 PY
 }
-# fake_py: DRY_RUN's interpreter for the two GPU entry points (stand-ins); everything else runs as is
+# MPY runs the entry points that load the model or its tokenizer (scorer, trainer, ftgrid_data's length rule). Under
+# DRY_RUN it is fake_py: the scorer and the trainer are stand-ins, ftgrid_data is the real code with the stand-in
+# tokenizer; any other call runs as is
 fake_py() {
   if [ "$1" = -m ]; then
     case "$2" in
       src.confrec.pyes_scorer) shift 2; "$PY" "$FAKES" scorer "$@"; return ;;
       src.confrec.train_lora_yesno) shift 2; "$PY" "$FAKES" trainer "$@"; return ;;
+      src.confrec.ftgrid_data) shift 2; "$PY" "$FAKES" ftgrid_data "$@"; return ;;
     esac
   fi
   "$PY" "$@"
 }
-GPY="$PY"
-if [ "$DRY_RUN" = 1 ]; then GPY=fake_py; fi
+MPY="$PY"
+if [ "$DRY_RUN" = 1 ]; then MPY=fake_py; fi
 # score DATA DIR [--lora A] ARGS...: pyes_scorer (fp16, top-50 logprobs, max_model_len 4096, 100-user chunks, the selected
 # variant, yes/no readout, like); completion marker DIR/report.json, run.key = panel sha1 + model + variant + adapter
 # weights sha1 + args. ADOPT=<finished dir> (set just before the call) is copied in first and kept only if the scorer
@@ -185,7 +191,7 @@ score() {
     cp "$adopt/report.json" "$adopt/scores.csv.gz" "$dir/"
     echo "$adopt" > "$dir/adopted_from"
   fi
-  until "$GPY" -m src.confrec.pyes_scorer --data "$data" --output "$dir" --model "$MODEL" --dtype float16 \
+  until "$MPY" -m src.confrec.pyes_scorer --data "$data" --output "$dir" --model "$MODEL" --dtype float16 \
       --topk_logprobs 50 --max_model_len 4096 --chunk_users 100 --variant "$VARIANT" --readout yesno \
       --questions like "$@"; do
     [ -f "$dir/adopted_from" ] || return 1
@@ -252,7 +258,7 @@ train_adapter() {
   if adapter_done "$out"; then echo "[skip] adapter $out exists"; return 0; fi
   [ -f "$train" ] || { echo "missing $train (stage 0)" >&2; exit 1; }
   rm -rf "$out"
-  "$GPY" -m src.confrec.train_lora_yesno --train "$train" --model "$MODEL" --out "$out" --variant "$VARIANT" \
+  "$MPY" -m src.confrec.train_lora_yesno --train "$train" --model "$MODEL" --out "$out" --variant "$VARIANT" \
     --seed "$seed" --max_len "$MAXLEN" --bsz "$MICRO" --grad_accum "$ACCUM" 2>&1 | grep -vE "it/s\]|s/it\]" || true
   adapter_done "$out" || { echo "training of $out did not finish" >&2; exit 1; }
 }
@@ -296,16 +302,17 @@ like_models() {
   fi
   echo "$m"
 }
-# join_h20 DEV CONFIRM: the full rebuilt h20 panel = the DEV rows, then the CONFIRM rows; the gate-fix manifest must
-# record a prefix split (DEV = the first 1,500 rows) and both files must be its recorded bytes
+# join_h20 DEV CONFIRM: panel_all = the DEV rows (TRAIN = the Pilot-1 users), then the CONFIRM rows in panel order,
+# byte for byte; both files must be the bytes the gate-fix manifest records. Under its prefix split this is the rebuilt
+# panel itself; otherwise (user-id exclusion) the roles are the same and a NOTE says that positions follow the files.
 join_h20() {
   "$PY" - "$G/panels/manifest.json" "$D" "$1" "$2" <<'PY'
 import hashlib, json, sys
 man, src, dev, conf = sys.argv[1:5]
 rec = json.load(open(man, encoding="utf-8"))["sources"][src]
-if rec.get("prefix_match") is not True or rec.get("split_method") != "prefix":
-    sys.exit(f"{man}: {src} was not split by row prefix, so DEV + CONFIRM is not the rebuilt panel's row order; build the "
-             "full panel with build_rated_panels --hist_len 20 --gatefix_fields instead")
+if rec.get("prefix_match") is not True:
+    print(f"NOTE {src}: {man} records split method {rec.get('split_method')!r}, not the 1,500-row prefix: panel_all is "
+          "DEV then CONFIRM (each in panel order)", file=sys.stderr)
 for path, split in ((dev, "dev"), (conf, "confirm")):
     h = hashlib.sha1()
     with open(path, "rb") as f:
@@ -339,6 +346,7 @@ if [ "$DRY_RUN" = 1 ]; then
     python ftgrid_fakes.py setup --domain D --dry DIR --gatefix G --gateft GT --variant V --n_dev N --gate DECISION
     python ftgrid_fakes.py scorer <the pyes_scorer arguments>
     python ftgrid_fakes.py trainer <the train_lora_yesno arguments>
+    python ftgrid_fakes.py ftgrid_data <the ftgrid_data arguments>
 
 setup    the synthetic world of one domain shaped like D: raw files in the real layouts under DIR/raw; for ml1m and toys
          the gate-fix h20 DEV / CONFIRM panels (build_rated_panels.build on that raw, DEV = the first N rows) and their
@@ -351,6 +359,7 @@ scorer   pyes_scorer's own parse_args and run() with a fake vLLM model: a charac
          scorer's. DRY_E1_FAIL=<text>: a run whose --output contains <text> gets Yes+No mass 0.5 (fails E1).
 trainer  train_lora_yesno's own argparse and panel check; writes a placeholder adapter_model.safetensors,
          adapter_config.json, train_report.json and train_config.json (the real keys, plus dry_run).
+ftgrid_data  the real ftgrid_data.main with the stand-in tokenizer in place of --tokenizer's model (TRAIN length rule).
 """
 from __future__ import annotations
 
@@ -604,9 +613,14 @@ def trainer(argv) -> None:
     print(f"dry-run trainer: {out} ({n} examples, variant {a.variant}, bsz {a.bsz} x {a.grad_accum}, max_len {a.max_len})")
 
 
+def ftgrid_data(argv) -> None:
+    from src.confrec import ftgrid_data as fd
+    fd.main(argv, tokenizer=Tok())
+
+
 if __name__ == "__main__":
     sys.path.insert(0, os.getcwd())
-    {"setup": setup, "scorer": scorer, "trainer": trainer}[sys.argv[1]](sys.argv[2:])
+    {"setup": setup, "scorer": scorer, "trainer": trainer, "ftgrid_data": ftgrid_data}[sys.argv[1]](sys.argv[2:])
 PYFAKES
   if cmp -s "$FAKES.tmp" "$FAKES"; then rm -f "$FAKES.tmp"; else mv "$FAKES.tmp" "$FAKES"; fi
   "$PY" "$FAKES" setup --domain "$D" --dry "$DRY" --gatefix "$G" --gateft "$GT" --variant "${VARIANT:-V3}" \
@@ -665,15 +679,18 @@ if want 0; then
         --gatefix_fields
   fi
   FDEPS=("$ALL" src/confrec/ftgrid_data.py src/confrec/gateft_data.py src/confrec/build_rated_panels.py)
-  if [ "$DRY_RUN" != 1 ]; then FTD+=(--tokenizer "$MODEL"); fi
-  if [ "$D" = ml1m ]; then
+  if [ "$D" = ml1m ] || [ "$D" = toys ]; then        # TRAIN = the DEV (Pilot-1) users, checked by their list's sha1
+    DEV_SHA=$(jget "$G/panels/manifest.json" sources "$D" dev user_ids_sha1)
+    [ -n "$DEV_SHA" ] || { echo "$G/panels/manifest.json records no $D dev user_ids_sha1" >&2; exit 1; }
+    FTD+=(--dev_users_sha1 "$DEV_SHA")
+  fi
+  if [ "$D" = ml1m ]; then                           # T and train.jsonl must be Gate-FT's (the G9 set)
     [ -f "$GT/gateft_split.json" ] || { echo "missing $GT/gateft_split.json (Gate-FT stage A)" >&2; exit 1; }
-    FTD+=(--gateft_split "$GT/gateft_split.json"
-      --ml1m_dev_users_sha1 "$(jget "$G/panels/manifest.json" sources ml1m dev user_ids_sha1)")
+    FTD+=(--gateft_split "$GT/gateft_split.json")
     FDEPS+=("$GT/gateft_split.json")
   fi
   step "$SPLIT" "${FDEPS[@]}" -- \
-    "$PY" -m src.confrec.ftgrid_data --domain "$D" --panel_all "$ALL" --out_dir "$P" "${FTD[@]}"
+    "$MPY" -m src.confrec.ftgrid_data --domain "$D" --panel_all "$ALL" --out_dir "$P" --tokenizer "$MODEL" "${FTD[@]}"
   step "$P/eval_sd_test_starperm1.jsonl" "$P/eval_sd_test.jsonl" scripts/sigir/starperm_panel.py \
       src/confrec/diag_battery.py -- \
     "$PY" scripts/sigir/starperm_panel.py --panel "$P/eval_sd_test.jsonl" --variant "$VARIANT" \

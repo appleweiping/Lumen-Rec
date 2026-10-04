@@ -1,5 +1,50 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment-2 FREEZE record (G-round: prompt-fix, diagnosis battery; before any such GPU job)
+
+Produced by `scripts/sigir/run_gatefix.sh` stage 0 on the server repo (`/root/autodl-tmp/lumen-rec` at commit 6da7ae4), file
+`outputs/confrec/gatefix/FREEZE.txt`; the same hashes were produced by an earlier rehearsal on a snapshot of the code (apart from
+the amendment, which gained the O carve-out and the G7 scale note in between). ML-1M: 3,183 eligible users, the first 1,500 lines
+of the rebuilt panel hash to the Pilot-1 panel (MATCH), DEV 1,500 + CONFIRM 1,683. Toys: 14,202 eligible users, prefix MATCH,
+DEV 1,500 + CONFIRM 12,702. Video_Games 4,109 and Sports 16,712 eligible users (counted, untouched).
+
+| REQUIRED quantity | sha1 |
+|---|---|
+| `idea-stage/PREREG_AMENDMENT_2.md` | 46e96c763fb086e4717897acdbd70d952027233d |
+| rendered prompt bank (7 variants + T0 probe, first 50 rows of each dev panel, 13,168 prompts) | 6cee435adc05c860c427e2a820dba57bc86cc0c1 |
+| diagnosis battery bank (arms T0, T0_digits, T1, T2, T3, starperm; 10,956 prompts; spec baa7a763f23119f9de4c0768d29e9c820f5f2e32) | 0c7288d2d43b6225603a50739eb62de6f6cdfc4c |
+| ML-1M DEV user ids | b7124d7b2d000ede32ea76078a775685a3734120 |
+| ML-1M CONFIRM user ids | 9660a965bf6b0afaeb5952d3c382f280ef111d93 |
+| Toys DEV user ids | 77b46ce3839d2191a3cf211ddad8e7ebfa905045 |
+| Toys CONFIRM user ids | 44e673cfb2399a1a89d2ad83bad1bb9b07995589 |
+
+Per variant (informational): V0 cc6779de2ce461076a2ce2b264e100f35041a107, V1 d135b9b1479d7a0d8dda9793efacf1d63d945cd7, V2
+f8925a44b438a68c517239109c41feb618bba15d, V3 6a1f16dfc27ed632de4cbb387cbecb6879057ca3, V4 fb2a91e6dedc77a3130d23f9641e79ba15b02d3e,
+V5 f8c8969d8ac94c1ef35928dd0c6e0382086e6ad0, V7 e81f23498daf842b2505100b901ad9542638e43c, T0 probe
+b8eab6b78be5c4eda9606d89644130066412eb69; prompt strings cc215d598a6a6a0f6b6545df690f60d44ee6bafb; dev panels ML-1M
+74b8873b23b436a62cdadb3215ae0936f4d8ffd0, Toys dde50d633416719f7cefd0af04b4f92364f82cd3. Registered V0 check: the V0 rendering
+of the real Pilot-1 panels reproduces the stored prompts_sha1 (ML-1M 12e83c4f…, Toys cd47bdb8…, sports 81a2106b…) and swap
+prompts_sha1 (integration agent, CPU dry run, 2026-10-04: IDENTICAL).
+
+## 2026-10-04 · Freeze of the next-item audit analysis (Amendment 2 section N; `NEXTITEM_AUDIT_SPEC.md` section G)
+
+Recorded before `nextitem_audit run` was executed on any LLM audit score. Provenance, stated plainly: the scoring started
+2026-10-03 16:55 local under carve-out N; the detailed spec (`NEXTITEM_AUDIT_SPEC.md`) was written 22:48 the same day, while the
+scoring was running, from the endpoints already declared in the judge's action 7 (2026-10-02, before any scoring). Until this
+record the only audit output read was the scorer's own progress lines (chunk counters, prompts per second); the analysis module
+was written and tested on synthetic data and on the C-CRP / baseline ranks, never on an LLM audit score file. Sports TEST is
+fully scored on the server (100/100 chunks) but has not been analysed.
+
+| file | sha1 |
+|---|---|
+| `src/confrec/nextitem_audit.py` | ea848324e8421576dd22946641da82838a3775db |
+| `docs/sigir/NEXTITEM_AUDIT_SPEC.md` | 8d584f43d0f7fe637b5484a23a52e60b0b680324 |
+| `scripts/sigir/export_ref_exposure.py` | 666bee91a1d33eb50679d6a338d7126c6f8fd9aa |
+| `docs/sigir/ref_exposure` manifest (40 files, 34,969,901 bytes; sha1 of the lines `<relative path> <sha1>` in sorted order) | d32c79b0c1b13d3838474c605009950c84dac548 |
+
+The registered endpoints are the entries of `Q_ENDPOINTS` in the module at this sha1. The 35 MB of exposure exports are accepted and
+committed (the baselines' ranking files exist only on the workstation; the server reads them through git).
+
 ## 2026-10-04 · Infrastructure smoke test of the Gate-FT path (Amendment 2 carve-out O)
 
 Synthetic panel only (`scripts/sigir/synth_smoke_panel.py`, invented titles and random labels); no real user, item or rating

@@ -89,6 +89,23 @@ On the TOP-10 candidates of each event (the served set) with the list-normalised
 `summary.json`: for each of S1..S5 the registered endpoint values per domain (and per sports split), Holm-adjusted
 (m = 4 domains per endpoint) bootstrap-based sign statements, and the admission flags. Never write prose; numbers only.
 
+## G. Endpoint registry, segments and freeze (added 2026-10-04, before any LLM audit score was analysed)
+- **Registry.** The registered endpoints of the cross-domain summary (S1, S2, S4, S5, and A as context) are the entries of the
+  dictionary `Q_ENDPOINTS` in `src/confrec/nextitem_audit.py` at the sha1 recorded in PILOT_LOG. Where sections C-E above name an
+  endpoint (`confident_error_rate`, `unsure_correct_rate`, the AUROC of `p_max`, `bias_index`, ...) the dictionary uses it; the
+  dictionary completes the sections where they were silent (the signed contrasts are those with a Holm sign statement).
+- **Segments.** Sports yields two segments in panel file order: `events_1_1000` (quarantine) and `events_1001_10000` (main).
+  The summary uses `main` as the sports entry in every Holm family (m = 4) and in the 3-of-4 rule; the quarantine segment is
+  reported under its own unit and is never counted.
+- **S3 admission** requires all four domains present, and a CI excluding 0 with the same sign in at least 3 of them; it is
+  evaluated for the LLM (`next`, `like`) and for every reference method.
+- **Unscored candidates** (censored 2/3 or non-finite logit) rank below all scored ones, an unscored positive ranks last, they
+  get probability 0 in the list softmax; an event with no scored candidate stays in A and UAUC and is excluded from B-E (counted).
+- **Freeze.** Before the first run of `nextitem_audit run` on real LLM scores, PILOT_LOG records the sha1 of `nextitem_audit.py`,
+  of this file, of `scripts/sigir/export_ref_exposure.py` and the manifest hash of `docs/sigir/ref_exposure` (the sha1 of the lines
+  `<relative path> <sha1>` over its files in sorted order). Before this record the only audit output read was the scorer's own
+  progress lines (chunk counters, prompts per second).
+
 ## CLI
 ```
 python -m src.confrec.nextitem_audit run --domain sports --audit_dir <audit root> --panel_test P --panel_valid P \

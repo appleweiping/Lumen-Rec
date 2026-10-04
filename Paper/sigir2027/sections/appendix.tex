@@ -30,7 +30,7 @@ user rate the candidate item 4 stars or higher (on a 1-5 scale)?'' (like), with 
 All of these were fixed in advance and are scored only after the zero-shot gate is passed. Table~\ref{tab:app-bank} lists the seven
 registered variants.
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Registered prompt-variant bank (rated panels). No variant uses collaborative statistics, the user's mean rating, few-shot
 examples, thinking, or a verbalised or digit readout. V6 (semantic retrieval of history items) was dropped before any scoring.}
 \label{tab:app-bank}
@@ -57,7 +57,7 @@ V7 & V1 + V3 + V4 + V5 & 20 & combined\\
 \section{Prompt Sensitivity of the Zero-Shot Channel}\label{app:sensitivity}
 Table~\ref{tab:app-sens} publishes all $7\times2$ development UAUCs of the registered remedy round (burned users, like question).
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Prompt sensitivity (G5): like-question UAUC of the seven registered variants on the two development panels (1,500 burned
 users each). E1 (per panel): censored rows $\le0.5\%$, no overlength prompt, mean Yes$+$No mass $\ge0.95$; E2: Toys UAUC $\ge$ V0
 $-0.010$. V$^\star$: highest ML-1M UAUC among eligible variants (ties within 0.005: Toys UAUC, then V0 $<$ V1 $<$ V5 $<$ V3 $<$ V4
@@ -114,7 +114,7 @@ no-user probe (``Movie: \{title\} \ldots{} Is this movie widely considered good?
 rated this item r/5.)'', an evidence injection that appends ``Average rating by other users before this date: m/5 (n ratings)'', and a
 digit readout (``What star rating from 1 to 5 would this user give the candidate item?'', answered by one digit).
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Diagnosis battery on burned users with the registered reading of each probe (95\% user-bootstrap intervals). Interpretive only.}
 \label{tab:app-battery}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
@@ -150,7 +150,7 @@ treated candidates. The label of each model follows the registered rule of Secti
 destroys evidence in that domain (a UAUC fall of more than 0.02 overall and in the tail). Table~\ref{tab:app-ko} lists every model.
 
 % BRANCH-GATEFT-BEGIN
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Pseudonym knockout by model: head-minus-tail drop of $\ell$ on store-in-title candidates and the registered label (POSITIVE,
 NEGATIVE, NULL, INDETERMINATE, INCOMPLETE). ``Not run'' only where a cut rule applies.}
 \label{tab:app-ko}
@@ -208,7 +208,7 @@ by confidence; Table~\ref{tab:app-seeds} lists every seed of the fine-tuned grid
 gives the tail share of the top-10 lists not shown in Table~\ref{tab:exposure}; Table~\ref{tab:app-z2} compares the two backbones on the
 next-item panels.
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Corrections against their controls. Row 0: raw UAUC and references; rows 1--2: invariance checks on stored scores; rows 3--4:
 priors on $S_d$; rows 5--7: the two-view contrast, scored only after the zero-shot gate is passed. 2nd rated:
 \DATANEEDED{mir:second\_rated\_domain}; Sports: validation events 1--1000.}
@@ -241,7 +241,7 @@ priors on $S_d$; rows 5--7: the two-view contrast, scored only after the zero-sh
 \end{table}
 
 % METHOD-SLOT-BEGIN (appendix)
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Nested method slot: TEST UAUC (seed mean, s.d.); last row before the references: paired difference offset minus stacking.}
 \label{tab:slot}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
@@ -265,7 +265,7 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 \end{table}
 % METHOD-SLOT-END (appendix)
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Second backbone, Llama-3.1-8B-Instruct, ML-1M and Toys (cells and rows as in Tables~\ref{tab:reliability} and~\ref{tab:decomp};
 decomposition on $S_d$; P1 and the LoRA columns only after a Gate-FT pass). A cell reads ``not run'' only where the registered cut rule
 applies.}
@@ -300,7 +300,7 @@ P1: $G_{\rm FT}-G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multic
 \end{tabular}}
 \end{table}
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Selective serving by confidence (RQ3), Qwen3-8B, question \textsf{next}. A: NDCG@10 of the served half (50\% coverage) minus
 full coverage. B: served share of niche- minus mainstream-quintile users at 50\% coverage. Last row of each block: range over the
 baselines' own score margins where a score column exists.}
@@ -335,7 +335,7 @@ baselines' own margin & \DATANEEDED{no score column, or range} & \DATANEEDED{no 
 \end{table}
 
 % BRANCH-GATEFT-BEGIN
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Every seed of the fine-tuned grid (Qwen3-8B, LoRA, seeds 0--2), TEST rows, and the within-item label-permutation control (FT-C;
 ML-1M, seeds 0 and 1). All rows: CAL $\cup$ TEST rows of the evaluation users; ECE: 10 equal-mass bins after Platt scaling fitted on CAL;
 slope: of that map. The ML-1M UAUC seeds equal those of Table~\ref{tab:gate-outcomes}.}
@@ -373,7 +373,7 @@ ML-1M, real $-$ permuted, seed 1 & \DATANEEDED{grid:ftc\_dUAUC\_real\_minus\_per
 \end{table}
 % BRANCH-GATEFT-END
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Tail share of the top-10 lists (APLT) for the methods of Table~\ref{tab:exposure} (RQ3); same splits (S1k, S10k: sports events
 1--1000, 1001--10000). First row: tail share of the candidate pool (level).}
 \label{tab:app-expo}
@@ -403,7 +403,7 @@ RLMRec & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_
 \end{tabular}}
 \end{table}
 
-\begin{table}[!tb]
+\begin{table}[!tbp]
 \caption{Second backbone on the next-item panels (RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on the same 2,000 events (1,001--3,000) of
 each domain, question \textsf{next}, prompt V0; Sports events 1--1000 stay quarantined. Cells: Qwen / Llama.}
 \label{tab:app-z2}

@@ -5,21 +5,25 @@
 % Registered design behind the tables: PREREG_AMENDMENT_2 (gates G0-G9, forking-path rules F), PREREG_AMENDMENT_3 as revised on
 % 2026-10-04 (fine-tuned program: TRAIN/EVAL/CAL/TEST roles, endpoint dictionary E-A..E-E, primary hypothesis P1, zero-shot panels
 % Z1/Z2, knockout labels, pruning arms P0-P3, nested method slot, Llama replication, within-item permutation control FT-C, Holm
-% families, cut rules) and docs/sigir/NEXTITEM_AUDIT_SPEC.md (next-item audit, sections A-F). If a registered text is revised again,
-% re-check every endpoint sentence and every slot name below against it before filling.
+% families, cut rules) and docs/sigir/NEXTITEM_AUDIT_SPEC.md (next-item audit, sections A-F). Definitions, thresholds and decision
+% rules are stated once, in Section "Audit Protocol" (tab:rq, sec:protocol) and Section "Measurement and Actionability Tools"
+% (sec:tools); the endpoint sentences below only point to them. If a registered text is revised again, re-check every endpoint
+% sentence and every slot name below against it before filling. Notation: m(i) prior-only item mean, pi-hat item prior, calG
+% information gain, r_8 reliability (as in preliminaries.tex and method.tex).
 %
 % FILL RULES (binding)
 %  1. A slot is filled ONLY from the committed result file named in it (alias legend below), never from memory, from a log
 %     or from a Pilot-1 diagnostic (those are exploratory and may not enter any cell or sentence).
-%  2. Cell format: estimate, then the half-width of its 95% interval, three decimals (0.612 \pm .014). LoRA cells: mean over
-%     seeds 0-2 with the seed s.d. in parentheses. Intervals: percentile bootstrap, 2,000 resamples, seed 0, over users (rated
-%     panels, user-cluster) or events (next-item panels). Write a direction word only where the registered test supports it
-%     (Amendment 3 section 11): Holm p < 0.05 inside the registered family (E-B: the regime contrast over the four Qwen domains;
-%     E-D: G and the star-permutation contrast per domain and regime; the method slot over the datasets run; next-item audit
-%     endpoints over the four domains, summary.json), or the single test of P1 or of the pruning contrast P2 - P1; fine-tuned
-%     gains also need the 2 sigma_seed rule with all seeds agreeing in sign. Every other endpoint is descriptive: report the
-%     interval, write a direction only if it excludes 0, and make no interval-based claim for an endpoint computed on fewer than
-%     150 users (grid:n_users, grid:n_sd). Otherwise write "indistinguishable from".
+%  2. Cell format: estimate, then the half-width of its 95% interval, three decimals (0.612 \pm .014); the wide tables tab:exposure
+%     (Gini and APLT blocks) and tab:serving give estimates only. LoRA cells: mean over seeds 0-2 with the seed s.d. in parentheses.
+%     Intervals: percentile bootstrap, 2,000 resamples, seed 0, over users (rated panels, user-cluster) or events (next-item
+%     panels). Write a direction word only where the registered test supports it (Amendment 3 section 11): Holm p < 0.05 inside the
+%     registered family (E-B: the regime contrast over the four Qwen domains; E-D: G and the star-permutation contrast per domain
+%     and regime; the method slot over the datasets run; next-item audit endpoints over the four domains, summary.json), or the
+%     single test of P1 or of the pruning contrast P2 - P1; fine-tuned gains also need the 2 sigma_seed rule with all seeds agreeing
+%     in sign. Every other endpoint is descriptive: report the interval, write a direction only if it excludes 0, and make no
+%     interval-based claim for an endpoint computed on fewer than 150 users (grid:n_users, grid:n_sd). Otherwise write
+%     "indistinguishable from".
 %  3. A cell may read "not run" only where a registered cut rule applies (Amendment 3 section 10: P3, the Sports knockout and Llama
 %     Toys fine-tuning may be cut on 2026-10-22, Sports fine-tuning and the later slot datasets on 2026-10-29, anything unfinished on
 %     2026-11-30; the method slot is also retired at its kill rule) or where the G2 eligibility rule applies (fresh Toys users only
@@ -38,9 +42,10 @@
 %     columns of Z1 (Qwen: four rated panels with the decomposition arms on S_d; Llama: ML-1M and Toys), Z2 and the whole Qwen
 %     next-item audit.
 %  5. Page budget (3 pages when filled, about 2.9 without the optional method slot). If exceeded, move to the appendix in this order:
-%     the ECE/Brier columns of tab:anatomy, then the Gini block of tab:exposure.
+%     the ECE/Brier columns of tab:anatomy, the APLT block of tab:exposure, the guide column "Actionable via".
 %  6. LaTeX note: a table* that is still deferred at the end of the document makes any single-column float queued behind it
-%     vanish (acmart end-of-document flush). The appendix therefore uses single-column floats only.
+%     vanish (acmart end-of-document flush), and a float with only the specifiers t/b that is still queued at the end is lost. All
+%     floats therefore carry the specifier p (tp, !tbp), and the appendix uses single-column floats only.
 %
 % FILE ALIASES (paths relative to the repository root). A slot reads "alias:field"; the row and column of the table give the
 % panel, backbone, regime or arm. Rated panels: TEST = EVAL users' candidates at or after T_d; CAL = EVAL users' candidates before
@@ -73,6 +78,10 @@
 %   prn   pruning analysis (Amendment 3 section 6, src/confrec/ftprune.py): arms P0-P3 x seeds 0-4. PROPOSED path:
 %         outputs/confrec/ftgrid/pruning_ml1m.json
 %   slot  method-slot comparison (Amendment 3 section 7, src/confrec/train_lora_offset.py). PROPOSED path: outputs/confrec/ftgrid/slot_<d>.json
+%   corr  corrections analysis on stored scores (Lemma checks and the item-dependent corrections of Section "Measurement and Actionability
+%         Tools"): max_abs_dAUC_user, dAUC_pooled_offset_removal (rated panels, zero-shot), max_abs_dNDCG_event (Sports VALID events 1-1000,
+%         list softmax with the fitted T), dUAUC_nohist_minus_raw, dUAUC_evidence_minus_raw (on S_d). PROPOSED path:
+%         outputs/confrec/ftgrid/corrections_<d>.json
 %   mir   stage-3 decision JSON (pilot1_gate.py --stage3_gate), only after GATE_PASS (G7). PROPOSED path:
 %         outputs/confrec/gatefix/stage3/decision.json
 %   A PROPOSED path is a convention for analysis scripts that do not exist yet; if a script writes elsewhere, the alias follows
@@ -81,22 +90,19 @@
 \section{Findings}
 \label{sec:exp}
 
-Every number is read from a committed result file of the registered scripts. Cells give the estimate $\pm$ the half-width of its 95\%
-percentile-bootstrap interval over users (rated panels) or events (next-item panels). A direction is written only if the registered
-test supports it (Holm within the registered families, over the four domains for next-item endpoints, the single tests of P1 and of the
-pruning contrast, and for fine-tuned gains twice the seed s.d. with all seeds agreeing in sign); other endpoints are descriptive, and an
-endpoint on fewer than 150 users carries no interval-based claim (Section~\ref{sec:observation}). Rated tables carry three non-LLM
-references as context, never as gates; next-item statements are same-candidate statements.
+Every number is read from a committed result file of the registered scripts; cells give the estimate $\pm$ the half-width of its 95\%
+percentile-bootstrap interval over users (rated panels) or events (next-item panels). Section~\ref{sec:protocol} fixes the Holm
+families, the single tests, the admission rule and the 150-user floor: a direction is written only where the registered test supports
+it, and every other endpoint is descriptive. Rated tables carry three non-LLM references as context, never as gates; next-item
+statements are same-candidate statements.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{Registered gates and the prompt remedy}\label{sec:exp-gates}
-Under the registered prompt V0 the zero-shot channel missed its rated-label bar and met its next-item bar: UAUC on the 1,500
-ML-1M pilot users was 0.587 against the registered 0.60, and NDCG@10 on the first 1,000 sports events was 0.2093 against
-$0.8\times0.2329=0.1863$ (Table~\ref{tab:gate-outcomes}). On KuaiRec's fully observed matrix the zero-shot UAUC was 0.469, below the
-registered 0.58, so the fully observed calibration check and the feedback loop were not pursued and exposure is answered statically
-(RQ3). The rated-label and KuaiRec outcomes are registered negative results of the zero-shot channel under that prompt. They led to the
-single registered remedy round (seven prompt variants, one selection on burned users, one confirmatory gate on fresh users;
-Appendix~\ref{app:sensitivity}) and to Gate-FT, which runs in every branch (diagnosis readings: Appendix~\ref{app:battery}).
+Under the registered prompt V0 the zero-shot channel missed its rated-label bar (UAUC 0.587 on the 1,500 ML-1M pilot users against
+0.60) and met its next-item bar (NDCG@10 0.2093 on the first 1,000 sports events against $0.8\times0.2329=0.1863$); on KuaiRec's fully
+observed matrix its UAUC was 0.469 against 0.58, so exposure is answered statically (Table~\ref{tab:gate-outcomes}). These are
+registered negative results of the zero-shot channel under that prompt; they led to the single registered remedy round
+(Appendix~\ref{app:sensitivity}) and to Gate-FT, which runs in every branch (diagnosis readings: Appendix~\ref{app:battery}).
 \emph{Reading template.} The remedy round ended in \DATANEEDED{branch: FIX\_FOUND with V$^\star$ and GATE\_PASS (gate:UAUC, ci95) /
 GATE\_FAIL\_AFTER\_REMEDY(dev) / GATE\_FAIL\_AFTER\_REMEDY(confirm)}, so the zero-shot rows are \DATANEEDED{branch: a valid regime under
 V$^\star$, with the gap to V0 reported as prompt sensitivity / descriptive, labelled ``below the registered bar'', and re-measured on
@@ -135,13 +141,10 @@ item mean, MF (same rows) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ1 (S1): is the model sure when it is right?}\label{sec:exp-rq1}
-\emph{Endpoint.} Next-item panels (Qwen3-8B, zero-shot, V0, question \textsf{next}): the top-1 accuracy in the lowest and the highest
-tertile of the list-normalised confidence $p_{\max}$ ($\mathrm{acc}_{\rm low}$, $\mathrm{acc}_{\rm high}$; one temperature per domain
-fitted on 2,000 validation events, Section~\ref{sec:method}) and the AUROC of $p_{\max}$ for top-1 correctness against a seeded random
-signal (Table~\ref{tab:anatomy}). Rated panels (TEST rows; Platt scaling fitted on CAL): each user's top-$k$ decision, $k$ = the user's
-number of TEST likes, cut at the midpoint of the $k$-th and $(k{+}1)$-th largest logits, with margin the distance of the logit from the
-cut; the share of correct decisions that fall in the bottom margin tertile (correct but unsure; one third if the margin carried no
-information; Table~\ref{tab:reliability}).
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ1). Next-item panels: $\mathrm{acc}_{\rm low}$ and $\mathrm{acc}_{\rm high}$, the top-1 accuracy in
+the lowest and the highest tertile of the list-normalised confidence $p_{\max}$, and the AUROC of $p_{\max}$ against a seeded random
+signal (Table~\ref{tab:anatomy}). Rated panels: the share of correct per-user top-$k$ decisions that fall in the bottom margin tertile,
+one third if the margin carries no information (Table~\ref{tab:reliability}).
 \emph{Reading template.} On \DATANEEDED{k of 4} domains $\mathrm{acc}_{\rm high}$ is \DATANEEDED{above / indistinguishable from /
 below} $\mathrm{acc}_{\rm low}$ (difference \DATANEEDED{aud:C.acc\_top\_minus\_bottom\_tertile}), so correct top-1 decisions are
 \DATANEEDED{concentrated in the high tertile / spread evenly / concentrated in the low tertile}; on rated panels the share of correct
@@ -176,10 +179,9 @@ Tools & \DATANEEDED{aud:temperature.T} & \DATANEEDED{aud:C.ece} & \DATANEEDED{au
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ2 (S2): when it is wrong, was it unsure?}\label{sec:exp-rq2}
-\emph{Endpoint.} Next-item panels: the share of top-1 errors that fall in the highest tertile of $p_{\max}$ (one third if confidence
-carried no information) and the confident-error rate $\Pr(\text{wrong}\mid\text{high tertile})$, against the random-signal null
-(Table~\ref{tab:anatomy}). Rated panels (the per-user top-$k$ decision of RQ1): the share of all errors in the top margin tertile, and the
-AUROC and AURC of the margin for correctness (Table~\ref{tab:reliability}).
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ2). Next-item panels: the share of top-1 errors in the top $p_{\max}$ tertile (one third if
+uninformative) and the confident-error rate $1-\mathrm{acc}_{\rm high}$, against the random-signal null (Table~\ref{tab:anatomy}). Rated
+panels: the share of errors in the top margin tertile and the AUROC and AURC of the margin for correctness (Table~\ref{tab:reliability}).
 \emph{Reading template.} Top-1 errors fall in the high tertile \DATANEEDED{more often than / as often as / less often than} one third of
 the time (share \DATANEEDED{aud:C.share\_errors\_in\_top\_tertile}); on rated panels the share of errors in the top margin tertile is
 \DATANEEDED{grid:share\_errors\_top\_tertile} and the margin \DATANEEDED{detects / does not detect} errors (AUROC
@@ -189,9 +191,8 @@ high-confidence / mostly high-confidence}.
 \begin{table*}[tp]
 \caption{Reliability of token confidence on rated panels (RQ1, RQ2, RQ4), Qwen3-8B (Llama-3.1-8B-Instruct: Table~\ref{tab:app-llama}).
 ZS: zero-shot under the Gate-FT prompt; LoRA: seed mean (s.d.); TEST rows. ECE: 10 equal-mass bins and slope of the Platt map fitted on
-CAL. Decision: each user's top-$k$ cut ($k$ = number of TEST likes) at the midpoint of the $k$-th and $(k{+}1)$-th largest logits;
-margin: distance from the cut, tertiles over all TEST pairs (the two shares are one third if the margin is uninformative); AUROC / AURC:
-of the margin for correctness. References: non-LLM context. Holm family E-B: the regime contrast over the four domains.}
+CAL. Tertile shares and AUROC / AURC: of the margin of the per-user top-$k$ decision (Section~\ref{sec:tools}; the shares are one
+third if the margin is uninformative). References: non-LLM context. Holm family E-B: the regime contrast over the four domains.}
 \label{tab:reliability}
 \centering\scriptsize\setlength{\tabcolsep}{4pt}
 % COLUMNS: rated panels ML-1M, Toys, Video Games, Sports x {ZS, LoRA}; EVAL users of each panel, TEST rows. ROWS and sources
@@ -211,7 +212,7 @@ of the margin for correctness. References: non-LLM context. Holm family E-B: the
 %   margin AUROC / AURC .............. grid:auroc_margin_correct, grid:aurc_margin (metrics.auroc, metrics.risk_coverage; target = decision correct)
 %   users ............................ grid:n_users (users with both classes among TEST candidates; below 150 the endpoint is descriptive)
 %   Registered outputs of the same report that stay in the released files: P(wrong | margin tertile), the 10-bin reliability table, Brier
-%   skill, seen/unseen-item UAUC and tail UAUC (exploratory); the all-rows UAUC of every seed is in tab:app-seeds.
+%   skill, all-rows UAUC (per seed: tab:app-seeds), seen/unseen-item UAUC and tail UAUC (exploratory).
 \resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccccccc@{}}
 \toprule
@@ -236,15 +237,11 @@ Users ($n$) & \multicolumn{2}{c}{\DATANEEDED{grid:n\_users}} & \multicolumn{2}{c
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ3 (S3): does confidence concentrate exposure? (static)}\label{sec:exp-rq3}
-\emph{Endpoint.} On the four same-candidate panels (10,000 events $\times$ 101 candidates), $\Delta_{\rm head}$, the top-10 head share
-minus the head share of the candidate pool (what a random ranking gives), for the LLM scores (\textsf{next}, \textsf{like}), C-CRP and
-the eight official baselines, with the Gini coefficient of exposure counts and the tail share of the top-10 lists (APLT)
-(Table~\ref{tab:exposure}, Table~\ref{tab:app-expo}); for selective serving, the NDCG@10 gain of the most confident half of the events and
-the niche-minus-mainstream difference in served share at 50\% coverage, against a random signal (Table~\ref{tab:serving},
-Appendix~\ref{app:tables}). Sports events 1--1000 are reported separately. An exposure effect is claimed only if the interval of
-$\Delta_{\rm head}$ excludes 0 with the same sign on at least 3 of 4 domains. The second backbone, Llama-3.1-8B-Instruct, scores events
-1,001--3,000 of each domain and is compared with the Qwen audit restricted to the same events (Table~\ref{tab:app-z2}); the answer is
-static and model-side.
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ3). $\Delta_{\rm head}$, Gini and tail share (APLT) of the top-10 lists for the LLM scores, C-CRP
+and the eight baselines (Table~\ref{tab:exposure}); the NDCG@10 gain of the confident half and the niche-minus-mainstream served share
+at 50\% coverage against a random signal (Table~\ref{tab:serving}); Llama-3.1-8B-Instruct against Qwen3-8B on events 1,001--3,000
+(Table~\ref{tab:app-z2}). Sports events 1--1000 are reported separately. An effect is claimed only if the $\Delta_{\rm head}$ interval
+excludes 0 with one sign on at least 3 of 4 domains; the answer is static and model-side.
 \emph{Reading template.} For the \textsf{next} scores $\Delta_{\rm head}$ is \DATANEEDED{above / indistinguishable from / below} 0 on
 \DATANEEDED{k of 4} domains (\DATANEEDED{aud:B.delta\_head}; summary.json S3.admission), with \DATANEEDED{the same / the opposite / no} sign
 on the second backbone (\DATANEEDED{aud2l:B.delta\_head}), and \DATANEEDED{larger / similar / smaller} than for the baselines (paired
@@ -254,37 +251,39 @@ difference \DATANEEDED{aud:B.head\_share\_top10\_llm\_minus\_ref}); serving the 
 
 \begin{table*}[tp]
 \caption{Static exposure on next-item panels (RQ3). $\Delta_{\rm head}$: top-10 head share minus pool head share; Gini: of the top-10
-exposure counts. LLM: Qwen3-8B token confidence (V0). C-CRP (a verbalised-probability pointwise reranker) and the eight baselines ran
-on the same frozen panels under an existing same-candidate benchmark protocol (context, not competitors). S1k, S10k: sports events
-1--1000, 1001--10000. Reference rows: head-share levels.}
+exposure counts; APLT: tail share of the top-10 lists (estimates). LLM: Qwen3-8B token confidence (V0). C-CRP (a verbalised-probability
+pointwise reranker) and the eight baselines ran on the same frozen panels under an existing same-candidate benchmark protocol (context,
+not competitors). S1k, S10k: sports events 1--1000, 1001--10000. Reference rows: levels.}
 \label{tab:exposure}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\scriptsize\setlength{\tabcolsep}{2.5pt}
 % ROWS: two reference rows (levels) and 11 methods. COLUMNS: Delta_head for S1k, S10k, Toys, Home, Tools; Gini for the same five
-% splits (segments events_1_1000, events_1001_10000, all). Sources (alias aud, letter B): B.pool_head_share; B.target_head_share
-% (P(positive is head)); B.delta_head = head_share_top10 - pool_head_share; B.gini_exposure. LLM rows: question next and question
-% like (questions[q].B_exposure.llm); the other rows: reference[<method>].B_exposure with methods from docs/sigir/ref_exposure
-% (ccrp_v3, elmrec_graph, irllrec_intent, llm2rec_sasrec, llmemb, llmesr_sasrec, proex_profile, promax_profile, rlmrec_graphcl).
+% splits; APLT for the same five splits (segments events_1_1000, events_1001_10000, all). Sources (alias aud, letter B):
+% B.pool_head_share; B.target_head_share (P(positive is head)); B.delta_head = head_share_top10 - pool_head_share (estimate +- half-width
+% of the event bootstrap); B.gini_exposure; B.pool_tail_share (level of the APLT block); B.tail_share_top10 (= APLT). LLM rows: question
+% next and question like (questions[q].B_exposure.llm); the other rows: reference[<method>].B_exposure with methods from
+% docs/sigir/ref_exposure (ccrp_v3, elmrec_graph, irllrec_intent, llm2rec_sasrec, llmemb, llmesr_sasrec, proex_profile, promax_profile,
+% rlmrec_graphcl). Registered output that stays in the released files: coverage_top10.
 \resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lccccccccccc@{}}
+\begin{tabular}{@{}lccccccccccccccccc@{}}
 \toprule
- & \multicolumn{5}{c}{$\Delta_{\rm head}$} & & \multicolumn{5}{c}{Gini of exposure}\\
-\cmidrule(lr){2-6}\cmidrule(lr){8-12}
-Method & S1k & S10k & Toys & Home & Tools & & S1k & S10k & Toys & Home & Tools\\
+ & \multicolumn{5}{c}{$\Delta_{\rm head}$} & & \multicolumn{5}{c}{Gini of exposure} & & \multicolumn{5}{c}{APLT}\\
+\cmidrule(lr){2-6}\cmidrule(lr){8-12}\cmidrule(lr){14-18}
+Method & S1k & S10k & Toys & Home & Tools & & S1k & S10k & Toys & Home & Tools & & S1k & S10k & Toys & Home & Tools\\
 \midrule
-Pool head share (level) & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & & -- & -- & -- & -- & --\\
-Target head share (level) & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & & -- & -- & -- & -- & --\\
+Pool (level) & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & \DATANEEDED{aud:B.pool\_head\_share} & & -- & -- & -- & -- & -- & & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share} & \DATANEEDED{aud:B.pool\_tail\_share}\\
+Target head share (level) & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & \DATANEEDED{aud:B.target\_head\_share} & & -- & -- & -- & -- & -- & & -- & -- & -- & -- & --\\
 \midrule
-LLM, \textsf{next} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-LLM, \textsf{like} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-C-CRP (verbalised) & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-ELMRec~\citep{wang2024elmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-IRLLRec~\citep{wang2025irllrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-LLM2Rec~\citep{he2025llm2rec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-LLMEmb~\citep{liu2025llmemb} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-LLM-ESR~\citep{liu2024llmesr} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-ProEx~\citep{zhang2026proex} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-ProMax~\citep{zhang2026promax} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
-RLMRec~\citep{ren2024rlmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure}\\
+LLM, \textsf{next} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM, \textsf{like} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+C-CRP (verbalised) & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ELMRec~\citep{wang2024elmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+IRLLRec~\citep{wang2025irllrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM2Rec~\citep{he2025llm2rec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLMEmb~\citep{liu2025llmemb} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+LLM-ESR~\citep{liu2024llmesr} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ProEx~\citep{zhang2026proex} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+ProMax~\citep{zhang2026promax} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
+RLMRec~\citep{ren2024rlmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:B.delta\_head} & & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & \DATANEEDED{aud:B.gini\_exposure} & & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10} & \DATANEEDED{aud:B.tail\_share\_top10}\\
 \bottomrule
 \end{tabular}}
 \end{table*}
@@ -292,40 +291,34 @@ RLMRec~\citep{ren2024rlmrec} & \DATANEEDED{aud:B.delta\_head} & \DATANEEDED{aud:
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ4 (S4): what does yes/no confidence track?}\label{sec:exp-rq4}
-\emph{Endpoint.} Per rated panel, backbone and regime on TEST rows: UAUC of $\ell$ with paired differences to the three references,
-ECE (10 equal-mass bins) and slope of the Platt map fitted on CAL, and the regime contrast, the $\Delta$UAUC between the seed-averaged
-LoRA score and zero-shot on identical rows (Tables~\ref{tab:gate-outcomes}, \ref{tab:reliability}). The decomposition of
-Section~\ref{sec:prelim} on the subset $S_d$ of the first 1,000 evaluation users with a TEST candidate (Table~\ref{tab:decomp}): UAUC of
-$\ell$, of the item prior $\hat\pi$ and of $\hat e=\ell-\hat\pi$; the Spearman--Brown reliability $r_8$ of $\hat\pi$; the non-prior share
-$1-\rho^2/r_8$, an upper bound on the personal share; the personal information gain $G=\Delta\mathrm{UAUC}(M_2-M_1)$ and the reference gain
-$G_{\rm CF}=\Delta\mathrm{UAUC}(M_3-M_0)$ of two-fold cross-fitted stackers ($M_0=[\hat q]$, $M_1=[\hat q,\hat\pi]$,
-$M_2=[\hat q,\hat\pi,\hat e]$, $M_3=[\hat q,\text{MF personal residual}]$; $\hat q$ the prior-only item mean); and the star-permutation
-contrast ($K=2$). Wording rules fixed in advance: $r_8<0.7$ makes the shares uninterpretable; $G/G_{\rm CF}$ is reported only if the
-interval of $G_{\rm CF}$ excludes 0; a temporal-MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of
-consumed-item panels. The one primary hypothesis of the fine-tuned program is P1 (ML-1M, Qwen3-8B): fine-tuning raises the personal
-information gain, $G_{\rm FT}-G_{\rm ZS}>0$. P1 holds iff the seed mean is positive with $p<0.05$, all three seeds are positive and the
-mean exceeds $2\sigma_{\rm seed}$; otherwise we write that there is no evidence that supervision adds personal evidence. A control
-adapter trained on labels permuted within each item (ML-1M, seeds 0 and 1) keeps every item's label marginal and removes personal
-evidence; its UAUC against the real adapter's is descriptive (Table~\ref{tab:app-seeds}).
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ4): UAUC, the regime contrast, ECE and the Platt slope on TEST rows (Tables~\ref{tab:gate-outcomes},
+\ref{tab:reliability}) and, on the decomposition subset $S_d$ (Section~\ref{sec:tools}), the quantities of Table~\ref{tab:decomp}.
+Wording rules fixed in advance: the shares are uninterpretable if $r_8<0.7$; $\mathcal G/\mathcal G_{\rm CF}$ is reported only if the interval
+of $\mathcal G_{\rm CF}$ excludes 0; a temporal-MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of
+consumed-item panels.
+% BRANCH-GATEFT-BEGIN (FT-C control)
+A control adapter trained on labels permuted within each item (ML-1M, seeds 0 and 1) keeps every item's label marginal and removes
+personal evidence; its UAUC against the real adapter's is descriptive (Table~\ref{tab:app-seeds}).
+% BRANCH-GATEFT-END
+Further registered views (seen/unseen-item UAUC, Brier skill, margin-tertile errors) stay in the released files.
 \emph{Reading template.} In the zero-shot regime $\mathrm{UAUC}(\ell)$ is \DATANEEDED{above / indistinguishable from / below} the
 prior-only item mean on \DATANEEDED{k of 4} panels and after LoRA \DATANEEDED{above / indistinguishable from / below} it (paired
 difference \DATANEEDED{grid:UAUC minus cpu:UAUC\_item\_mean\_prior}); the non-prior share is \DATANEEDED{grid:non\_prior\_share} (zero-shot)
-and \DATANEEDED{grid:non\_prior\_share} (LoRA), and the personal information gain $G$ is \DATANEEDED{above / not distinguishable from} 0
-(\DATANEEDED{grid:G}) against a reference gain $G_{\rm CF}$ of \DATANEEDED{grid:G\_CF}; fine-tuning \DATANEEDED{raises / leaves / lowers}
-UAUC (paired difference \DATANEEDED{grid:dUAUC\_ft\_minus\_zs}), and P1 \DATANEEDED{holds / does not hold} (\DATANEEDED{grid:P1};
-\DATANEEDED{n of 3} seeds positive), so \DATANEEDED{branch: supervision raises the personal information gain / there is no evidence that
-supervision adds personal evidence}.
+and \DATANEEDED{grid:non\_prior\_share} (LoRA), and the information gain $\mathcal G$ is \DATANEEDED{above / not distinguishable from} 0
+(\DATANEEDED{grid:G}) against a reference gain $\mathcal G_{\rm CF}$ of \DATANEEDED{grid:G\_CF}; fine-tuning \DATANEEDED{raises / leaves /
+lowers} UAUC (paired difference \DATANEEDED{grid:dUAUC\_ft\_minus\_zs}), and P1 \DATANEEDED{holds / does not hold} (mean
+$\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ \DATANEEDED{grid:P1}; \DATANEEDED{n of 3} seeds positive), so \DATANEEDED{branch: supervision raises the
+personal information gain / there is no evidence that supervision adds personal evidence}.
 
 \begin{table*}[tp]
 \caption{Decomposition of the token confidence on rated panels (RQ4, RQ5), Qwen3-8B (Llama: Table~\ref{tab:app-llama}); layout as
-Table~\ref{tab:reliability}; subset $S_d$. $\hat\pi$: item prior (mean over $K{=}8$ donor histories); $r_8$: Spearman--Brown reliability;
-non-prior share $1-\rho^2/r_8$; $G$, $G_{\rm CF}$: cross-fitted information gains (RQ4 text); star permutation: UAUC change when displayed
-ratings are permuted ($K{=}2$); popularity link: partial Spearman correlation of $\hat\pi$ with log popularity given the prior-only item
-mean. P1: LoRA minus zero-shot $G$ (seeds 0 / 1 / 2; mean, $p$). Holm family E-D: $G$ and star permutation per domain and regime.}
+Table~\ref{tab:reliability}; subset $S_d$; quantities as in Section~\ref{sec:tools} ($\hat\pi$: 8-donor item prior; $m$: prior-only item mean;
+M0--M3: cross-fitted stackers). Popularity link: partial Spearman correlation with log popularity given $m$. P1: LoRA minus
+zero-shot $\mathcal G$ (seeds 0 / 1 / 2; mean, $p$). Holm family E-D: $\mathcal G$ and star permutation per domain and regime.}
 \label{tab:decomp}
 \centering\scriptsize\setlength{\tabcolsep}{4pt}
 % COLUMNS as in tab:reliability. ROWS and sources (alias grid; Amendment 3 endpoints E-D and E-E; subset S_d, TEST rows only; definitions in
-% forensics.py A2, A7 and diag_battery.py, as fixed by Amendment 3 section 3):
+% method.tex "Item prior and reliability" and "Information gain and star permutation", as fixed by Amendment 3 section 3):
 %   UAUC of l on S_d ........ grid:uauc_L_Sd
 %   UAUC of pi-hat alone .... grid:uauc_pi (pi-hat = the 8-donor swap prior, donors in S_d)
 %   UAUC of e-hat ........... grid:uauc_evidence (e-hat = l - pi-hat)
@@ -333,12 +326,12 @@ mean. P1: LoRA minus zero-shot $G$ (seeds 0 / 1 / 2; mean, $p$). Holm family E-D
 %                             vs 5-8; r_8c = 2 r_c / (1 + r_c); re-estimated in every user resample)
 %   non-prior share ......... grid:non_prior_share = 1 - rho^2 / r_8c, unclipped (rho = pooled within-user Pearson correlation of centred l and
 %                             centred pi-hat); "uninterpretable" if r_8c < 0.7; an upper bound on the personal share
-%   G ....................... grid:G = dUAUC(M2 - M1) (cross-fitted logistic stackers on S_d TEST rows; folds = stats.user_halves(S_d, 0), each stacker
-%                             fit on the other fold; M0 = [q-hat], M1 = [q-hat, pi-hat], M2 = [q-hat, pi-hat, e-hat])
-%   G_CF .................... grid:G_CF = dUAUC(M3 - M0), M3 = [q-hat, MF personal residual]
+%   calG .................... grid:G = dUAUC(M2 - M1) (cross-fitted logistic stackers on S_d TEST rows; folds = stats.user_halves(S_d, 0), each stacker
+%                             fit on the other fold; M0 = [m], M1 = [m, pi-hat], M2 = [m, pi-hat, e-hat])
+%   calG_CF ................. grid:G_CF = dUAUC(M3 - M0), M3 = [m, MF personal residual]
 %   star permutation ........ grid:starperm_dUAUC (UAUC(l) minus UAUC after permuting the rating suffixes among the history items, K = 2)
-%   popularity link ......... grid:partial_rho_pi_logpop (partial Spearman of pi-hat with log popularity given q-hat; ML-1M also release year; Toys and
-%                             Sports also description length and has_store)
+%   popularity link ......... grid:partial_rho_pi_logpop, grid:partial_rho_L_logpop (partial Spearman of pi-hat, resp. l, with log popularity given m;
+%                             ML-1M also release year; Toys and Sports also description length and has_store)
 %   P1 ...................... grid:P1 (ML-1M, Qwen3-8B only, LoRA minus zero-shot: G_FT,s - G_ZS for s = 0, 1, 2, their mean and p-value; one cell
 %                             "a / b / c; mean, p"; the 2 sigma_seed rule uses the SD of the three differences)
 %   users in S_d ............ grid:n_sd (from ftgrid_split.json; below 150 the endpoint is descriptive)
@@ -346,7 +339,7 @@ mean. P1: LoRA minus zero-shot $G$ (seeds 0 / 1 / 2; mean, $p$). Holm family E-D
 % rule. Reference rows (same rows, one value per panel spanning ZS and LoRA; alias cpu): UAUC_item_mean_prior, UAUC_popularity and
 % UAUC_mf_personal_residual (temporal biased MF minus b_u minus b_i, warm pairs); the MF personal-residual value also drives the
 % registered wording rule of RQ4. Registered outputs that stay in the released files: UAUC of the no-history logit, split-half r_c (raw), rho,
-% G/G_CF, within-user s.d. of the star-permutation difference, popularity link of l, Bias Index of the rated panels.
+% G/G_CF, within-user s.d. of the star-permutation difference, Bias Index of the rated panels.
 \resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccccccc@{}}
 \toprule
@@ -359,11 +352,12 @@ UAUC of $\hat\pi$ alone & \DATANEEDED{grid:uauc\_pi} & \DATANEEDED{grid:uauc\_pi
 UAUC of $\hat e$ & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence} & \DATANEEDED{grid:uauc\_evidence}\\
 Reliability $r_8$ of $\hat\pi$ & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c}\\
 Non-prior share $1-\rho^2/r_8$ & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share}\\
-$G=\Delta$UAUC$(M_2-M_1)$ & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
-$G_{\rm CF}=\Delta$UAUC$(M_3-M_0)$ & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF}\\
+$\mathcal G=\Delta$UAUC(M2$-$M1) & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
+$\mathcal G_{\rm CF}=\Delta$UAUC(M3$-$M0) & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF} & \DATANEEDED{grid:G\_CF}\\
 Star permutation $\Delta$UAUC & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC}\\
 Popularity link of $\hat\pi$ (partial $\rho$) & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
-P1: $G_{\rm FT}-G_{\rm ZS}$ (ML-1M) & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--}\\
+Popularity link of $\ell$ (partial $\rho$) & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop}\\
+P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ (ML-1M) & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--}\\
 Users in $S_d$ ($n$) & \multicolumn{2}{c}{\DATANEEDED{grid:n\_sd}} & \multicolumn{2}{c}{\DATANEEDED{grid:n\_sd}} & \multicolumn{2}{c}{\DATANEEDED{grid:n\_sd}} & \multicolumn{2}{c}{\DATANEEDED{grid:n\_sd}}\\
 \midrule
 UAUC, prior-only item mean (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
@@ -375,24 +369,19 @@ UAUC, MF personal residual (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{RQ5 (S5): are popular items endorsed more confidently?}\label{sec:exp-rq5}
-\emph{Endpoint.} Two axes, as in proximity-informed calibration~\citep{xiong2023procal}. Next-item panels: the confidence \emph{level}
-(head minus tail in mean list-normalised $p$ among top-10 candidates) and the matched-confidence calibration \emph{gap} (Bias Index: head
-minus tail accuracy at matched confidence), Table~\ref{tab:popularity}A; the second backbone on the same events is in
-Table~\ref{tab:app-z2}. Rated panels: the partial Spearman correlation of $\hat\pi$ with log popularity given the prior-only item mean
-(Table~\ref{tab:decomp}). Pseudonym knockout (Qwen3-8B zero-shot and LoRA on Toys and Video Games; Llama-3.1-8B-Instruct on Toys; Sports
-unless cut), a test-time intervention on fixed models: the head-minus-tail drop in $\ell$ when brand names are replaced by consistent
-pseudonyms, against a real-brand swap of matched popularity (Table~\ref{tab:popularity}B, Appendix~\ref{app:pseudonym}). The label of each
-model is the registered decision rule applied verbatim: NULL iff $\Delta$UAUC (real $-$ pseudonym) exceeds 0.02 overall and in the tail;
-POSITIVE iff the head-minus-tail drop is at least 0.20 with its interval above 0, the placebo's drop is at most 0.05 in absolute value and
-the tail $\Delta$UAUC is at most 0.01 in absolute value; NEGATIVE iff the slope's interval contains 0 and the pseudonym and placebo drops
-differ by at most 0.05; otherwise INDETERMINATE (INCOMPLETE if an input is missing). Labels carry no $p$-value and no Holm family.
-``Familiarity'' may be written only if Qwen is POSITIVE on both domains, zero-shot and in all three LoRA seeds, and Llama on Toys has the
-same sign of the drop; otherwise ``popularity-linked confidence''.
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ5). Next-item panels: the confidence level and the matched-confidence gap (Table~\ref{tab:popularity}A;
+second backbone: Table~\ref{tab:app-z2}). Rated panels: the quality-partialled link of $\hat\pi$ with log popularity
+(Table~\ref{tab:decomp}). The pseudonym knockout (Section~\ref{sec:tools}, Appendix~\ref{app:pseudonym}) is a test-time intervention on
+fixed models: Qwen3-8B zero-shot and every LoRA seed on Toys, Video Games and (unless cut) Sports, Llama-3.1-8B-Instruct on Toys
+(Table~\ref{tab:popularity}B). Each model's label is the registered decision function (INDETERMINATE for an ambiguous and INCOMPLETE for a
+missing input), without $p$-value or Holm family; ``familiarity'' may be written only under the condition of Table~\ref{tab:rq}, otherwise
+``popularity-linked confidence''.
 \emph{Reading template.} Level and gap point in \DATANEEDED{the same / opposite / unrelated} directions
 (\DATANEEDED{aud:E.head\_minus\_tail\_mean\_p}, \DATANEEDED{aud:E.bias\_index.head\_minus\_tail}); the quality-partialled popularity link of
-$\hat\pi$ is \DATANEEDED{above / indistinguishable from / below} 0 (\DATANEEDED{grid:partial\_rho\_pi\_logpop}); the knockout labels are
-\DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} (drop \DATANEEDED{ko:head\_minus\_tail.delta}, placebo \DATANEEDED{ko:placebo.delta}),
-so the confidence is \DATANEEDED{branch: familiarity-linked / popularity-linked}.
+$\hat\pi$ is \DATANEEDED{above / indistinguishable from / below} 0 (\DATANEEDED{grid:partial\_rho\_pi\_logpop}); the Qwen3-8B knockout is
+labelled \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} (drop \DATANEEDED{ko:head\_minus\_tail.delta}, placebo
+\DATANEEDED{ko:placebo.delta}), Llama on Toys \DATANEEDED{ko:label, drop with the same / the opposite sign}, Sports \DATANEEDED{ko:label or not
+run}, so the confidence is \DATANEEDED{branch: familiarity-linked / popularity-linked}.
 
 \begin{table}[tp]
 \caption{Popularity axes (RQ5). A: next-item, Qwen3-8B zero-shot, top-10 candidates: head minus tail mean $p$, Bias Index at matched
@@ -406,9 +395,9 @@ on store-in-title candidates, zero-shot and LoRA (seed mean; labels of seeds 0 /
 % Delta real-pseudo on treated rows, top vs bottom popularity quintile; placebo.delta = the same for real minus placebo; tail_dUAUC = UAUC
 % change on tail candidates (pseudo); overall_dUAUC = UAUC change over all candidates (pseudo); label = pilot_pseudonym.decide() verbatim
 % (POSITIVE / NEGATIVE / NULL; AMBIGUOUS is written INDETERMINATE, UNDETERMINED is written INCOMPLETE). COLUMNS: Toys ZS, Toys LoRA,
-% Games ZS, Games LoRA. Per-seed values, Llama (Toys) and Sports: tab:app-ko. The whole of block B exists only after a recorded
-% GATE_FT_PASS (Amendment 3 section 0: the knockout, zero-shot arm included, is section 5); on GATE_FT_FAIL delete block B and the
-% knockout sentences of RQ5.
+% Games ZS, Games LoRA. Llama (Toys) and Sports are read in the RQ5 reading template (slot ko). The whole of block B exists only after a
+% recorded GATE_FT_PASS (Amendment 3 section 0: the knockout, zero-shot arm included, is section 5); on GATE_FT_FAIL delete block B and
+% the knockout sentences of RQ5.
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -435,14 +424,10 @@ Registered label (per seed) & \DATANEEDED{ko:label} & \DATANEEDED{ko:label} & \D
 % BRANCH-GATEFT-BEGIN (RQ6 and tab:pruning; on GATE_FT_FAIL or INCOMPLETE replace both by one sentence: S6 was not run, because the
 % fine-tuned program is registered to run only after a Gate-FT pass)
 \subsection{RQ6 (S6): can uncertainty prune noisy training data?}\label{sec:exp-rq6}
-\emph{Endpoint.} ML-1M, Qwen3-8B LoRA, seeds 0--4 per arm, 25\% of the training examples of each label class removed: P1 uniformly at
-random; P2 the largest uncertainty $u=-|\ell_{\rm ZS}-\tau|$, the distance of the zero-shot logit from the boundary $\tau$ at which the
-predicted-Yes share equals the training label rate; P3 the largest prior congruence $(2y-1)(\hat q-\overline{\hat q})$; P0 nothing
-(Section~\ref{sec:method}). The single confirmatory test is the seed-averaged TEST-UAUC contrast P2 $-$ P1 with its user-bootstrap
-interval and $p$-value: P2 beats random iff the lower bound exceeds 0, the mean exceeds twice the s.d.\ of the five paired seed
-differences and all five are positive; it is worse under the mirrored condition, about equal iff the interval lies within $\pm0.01$,
-and otherwise inconclusive. P3 $-$ P1, P1 $-$ P0 and P2 $-$ P0 are descriptive (Table~\ref{tab:pruning}). The signal and the removal rule
-are fixed; a gain is scoped to this signal, domain and backbone.
+\emph{Endpoint} (Table~\ref{tab:rq}, RQ6; arms and signals: Section~\ref{sec:tools}). The single confirmatory contrast is the seed-averaged
+TEST-UAUC difference P2 $-$ P1 of five seeds (Table~\ref{tab:pruning}); P3 $-$ P1, P1 $-$ P0 and P2 $-$ P0 are descriptive. P2 is worse than
+random under the mirrored condition, about equal if the interval lies within $\pm0.01$, and inconclusive otherwise; a gain is scoped to
+this signal, domain and backbone.
 \emph{Reading template.} The contrast P2 $-$ P1 is \DATANEEDED{prn:d\_vs\_P1} (interval \DATANEEDED{prn:ci\_P2\_minus\_P1}, $p$
 \DATANEEDED{prn:p\_P2\_minus\_P1}) with \DATANEEDED{prn:n\_pos\_of\_5} of 5 paired differences positive, so pruning the zero-shot model's most
 uncertain examples is \DATANEEDED{better than / worse than / about equal to / inconclusive against} random pruning for this signal,
@@ -475,29 +460,23 @@ Item mean, popularity, MF (ref.) & \multicolumn{4}{c}{\DATANEEDED{cpu:UAUC\_item
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{Which corrections can change a ranking?}\label{sec:exp-corr}
-\emph{Endpoint.} Strictly increasing per-user maps cannot change per-user AUC or within-event NDCG (Lemma~\ref{lem:invariance}); we verify
-this on stored scores and test the item-dependent routes of Proposition~\ref{prop:itemdep} against equal-compute controls
-(Table~\ref{tab:corrections}, Appendix~\ref{app:tables}): the no-history and swap priors against the raw score on $S_d$ and, only after the zero-shot gate is passed,
-the two-view contrast \method{} against the registered paraphrase placebo and a correlation-matched ensemble null (within-user $z$-sum of
-like and $-$dislike). The next-item no-loss check uses the first 1,000 sports validation events (no NDCG@10 loss above 0.005).
-\emph{Reading template.} Per-user maps change per-user AUC by at most \DATANEEDED{grid:max\_abs\_dAUC\_user}; each item-dependent
+\emph{Endpoint} (Section~\ref{sec:tools}). Per-user maps verify Lemma~\ref{lem:invariance} on stored scores; the no-history and swap priors
+(Proposition~\ref{prop:itemdep}) are tested against the raw score on $S_d$ and, only after GATE\_PASS, \method{} against the paraphrase
+placebo and the correlation-matched ensemble null, with the next-item no-loss check (NDCG@10 loss at most 0.005) on the first 1,000 Sports
+VALID events (Table~\ref{tab:corrections}, Appendix~\ref{app:tables}).
+\emph{Reading template.} Per-user maps change per-user AUC by at most \DATANEEDED{corr:max\_abs\_dAUC\_user}; each item-dependent
 correction is \DATANEEDED{above / indistinguishable from / below} its control in UAUC (\DATANEEDED{mir:dUAUC\_mirror\_minus\_placebo},
 \DATANEEDED{mir:dUAUC\_mirror\_minus\_ensemble\_null}) and moves next-item NDCG@10 by \DATANEEDED{mir:dNDCG10\_mirror\_minus\_raw}.
 
 
 % METHOD-SLOT-BEGIN (findings)
 \subsection{Optional method: prior-offset LoRA}\label{sec:exp-slot}
-\emph{Endpoint.} Four rated datasets in the order ML-1M, Toys, Video Games, Sports, seeds 0--2, Qwen3-8B, TEST UAUC of SFT with $b=0$ (the
-adapters of the main grid), of post-hoc stacking (the SFT logit stacked with the standardised prior-only item mean $z(\hat q)$ by a
-logistic regression fitted on CAL) and of prior-offset LoRA, whose Yes logit is shifted by $b\,z(\hat q)$ during training (learnable
-scalar $b$, no gradient into $\hat q$, full-vocabulary loss; Table~\ref{tab:slot}, Appendix~\ref{app:tables}). The endpoint is
-$\Delta$UAUC (prior-offset $-$ stacking) of seed-averaged scores; a dataset passes if the gain is at least $+0.01$, its interval excludes 0
-and the $2\sigma_{\rm seed}$ rule holds. The method is retired as soon as it fails on two datasets and survives only with passes on at
-least three of four (hard kill date 2026-11-30); it is single-backbone.
+\emph{Endpoint} (Section~\ref{sec:slot}). $\Delta$UAUC (prior-offset $-$ post-hoc stacking) of seed-averaged TEST scores on ML-1M, Toys, Video
+Games and Sports, in this order (Table~\ref{tab:slot}, Appendix~\ref{app:tables}); a dataset passes at a gain of at least $+0.01$ with its
+interval excluding 0 and the $2\sigma_{\rm seed}$ rule, and the method is retired as soon as it fails on two datasets (kill date 2026-11-30).
 \emph{Reading template.} Prior-offset LoRA is \DATANEEDED{above / indistinguishable from / below} post-hoc stacking on \DATANEEDED{k of 4}
 datasets (gain \DATANEEDED{slot:d\_offset\_minus\_stack}), so the method is \DATANEEDED{branch: retained / retired and reported in the
 appendix}.
-
 % METHOD-SLOT-END (findings)
 
 % ---------------------------------------------------------------------------------------------------------------------
@@ -522,8 +501,8 @@ Seed question & Registered endpoint (table) & Answer & Actionable via (control) 
 \midrule
 S1 Is the model sure when it is right? & $\mathrm{acc}_{\rm high}$ vs.\ $\mathrm{acc}_{\rm low}$, AUROC($p_{\max}$), correct decisions in the bottom margin tertile (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{cross-user serving vs.\ random signal (Table~\ref{tab:serving}A)} & \DATANEEDED{admitted: yes / no}\\
 S2 When it is wrong, was it unsure? & error share in the high tertile, margin AUROC / AURC (Tables~\ref{tab:anatomy}, \ref{tab:reliability}) & \DATANEEDED{one clause from Tables~\ref{tab:anatomy}, \ref{tab:reliability}} & \DATANEEDED{selective serving (Table~\ref{tab:serving}A); not per-user maps (Lemma~\ref{lem:invariance}; Table~\ref{tab:corrections}, rows 1--2)} & \DATANEEDED{admitted: yes / no}\\
-S3 Does serving confident items concentrate exposure on head items? (static) & $\Delta_{\rm head}$, Gini, niche served share, second backbone (Tables~\ref{tab:exposure}, \ref{tab:serving}B, \ref{tab:app-z2}) & \DATANEEDED{one clause from Tables~\ref{tab:exposure}, \ref{tab:serving}} & \DATANEEDED{exposure-aware serving vs.\ random signal (Table~\ref{tab:serving}B)} & \DATANEEDED{admitted: yes / no}\\
-S4 How does yes/no confidence track the labels, and what is it made of? & UAUC vs.\ references, ECE, non-prior share, $G$ vs.\ $G_{\rm CF}$, star permutation, P1 (Tables~\ref{tab:reliability}, \ref{tab:decomp}) & \DATANEEDED{one clause from Tables~\ref{tab:reliability}, \ref{tab:decomp}} & \DATANEEDED{item-dependent corrections vs.\ controls (Table~\ref{tab:corrections}, rows 3--7)} & \DATANEEDED{admitted: yes / no}\\
+S3 Does serving confident items concentrate exposure on head items? (static) & $\Delta_{\rm head}$, Gini, APLT, niche served share, second backbone (Tables~\ref{tab:exposure}, \ref{tab:serving}B, \ref{tab:app-z2}) & \DATANEEDED{one clause from Tables~\ref{tab:exposure}, \ref{tab:serving}} & \DATANEEDED{exposure-aware serving vs.\ random signal (Table~\ref{tab:serving}B)} & \DATANEEDED{admitted: yes / no}\\
+S4 How does yes/no confidence track the labels, and what is it made of? & UAUC vs.\ references, ECE, non-prior share, $\mathcal G$ vs.\ $\mathcal G_{\rm CF}$, star permutation, P1 (Tables~\ref{tab:reliability}, \ref{tab:decomp}) & \DATANEEDED{one clause from Tables~\ref{tab:reliability}, \ref{tab:decomp}} & \DATANEEDED{item-dependent corrections vs.\ controls (Table~\ref{tab:corrections}, rows 3--7)} & \DATANEEDED{admitted: yes / no}\\
 S5 Are popular items endorsed more confidently, and is that warranted? & level, matched-confidence gap, quality-partialled link, knockout label (Tables~\ref{tab:popularity}, \ref{tab:decomp}) & \DATANEEDED{one clause from Tables~\ref{tab:popularity}, \ref{tab:decomp}} & \DATANEEDED{knockout vs.\ real-brand placebo (Table~\ref{tab:popularity}B)} & \DATANEEDED{admitted: yes / no}\\
 S6 Can uncertainty prune noisy training data? & $\Delta$UAUC P2 $-$ P1 over 5 seeds (Table~\ref{tab:pruning}) & \DATANEEDED{one clause from Table~\ref{tab:pruning}} & \DATANEEDED{training-time only; control: random pruning P1 (Table~\ref{tab:pruning})} & \DATANEEDED{admitted: yes / no}\\
 \bottomrule

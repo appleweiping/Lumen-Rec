@@ -45,6 +45,16 @@ fully scored on the server (100/100 chunks) but has not been analysed.
 The registered endpoints are the entries of `Q_ENDPOINTS` in the module at this sha1. The 35 MB of exposure exports are accepted and
 committed (the baselines' ranking files exist only on the workstation; the server reads them through git).
 
+**Addendum (same day, after the first real run on sports).** The registered niche-minus-mainstream served-share difference came
+back undefined: the popularity profile of the sports users is heavily tied (about half of them have every mapped history item in
+the head group), `rank_bins` leaves the top quintile empty, and the bin-0 vs bin-4 difference has no estimate. The module now
+compares the lowest with the highest non-empty quintile (`niche_bin`, `mainstream_bin` are reported). Made after that one field was
+seen to be empty, before any niche value (served share, utility among served) had been looked at; nothing else changed
+(33 tests). New hashes: `nextitem_audit.py` 8e3fa3d0f28acd4ca2843631422fe9150f03da6f, `NEXTITEM_AUDIT_SPEC.md`
+79911b40bb1812c1bcd0a5a1ebf00761550c44fa (exporter and exposure manifest unchanged). The sports run is repeated with this version.
+What was seen before the fix, for the record: the sports ranking, exposure, calibration, error-anatomy and selective-serving
+sections of the first run (they are unaffected by the change).
+
 ## 2026-10-04 · Infrastructure smoke test of the Gate-FT path (Amendment 2 carve-out O)
 
 Synthetic panel only (`scripts/sigir/synth_smoke_panel.py`, invented titles and random labels); no real user, item or rating

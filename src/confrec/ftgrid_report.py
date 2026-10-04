@@ -219,7 +219,9 @@ def boot_p(draws) -> float:
 def mean_draws(V, n_boot: int, seed: int) -> np.ndarray:
     """(n_boot, k) column means of V (n_units x k, units in sorted key order) over unit resamples: one
     rng.integers(0, n, n) per resample, i.e. stats.paired_bootstrap's draws for every column at once."""
-    V = np.asarray(V, float).reshape(len(V), -1)
+    V = np.asarray(V, float)
+    if V.ndim == 1:
+        V = V[:, None]
     out = np.full((n_boot, V.shape[1]), NAN)
     n = len(V)
     if n:
@@ -248,6 +250,8 @@ class Clusters:
         return self.order[np.repeat(self.starts[pick], ln) + np.arange(int(ln.sum())) - off]
 
     def draws(self, n_boot: int, seed: int):
+        if not self.n:
+            return
         rng = np.random.default_rng(seed)
         for _ in range(n_boot):
             yield self.rows(rng.integers(0, self.n, self.n))
@@ -255,6 +259,8 @@ class Clusters:
 
 def unit_draws(n_units: int, n_boot: int, seed: int):
     """forensics.unit_bootstrap's draws (items)."""
+    if not n_units:
+        return
     rng = np.random.default_rng(seed)
     for _ in range(n_boot):
         yield rng.integers(0, n_units, n_units)
@@ -436,8 +442,10 @@ def load_run(run_dir: Path, tag: str, panel_sha1: str | None, model: str, varian
              "match": None if sha is None or panel_sha1 is None else sha == panel_sha1}
     backbone = rep.get("backbone") or (Path(str(rep["model"])).name if rep.get("model") else None)
     key = run_dir / "run.key"
+    lora = rep.get("lora")
     out.update(integrity=integ, panel_identity=ident, backbone=backbone, variant=rep.get("variant"),
-               adapter=bool(rep.get("lora")), hist_len=rep.get("hist_len"), swap_k=rep.get("swap_k"),
+               adapter=bool(lora), adapter_id=hashlib.sha1(str(lora).encode("utf-8")).hexdigest()[:12] if lora else None,
+               hist_len=rep.get("hist_len"), swap_k=rep.get("swap_k"),
                run_key_sha1=fx.file_sha1(key) if key.is_file() else None,
                scores_censoring=sc["censoring"])
     if not integ["E1"]:
@@ -611,8 +619,9 @@ def topk_anatomy(L, y, users, rows) -> tuple[np.ndarray, np.ndarray, np.ndarray]
     user's likes there, c_u = midpoint of the k-th and (k+1)-th largest L, decision = 1[L >= c_u]."""
     margin, correct, cu = np.full(len(L), NAN), np.full(len(L), NAN), np.full(len(L), NAN)
     ok = np.asarray(rows, bool) & np.isfinite(L)
+    okidx = np.flatnonzero(ok)
     for idx in fx._groups(np.asarray(users)[ok]).values():
-        j = np.flatnonzero(ok)[idx]
+        j = okidx[idx]
         k = int(y[j].sum())
         if k == 0 or k == len(j):
             continue
@@ -684,8 +693,7 @@ def ec_block(cx, L: dict, n_boot: int, seed: int, n_reg: int) -> dict:
         per[m]["reliability_equal_width"] = [
             {"lo": lo, "hi": hi, "n": n, "mean_p": mp, "frac_like": fy}
             for lo, hi, n, mp, fy in (reliability_bins(p_test, cx.y[tr], ECE_BINS) if np.isfinite(p_test).all() else [])]
-    mean = {k: rec(np.nanmean(est[:, i]) if np.isfinite(est[:, i]).any() else NAN, np.nanmean(draws[:, :, i], 1)
-                   if n_boot else None, *nn(k)) for i, k in enumerate(EC_KEYS)} if len(models) else {}
+    mean = {k: rec(est[:, i].mean(), draws[:, :, i].mean(1), *nn(k)) for i, k in enumerate(EC_KEYS)}
     return {"rows": {"n_users_test": n_test, "n_pairs_test": n_pairs_test, "n_users_anatomy": n_anat,
                      "n_pairs_anatomy": n_pairs_anat, "n_pairs_cal": int((R & cx.cal).sum())},
             "per_model": per, "mean_over_seeds": mean,
@@ -1018,11 +1026,8 @@ def ee_block(cx, domain, models, L: dict, PI: dict | None, refs, platt: dict, n_
             return res
         out["partial_spearman"] = spec(ctl)
         if sens:
-            out["controls_sensitivity"] = ["q_hat"] + list(sens)
-            s = spec({**ctl, **sens}) if n_boot == 0 else None
-            if s is None:
-                s = spec_point(cx, models, L, PI, q, {**ctl, **sens}, R)
-            out["partial_spearman_sensitivity_point_estimates"] = s
+            out["controls_sensitivity"] = ["q_hat"] + list(ctl) + list(sens)
+            out["partial_spearman_sensitivity_point_estimates"] = spec_point(cx, models, L, PI, q, {**ctl, **sens}, R)
     out["bias_index"] = bias_index_block(cx, models, L, platt, R, n_boot, seed)
     out["tail_UAUC_exploratory"] = uauc_models(L, cx.y, cx.uc, R & cx.tail, n_boot, seed, n_registered=n_reg)
     return out
@@ -1099,7 +1104,8 @@ def p1_block(cx, L: dict, PI: dict, refs, present: set, role: str, n_boot: int, 
                   G_FT=float(G[s].mean()) if nu else NAN) for j, s in enumerate(need[1:])}
     mean = rec(V.mean(1).mean() if nu else NAN, D.mean(1), nu, npairs, contrast=True)
     out.update(available=True, rows={"n_pairs": npairs, "n_users": nu}, G_ZS=float(G["zeroshot"].mean()) if nu else NAN,
-               per_seed=per, mean_over_seeds=mean, decision=p1_decision([per[s]["est"] for s in need[1:]], mean))
+               per_seed=per, mean_over_seeds=mean, decision=p1_decision([per[s]["est"] for s in need[1:]], mean),
+               mean_sign=None if not math.isfinite(mean["est"]) else int(np.sign(mean["est"])))
     return out
 
 
@@ -1196,11 +1202,9 @@ def build(a) -> dict:
     sd_path = panels / ((split.get("sd") or {}).get("user_ids_path") or "sd_users.txt")
     sd_test_path = panels / ARM_PANEL["swap"]
     if sd_path.is_file():
-        txt = sd_path.read_text(encoding="utf-8")
-        sd_ids = [x for x in txt.split("\n") if x]
+        sd_ids = [x for x in sd_path.read_bytes().decode("utf-8").split("\n") if x]
         checks["sd_user_ids_sha1_match"] = (None if not (split.get("sd") or {}).get("user_ids_sha1")
-                                            else hashlib.sha1(txt.encode("utf-8")).hexdigest()
-                                            == split["sd"]["user_ids_sha1"])
+                                            else fx.file_sha1(sd_path) == split["sd"]["user_ids_sha1"])
     elif sd_test_path.is_file():
         sd_ids = [str(r["user_id"]) for r in fx.read_jsonl(sd_test_path)]
         checks["sd_user_ids_source"] = "eval_sd_test.jsonl (sd_users.txt absent)"
@@ -1221,8 +1225,10 @@ def build(a) -> dict:
         checks["eval_sd_test_pairs_equal_sd_test_rows"] = sdp == mine
         if sdp != mine:
             problems.append("eval_sd_test.jsonl pairs differ from S_d's TEST rows of eval.jsonl")
-    checks["sd_users_have_both_classes_in_test"] = bool(all(
-        0 < cx.y[cx.sd_test & (cx.users == u)].sum() < (cx.sd_test & (cx.users == u)).sum() for u in sd_ids[:50]))
+    both = set(user_aucs(np.zeros(cx.n), cx.y, cx.users, cx.test))
+    checks["sd_users_are_eval_users_with_both_classes_in_test"] = all(u in both for u in sd_ids)
+    if not checks["sd_users_are_eval_users_with_both_classes_in_test"]:
+        problems.append("an S_d user is not an EVAL user with both classes among the TEST rows")
 
     # ---- runs
     sdir = Path(a.scores_root) / a.domain
@@ -1242,7 +1248,16 @@ def build(a) -> dict:
                         if r["status"] == "OK" and r.get("backbone")})
     if len(backbones) > 1:
         problems.append(f"runs of several backbones in one report: {backbones}")
-    loras_ok = [m for m in models if runs[m]["like"]["status"] == "OK"]
+    adapter_of = {}
+    for m in models:
+        ids = {r.get("adapter_id") for r in runs[m].values() if r["status"] == "OK"}
+        if len(ids) > 1:
+            problems.append(f"{m}: its arms were scored with different adapters (report.json lora)")
+        adapter_of[m] = sorted(i for i in ids if i)
+    shared = Counter(i for v in adapter_of.values() for i in v)
+    if any(c > 1 for c in shared.values()):
+        problems.append("two models were scored with the same adapter (report.json lora)")
+    checks["adapters_distinct_across_models"] = not any(c > 1 for c in shared.values())
 
     # ---- per-model vectors
     L, PI, PA, PB, NH, LP, joins = {}, {}, {}, {}, {}, {}, defaultdict(dict)
@@ -1343,22 +1358,25 @@ def build(a) -> dict:
             ed.update(_na("no S_d"))
         else:
             ed["swap_models"] = msw
+            D = cx.sd_test.copy()     # identical rows for pi, e-hat, L (and L_nohist): L and pi finite for every model
+            for m in msw or ms:
+                D &= np.isfinite(L[m]) & (np.isfinite(PI[m]) if msw else True)
             if msw:
                 Q = {"pi": PI, "e_hat": {m: L[m] - PI[m] for m in msw}, "L": L}
-                ed["UAUC"] = {k: uauc_models({m: Q[k][m] for m in msw}, cx.y, cx.uc, cx.sd_test, *boot,
-                                             n_registered=nreg) for k in ("pi", "e_hat", "L")}
-                ed["shares"] = shares_block(cx.uc, cx.sd_test, {m: (PA[m], PB[m], L[m], PI[m]) for m in msw}, *boot, nreg)
+                ed["UAUC"] = {k: uauc_models({m: Q[k][m] for m in msw}, cx.y, cx.uc, D, *boot, n_registered=nreg)
+                              for k in ("pi", "e_hat", "L")}
+                ed["shares"] = shares_block(cx.uc, D, {m: (PA[m], PB[m], L[m], PI[m]) for m in msw}, *boot, nreg)
                 ed["information_gain"] = (stacker_block(cx, msw, L, PI, refs["arrays"]["q_hat"],
-                                                        refs["arrays"]["mf_residual"], cx.sd_test, *boot, nreg)
+                                                        refs["arrays"]["mf_residual"], D, *boot, nreg)
                                           if refs is not None else _na("no q-hat / MF residual (needs --raw or --refs)"))
                 ed["swap_arm_like_consistency"] = {m: consistency.get(m) for m in msw}
             else:
                 for k in ("shares", "information_gain"):
                     ed[k] = _na("no usable swap arm for the regime's models")
-                ed["UAUC"] = {"L": uauc_models(Lr, cx.y, cx.uc, cx.sd_test, *boot, n_registered=nreg),
+                ed["UAUC"] = {"L": uauc_models(Lr, cx.y, cx.uc, D, *boot, n_registered=nreg),
                               "pi": _na("no usable swap arm"), "e_hat": _na("no usable swap arm")}
             mnh = [m for m in ms if m in NH]
-            ed["UAUC"]["L_nohist"] = (uauc_models({m: NH[m] for m in mnh}, cx.y, cx.uc, cx.sd_test, *boot,
+            ed["UAUC"]["L_nohist"] = (uauc_models({m: NH[m] for m in mnh}, cx.y, cx.uc, D, *boot,
                                                   n_registered=nreg) if mnh else _na("no usable nohist arm"))
             mlp = [m for m in ms if m in LP]
             ed["star_permutation"] = (starperm_block(cx, mlp, L, LP, cx.sd_test, *boot, nreg) if mlp
@@ -1423,7 +1441,6 @@ def build(a) -> dict:
            "excluded_runs": excluded, "runs": run_meta, "joins": {m: dict(v) for m, v in joins.items()},
            "references": {**refs_info, **({"cf_block": refs["cf_block"]} if refs is not None else {})},
            "operationalizations": list(OPERATIONALIZATIONS), **res}
-    out["adapters_distinct"] = len(loras_ok) == len(set(loras_ok))
     return out
 
 

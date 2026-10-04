@@ -101,6 +101,11 @@ On the TOP-10 candidates of each event (the served set) with the list-normalised
   evaluated for the LLM (`next`, `like`) and for every reference method.
 - **Unscored candidates** (censored 2/3 or non-finite logit) rank below all scored ones, an unscored positive ranks last, they
   get probability 0 in the list softmax; an event with no scored candidate stays in A and UAUC and is excluded from B-E (counted).
+- **Addendum 2026-10-04 (niche bins).** The first real run (sports) returned the registered niche-minus-mainstream difference as
+  undefined, because about half of the sports users have every mapped history item in the head group, so the popularity profile
+  is heavily tied and `rank_bins` leaves the top quintile empty. Niche is now the lowest and mainstream the highest NON-EMPTY
+  quintile (reported as `niche_bin`, `mainstream_bin`). The change was made after that field came back empty and before any niche
+  value (served share, utility among served) had been looked at; nothing else changed.
 - **Freeze.** Before the first run of `nextitem_audit run` on real LLM scores, PILOT_LOG records the sha1 of `nextitem_audit.py`,
   of this file, of `scripts/sigir/export_ref_exposure.py` and the manifest hash of `docs/sigir/ref_exposure` (the sha1 of the lines
   `<relative path> <sha1>` over its files in sorted order). Before this record the only audit output read was the scorer's own

@@ -668,6 +668,23 @@ def test_sec_d_niche_profile_quintiles_and_exclusion(tmp_path):
     assert 0.35 * 475 < served < 0.65 * 475
 
 
+def test_sec_d_niche_difference_uses_the_extreme_non_empty_quintiles_under_heavy_ties(tmp_path):
+    """Real sports profiles are tied at the top (about half of the users have every mapped history item in the head group):
+    rank_bins then leaves the top quintile empty and the registered bin-0 vs bin-4 difference would be undefined."""
+    L, grp, pos, _ = synth_confident(500, 21, 5)
+    panel, qv = qctx(tmp_path, L, grp, pos)
+    rng = np.random.default_rng(3)
+    profile = np.where(rng.random(500) < 0.55, 2.0, rng.integers(0, 8, 500) / 4.0)       # 55% of the users tied at the top
+    d = run_sections(qv, profile=profile, n_boot=40)["D"]
+    assert d["quintile_sizes"][4] == 0 and sum(d["quintile_sizes"]) == 500              # the top quintile is empty
+    ps = d["signals"]["p_max"]["niche"]
+    lo, hi = ps["niche_bin"], ps["mainstream_bin"]
+    assert lo == 0 and hi == max(j for j, s in enumerate(d["quintile_sizes"]) if s > 0) < 4
+    diff = ps["niche_minus_mainstream_served_share"]
+    assert diff["est"] is not None and diff["n"] == d["quintile_sizes"][lo] + d["quintile_sizes"][hi]
+    assert diff["est"] == pytest.approx(ps["served_share"][lo]["est"] - ps["served_share"][hi]["est"])
+
+
 # ====================================================================================== E: popularity and S5
 def _fake_e_qv(E=700, K=10, seed=0, shift=(-0.12, 0.0, 0.12), p_by_group=(0.0, 0.0, 0.0)):
     rng = np.random.default_rng(seed)

@@ -1244,9 +1244,15 @@ def sec_D(batch: LinearBatch, boot: EventBoot, qv: dict, m: np.ndarray, profile:
             sh_est = est["served"][0] / est["size"][0]
             sh_reps = reps["served"] / reps["size"]
         blk["niche"]["served_share"] = [ci_dict(sh_est[j], sh_reps[:, j], int(est["size"][0, j])) for j in range(N_QUINT)]
+        # niche = the lowest and mainstream = the highest NON-EMPTY quintile: with heavy ties in the profile (about half of
+        # the sports users have every mapped history item in the head group) rank_bins leaves the top quintile empty, and the
+        # difference of bin 0 and bin 4 is undefined (addendum 2026-10-04, made after that output was None, before any value)
+        filled = [j for j in range(N_QUINT) if est["size"][0, j] > 0]
+        lo_bin, hi_bin = (filled[0], filled[-1]) if filled else (0, N_QUINT - 1)
+        blk["niche"]["niche_bin"], blk["niche"]["mainstream_bin"] = lo_bin, hi_bin
         blk["niche"]["niche_minus_mainstream_served_share"] = ci_dict(
-            sh_est[0] - sh_est[N_QUINT - 1], sh_reps[:, 0] - sh_reps[:, N_QUINT - 1],
-            int(est["size"][0, 0] + est["size"][0, N_QUINT - 1]), null=0.0)
+            sh_est[lo_bin] - sh_est[hi_bin], sh_reps[:, lo_bin] - sh_reps[:, hi_bin],
+            int(est["size"][0, lo_bin] + est["size"][0, hi_bin]), null=0.0)
         out["signals"][sg] = blk
     return out
 

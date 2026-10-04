@@ -1,5 +1,44 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Wording rules record (Amendment 3 addendum 6 section 9.3; recorded before any further result file was pulled)
+
+`scripts/sigir/fill_paper.py` sha1 = b2702b7f69b8cfcb72668d860b9a821a9b32e1e9 and `docs/sigir/PAPER_DATA_MAP.md` sha1 = 01a72d00c197fea350788d13d3529436dd6a3ecb.
+The decision functions of the fill script (direction words only from registered tests and Holm families; mixed outcomes stay red slots; "not
+run" only for a registered cut) are the paper's wording rules from now on. The script fills 241 of 774 slots from the committed result files
+(selection, gate, Gate-FT, the Sports next-item audit analysis, the ML-1M grid report and the split files); nothing from the Toys, Video_Games,
+Sports, Llama, Z2, S6 or slot runs has been pulled. Extensions that only add specs for result files not yet pulled get a new line here before
+those files are pulled; a change to an existing decision function after results have been read needs a dated addendum.
+
+## 2026-10-04 · Amendment 3 addendum 6 (reviewer-driven additions; recorded before any non-ML-1M outcome of its items was read)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_6.md` sha1 = 868f87b6819fddd03717f44a9baac63ea4db4cf3. Recorded 2026-10-05 about 04:40 server time
+(2026-10-04 about 20:40 UTC). At that time the Toys fine-tuned job (`32_ft_toys`, queue) was in stage 4 (decomposition arms; the like passes of the
+zero-shot model and of s0-s2 were finished) and no Toys, Video_Games or Sports report, no knockout arm, no FT-C adapter and no Llama, S6, Z2 or
+method-slot result existed; the files of the running job were not opened. The addendum adds: two corrections (the non-prior share is withdrawn as
+"an upper bound on the personal share"; direction words follow registered tests only), E-W (a within-user stacker estimator with repeated
+cross-fitting, as sensitivity for E-D), E-F (complementarity to collaborative filtering, family E-F), E-G (item share of MF and of the labels, the
+e-share), E-H (sparse/unseen strata, family E-H), E-J (the LLM against the item mean, the information-matched item mean and MF, family E-J), E-C'
+(a deployable top-k decision), the FT-C reading rule and Toys FT-C (new script, no bound file changes), the admission and wording rules, and the
+code to be recorded. Read before writing: Gate-FT, the ML-1M grid report, the gate-fix selection and confirmation, the Sports audit analysis, two
+same-family reviewer reports on the draft, and one exploratory ML-1M recomputation with user-centred stacker features (scratch code on the server,
+CPU, not a registered script): G(zero-shot) = +0.0001 [-0.0030, +0.0036], G(LoRA s0, s1, s2) = +0.0067, +0.0102, +0.0108 (mean +0.0092
+[+0.0024, +0.0182]), G_CF = +0.0378 [+0.0253, +0.0498], against the registered pooled-stacker values -0.0018, +0.0096 and +0.0362: the
+estimator choice moves G(zero-shot) by about +0.002 and leaves the fine-tuned mean and the sign of the regime contrast unchanged. ML-1M
+values of the addendum's items are therefore exploratory. Code validation recorded here as well: the four server-only tiny-model tests of the
+method slot (`tests/test_confrec_ftmethod.py -k tiny`, CPU, lumen env, commit 82ffbc9) passed (4 passed), and `ftgrid_freeze --check --stage
+amendment` and `--stage core` passed on the server at that commit.
+
+## 2026-10-04 · Amendment 1 (retroactive record; its sha1 was not entered in this log when it was written)
+
+`idea-stage/PREREG_AMENDMENT_1.md` sha1 = fcf1a59b8a5004891c51eb16cfcb98f0b52785ea (git blob 5796c736e5b8735168d20cf52baaf007baf89b72). A methodology
+review found that no line of this log carries the sha1 of Amendment 1. The file is byte-identical in its first commit,
+`189c164855aaf5e0d96cd405878fbd6ad3acf58b` (branch `sigir2027`, authored 2026-10-02T12:27:08-05:00 = 17:27:08 UTC, "pre-GPU review fixes ... PREREG
+amendment 1 ..."), and at the current head. Evidence that it preceded the pilot data: the GPU server's reflog records `pull --ff-only` to `189c164`
+from GitHub at 2026-10-03 01:37:10 +0800 (= 2026-10-02 17:37:10 UTC), so the commit was public by then, and the earliest Pilot-1 output on the
+server (the panel brand-popularity sidecar) was written at 2026-10-03 01:39:25 +0800, the earliest `pilot1_mirror` file at 01:41:22. The statement
+of the draft that every registration hash was recorded before the runs it governs is therefore exact for Amendments 2 and 3 and their addenda;
+for Amendment 1 it rests on the commit and pull times above, not on a line of this log.
+
 ## 2026-10-04 · Amendment 3 addendum 5 (two corrections to addendum 3; recorded before any prior-offset adapter existed)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_5.md` sha1 = 6f3e7b0af8bfa40274825c39f835149a6c28cc49. The scorer (a bound file) does not record the Yes-mass share

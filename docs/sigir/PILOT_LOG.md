@@ -1,5 +1,17 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3: the two Llama-3.1-8B-Instruct split files (record for any Llama job; Amendment 3 section 0)
+
+Built by `MODEL=<Llama-3.1-8B-Instruct> OUT_ROOT=outputs/confrec/ftgrid_llama STAGES=0 bash scripts/sigir/run_ftgrid.sh <d>` under the selected
+prompt V1 (same rows, T and users as the Qwen splits; the length audit uses the Llama tokenizer: p99.5 prompt length 294 tokens on
+ML-1M and 605 on Toys, share above 1,024 = 0, so micro-batch 8 × accumulation 4 and max_len 1,024 apply). ML-1M's T equals Gate-FT's
+(checked). No Llama job has run.
+
+```
+outputs/confrec/ftgrid_llama/panels/ml1m/ftgrid_split.json = c75ef45b134b3427244b839a251b26dbd875ea95
+outputs/confrec/ftgrid_llama/panels/toys/ftgrid_split.json = eda0ff39c0e110836844a1a679190153c53c36e4
+```
+
 ## 2026-10-04 · Amendment 3 FULL RECORD (FREEZE `core`): bound code and the four `ftgrid_split.json` (before any adapter was scored)
 
 Produced by `python -m src.confrec.ftgrid_freeze --print --stage core` on the server repo (commit 85c2ee6; the split files were built

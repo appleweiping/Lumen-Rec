@@ -1,5 +1,65 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 FULL RECORD (FREEZE `core`): bound code and the four `ftgrid_split.json` (before any adapter was scored)
+
+Produced by `python -m src.confrec.ftgrid_freeze --print --stage core` on the server repo (commit 85c2ee6; the split files were built
+the same day by `run_ftgrid.sh` stage 0 under the selected prompt V1: ML-1M and Toys from the gate-fix stage-0 DEV and CONFIRM panels,
+Video_Games and Sports with `build_rated_panels --hist_len 20`). Every listed file is unit-tested. Gate-FT adapter training started at
+20:31 server time under the amendment-stage record; scoring of any adapter and the zero-shot panels of section 4 may start now.
+Split facts (V1; TRAIN = first 1,500 rows, EVAL = next min(3,000, rest) rows; none of the TRAIN prompts exceeds 1,024 tokens, so
+the registered 1,024 / micro-batch 8 × accumulation 4 recipe applies everywhere): ML-1M T = 977099602.0 (equal to Gate-FT's, checked),
+23,348 pre-T training examples, 1,683 EVAL users, 6,466 TEST candidates, 366 TEST users with both classes (204 in the tail), seen
+share 0.966; Toys 15,010 / 3,000 / 7,463 / 943 (331) / 0.111; Video_Games 15,353 / 2,609 / 6,645 / 820 (242) / 0.214; Sports 15,695 /
+3,000 / 7,654 / 997 (226) / 0.136; S_d = all TEST users with both classes in every domain (each below 1,000).
+
+```
+idea-stage/PREREG_AMENDMENT_3.md = 4db1b62f30399c4d2d06fae205cfc0a52db8a419
+idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md = 7d855492a6f6486f964a2601c485b1b89b8d58ee
+src/confrec/ftgrid_data.py = cc8e1c4d07360aa75ce5e62782a4f3a89fb10716
+src/confrec/ftgrid_report.py = 2604709eaefe15496c10aee259de5ad3f6f72479
+src/confrec/ftgrid_freeze.py = e90c9fbddaeb9e1643a285737d3a7757c91518d4
+src/confrec/lora_trainer.py = 4200b42cf1e987acbd477ffe55e248c036519b3e
+src/confrec/train_lora_yesno.py = 0e3e994ff4f879c1ee8c8a0a7bac1f37ae528728
+src/confrec/pyes_scorer.py = a5c45b361170b64794d8ede5721eacec17955ed4
+src/confrec/prompting.py = e7e9bf7f1f998d28b6f65d73fdfde491411000e5
+src/confrec/build_rated_panels.py = 3aa60f1d3541826cbfc3abbff755d06c43486e8a
+src/confrec/gateft_data.py = 226835415ce0fd1c0240693b3227ffa065a70a6e
+src/confrec/gateft_eval.py = 9a33c82498cd9acdbf7f92f40de3f96e42fd4125
+src/confrec/forensics.py = efd1ad03df0d02be04130737f25729cd8ff32e11
+src/confrec/pilot_pseudonym.py = 27737ecb459d74f83333e94c5e1b5f284c6287b2
+src/confrec/pseudonymize.py = 2bcc0ce23f96c998e7c8bb3a98d916c29271f4bb
+src/confrec/diag_battery.py = 01c91a3d251fb6642255b04c1752d098149c7ff7
+src/confrec/metrics.py = 79564e1254b380b02321c164ed919321063bd0c7
+src/confrec/stats.py = 864b2b82cfd212004afe5bab0f74e83f7250adb0
+scripts/sigir/starperm_panel.py = 76da557ad7212cd534fa74c20161566a20fba4a4
+scripts/sigir/run_gateft.sh = de72075f70fb3ce74f2c1b8a7166913f5509b3d8
+scripts/sigir/run_ftgrid.sh = 17a55016269263e06bc93757bb675b277e1f1745
+scripts/sigir/run_llama_nextitem.sh = d1199302795fecc274d8217193198e577c4ade86
+outputs/confrec/ftgrid/panels/ml1m/ftgrid_split.json = e5e97ca6316e97173d72d5f3f1b476e34da3e8b6
+outputs/confrec/ftgrid/panels/toys/ftgrid_split.json = e43416bb960cb86ae6fb1ed7a2ad16f063de5e28
+outputs/confrec/ftgrid/panels/games/ftgrid_split.json = dfd01e9e4012d19a958c154e848c546774d62121
+outputs/confrec/ftgrid/panels/sports/ftgrid_split.json = ad02a5962a63a352f74444eb050b5d5cdd3c3340
+```
+
+## 2026-10-04 · Next-item audit module: Z2 support added (default output byte-identical; Amendment 3 section 4)
+
+`nextitem_audit.py` gained `run --segments {auto,single}`, `--test_role`, `--valid_role`, `--first_event` and a `restrict` subcommand (the
+second-backbone replication on TEST events 1,001–3,000 and a 500-event VALID sample). The frozen module (sha1 8e3fa3d0…) and the new
+one were run on the same synthetic inputs in nine configurations: the JSON bytes (with the `timing_s` line removed) are identical, and
+the test suite pins digests of the frozen output (39 tests). `Q_ENDPOINTS` and every estimator are unchanged. New hashes:
+`src/confrec/nextitem_audit.py` de08087f43acff59292b16292be74c2b071b7c7a, `docs/sigir/NEXTITEM_AUDIT_SPEC.md`
+80730682855417c878e41e8c4c6a107b0e96578c. Not an outcome-driven change: no Z2 score exists yet.
+
+## 2026-10-04 · G6 confirmatory gate result (registered stage 2; `outputs/confrec/gatefix/confirm/gate.json`): **GATE_PASS**
+
+V\* = V1 on the 1,683 fresh ML-1M CONFIRM users (disjoint from the dev users, panel identity checked against the stage-0 manifest):
+**UAUC(V1) = 0.6033, 95% user-bootstrap CI [0.5944, 0.6124]**, against the registered bar 0.60 on the point estimate; E1 holds
+(censored = 2 share 0, no overlength prompt, mean Yes+No mass 0.99999). Context only (never gates): the registered prompt V0 on the
+same users, UAUC 0.5756 [0.5665, 0.5848]. The gate is met on the point estimate by 0.003 and the interval extends below 0.60; both
+statements are reported (the dev estimate 0.6122 carried the expected winner's curse). Consequences (Amendment 2): the zero-shot
+regime under V1 is a valid regime, G7 stage 3 (the registered MIRROR arms: like, dislike, like_para, swap prior, no-history prior on
+CONFIRM ML-1M and the first 1,500 fresh Toys users, plus the sports VALID next-item no-loss check) now runs, and Gate-FT trains under V1.
+
 ## 2026-10-04 · Amendment 3 recorded (enables the training of the Gate-FT adapters; scoring still waits for the full record)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md` sha1 = 7d855492a6f6486f964a2601c485b1b89b8d58ee (dated addendum 1: how the three

@@ -1,5 +1,24 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · G7 stage 3 (the registered MIRROR arms; runs because G6 was GATE_PASS): code recorded before its first scoring
+
+`scripts/sigir/run_gatefix_stage3.sh` (with `src/confrec/gatefix_stage3.py`, the input check) scores, under V\* = V1 on CONFIRM ML-1M and on
+the first 1,500 fresh Toys users: like, dislike, like_para (V1's threshold-family strings), the 8-donor swap prior and the no-history
+prior; and, under V0, the next-item no-loss check (next, like, dislike, like_para) on the first 1,000 events of the sports VALID panel
+(never sports TEST events 1–1000); then `pilot_mirror` and `pilot1_gate --stage3_gate` write the decision (labels POSITIVE / NULL / NEGATIVE
+/ INDETERMINATE / INCOMPLETE / GATE_FAIL_UNINTERPRETABLE). Estimated 2.7 GPU-h. Choices accepted: the correlation-matched ensemble null
+is the per-user binormal prediction (the Pilot-1 decision, `pilot_mirror`), the literal within-user z-sum is context only; the Video_Games
+fallback cannot trigger (Toys has 12,702 fresh users); the VALID next-item panel is scored with all four questions in one fresh run; the C-CRP
+context on VALID is empty by construction (its ranks cover TEST events only; context never gates). 46 + 17 tests pass in the CPU sandbox.
+
+| file | sha1 |
+|---|---|
+| `scripts/sigir/run_gatefix_stage3.sh` | 9c69a7b5a19417fb9c6123c642050325ab93a344 |
+| `src/confrec/gatefix_stage3.py` | 382c519f78174aa6c19be86427caa102724d90f1 |
+| `src/confrec/pilot_mirror.py` | a4a8bffb5c30035538d63dcb8013b09d7e6fa3c8 |
+| `scripts/sigir/pilot1_gate.py` | 3a4c163293a7d6beebff883838fe1786a69aee59 |
+| `src/confrec/gatefix_select.py` | b7f4380d872e883f331938e9ebdae50a938e08a6 |
+
 ## 2026-10-04 · Amendment 3: the two Llama-3.1-8B-Instruct split files (record for any Llama job; Amendment 3 section 0)
 
 Built by `MODEL=<Llama-3.1-8B-Instruct> OUT_ROOT=outputs/confrec/ftgrid_llama STAGES=0 bash scripts/sigir/run_ftgrid.sh <d>` under the selected

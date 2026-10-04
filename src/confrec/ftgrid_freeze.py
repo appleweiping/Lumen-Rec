@@ -57,15 +57,22 @@ def required(stage: str, root: Path, splits=None, ftgrid_dir: str = "outputs/con
         raise SystemExit(f"{am} does not exist")
     items = [(AMENDMENT, am)]
     # dated addenda of the amendment (idea-stage/PREREG_AMENDMENT_3_ADDENDUM_*.md) are part of it, for every stage
-    items += [(p.relative_to(root).as_posix(), p) for p in sorted((root / "idea-stage").glob("PREREG_AMENDMENT_3_ADDENDUM_*.md"))]
+    addenda = sorted((root / "idea-stage").glob("PREREG_AMENDMENT_3_ADDENDUM_*.md"))
+    items += [(p.relative_to(root).as_posix(), p) for p in addenda]
     if stage != "amendment":
-        blocks = parse_blocks(am.read_text(encoding="utf-8"))
+        blocks: dict = {}                      # the amendment's FREEZE_FILES blocks, extended by those of its addenda
+        for src in [am] + addenda:
+            for st, files in parse_blocks(src.read_text(encoding="utf-8")).items():
+                cur = blocks.setdefault(st, [])
+                cur += [f for f in files if f not in cur]
         if stage not in blocks:
             raise SystemExit(f"{AMENDMENT} has no FREEZE_FILES block for stage {stage!r}")
         items += [(rel, root / rel) for rel in blocks[stage] if rel != AMENDMENT]    # the amendment is listed once
-        if stage == "core":
-            paths = splits or [str(Path(ftgrid_dir) / "panels" / d / "ftgrid_split.json") for d in DOMAINS]
-            items += [(rel, root / rel) for rel in paths]
+        # files the stage needs besides code: the four splits (core), the prune manifest (prune: signals, subsets and pruned
+        # train files by sha1), per-dataset q-hat manifests given with --split (method); `splits` replaces the default list
+        extra = {"core": [str(Path(ftgrid_dir) / "panels" / d / "ftgrid_split.json") for d in DOMAINS],
+                 "prune": ["outputs/confrec/ftprune/prune_manifest.json"], "method": []}[stage]
+        items += [(rel, root / rel) for rel in (splits or extra)]
     missing = [rel for rel, p in items if not p.exists()]
     if missing:
         raise SystemExit(f"freeze stage {stage}: these required files do not exist yet: {missing}")

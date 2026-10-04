@@ -1,5 +1,13 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 addendum 2 and the extended freeze tool (a bound file changed; recorded before any adapter was scored)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_2.md` sha1 = 402ff901ba622b0848ce5aa288d41f960f77ba73 makes the `prune` and `method` freezes concrete
+(manifests of the signals/subsets and of the q̂ standardisation constants; FREEZE blocks may also come from addenda). The tool
+`src/confrec/ftgrid_freeze.py` (a core file) was extended accordingly: new sha1 = a9931a12bc4b184dab3db9a65f518c0eb8a6dab9
+(it replaces e90c9fbddaeb9e1643a285737d3a7757c91518d4 of the full record below; nothing else of the core list changed, and no outcome
+statistic of any adapter, zero-shot panel, pruning or slot run existed when this was done).
+
 ## 2026-10-04 · G7 stage 3 (the registered MIRROR arms; runs because G6 was GATE_PASS): code recorded before its first scoring
 
 `scripts/sigir/run_gatefix_stage3.sh` (with `src/confrec/gatefix_stage3.py`, the input check) scores, under V\* = V1 on CONFIRM ML-1M and on

@@ -79,6 +79,8 @@ def test_core_stage_needs_every_listed_file_and_every_split(tmp_path):
 
 def test_a_missing_listed_file_or_split_is_an_error_not_a_skip(tmp_path):
     root = repo(tmp_path, with_prune=False)
+    (root / "outputs" / "confrec" / "ftprune").mkdir(parents=True)                  # the manifest exists, src/prune.py does not
+    (root / "outputs" / "confrec" / "ftprune" / "prune_manifest.json").write_text("{}", encoding="utf-8")
     with pytest.raises(SystemExit, match="do not exist"):
         ff.required("prune", root)
     root2 = repo(tmp_path / "b", with_splits=False)
@@ -102,6 +104,26 @@ def test_dated_addenda_of_the_amendment_are_part_of_every_stage(tmp_path):
     assert "idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md" in [r for r, _ in ff.required("core", root)]
 
 
+def test_prune_needs_its_manifest_method_takes_extra_files_and_addenda_extend_the_lists(tmp_path):
+    root = repo(tmp_path)
+    (root / "src" / "m.py").write_text("m = 1\n", encoding="utf-8")
+    (root / "outputs" / "confrec" / "ftprune").mkdir(parents=True)
+    # an addendum may add files to a stage list (the method stage has none of its own in the repo() amendment text)
+    (root / "idea-stage" / "PREREG_AMENDMENT_3_ADDENDUM_2.md").write_text(
+        "# add 2\n<!-- FREEZE_FILES method -->\nsrc/m.py\n<!-- /FREEZE_FILES -->\n"
+        "<!-- FREEZE_FILES prune -->\nsrc/prune.py\nsrc/a.py\n<!-- /FREEZE_FILES -->\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="prune_manifest.json"):
+        ff.required("prune", root)                                   # the manifest does not exist yet
+    (root / "outputs" / "confrec" / "ftprune" / "prune_manifest.json").write_text("{}", encoding="utf-8")
+    labels = [r for r, _ in ff.required("prune", root)]
+    assert labels.count("src/prune.py") == 1 and "src/a.py" in labels and "outputs/confrec/ftprune/prune_manifest.json" in labels
+    assert [r for r, _ in ff.required("method", root)][-1] == "src/m.py"                  # no manifest by default
+    extra = root / "outputs" / "confrec" / "ftmethod_ml1m_qhat.json"
+    extra.write_text("{}", encoding="utf-8")
+    labels = [r for r, _ in ff.required("method", root, splits=["outputs/confrec/ftmethod_ml1m_qhat.json"])]
+    assert labels[-1] == "outputs/confrec/ftmethod_ml1m_qhat.json" and "src/m.py" in labels
+
+
 def test_a_split_without_a_tokenizer_audit_or_without_the_gateft_check_cannot_be_frozen(tmp_path):
     root = repo(tmp_path)
     sp = root / "outputs" / "confrec" / "ftgrid" / "panels"
@@ -119,6 +141,8 @@ def test_a_split_without_a_tokenizer_audit_or_without_the_gateft_check_cannot_be
 
 def test_check_is_case_insensitive_and_print_lists_one_hash_per_file(tmp_path):
     root = repo(tmp_path)
+    (root / "outputs" / "confrec" / "ftprune").mkdir(parents=True)
+    (root / "outputs" / "confrec" / "ftprune" / "prune_manifest.json").write_text("{}", encoding="utf-8")
     log = root / "docs" / "sigir" / "PILOT_LOG.md"
     log.write_text("\n".join(line.upper() for line in ff.lines_for("prune", root)), encoding="utf-8")
     assert ff.check("prune", root, log) == []

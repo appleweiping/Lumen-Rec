@@ -1,5 +1,12 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 addendum 3 (the optimizer of the offset b; recorded before any prior-offset adapter was trained)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_3.md` sha1 = 8e278c8bdbff8137a67b26075d7676d39d0dfe31. The code review of section 7 found that b has no optimizer
+setting and that in the LoRA group (lr 1e-4) it could move by only about 0.04 over the run, which would make the prior-offset arm SFT by
+construction; b now has its own AdamW group with lr 1e-2 (fixed from the optimizer arithmetic, not tuned); INCOMPLETE is not a failure;
+the train/test shift reading is stated. No slot outcome, adapter score or zero-shot panel existed when this was written.
+
 ## 2026-10-04 · Amendment 3 addendum 2 and the extended freeze tool (a bound file changed; recorded before any adapter was scored)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_2.md` sha1 = 402ff901ba622b0848ce5aa288d41f960f77ba73 makes the `prune` and `method` freezes concrete

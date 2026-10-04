@@ -1371,6 +1371,50 @@ def p_gft_mean(R, s):
     return fmt(v, prose=True)
 
 
+def p_gft_mean_est(R, s):
+    """Gate-FT mean post-T_d UAUC, estimate only (abstract, introduction, conclusion): after a recorded GATE_FT_PASS."""
+    require_ft(R)
+    return num(R.get(GFT, "UAUC_post_T_mean_over_seeds"))
+
+
+def p_gft_seeds(R, s):
+    require_ft(R)
+    per = R.get(GFT, "UAUC_post_T_per_seed")
+    if not isinstance(per, list) or len(per) != 3:
+        raise Missing("incomplete_regime", f"{GFT}: UAUC_post_T_per_seed has {per!r} (seeds 0, 1, 2 registered)")
+    return ", ".join(num(x) for x in per)
+
+
+def p_gate_est(R, s):
+    """The G6 confirmation-user UAUC of V*, estimate only: after a recorded GATE_PASS."""
+    require_gatepass(R)
+    return num(R.get(GATE, "UAUC"))
+
+
+def p_gate_ci(R, s):
+    """0.603$\\pm$.009 (the table convention: estimate and half-width of the 95% interval)."""
+    require_gatepass(R)
+    return fmt(_ci_val(R.get(GATE, "UAUC"), R.get(GATE, "ci95")), prose=True)
+
+
+def p_gate_range(R, s):
+    """0.603 (95\\% CI 0.594--0.612): the same interval written out for the introduction."""
+    require_gatepass(R)
+    ci = R.get(GATE, "ci95")
+    lo, hi = num(ci.get("lo"), src=f"{GATE}:ci95.lo"), num(ci.get("hi"), src=f"{GATE}:ci95.hi")
+    return f"{num(R.get(GATE, 'UAUC'))} (95\\% CI {lo}--{hi})"
+
+
+def p_gate_v0(R, s):
+    require_gatepass(R)
+    return num(R.get(GATE, "v0_context", "UAUC"))
+
+
+def p_gate_n(R, s):
+    require_gatepass(R)
+    return integer(R.get(GATE, "n_users"))
+
+
 def p_aud(path):
     return lambda R, s: _aud_list(R, path)
 
@@ -1751,6 +1795,18 @@ class ProseSpec:
 P_AMB = "the sentence does not say which regime (zero-shot or LoRA) the value belongs to"
 PROSE_SPECS = {
     ("experiments", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("(mean post-$T_d$ UAUC", p_gft_mean),
+    # The gate branches that occurred (GATE_PASS, GATE_FT_PASS) were resolved in the skeleton by the main session on
+    # 2026-10-04; their numbers still come from gate.json / gate_ft.json (and the handlers refuse any other decision).
+    ("abstract", "gate:UAUC", 0): ProseSpec("a registered remedy then reached UAUC", p_gate_est),
+    ("abstract", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("and LoRA tuning reached", p_gft_mean_est),
+    ("introduction", "gate:n_users", 0): ProseSpec("or higher and, on", p_gate_n),
+    ("introduction", "gate:UAUC, ci95", 0): ProseSpec("that prompt reached UAUC", p_gate_range),
+    ("introduction", "gate:v0_context.UAUC", 0): ProseSpec("against", p_gate_v0),
+    ("introduction", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("It did (mean", p_gft_mean_est),
+    ("introduction", "gft:UAUC_post_T_per_seed", 0): ProseSpec("[S]; seeds", p_gft_seeds),
+    ("experiments", "gate:UAUC, ci95", 0): ProseSpec(r"GATE\_PASS (UAUC", p_gate_ci),
+    ("conclusion", "gate:UAUC", 0): ProseSpec("the remedied zero-shot prompt reached UAUC", p_gate_est),
+    ("conclusion", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("and LoRA tuning reached", p_gft_mean_est),
     ("experiments", "k of 4", 0): ProseSpec(r"\emph{Reading template (RQ1).} On", c_rq1_k),
     ("experiments", "above / indistinguishable from / below", 0): ProseSpec(r"domains $\mathrm{acc}_{\rm high}$ is",
                                                                              c_rq1_dir),

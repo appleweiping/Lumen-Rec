@@ -60,16 +60,13 @@ at least one fresh Amazon domain and on a second backbone; until then its wordin
 under the registered zero-shot prompt a pilot on 1,500 ML-1M users reached UAUC 0.587 against a bar of 0.60 while the next-item
 component was met (NDCG@10 0.2093 against 0.1863), and on the fully observed KuaiRec matrix~\citep{gao2022kuairec} the zero-shot
 UAUC was 0.469 against 0.58, so exposure is analysed statically. These registered negative results (Section~\ref{sec:exp-gates})
-motivated one registered prompt-remedy round.
-\DATANEEDED{branch: remedy passed -- selected prompt, confirmation-user UAUC with 95\% CI, gap to the registered prompt; else delete}
-\DATANEEDED{branch: remedy failed -- zero-shot rated results reported descriptively as below the registered bar and re-measured
-on confirmation users; else delete}
-As TALLRec-style recommenders are fine-tuned~\citep{bao2023tallrec}, the LoRA regime carries the main results if it meets its own
-registered gate, a mean UAUC of at least 0.65 over three seeds.
-\DATANEEDED{branch: fine-tuning gate passed -- mean and per-seed UAUC beside the reference rows; the fine-tuned regime is the
-main object and zero-shot the contrast; else delete}
-\DATANEEDED{branch: fine-tuning gate failed -- the rated-panel method line closes and the paper is the zero-shot audit plus the
-next-item exposure audit; else delete}
+motivated one registered prompt-remedy round. It selected, on development users, the label-aligned prompt that asks whether the
+user would rate the item 4 stars or higher and, on \DATANEEDED{gate:n\_users} untouched ML-1M users, that prompt reached UAUC
+\DATANEEDED{gate:UAUC, ci95} against \DATANEEDED{gate:v0\_context.UAUC} for the registered prompt on the same users, so the bar was
+met.
+As TALLRec-style recommenders are fine-tuned~\citep{bao2023tallrec}, the LoRA regime was to carry the main results if it met its own
+registered gate, a mean UAUC of at least 0.65 over three seeds. It did (mean \DATANEEDED{gft:UAUC\_post\_T\_mean\_over\_seeds};
+seeds \DATANEEDED{gft:UAUC\_post\_T\_per\_seed}), so the fine-tuned regime is the main object and the zero-shot regime its contrast.
 
 \paragraph{Contributions.}
 \begin{list}{}{\introlistsetup}

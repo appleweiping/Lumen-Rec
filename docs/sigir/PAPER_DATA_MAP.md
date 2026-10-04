@@ -310,6 +310,13 @@ Counted by the alias in the slot text, as the script prints them:
 | `interpretive` | 2 |
 | `field_not_produced`, `to_be_removed`, `skeleton_changed` | 0 |
 
+**Update (main session, 2026-10-04, after the counts above).** The gate branches that occurred (GATE_PASS and GATE_FT_PASS)
+were resolved in the skeleton: nine `branch:` slots (abstract 1, introduction 4, experiments 3, conclusion 1) became plain text
+with ten number slots, which `PROSE_SPECS` fill from `gate.json` and `gate_ft.json` (`gate:UAUC`, `gate:UAUC, ci95`,
+`gate:n_users`, `gate:v0_context.UAUC`, `gft:UAUC_post_T_mean_over_seeds`, `gft:UAUC_post_T_per_seed`) and refuse
+(`branch_not_taken`) for any other decision. Totals now: 774 slots, 241 filled, 533 unfilled, `branch_slot` 5 (the nested method
+slot's three sentences, `familiarity-linked / popularity-linked`, `supervision raises ... / no evidence`).
+
 **Duplicates (`CHECK_EQUAL.json`).**
 
 - 16 quantities are printed more than once, 14 of them in more than one table.

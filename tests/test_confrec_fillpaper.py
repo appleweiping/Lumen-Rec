@@ -418,6 +418,40 @@ def test_real_gate_files_fill_the_gate_table(real):
            "against 0.65)" in text.replace("\n", " ")
 
 
+def test_resolved_gate_branches_are_filled_from_the_gate_files_and_refused_for_any_other_decision(real, tmp_path):
+    gate, gft = real.j["gate/gate.json"], real.j["gft/gate_ft.json"]
+    ci, est, v0 = gate["ci95"], n3(gate["UAUC"]), n3(gate["v0_context"]["UAUC"])
+    mean = n3(gft["UAUC_post_T_mean_over_seeds"])
+    seeds = ", ".join(n3(x) for x in gft["UAUC_post_T_per_seed"])
+
+    def flat(out, f):
+        return " ".join(read(out, f"sections/{f}.tex").split())
+    assert f"a registered remedy then reached UAUC {est} on untouched ML-1M users" in flat(real.out, "abstract")
+    assert f"and LoRA tuning reached {mean} (bar 0.65)" in flat(real.out, "abstract")
+    intro = flat(real.out, "introduction")
+    assert (f"on {gate['n_users']:,} untouched ML-1M users, that prompt reached UAUC {est} "
+            f"(95\\% CI {n3(ci['lo'])}--{n3(ci['hi'])}) against {v0} for the registered prompt") in intro
+    assert f"It did (mean {mean}; seeds {seeds})" in intro
+    assert f"GATE\\_PASS (UAUC {est}$\\pm${s3((ci['hi'] - ci['lo']) / 2)})" in flat(real.out, "experiments")
+    assert (f"the remedied zero-shot prompt reached UAUC {est} on untouched users (bar 0.60) and LoRA tuning reached "
+            f"{mean} (bar 0.65)") in flat(real.out, "conclusion")
+    # any other registered decision leaves them red as branch_not_taken (the branch that occurred is not the one written)
+    res = tmp_path / "results"
+    shutil.copytree(real.res, res)
+    for rel, dec in (("gate/gate.json", "GATE_FAIL_AFTER_REMEDY"), ("gft/gate_ft.json", "GATE_FT_FAIL")):
+        d = json.loads((res / rel).read_text(encoding="utf-8"))
+        d["decision"] = dec
+        (res / rel).write_text(json.dumps(d), encoding="utf-8")
+    out = tmp_path / "filled"
+    fill.run(PAPER, res, out)
+    doc = json.loads(read(out, "UNFILLED.json"))
+    wanted = {"gate:UAUC", "gate:UAUC, ci95", "gate:n_users", "gate:v0_context.UAUC", "gft:UAUC_post_T_mean_over_seeds",
+              "gft:UAUC_post_T_per_seed"}
+    reds = [u for u in doc["unfilled"] if fill.norm(u["slot"]) in wanted and u["kind"] == "prose"
+            and u["file"] in ("sections/abstract.tex", "sections/introduction.tex", "sections/conclusion.tex")]
+    assert len(reds) == 2 + 5 + 2 and all(u["reason"] == "branch_not_taken" for u in reds)
+
+
 def test_real_selection_fills_the_sensitivity_table(real):
     sel = real.j["sel/selection.json"]
     t = table_text(read(real.out, "sections/appendix.tex"), "tab:app-sens")

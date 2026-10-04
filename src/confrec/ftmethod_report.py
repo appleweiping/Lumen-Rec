@@ -212,10 +212,16 @@ def load_offset(adir: Path, k: int, qh: dict, domain: str) -> dict:
         probs.append("trained on another q-hat manifest")
     if qh["manifest"] is not None and off.get("standardisation") != qh["manifest"].get("standardisation"):
         probs.append("standardisation constants differ from the manifest's")
+    grp = off.get("b_group") or {}
+    if not (grp.get("own_group") is True and grp.get("lr") == tlo.B_LR and grp.get("weight_decay") == 0.0):
+        probs.append(f"b's optimizer group {({k: grp.get(k) for k in ('own_group', 'lr', 'weight_decay')})} is not the "
+                     f"registered one (its own group, lr {tlo.B_LR}, weight decay 0; Amendment 3 addendum 3)")
     return {"status": "INVALID" if probs else "OK", "reason": f"o{k}: " + "; ".join(probs) if probs else None,
-            "b": float(b) if _fin(b) else None, "b_lr": off.get("b_lr"), "yes_token_id": off.get("yes_token_id"),
-            "sft_adapter": off.get("sft_adapter"), "weights_sha1": adapter_weights_sha1(adir),
-            "n_examples": off.get("n_examples"), "dry_run": bool(off.get("dry_run"))}
+            "b": float(b) if _fin(b) else None, "b_lr": off.get("b_lr"),
+            "b_group": {k: grp.get(k) for k in ("own_group", "lr", "weight_decay", "source")},
+            "yes_token_id": off.get("yes_token_id"), "sft_adapter": off.get("sft_adapter"),
+            "weights_sha1": adapter_weights_sha1(adir), "n_examples": off.get("n_examples"),
+            "dry_run": bool(off.get("dry_run"))}
 
 
 # ---------------------------------------------------------------- statistics

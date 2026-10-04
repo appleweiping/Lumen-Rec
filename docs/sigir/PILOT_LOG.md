@@ -1,5 +1,11 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 addendum 4 (S6 implementation readings; recorded before the TRAIN zero-shot pass and any pruned adapter)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_4.md` sha1 = b0bca2a7cfa269da58d25297bd9dfc3e48b43372 (class-size rounding, τ's quantile rule and the handling of
+non-finite logits, P1's seeded draw, the claim-label order with BEATS winning over ABOUT_EQUAL, per-run AUC rows, and that the zero-shot
+TRAIN pass is a section-0 scoring and not an S6 run). No S6 or slot outcome existed.
+
 ## 2026-10-04 · Amendment 3 addendum 3 (the optimizer of the offset b; recorded before any prior-offset adapter was trained)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_3.md` sha1 = 8e278c8bdbff8137a67b26075d7676d39d0dfe31. The code review of section 7 found that b has no optimizer

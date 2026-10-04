@@ -6,6 +6,15 @@ full-vocabulary softmax, l'_Yes = l_Yes + b * z(q-hat): z = the TRAIN-standardis
 q-hat. The loss is Gate-FT's last-token cross-entropy of the answer token under l' (full-vocabulary softmax, so the
 Yes + No mass stays constrained and E1 keeps its meaning). At test time the ranking score is the scorer's
 logit(Yes) - logit(No) + b * z(q-hat) (src/confrec/ftmethod_report.py).
+Training shifts the logit of the single answer token tok("Yes") (the id YesNoSet trains as the label); at test time b z
+is added to the scorer's logit(Yes) - logit(No), i.e. log of the summed probability of the yes ids minus that of the no
+ids (prompting.read_yes_no), as registered (main-session decision of 2026-10-04).
+b's optimizer group (Amendment 3 addendum 3, decided 2026-10-04 from the optimizer arithmetic before any prior-offset
+run, not tuned): b has its OWN AdamW parameter group with lr 1e-2 (--b_lr, the default), the same cosine schedule and 3%
+warmup as the LoRA group (the Trainer's scheduler is built after the groups, so one multiplier scales both), weight decay
+0, init 0; everything else of section 2 is unchanged. (In the LoRA group at the recipe's lr 1e-4, AdamW moves b by at
+most about the summed learning rates, ~0.5 x 1e-4 x steps: b z would stay below ~0.1 logit.) --b_lr 0 keeps b in the
+LoRA group (the literal pre-addendum reading), for comparison tests only.
 
     # stage 1 of run_ftmethod.sh (CPU): q-hat of every TRAIN example and EVAL pair and the TRAIN standardisation
     python -m src.confrec.train_lora_offset qhat --domain ml1m --panels outputs/confrec/ftgrid/panels/ml1m \
@@ -14,7 +23,7 @@ logit(Yes) - logit(No) + b * z(q-hat) (src/confrec/ftmethod_report.py).
     python -m src.confrec.train_lora_offset train --train outputs/confrec/ftgrid/panels/ml1m/train.jsonl \
         --model <Qwen3-8B> --out outputs/confrec/ftmethod/ml1m/adapters/o0 --variant V1 --seed 0 \
         --qhat outputs/confrec/ftmethod/ml1m/train_qhat.csv.gz --manifest outputs/confrec/ftmethod/ml1m/qhat_manifest.json \
-        --sft_adapter outputs/confrec/gateft/adapters/s0 [--max_len 1024 --bsz 8 --grad_accum 4] [--b_lr LR]
+        --sft_adapter outputs/confrec/gateft/adapters/s0 [--max_len 1024 --bsz 8 --grad_accum 4] [--b_lr 0.01]
 
 qhat. q-hat(u, i, t) = forensics.prior_means' mean_prior_shrunk (A3 section 3, k = 5): (s + k g) / (n + k), s and n = the
 sum and count of other users' first ratings of i strictly before the candidate's timestamp t, g = the mean of all other
@@ -51,12 +60,13 @@ last_token_trainer / last_token_loss. Composition:
   * --sft_adapter (the SFT comparator of the same seed: ML-1M Gate-FT's) must share the recipe: train file bytes, seed,
     variant, mode, max_len, epochs, lr, micro-batch, accumulation, LoRA rank, window, backbone and, once the examples are
     built, their count and overlength skips (SystemExit before the model is loaded otherwise).
-  * --b_lr (default: none) puts b in an optimizer group of its own with that learning rate; without it b shares the
-    LoRA weights' group (the recipe's lr; see the report: with AdamW the total movement of b is bounded by the summed
-    learning rates, about 0.5 * lr * steps).
+  * b's group: the subclass's create_optimizer moves b out of the Trainer's group into a group of its own (lr --b_lr,
+    weight decay 0; idempotent, as the Trainer calls create_optimizer again inside train()); train() builds the
+    optimizer first, checks the group against --b_lr and records it (b_group: own_group, lr, weight_decay).
 Outputs next to the adapter: train_report.json (before the model is loaded, as train_lora_yesno), train_config.json
-(train_lora_yesno's keys, loss "last_token_prior_offset", and prior_offset {b, ...}) and offset.json (b, the
-standardisation constants, the yes token id, the manifest and data sha1s, the code sha1; read by ftmethod_report.py).
+(train_lora_yesno's keys, loss "last_token_prior_offset", and prior_offset {b, b_lr, b_group, ...}) and offset.json (b,
+b_lr and b_group, the standardisation constants, the yes token id, the manifest and data sha1s, the code sha1; read by
+ftmethod_report.py, which accepts only b's own group at the registered lr).
 torch, transformers and peft are imported inside the functions that need them, never at module import.
 """
 from __future__ import annotations
@@ -88,6 +98,7 @@ TRAIN_QHAT, EVAL_QHAT = "train_qhat.csv.gz", "eval_qhat.csv.gz"
 OFFSET_JSON = "offset.json"
 MANIFEST_FORMAT, OFFSET_FORMAT = "ftmethod_qhat_v1", "ftmethod_offset_v1"
 OFFSET_PARAM = "prior_offset_b"      # b on the PEFT model; no "lora_" in the name, so never part of the saved adapter
+B_LR = 1e-2                          # A3 addendum 3: b's own AdamW group, lr 1e-2 (cosine + 3% warmup as LoRA, wd 0)
 QHAT_COLS = ("source_event_id", "cand_idx", "user_id", "item_id", "ts", "label", "q_hat", "q_hat_unshrunk",
              "n_prior", "global_prior", "z")
 # recipe keys the prior-offset run shares with its SFT comparator (train_config.json of train_lora_yesno)
@@ -465,8 +476,14 @@ class PriorOffsetModel:
 
 
 def own_param_group(optimizer, b, lr: float) -> None:
-    """--b_lr: b leaves the Trainer's parameter groups for a group of its own (lr, no weight decay); the learning-rate
-    schedule, created afterwards, scales it like every other group. Groups left empty are dropped."""
+    """b in a parameter group of its own (lr, weight decay 0), out of the Trainer's groups; groups left empty are dropped.
+    The learning-rate schedule, created after the optimizer, applies the same multiplier (cosine, warmup) to every
+    group. Idempotent: when b is already alone in a group, only that group's lr and weight decay are (re)set (the
+    Trainer calls create_optimizer again inside train(), before it builds the schedule)."""
+    holders = [g for g in optimizer.param_groups if any(p is b for p in g["params"])]
+    if len(holders) == 1 and len(holders[0]["params"]) == 1:
+        holders[0].update(lr=float(lr), weight_decay=0.0)
+        return
     found = 0
     for g in optimizer.param_groups:
         keep = [p for p in g["params"] if p is not b]
@@ -478,9 +495,34 @@ def own_param_group(optimizer, b, lr: float) -> None:
     optimizer.add_param_group({"params": [b], "lr": float(lr), "weight_decay": 0.0})
 
 
+def b_group_record(optimizer, b) -> dict:
+    """The optimizer group that holds b: own_group (b alone in it), its base lr (initial_lr once a schedule exists),
+    weight decay and size."""
+    holders = [g for g in optimizer.param_groups if any(p is b for p in g["params"])]
+    if len(holders) != 1:
+        raise RuntimeError(f"b is in {len(holders)} of the optimizer's parameter groups (expected one)")
+    g = holders[0]
+    return {"own_group": len(g["params"]) == 1, "lr": float(g.get("initial_lr", g["lr"])),
+            "weight_decay": float(g.get("weight_decay", 0.0)), "n_params_in_group": len(g["params"])}
+
+
+def intended_b_group(a) -> dict:
+    """b's group as --b_lr asks for it (a positive value: its own group at that lr; 0: the LoRA group at --lr)."""
+    own = bool(a.b_lr)
+    return {"own_group": own, "lr": float(a.b_lr if own else a.lr), "weight_decay": 0.0}
+
+
+def b_group_problems(rec: dict, a) -> list:
+    """How the optimizer's group of b differs from the one --b_lr asks for (empty = as asked)."""
+    want = intended_b_group(a)
+    return [f"{k}: optimizer {rec.get(k)!r} != {v!r}" for k, v in want.items() if rec.get(k) != v]
+
+
 def prior_offset_trainer(trainer_base, yes_id: int, b, b_lr: float | None = None):
     """`trainer_base` is transformers.Trainer: the subclass of lora_trainer.last_token_trainer(trainer_base) whose loss
-    is last_token_loss on the model view with the shifted Yes logit (z from the batch)."""
+    is last_token_loss on the model view with the shifted Yes logit (z from the batch). b_lr > 0 puts b in an optimizer
+    group of its own with that lr (Amendment 3 addendum 3: 1e-2, train()'s default); None or 0 leaves it in the Trainer's
+    group of the LoRA weights."""
     from src.confrec.lora_trainer import last_token_trainer
 
     class PriorOffsetTrainer(last_token_trainer(trainer_base)):
@@ -490,7 +532,7 @@ def prior_offset_trainer(trainer_base, yes_id: int, b, b_lr: float | None = None
 
         def create_optimizer(self, *args, **kwargs):
             opt = super().create_optimizer(*args, **kwargs)
-            if b_lr is not None:
+            if b_lr:
                 own_param_group(self.optimizer, b, b_lr)
             return opt
 
@@ -537,12 +579,19 @@ def write_train_report(out: Path, a, panel: dict, ds, n_built: int, zinfo: dict,
 
 
 def write_offset_and_config(out: Path, a, panel: dict, ds, zinfo: dict, sft: dict, b: float,
-                            dry_run: bool = False) -> dict:
+                            b_group: dict | None = None, dry_run: bool = False) -> dict:
     """offset.json (read by ftmethod_report.py) and train_config.json (train_lora_yesno's keys; b recorded, A3
-    section 7)."""
+    section 7). b_group: the optimizer group that held b (b_group_record before training); without an optimizer (the
+    DRY_RUN stand-in) the group --b_lr asks for, marked as intended."""
+    group = ({**b_group, "source": "the Trainer's optimizer, before the first step"} if b_group is not None else
+             {**intended_b_group(a), "source": "intended by --b_lr (no optimizer was built)"})
+    group.update(init=0.0, schedule="the Trainer's scheduler (cosine with 3% warmup): the LoRA group's multiplier",
+                 registered=bool(a.b_lr == B_LR),
+                 rule=("Amendment 3 addendum 3: b's own AdamW group, lr 1e-2, weight decay 0, init 0" if a.b_lr == B_LR
+                       else f"--b_lr {a.b_lr}: b's own group, not the registered lr 1e-2 (comparison runs only)"
+                       if a.b_lr else "--b_lr 0: b in the LoRA group at the recipe's lr (comparison runs only)"))
     off = {"format": OFFSET_FORMAT, "spec": SPEC, "domain": zinfo["domain"], "seed": a.seed, "b": float(b), "b_init": 0.0,
-           "b_lr": a.b_lr, "b_lr_rule": ("--b_lr: an optimizer group of its own" if a.b_lr is not None else
-                                         "none: b is in the Trainer's group of the LoRA weights (lr = --lr)"),
+           "b_lr": a.b_lr, "b_group": group,
            "yes_token_id": int(ds.yes_id), "answer_ids": ds.answer, "standardisation": zinfo["standardisation"],
            "qhat_manifest_sha1": zinfo["manifest_sha1"], "train_qhat_sha1": zinfo["qhat_sha1"],
            "train_sha1": zinfo["train_sha1"], "n_examples": len(ds),
@@ -555,9 +604,9 @@ def write_offset_and_config(out: Path, a, panel: dict, ds, zinfo: dict, sft: dic
     cfg = {**vars(a), "loss": "last_token_prior_offset", "hist_len_used": panel["hist_len_used"],
            "panel_kind": panel["panel_kind"], "max_history_len_in_panel": panel["max_history_len_in_panel"],
            "n_examples": len(ds), "n_skipped_overlength": ds.n_skipped,
-           "prior_offset": {"b": float(b), "b_init": 0.0, "b_lr": a.b_lr, "yes_token_id": int(ds.yes_id),
-                            "standardisation": zinfo["standardisation"], "qhat_manifest_sha1": zinfo["manifest_sha1"],
-                            "offset_json": OFFSET_JSON},
+           "prior_offset": {"b": float(b), "b_init": 0.0, "b_lr": a.b_lr, "b_group": group,
+                            "yes_token_id": int(ds.yes_id), "standardisation": zinfo["standardisation"],
+                            "qhat_manifest_sha1": zinfo["manifest_sha1"], "offset_json": OFFSET_JSON},
            **({"dry_run": True} if dry_run else {})}
     (out / "train_config.json").write_text(json.dumps(strict_json(cfg), indent=2), encoding="utf-8")
     return off
@@ -609,6 +658,11 @@ def train(a) -> dict:
     trainer.create_optimizer()        # the Trainer's own optimizer, which train() reuses: b must be in it before any step
     if not b_in_optimizer(trainer.optimizer, b):
         raise RuntimeError(f"{OFFSET_PARAM} is not in the Trainer's optimizer: b would never be learned")
+    b_group = b_group_record(trainer.optimizer, b)
+    probs = b_group_problems(b_group, a)
+    if probs:
+        raise RuntimeError(f"b's optimizer group is not the one --b_lr {a.b_lr} asks for: " + "; ".join(probs))
+    print(f"prior offset b: optimizer group {b_group}", flush=True)
     trainer.train()
     if trainer.optimizer is not None and not b_in_optimizer(trainer.optimizer, b):
         raise RuntimeError(f"{OFFSET_PARAM} left the Trainer's optimizer during training")
@@ -619,7 +673,7 @@ def train(a) -> dict:
     leaked = [k for k in saved_adapter_keys(out) if OFFSET_PARAM in k]
     if leaked:
         raise RuntimeError(f"the saved adapter carries {leaked}: pyes_scorer --lora would not load it as an SFT adapter")
-    return write_offset_and_config(out, a, panel, ds, zinfo, sft, b_final)
+    return write_offset_and_config(out, a, panel, ds, zinfo, sft, b_final, b_group)
 
 
 # ---------------------------------------------------------------- CLI
@@ -651,11 +705,12 @@ def parse_args(argv=None) -> argparse.Namespace:
     t.add_argument("--manifest", required=True, help="qhat_manifest.json of stage 1 (the recorded constants)")
     t.add_argument("--sft_adapter", required=True,
                    help="the SFT comparator of the same seed (section 2 adapter; ML-1M: Gate-FT's): same recipe")
-    t.add_argument("--b_lr", type=float, default=None,
-                   help="learning rate of b in a group of its own (default: none, b shares the LoRA weights' group)")
+    t.add_argument("--b_lr", type=float, default=B_LR,
+                   help="lr of b's own AdamW group (Amendment 3 addendum 3: 1e-2, the default; same schedule as the "
+                        "LoRA group, weight decay 0); 0 = b in the LoRA group (comparison runs only)")
     a = ap.parse_args(argv)
-    if a.cmd == "train" and a.b_lr is not None and not a.b_lr > 0:
-        ap.error("--b_lr must be > 0")
+    if a.cmd == "train" and not (math.isfinite(a.b_lr) and a.b_lr >= 0):
+        ap.error("--b_lr must be >= 0 (0 = b in the LoRA group)")
     return a
 
 

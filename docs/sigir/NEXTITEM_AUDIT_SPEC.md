@@ -110,6 +110,17 @@ On the TOP-10 candidates of each event (the served set) with the list-normalised
   of this file, of `scripts/sigir/export_ref_exposure.py` and the manifest hash of `docs/sigir/ref_exposure` (the sha1 of the lines
   `<relative path> <sha1>` over its files in sorted order). Before this record the only audit output read was the scorer's own
   progress lines (chunk counters, prompts per second).
+- **Z2, second backbone on a subsample (Amendment 3 section 4; added 2026-10-04 as implementation only: no endpoint or estimator
+  changed, every default output is byte-identical).** Llama-3.1-8B-Instruct is scored on TEST events 1,001-3,000 of each domain (the
+  2,000 lines of `ranking_test.jsonl`; scores at `<audit>/<d>_test1001_3000/`) and on the first 500 VALID events
+  (`<audit>/<d>_valid500/`, temperature only); the paired comparison is the Qwen audit restricted to the same 2,000 events
+  (`nextitem_audit restrict` writes `<d>_test/` with those events' score lines and copies the VALID2k scores unchanged). The
+  supplied panel is analysed as ONE segment of role `all` per domain (`run --segments single --test_role test1001_3000
+  --valid_role valid500 --first_event 1001`, the segment named after the scores role): the sports quarantine split assumes a panel
+  that starts at event 1 and does not apply, and a sports panel that straddles events 1-1000 is refused. The pool of B.4 and the
+  item->group map and quintiles of D are those of the supplied panel (identical for both backbones), and each backbone's list
+  temperature is fitted on its own VALID sample (Llama 500 events; Qwen its VALID2k, unchanged by the restriction) and applied
+  unchanged to that backbone's TEST events. `summarize` is run once per backbone.
 
 ## CLI
 ```

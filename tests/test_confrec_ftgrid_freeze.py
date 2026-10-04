@@ -87,6 +87,21 @@ def test_a_missing_listed_file_or_split_is_an_error_not_a_skip(tmp_path):
     assert ff.required("amendment", root2)                         # the amendment stage never needs splits
 
 
+def test_dated_addenda_of_the_amendment_are_part_of_every_stage(tmp_path):
+    root = repo(tmp_path)
+    log = root / "docs" / "sigir" / "PILOT_LOG.md"
+    record(root, "amendment")
+    assert ff.check("amendment", root, log) == []
+    add = root / "idea-stage" / "PREREG_AMENDMENT_3_ADDENDUM_1.md"
+    add.write_text("# addendum 1\nclarification\n", encoding="utf-8")
+    assert ff.check("amendment", root, log) == ["idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md"]   # must be recorded too
+    record(root, "amendment")
+    assert ff.check("amendment", root, log) == []
+    add.write_text("# addendum 1\nchanged after the record\n", encoding="utf-8")
+    assert ff.check("amendment", root, log) == ["idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md"]
+    assert "idea-stage/PREREG_AMENDMENT_3_ADDENDUM_1.md" in [r for r, _ in ff.required("core", root)]
+
+
 def test_a_split_without_a_tokenizer_audit_or_without_the_gateft_check_cannot_be_frozen(tmp_path):
     root = repo(tmp_path)
     sp = root / "outputs" / "confrec" / "ftgrid" / "panels"

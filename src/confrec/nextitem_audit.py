@@ -1383,6 +1383,8 @@ def analyze_domain(domain: str, panel: Panel, L_test: dict, valid: dict, refs_ra
         raise ValueError("empty test panel")
     if panel.n_cand.min() < K:
         raise ValueError(f"every event needs at least {K} candidates (min {int(panel.n_cand.min())})")
+    plan = make_segments(domain, E, quarantine_n) if segments == "auto" else \
+        make_single_segment(domain, E, segment_name, first_event)       # option guards fail before any heavy work
     pool_size = len(panel.pool)
     rand = np.random.default_rng([int(seed), 1]).random(E)
     profile, prof_diag = user_profile(panel)
@@ -1409,8 +1411,6 @@ def analyze_domain(domain: str, panel: Panel, L_test: dict, valid: dict, refs_ra
                        "ref_ranks": {m: d for m, (_, d) in refs_rank.items()},
                        "ref_exposure": {m: d["diag"] for m, d in refs_expo.items()}},
               "temperature": Tinfo, "segments": {}}
-    plan = make_segments(domain, E, quarantine_n) if segments == "auto" else \
-        make_single_segment(domain, E, segment_name, first_event)
     fe = 1 if first_event is None else int(first_event)           # number of the first event (1 = start of the panel)
     if segments == "single":
         result["segment_mode"] = {

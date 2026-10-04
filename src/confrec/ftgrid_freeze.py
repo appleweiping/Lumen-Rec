@@ -56,6 +56,8 @@ def required(stage: str, root: Path, splits=None, ftgrid_dir: str = "outputs/con
     if not am.exists():
         raise SystemExit(f"{am} does not exist")
     items = [(AMENDMENT, am)]
+    # dated addenda of the amendment (idea-stage/PREREG_AMENDMENT_3_ADDENDUM_*.md) are part of it, for every stage
+    items += [(p.relative_to(root).as_posix(), p) for p in sorted((root / "idea-stage").glob("PREREG_AMENDMENT_3_ADDENDUM_*.md"))]
     if stage != "amendment":
         blocks = parse_blocks(am.read_text(encoding="utf-8"))
         if stage not in blocks:

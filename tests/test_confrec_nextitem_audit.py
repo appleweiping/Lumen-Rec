@@ -14,6 +14,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -988,6 +989,251 @@ def test_end_to_end_censored_candidates_are_unscored_and_counted(tmp_path):
     assert res["data"]["by_question"]["like"]["n_rows_unscored"] == 0
     cens_a = res["segments"]["all"]["questions"]["next"]["A_ranking"]["censoring"]
     assert cens_a["n_events_any_unscored"] == 1 and cens_a["n_rows_unscored"] == 2
+
+
+# ===================================================== Z2: second backbone on a subsample (Amendment 3 section 4)
+# sha256 digests (`canonical_digest`) of the documents the module frozen in PILOT_LOG (sha1 8e3fa3d0...) wrote for the
+# `four_domains` fixture: the four `run` documents and the `summarize` document. They were taken BEFORE the Z2 options
+# existed; a change of any default output (a value, a key, the key order, a type) changes a digest.
+FROZEN_DEFAULT_DIGESTS = {
+    "sports": "2827d5c29370d4e76974a6a9a167248f0cbd5ce0f84a1b85b5d59645459baf12",
+    "toys": "6d46d262f98155ead0d8169392287abfd85433bba8d4b4c69d6581f75f0e445a",
+    "home": "878d74d0e8702353087351cded7a3a11688bd259bc0d1151e5b506ddec970df5",
+    "tools": "6d590e551325807cdd1c16bc14db2d17388fdee545b3c70b08e6f656f0ab2f2a",
+    "summary": "3182a6dc55ef46c59b2d9db9e2f0e906942df027f35273545317d20138c674b5",
+}
+
+
+def _jload(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _strict(x) -> str:
+    return json.dumps(na.strict_json(x), allow_nan=False)
+
+
+def _without(doc, *keys):
+    return {k: v for k, v in doc.items() if k not in keys}
+
+
+def test_default_output_is_identical_to_the_frozen_module(four_domains):
+    outs, summ, tmp = four_domains
+    got = {}
+    for p in outs:
+        doc = _jload(p)
+        got[doc["domain"]] = canonical_digest(doc)
+        assert "segment_mode" not in doc                                              # the Z2 options leave no trace by default
+        assert list(doc["inputs"]) == ["audit_dir", "panel_test", "panel_valid", "ref_ranks", "ref_exposure"]
+    got["summary"] = canonical_digest(_jload(summ))
+    assert got == FROZEN_DEFAULT_DIGESTS
+    # spelling the new options out with their default values is the very same run (tools: segment `all`, no quarantine)
+    res = na.run_domain("tools", tmp / "audit", tmp / "panels" / "tools_test.jsonl", tmp / "panels" / "tools_valid.jsonl",
+                        tmp / "docs/sigir/ref_ranks/tools", tmp / "docs/sigir/ref_exposure/tools", n_boot=40, quarantine_n=0,
+                        segments="auto", test_role="test", valid_role="valid2k", first_event=None)
+    assert canonical_digest(json.loads(_strict(res))) == FROZEN_DEFAULT_DIGESTS["tools"]
+
+
+def test_segments_single_is_one_segment_named_after_the_scores_role(tmp_path):
+    d = make_domain(tmp_path, "sports", E=30, N=15, seed=51, n_valid=24, head_bias=1.5)
+    kw = dict(ref_ranks=d["ref_ranks"], ref_exposure=d["ref_exposure"], n_boot=16)
+    args = (d["audit"], d["panel_test"], d["panel_valid"])
+    auto = na.run_domain("sports", *args, **kw)                                       # the registered segmentation of sports
+    assert list(auto["segments"]) == ["events_1_30"] and auto["segments"]["events_1_30"]["role"] == "quarantine"
+    assert "segment_mode" not in auto
+    out = tmp_path / "single.json"
+    one = na.run_domain("sports", *args, segments="single", first_event=1001, out=out, **kw)
+    assert list(one["segments"]) == ["test"]                                          # named after the scores role
+    seg = one["segments"]["test"]
+    assert (seg["role"], seg["event_range"], seg["n_events"]) == ("all", [1001, 1030], 30)
+    sm = one["segment_mode"]
+    assert (sm["mode"], sm["segment"], sm["first_event"], sm["n_events"]) == ("single", "test", 1001, 30)
+    assert "full test panel" in sm["event_range_basis"] and "ONE segment" in sm["definition"]
+    assert {k: one["inputs"][k] for k in ("segments", "test_role", "valid_role", "first_event")} == {
+        "segments": "single", "test_role": "test", "valid_role": "valid2k", "first_event": 1001}
+    plain = na.run_domain("sports", *args, segments="single", **kw)                   # first_event unknown: panel positions
+    assert plain["segments"]["test"]["event_range"] == [1, 30] and plain["segment_mode"]["first_event"] is None
+    assert "first_event" not in plain["inputs"] and "positions" in plain["segment_mode"]["event_range_basis"]
+    # `single` is the standard one-segment analysis of the panel: another domain name with the same files, default options
+    shutil.copytree(d["audit"] / "sports_test", d["audit"] / "toys_test")
+    shutil.copytree(d["audit"] / "sports_valid2k", d["audit"] / "toys_valid2k")
+    toys = na.run_domain("toys", *args, **kw)
+    assert list(toys["segments"]) == ["all"] and _strict(toys["segments"]["all"]) == _strict(plain["segments"]["test"])
+    assert _strict(toys["temperature"]) == _strict(plain["temperature"])
+    # option guards (the first three fail before any file is read, the last one once the panel size is known)
+    for bad, msg in ((dict(segments="single", quarantine_n=5), "quarantine_n"), (dict(first_event=1001), "first_event"),
+                     (dict(segments="pooled"), "segments must be"), (dict(segments="single", first_event=0), "1-based")):
+        with pytest.raises(ValueError, match=msg):
+            na.run_domain("sports", *args, **kw, **bad)
+    with pytest.raises(ValueError, match="straddles"):       # events 985-1014 would pool quarantined and other events
+        na.run_domain("sports", *args, segments="single", first_event=985, **kw)
+    inside = na.run_domain("sports", *args, segments="single", first_event=971, **kw)             # events 971-1000: all quarantined
+    assert inside["segments"]["test"]["event_range"] == [971, 1000]
+    # summarize treats the single segment as the domain's entry (a one-domain family is incomplete: no admission)
+    s = na.summarize([_jload(out)])
+    assert s["units"]["sports"] == {"domain": "sports", "role": "all", "event_range": [1001, 1030], "n_events": 30}
+    assert s["family_units"] == ["sports"] and not s["complete_family"]
+    assert s["S4"]["pooled_auroc"]["next"]["values"]["sports"]["n"] == 30 * 15
+    assert not s["S3"]["admission"]["llm_next"]["effect_claimed"]
+
+
+def test_roles_select_the_scores_directories_of_a_second_backbone(tmp_path):
+    d = make_domain(tmp_path, "home", E=24, N=15, seed=61, n_valid=20, head_bias=1.5)
+    llama = tmp_path / "llama_audit"                  # <audit>/<d>_test1001_3000 and <d>_valid500, as scored for Z2
+    shutil.copytree(d["audit"] / "home_test", llama / "home_test1001_3000")
+    na.restrict_scores(d["audit"] / "home_valid2k" / "scores.csv.gz", llama / "home_valid500" / "scores.csv.gz",
+                       na.read_event_ids(d["panel_valid"])[:10])                       # a 10-event VALID sample (valid500)
+    kw = dict(ref_ranks=d["ref_ranks"], ref_exposure=d["ref_exposure"], n_boot=12)
+    res = na.run_domain("home", llama, d["panel_test"], d["panel_valid"], segments="single", test_role="test1001_3000",
+                        valid_role="valid500", first_event=1001, **kw)
+    assert list(res["segments"]) == ["test1001_3000"]
+    seg = res["segments"]["test1001_3000"]
+    assert (seg["role"], seg["event_range"], seg["n_events"]) == ("all", [1001, 1024], 24)
+    assert res["segment_mode"]["segment"] == "test1001_3000"
+    assert (res["inputs"]["test_role"], res["inputs"]["valid_role"]) == ("test1001_3000", "valid500")
+    # the temperature is fitted on the VALID role's own sample (10 events), not on the 20 events of valid2k
+    assert res["temperature"]["next"]["n_events_used"] == 10 and res["data"]["valid_events"] == 10
+    assert res["data"]["scores_valid"]["by_question"]["next"]["n"] == 10 * 15
+    full = na.run_domain("home", d["audit"], d["panel_test"], d["panel_valid"], **kw)            # registered layout
+    assert full["temperature"]["next"]["n_events_used"] == 20
+    assert res["temperature"]["next"]["T"] != full["temperature"]["next"]["T"]
+    # same TEST events and seeds: the ranking metrics (T-free) are identical, the calibration block is not
+    ranking = lambda r, name: _strict(r["segments"][name]["questions"]["next"]["A_ranking"]["ranking"])     # noqa: E731
+    assert ranking(res, "test1001_3000") == ranking(full, "all")
+    cal = lambda r, name: r["segments"][name]["questions"]["next"]["C_calibration"]["list_normalised"]["ece"]["est"]   # noqa: E731
+    assert cal(res, "test1001_3000") != cal(full, "all")
+    with pytest.raises(FileNotFoundError, match="valid999"):
+        na.run_domain("home", llama, d["panel_test"], d["panel_valid"], segments="single", test_role="test1001_3000",
+                      valid_role="valid999", **kw)
+    # the command line does the same
+    out = tmp_path / "llama_home.json"
+    na.main(["run", "--domain", "home", "--audit_dir", str(llama), "--panel_test", str(d["panel_test"]),
+             "--panel_valid", str(d["panel_valid"]), "--ref_ranks", str(d["ref_ranks"]), "--ref_exposure", str(d["ref_exposure"]),
+             "--out", str(out), "--n_boot", "12", "--segments", "single", "--test_role", "test1001_3000",
+             "--valid_role", "valid500", "--first_event", "1001"])
+    assert _strict(_without(_jload(out), "timing_s")) == _strict(json.loads(_strict(_without(res, "timing_s"))))
+
+
+def test_restrict_writes_the_subset_scores_and_an_unchanged_valid_copy(tmp_path):
+    d = make_domain(tmp_path, "toys", E=60, N=15, seed=41, n_valid=30, head_bias=1.5)
+    rows, lo, hi = d["rows"], 10, 30
+    subset = tmp_path / "panels" / "toys_test_11_30.jsonl"
+    write_jsonl(subset, rows[lo:hi])
+    out_dir = tmp_path / "restricted"
+    man = na.restrict_audit("toys", d["audit"], subset, out_dir)
+    src_test, src_valid = d["audit"] / "toys_test" / "scores.csv.gz", d["audit"] / "toys_valid2k" / "scores.csv.gz"
+    got_test = out_dir / "toys_test" / "scores.csv.gz"
+    src_lines = gzip.open(src_test, "rb").read().splitlines(keepends=True)
+    got_lines = gzip.open(got_test, "rb").read().splitlines(keepends=True)
+    ids = {r["source_event_id"] for r in rows[lo:hi]}
+    want = [src_lines[0]] + [ln for ln in src_lines[1:] if ln.split(b",", 1)[0].decode() in ids]
+    assert got_lines == want                                           # header + verbatim lines of those events, source order
+    assert len(got_lines) == 1 + (hi - lo) * 15 * 2                    # 20 events x 15 candidates x (next, like)
+    assert (out_dir / "toys_valid2k" / "scores.csv.gz").read_bytes() == src_valid.read_bytes()    # VALID copied unchanged
+    rt = man["restricted_test"]
+    assert (rt["n_rows_in"], rt["n_rows_kept"], rt["n_events_found"], rt["n_events_missing"]) == (60 * 15 * 2, 20 * 15 * 2, 20, 0)
+    assert man["n_events_requested"] == 20 and man["ids_sha1"] == hashlib.sha1(
+        "\n".join(r["source_event_id"] for r in rows[lo:hi]).encode("utf-8")).hexdigest()
+    assert rt["sha1"] == hashlib.sha1(got_test.read_bytes()).hexdigest()
+    assert man["valid_copy"]["sha1"] == hashlib.sha1(src_valid.read_bytes()).hexdigest()
+    assert _jload(out_dir / "toys_restrict.json")["restricted_test"]["sha1"] == rt["sha1"]
+    # level-9 gzip with a zero mtime: the same restriction twice is the same file
+    na.restrict_audit("toys", d["audit"], subset, tmp_path / "restricted_again")
+    assert (tmp_path / "restricted_again" / "toys_test" / "scores.csv.gz").read_bytes() == got_test.read_bytes()
+
+
+def test_restricted_qwen_analysis_equals_the_same_events_analysed_directly(tmp_path):
+    # a panel of six blocks of 10 events: blocks 2-3 (events 11-30) play the role of events 1,001-3,000 of the real panel
+    d = make_domain(tmp_path, "toys", E=60, N=15, seed=41, n_valid=30, head_bias=1.5)
+    rows, lo, hi = d["rows"], 10, 30
+    subset = tmp_path / "panels" / "toys_test_11_30.jsonl"
+    write_jsonl(subset, rows[lo:hi])
+    restricted = tmp_path / "qwen_restricted"
+    na.restrict_audit("toys", d["audit"], subset, restricted)
+    direct = tmp_path / "direct"                                       # the same events written straight from the arrays
+    write_scores(direct / "toys_test" / "scores.csv.gz", rows[lo:hi], {q: d["L"][q][lo:hi] for q in ("next", "like")})
+    (direct / "toys_valid2k").mkdir(parents=True)
+    shutil.copyfile(d["audit"] / "toys_valid2k" / "scores.csv.gz", direct / "toys_valid2k" / "scores.csv.gz")
+    kw = dict(ref_ranks=d["ref_ranks"], ref_exposure=d["ref_exposure"], n_boot=16, segments="single", first_event=lo + 1)
+    r_restricted = na.run_domain("toys", restricted, subset, d["panel_valid"], **kw)
+    r_direct = na.run_domain("toys", direct, subset, d["panel_valid"], **kw)
+    r_unrestricted = na.run_domain("toys", d["audit"], subset, d["panel_valid"], **kw)       # all 60 events' scores, 20-event panel
+    gone = ("timing_s", "inputs")
+    assert _strict(_without(r_restricted, *gone)) == _strict(_without(r_direct, *gone))
+    seg = r_restricted["segments"]["test"]
+    assert seg["event_range"] == [11, 30] and seg["n_events"] == 20 and r_restricted["data"]["panel"]["n_events"] == 20
+    # restricting is a convenience: the rows of events outside the panel are ignored (and counted) by `run` itself
+    sd = r_unrestricted["data"]["scores_test"]
+    assert sd["score_rows"] == 60 * 15 * 2 and sd["score_rows_without_panel_event"] == 40 * 15 * 2
+    assert _strict(sd["by_question"]) == _strict(r_restricted["data"]["scores_test"]["by_question"])
+    same_but_row_counts = lambda r: _strict(_without(dict(r, data=_without(r["data"], "scores_test")), *gone))   # noqa: E731
+    assert same_but_row_counts(r_unrestricted) == same_but_row_counts(r_restricted)
+    # the numbers are those of the 20 events: a per-event recomputation on the full arrays
+    L, pos = d["L"]["next"], d["pos"]
+    rank = np.array([stats.tie_aware_rank(L[e], int(pos[e])) for e in range(lo, hi)])
+    assert seg["questions"]["next"]["A_ranking"]["ranking"]["ndcg10"]["est"] == pytest.approx(
+        metrics.ndcg_from_rank(rank, 10).mean())
+    top = [np.argsort(-L[e], kind="stable")[:10] for e in range(lo, hi)]
+    assert seg["questions"]["next"]["B_exposure"]["llm"]["head_share_top10"]["est"] == pytest.approx(
+        np.mean([(d["grp"][e][t] == 0).mean() for e, t in zip(range(lo, hi), top)]))
+    # Qwen keeps its own temperature: the one fitted on the (unchanged) VALID2k sample of the full audit
+    full = na.run_domain("toys", d["audit"], d["panel_test"], d["panel_valid"], ref_ranks=d["ref_ranks"],
+                         ref_exposure=d["ref_exposure"], n_boot=8)
+    for q in ("next", "like"):
+        assert r_restricted["temperature"][q]["T"] == full["temperature"][q]["T"]
+        assert r_restricted["temperature"][q]["n_events_used"] == 30
+
+
+def test_restrict_error_paths_roles_and_id_list_input(tmp_path):
+    d = make_domain(tmp_path, "tools", E=24, N=15, seed=71, n_valid=16, head_bias=1.0)
+    sub = d["rows"][4:12]
+    subset = tmp_path / "subset.jsonl"
+    write_jsonl(subset, sub)
+    idlist = tmp_path / "ids.txt"
+    idlist.write_text("\n".join(r["source_event_id"] for r in sub) + "\n", encoding="utf-8")
+    a = na.restrict_audit("tools", d["audit"], subset, tmp_path / "out_a")
+    b = na.restrict_audit("tools", d["audit"], idlist, tmp_path / "out_b")                    # a plain id list works too
+    f_a, f_b = (tmp_path / o / "tools_test" / "scores.csv.gz" for o in ("out_a", "out_b"))
+    assert f_a.read_bytes() == f_b.read_bytes() and a["ids_sha1"] == b["ids_sha1"]
+    odd = tmp_path / "odd.jsonl"                                                              # id not the first JSON key
+    odd.write_text(json.dumps({"user_id": "u", "source_event_id": "a::1"}) + "\n" +
+                   json.dumps({"source_event_id": "b::2", "x": 1}) + "\n\n", encoding="utf-8")
+    assert na.read_event_ids(odd) == ["a::1", "b::2"]
+    # an id without any score row is an error and nothing is left behind; allow_missing counts it instead
+    ghost = tmp_path / "ghost.txt"
+    ghost.write_text("\n".join([r["source_event_id"] for r in sub] + ["nobody::1"]) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="no score row"):
+        na.restrict_audit("tools", d["audit"], ghost, tmp_path / "out_c")
+    assert not (tmp_path / "out_c" / "tools_test" / "scores.csv.gz").exists() and not list(tmp_path.rglob("*.tmp"))
+    man = na.restrict_audit("tools", d["audit"], ghost, tmp_path / "out_d", allow_missing=True)
+    rt = man["restricted_test"]
+    assert (rt["n_events_found"], rt["n_events_missing"], rt["missing_examples"]) == (8, 1, ["nobody::1"])
+    assert (tmp_path / "out_d" / "tools_test" / "scores.csv.gz").read_bytes() == f_a.read_bytes()
+    # refusals: a repeated id, out_dir == audit_dir, a missing source scores file
+    dup = tmp_path / "dup.txt"
+    dup.write_text(f"{sub[0]['source_event_id']}\n{sub[0]['source_event_id']}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicated"):
+        na.restrict_audit("tools", d["audit"], dup, tmp_path / "out_e")
+    with pytest.raises(ValueError, match="out_dir must differ"):
+        na.restrict_audit("tools", d["audit"], subset, d["audit"])
+    with pytest.raises(FileNotFoundError):
+        na.restrict_audit("tools", d["audit"], subset, tmp_path / "out_e", test_role="nope")
+    # roles name the directories on both sides: <d>_<test_role> and <d>_<valid_role>
+    llama = tmp_path / "llama"
+    shutil.copytree(d["audit"] / "tools_test", llama / "tools_test1001_3000")
+    shutil.copytree(d["audit"] / "tools_valid2k", llama / "tools_valid500")
+    na.restrict_audit("tools", llama, subset, tmp_path / "out_f", test_role="test1001_3000", valid_role="valid500")
+    assert (tmp_path / "out_f" / "tools_test1001_3000" / "scores.csv.gz").read_bytes() == f_a.read_bytes()
+    assert (tmp_path / "out_f" / "tools_valid500" / "scores.csv.gz").read_bytes() == (
+        llama / "tools_valid500" / "scores.csv.gz").read_bytes()
+    # the command line: success, and a one-line failure
+    cli = ["restrict", "--domain", "tools", "--audit_dir", str(d["audit"]), "--panel_subset"]
+    na.main(cli + [str(subset), "--out_dir", str(tmp_path / "out_g")])
+    assert (tmp_path / "out_g" / "tools_test" / "scores.csv.gz").read_bytes() == f_a.read_bytes()
+    assert _jload(tmp_path / "out_g" / "tools_restrict.json")["n_events_requested"] == 8
+    with pytest.raises(SystemExit, match="restrict:"):
+        na.main(cli + [str(ghost), "--out_dir", str(tmp_path / "out_h")])
+    na.main(cli + [str(ghost), "--out_dir", str(tmp_path / "out_h"), "--allow_missing"])
+    assert _jload(tmp_path / "out_h" / "tools_restrict.json")["restricted_test"]["n_events_missing"] == 1
 
 
 def _naive_gini_coverage(top_item_lists, pool_size):

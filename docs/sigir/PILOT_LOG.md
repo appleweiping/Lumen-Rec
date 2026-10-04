@@ -1,5 +1,13 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-04 · Amendment 3 addendum 5 (two corrections to addendum 3; recorded before any prior-offset adapter existed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_5.md` sha1 = 6f3e7b0af8bfa40274825c39f835149a6c28cc49. The scorer (a bound file) does not record the Yes-mass share
+on the answer token, so the train/test shift mismatch is not measured and is stated as a limitation; lifting the block of an INCOMPLETE slot dataset
+needs a dated addendum and a recorded report-code change. Method-slot code (final, before the `method` record): `train_lora_offset.py`
+aaae5e812637551a6430031349a418c43a78c594, `ftmethod_report.py` 8414bce88acee2a30721148404f32d3dbe0863ef, `run_ftmethod.sh`
+121ad50fced444b0db67a87d9665b188d9c92539 (60 tests pass locally, 4 server-only tests pending; b's own optimizer group at lr 1e-2 is the default).
+
 ## 2026-10-04 · Gate-FT result (registered G9; `outputs/confrec/gateft/gate_ft.json`): **GATE_FT_PASS**
 
 TALLRec-style LoRA (r 16, alpha 32, lr 1e-4, 1 epoch, seeds 0, 1, 2; prompt V1; trained on the 23,348 pre-T DEV candidates, 46 minutes per seed

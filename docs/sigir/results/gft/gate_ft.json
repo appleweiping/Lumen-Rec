@@ -1,0 +1,119 @@
+{
+  "decision": "GATE_FT_PASS",
+  "gate_pass": true,
+  "UAUC_post_T_mean_over_seeds": 0.7424660652577737,
+  "UAUC_min": 0.65,
+  "UAUC_post_T_per_seed": [
+    0.740006226084526,
+    0.7446659443846868,
+    0.7427260253041084
+  ],
+  "UAUC_post_T_sd_over_seeds": 0.0023407110198572154,
+  "UAUC_post_T_seed_averaged_ci95": {
+    "est": 0.7424660652577738,
+    "lo": 0.7231850321845275,
+    "hi": 0.760943592426028,
+    "n_users": 366,
+    "n_boot": 2000
+  },
+  "UAUC_all_confirm_per_seed": [
+    0.7330344446493904,
+    0.7340993390506507,
+    0.7340464177780646
+  ],
+  "problems": [],
+  "T": 977099602.0,
+  "variant": "V1",
+  "runs": [
+    {
+      "dir": "outputs/confrec/gateft/scores/s0",
+      "lora": "outputs/confrec/gateft/adapters/s0",
+      "integrity": {
+        "n_rows": 33043,
+        "censored2_share": 0.0,
+        "overlength": 0,
+        "mean_yes_no_mass": 0.9997359800260195,
+        "ok": true
+      },
+      "calibration_post_T": {
+        "n_rows_post_T": 6466,
+        "ECE": 0.02228125869283951,
+        "Brier": 0.17823138432748492,
+        "platt_slope": 1.0393891190576772,
+        "platt_intercept": -0.02309962069444933,
+        "mean_logit": 0.7180636164553047,
+        "positive_rate": 0.6463037426538818
+      }
+    },
+    {
+      "dir": "outputs/confrec/gateft/scores/s1",
+      "lora": "outputs/confrec/gateft/adapters/s1",
+      "integrity": {
+        "n_rows": 33043,
+        "censored2_share": 0.0,
+        "overlength": 0,
+        "mean_yes_no_mass": 0.9997673270889363,
+        "ok": true
+      },
+      "calibration_post_T": {
+        "n_rows_post_T": 6466,
+        "ECE": 0.021900916988959296,
+        "Brier": 0.178833434415885,
+        "platt_slope": 0.9907955354298492,
+        "platt_intercept": -0.036133358672395324,
+        "mean_logit": 0.7697364299412309,
+        "positive_rate": 0.6463037426538818
+      }
+    },
+    {
+      "dir": "outputs/confrec/gateft/scores/s2",
+      "lora": "outputs/confrec/gateft/adapters/s2",
+      "integrity": {
+        "n_rows": 33043,
+        "censored2_share": 0.0,
+        "overlength": 0,
+        "mean_yes_no_mass": 0.9997651006264408,
+        "ok": true
+      },
+      "calibration_post_T": {
+        "n_rows_post_T": 6466,
+        "ECE": 0.02237784374537193,
+        "Brier": 0.17785248882258478,
+        "platt_slope": 1.027551532448215,
+        "platt_intercept": -0.05785638446455456,
+        "mean_logit": 0.7730235335601607,
+        "positive_rate": 0.6463037426538818
+      }
+    }
+  ],
+  "rule": "PREREG_AMENDMENT_2.md G9: PASS iff the mean over 3 seeds of UAUC on CONFIRM candidates with ts >= T is >= 0.65 (point estimate) and every run passes the integrity checks",
+  "zero_shot_context": {
+    "note": "reported only, never gates",
+    "dir": "outputs/confrec/gateft/scores/zeroshot",
+    "variant": "V1",
+    "UAUC_post_T": 0.5959963330502943,
+    "UAUC_all_confirm": 0.6030071413577357,
+    "integrity": {
+      "n_rows": 33043,
+      "censored2_share": 0.0,
+      "overlength": 0,
+      "mean_yes_no_mass": 0.9999886861058421,
+      "ok": true
+    },
+    "calibration_post_T": {
+      "n_rows_post_T": 6466,
+      "ECE": 0.343811061917072,
+      "Brier": 0.3676532671516506,
+      "platt_slope": 0.09248581102716132,
+      "platt_intercept": 0.7320239199725284,
+      "mean_logit": -1.0232224327250232,
+      "positive_rate": 0.6463037426538818
+    },
+    "dUAUC_finetuned_minus_zeroshot_post_T": {
+      "est": 0.1464697322074794,
+      "lo": 0.12424073671164265,
+      "hi": 0.1686098787102675,
+      "n": 366
+    }
+  }
+}

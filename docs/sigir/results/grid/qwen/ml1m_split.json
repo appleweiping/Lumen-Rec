@@ -1,0 +1,67 @@
+{
+  "domain": "ml1m",
+  "panel_all_sha1": "a0e4511583fa8ef96afc4a3ab126104a16b98b2a",
+  "n_rows": 3183,
+  "variant": "V1",
+  "quantile": 0.8,
+  "T": 977099602.0,
+  "train": {
+    "users": 1500,
+    "user_ids_sha1": "442889764de9adc81b37a2fa72bc7af12ece2ff3",
+    "candidates_total": 29365,
+    "examples_pre_T": 23348,
+    "cap": 24000,
+    "cap_applied": false,
+    "examples_written": 23348,
+    "overlength": {
+      "max_len_registered": 1024,
+      "share_above_1024": 0.0,
+      "p995": 294.0,
+      "max_len_used": 1024,
+      "micro_bsz": 8,
+      "grad_accum": 4
+    }
+  },
+  "eval": {
+    "users": 1683,
+    "user_ids_sha1": "104107a568f1167ccef31118dd62d4b79a23f0eb",
+    "candidates": 33043,
+    "cal_candidates": 26577,
+    "test_candidates": 6466,
+    "users_both_classes_test": 366,
+    "users_both_classes_test_tail": 204,
+    "users_both_classes_all_rows": 1683,
+    "share_test_pairs_item_seen_in_train": 0.9659758738014228
+  },
+  "sd": {
+    "users": 366,
+    "user_ids_sha1": "f1c53bc8a1b6349d53cc72bd88efc69101e79105",
+    "user_ids_path": "sd_users.txt"
+  },
+  "files": {
+    "eval.jsonl": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+    "eval_sd_test.jsonl": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+    "eval_users.txt": "104107a568f1167ccef31118dd62d4b79a23f0eb",
+    "sd_users.txt": "f1c53bc8a1b6349d53cc72bd88efc69101e79105",
+    "train.jsonl": "1d1079ccd03a1be3494f8ee88afd956cd761b38e",
+    "train_perm.jsonl": "c9858e765f597cc4e3e566cb2e6ee4b9f6efb3e1",
+    "train_users.txt": "442889764de9adc81b37a2fa72bc7af12ece2ff3"
+  },
+  "code_sha1": {
+    "ftgrid_data.py": "cc8e1c4d07360aa75ce5e62782a4f3a89fb10716",
+    "gateft_data.py": "226835415ce0fd1c0240693b3227ffa065a70a6e",
+    "build_rated_panels.py": "3aa60f1d3541826cbfc3abbff755d06c43486e8a"
+  },
+  "args": {
+    "seed": 0,
+    "n_train": 1500,
+    "n_eval_max": 3000,
+    "s_max": 1000,
+    "train_cap": 24000,
+    "tokenizer_used": true,
+    "tokenizer": "Qwen3-8B",
+    "dev_users_sha1_checked": true,
+    "gateft_split_checked": true
+  },
+  "gateft_T_match": true
+}

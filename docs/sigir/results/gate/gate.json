@@ -1,0 +1,173 @@
+{
+  "stage": "confirm",
+  "decision": "GATE_PASS",
+  "outcome": "PASS",
+  "gate_pass": true,
+  "v_star": "V1",
+  "UAUC": 0.6032507035223247,
+  "UAUC_min": 0.6,
+  "UAUC_ge_min": true,
+  "ci95": {
+    "est": 0.6032507035223247,
+    "lo": 0.5944451938189681,
+    "hi": 0.6123815213826126,
+    "n_users": 1683,
+    "n_boot": 2000,
+    "seed": 0,
+    "level": 0.95
+  },
+  "E1": {
+    "n_rows": 33043,
+    "n_censored2": 0,
+    "censored2_share": 0.0,
+    "n_censored1": 0,
+    "n_overlength_report": 0.0,
+    "n_censored3_scores": 0,
+    "overlength": 0,
+    "mean_yes_no_mass": 0.9999887477225267,
+    "mean_yes_no_mass_report": 0.9999887477225267,
+    "censored2_share_le_0.005": true,
+    "overlength_eq_0": true,
+    "mean_yes_no_mass_ge_0.95": true,
+    "E1": true
+  },
+  "n_users": 1683,
+  "n_users_uauc": 1683,
+  "prompts_sha1": "ee0cb924da9376549aacccdc16c6967963077784",
+  "data_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+  "model": "/root/autodl-tmp/lumen/models/Qwen3-8B",
+  "user_ids_sha1": "9660a965bf6b0afaeb5952d3c382f280ef111d93",
+  "rendering": {
+    "system_sha1": null,
+    "prompt_spec_sha1": "455fa6e5cd9cda1ecdf4c6994cc8d28cda928052",
+    "scorer": "token_pyes_multiq_v2",
+    "yes_ids": [
+      7414,
+      9454,
+      9693,
+      9834,
+      14004,
+      14080
+    ],
+    "no_ids": [
+      902,
+      2152,
+      2308,
+      2753,
+      5664,
+      8996,
+      72104
+    ],
+    "hist_len": 10
+  },
+  "v0_context": {
+    "note": "reported context only, never gates (G6)",
+    "UAUC": 0.5755974660943467,
+    "ci95": {
+      "est": 0.5755974660943467,
+      "lo": 0.5664749639073055,
+      "hi": 0.5847805205048147,
+      "n_users": 1683,
+      "n_boot": 2000,
+      "seed": 0,
+      "level": 0.95
+    },
+    "E1": {
+      "n_rows": 33043,
+      "n_censored2": 0,
+      "censored2_share": 0.0,
+      "n_censored1": 0,
+      "n_overlength_report": 0.0,
+      "n_censored3_scores": 0,
+      "overlength": 0,
+      "mean_yes_no_mass": 0.9999994957176254,
+      "mean_yes_no_mass_report": 0.9999994957176254,
+      "censored2_share_le_0.005": true,
+      "overlength_eq_0": true,
+      "mean_yes_no_mass_ge_0.95": true,
+      "E1": true
+    },
+    "dUAUC_vstar_minus_v0": {
+      "est": 0.02765323742797806,
+      "lo": 0.02419076752465089,
+      "hi": 0.031213866412317732,
+      "n": 1683,
+      "n_rows": 33043,
+      "level": 0.95
+    }
+  },
+  "confirm_users_disjoint_from_dev": true,
+  "dev_user_ids_sha1": {
+    "ml1m": "b7124d7b2d000ede32ea76078a775685a3734120",
+    "toys": "77b46ce3839d2191a3cf211ddad8e7ebfa905045"
+  },
+  "rendering_equals_dev": true,
+  "confirm_panel_identity": {
+    "checked": true,
+    "source": "--manifest outputs/confrec/gatefix/panels/manifest.json",
+    "expected": {
+      "sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+      "user_ids_sha1": "9660a965bf6b0afaeb5952d3c382f280ef111d93",
+      "path": "outputs/confrec/gatefix/panels/ml1m_confirm_h20.jsonl"
+    }
+  },
+  "input_fingerprint": {
+    "sha1": "94d263b070beef93d04c34d4abe87f604e0318c9",
+    "files": {
+      "confirm/V1": {
+        "report_sha1": "c86f1538ae1435664eb3ae77c96fe6d2d10a7712",
+        "scores_sha1": "499f66d14d9c317913f80b24edbf7b7fe516eb4d"
+      },
+      "confirm/V0": {
+        "report_sha1": "0fb801ac7f914f56141c485eee7eef0241334f44",
+        "scores_sha1": "e75d3d6ae80ef3c5ceea6b985e05ff028fe2b3f9"
+      },
+      "selection": "7cd3972e7fedccfc0059e4ecfcfcdf12b5212a0e",
+      "manifest": "75305f93d3ec21f34ee79edaf27d1a6ff1e52c9a"
+    }
+  },
+  "text": [
+    "CONFIRM ML-1M UAUC(V1) = 0.6033 (registered >= 0.60, point estimate); E1 holds",
+    "context only: UAUC(V0) = 0.5756; dUAUC(V* - V0) = 0.0277 [0.0242, 0.0312]",
+    "DECISION: GATE_PASS"
+  ],
+  "constants": {
+    "variants": [
+      "V0",
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V7"
+    ],
+    "simplicity_order": [
+      "V0",
+      "V1",
+      "V5",
+      "V3",
+      "V4",
+      "V2",
+      "V7"
+    ],
+    "E1_censored2_max_share": 0.005,
+    "E1_overlength": 0,
+    "E1_mass_min": 0.95,
+    "E2_tolerance": 0.01,
+    "tie_tolerance": 0.005,
+    "UAUC_min": 0.6,
+    "n_boot": 2000,
+    "seed": 0,
+    "alpha_one_sided": 0.008333333333333333,
+    "dtype": "float16",
+    "topk_logprobs": 50,
+    "max_model_len": 4096
+  },
+  "inputs": {
+    "vstar_dir": "outputs/confrec/gatefix/confirm/ml1m/V1",
+    "v0_dir": "outputs/confrec/gatefix/confirm/ml1m/V0",
+    "selection": "outputs/confrec/gatefix/dev/selection.json",
+    "manifest": "outputs/confrec/gatefix/panels/manifest.json"
+  },
+  "rule": "PREREG_AMENDMENT_2.md G6 and G8 (F1)"
+}

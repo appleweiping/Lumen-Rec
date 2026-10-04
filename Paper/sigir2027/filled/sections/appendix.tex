@@ -68,13 +68,13 @@ V0 $-0.010$; Tied: within 0.005 of the best eligible ML-1M UAUC.}
 \toprule
 Variant & ML-1M & Toys & E1 & E2 & Eligible & Tied\\
 \midrule
-V0 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V1 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V2 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V3 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V4 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V5 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V7 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
+V0 & 0.588 & 0.540 & yes & yes & yes & no\\
+V1 & 0.612 & 0.544 & yes & yes & yes & yes\\
+V2 & 0.611 & 0.543 & yes & yes & yes & yes\\
+V3 & 0.598 & 0.541 & yes & yes & yes & no\\
+V4 & 0.540 & 0.547 & yes & yes & yes & no\\
+V5 & 0.595 & 0.540 & yes & yes & yes & no\\
+V7 & 0.585 & 0.544 & yes & yes & yes & no\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -99,11 +99,11 @@ GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sport
 \toprule
  & Correction (control) & ML-1M & 2nd rated & Sports\\
 \midrule
-0 & Raw UAUC; item mean; MF (ref.) & \DATANEEDED{grid:UAUC; cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{grid:UAUC; cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & --\\
-1 & Per-user Platt scaling: max $|\Delta|$ & \DATANEEDED{corr:max\_abs\_dAUC\_user} & \DATANEEDED{corr:max\_abs\_dAUC\_user} & --\\
-2 & Per-user offset removal: $\Delta$ pooled AUC & \DATANEEDED{corr:dAUC\_pooled\_offset\_removal} & \DATANEEDED{corr:dAUC\_pooled\_offset\_removal} & --\\
-3 & No-history prior subtracted (raw) & \DATANEEDED{corr:dUAUC\_nohist\_minus\_raw} & \DATANEEDED{corr:dUAUC\_nohist\_minus\_raw} & --\\
-4 & Swap-prior evidence $\hat e$ (raw) & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & --\\
+0 & Raw UAUC; item mean; MF (ref.) & 0.596{\scriptsize$\pm$.022} / 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & \DATANEEDED{grid:UAUC; cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & --\\
+1 & Per-user Platt scaling: max $|\Delta|$ & 0.000 & \DATANEEDED{corr:max\_abs\_dAUC\_user} & --\\
+2 & Per-user offset removal: $\Delta$ pooled AUC & $-$0.039 & \DATANEEDED{corr:dAUC\_pooled\_offset\_removal} & --\\
+3 & No-history prior subtracted (raw) & $-$0.036{\scriptsize$\pm$.014} & \DATANEEDED{corr:dUAUC\_nohist\_minus\_raw} & --\\
+4 & Swap-prior evidence $\hat e$ (raw) & $-$0.091{\scriptsize$\pm$.023} & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & --\\
 % BRANCH-GATEPASS-BEGIN
 5 & \method{} (paraphrase placebo) & \DATANEEDED{mir:dUAUC\_mirror\_minus\_placebo} & \DATANEEDED{mir:dUAUC\_mirror\_minus\_placebo} & --\\
 6 & \method{} (ensemble null) & \DATANEEDED{mir:dUAUC\_mirror\_minus\_ensemble\_null} & \DATANEEDED{mir:dUAUC\_mirror\_minus\_ensemble\_null} & --\\
@@ -127,12 +127,12 @@ GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sport
 \toprule
  & ML-1M & Toys & Video Games & Sports\\
 \midrule
-SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
+SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & 0.742{\scriptsize$\pm$.019\,(.002)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
 Post-hoc stacking & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Prior-offset LoRA & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Offset $-$ stacking & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack}\\
 \midrule
-Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal}\\
+Item mean / MF (ref.) & 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal}\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -187,7 +187,7 @@ P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{g
 \toprule
  & UAUC (seeds 0 / 1 / 2) & All rows (seeds 0 / 1 / 2) & Item mean (ref.)\\
 \midrule
-ML-1M & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
+ML-1M & 0.740 / 0.745 / 0.743 & 0.733 / 0.734 / 0.734 & 0.759{\scriptsize$\pm$.021}\\
 Toys & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 Video Games & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 Sports & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\

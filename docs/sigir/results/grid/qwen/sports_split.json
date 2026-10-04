@@ -1,0 +1,66 @@
+{
+  "domain": "sports",
+  "panel_all_sha1": "ec7aed47eae208823f5340dbc30107aeef37dd63",
+  "n_rows": 16712,
+  "variant": "V1",
+  "quantile": 0.8,
+  "T": 1632469261768.6,
+  "train": {
+    "users": 1500,
+    "user_ids_sha1": "fac221473bc71ce69b144700ae08ff51331e2bcd",
+    "candidates_total": 19718,
+    "examples_pre_T": 15695,
+    "cap": 24000,
+    "cap_applied": false,
+    "examples_written": 15695,
+    "overlength": {
+      "max_len_registered": 1024,
+      "share_above_1024": 0.0,
+      "p995": 542.0,
+      "max_len_used": 1024,
+      "micro_bsz": 8,
+      "grad_accum": 4
+    }
+  },
+  "eval": {
+    "users": 3000,
+    "user_ids_sha1": "7be90f4230dddbc54144b273a559928cb27e17b3",
+    "candidates": 38666,
+    "cal_candidates": 31012,
+    "test_candidates": 7654,
+    "users_both_classes_test": 997,
+    "users_both_classes_test_tail": 226,
+    "users_both_classes_all_rows": 3000,
+    "share_test_pairs_item_seen_in_train": 0.1362686177162268
+  },
+  "sd": {
+    "users": 997,
+    "user_ids_sha1": "641fea54d4c1247ca0de07fc8dcdd5ba8f0ddf16",
+    "user_ids_path": "sd_users.txt"
+  },
+  "files": {
+    "eval.jsonl": "e2363267bd156a745b135d6a4ec1f728a40c9fc5",
+    "eval_sd_test.jsonl": "f164e71fcf3d6ee26f6e922ae18f4e9fb70cc204",
+    "eval_users.txt": "7be90f4230dddbc54144b273a559928cb27e17b3",
+    "sd_users.txt": "641fea54d4c1247ca0de07fc8dcdd5ba8f0ddf16",
+    "train.jsonl": "25400927fc16b966505746239f25ed4df4754b15",
+    "train_users.txt": "fac221473bc71ce69b144700ae08ff51331e2bcd"
+  },
+  "code_sha1": {
+    "ftgrid_data.py": "cc8e1c4d07360aa75ce5e62782a4f3a89fb10716",
+    "gateft_data.py": "226835415ce0fd1c0240693b3227ffa065a70a6e",
+    "build_rated_panels.py": "3aa60f1d3541826cbfc3abbff755d06c43486e8a"
+  },
+  "args": {
+    "seed": 0,
+    "n_train": 1500,
+    "n_eval_max": 3000,
+    "s_max": 1000,
+    "train_cap": 24000,
+    "tokenizer_used": true,
+    "tokenizer": "Qwen3-8B",
+    "dev_users_sha1_checked": false,
+    "gateft_split_checked": false
+  },
+  "gateft_T_match": null
+}

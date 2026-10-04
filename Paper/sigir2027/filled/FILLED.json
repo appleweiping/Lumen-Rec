@@ -1,0 +1,3532 @@
+{
+ "schema": "fill_paper_filled_v1",
+ "summary": {
+  "slots_total": 773,
+  "filled": 231,
+  "unfilled": 542,
+  "unfilled_by_reason": {
+   "ambiguous_slot": 14,
+   "branch_slot": 14,
+   "free_text": 33,
+   "interpretive": 2,
+   "result_file_missing": 471,
+   "result_not_in_report": 8
+  },
+  "filled_by_alias": {
+   "aud": 106,
+   "corr": 4,
+   "cpu": 10,
+   "free": 2,
+   "gate": 4,
+   "gft": 6,
+   "grid": 51,
+   "sel": 48
+  },
+  "unfilled_by_alias": {
+   "aud": 168,
+   "aud2l": 1,
+   "aud2q": 32,
+   "branch": 14,
+   "corr": 5,
+   "cpu": 31,
+   "free": 52,
+   "grid": 176,
+   "ko": 24,
+   "mir": 9,
+   "prn": 17,
+   "slot": 13
+  }
+ },
+ "notes": [
+  {
+   "topic": "ML-1M zero-shot source of tab:gate-outcomes",
+   "note": "gate_ft.json zero_shot_context (UAUC_post_T, dUAUC_finetuned_minus_zeroshot_post_T) is a second scoring of the same V1 prompts on the same users (vLLM batching; |dUAUC| about 1e-4): not printed; tab:gate-outcomes prints the grid values of tab:reliability (main-session decision 2026-10-04)",
+   "not_printed": {
+    "gft/gate_ft.json:zero_shot_context.UAUC_post_T": 0.5959963330502943,
+    "gft/gate_ft.json:zero_shot_context.dUAUC_finetuned_minus_zeroshot_post_T.est": 0.1464697322074794
+   },
+   "printed_instead": {
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot.est": 0.5958827069982499,
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds.est": 0.14658335825952382
+   },
+   "slots": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 135,
+     "row": "mean over seeds",
+     "column": 1
+    },
+    {
+     "file": "sections/experiments.tex",
+     "line": 136,
+     "row": "paired $\\Delta$ (LoRA $-$ zero-shot)",
+     "column": 2
+    }
+   ],
+   "abs_difference": {
+    "UAUC_zero_shot": 0.00011362605204445764,
+    "dUAUC_LoRA_minus_zero_shot": 0.00011362605204442988
+   }
+  }
+ ],
+ "sources": {
+  "aud/sports.json": "a7406bd2509464352eac2e390dfcb7ab5784c837",
+  "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
+  "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
+  "grid/qwen/games_split.json": "dfd01e9e4012d19a958c154e848c546774d62121",
+  "grid/qwen/ml1m.json": "bf76f48414ac99a887dbc63a4e2f29617269a46e",
+  "grid/qwen/ml1m_split.json": "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
+  "grid/qwen/sports_split.json": "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
+  "grid/qwen/toys_split.json": "e43416bb960cb86ae6fb1ed7a2ad16f063de5e28",
+  "sel/selection.json": "7cd3972e7fedccfc0059e4ecfcfcdf12b5212a0e"
+ },
+ "filled": [
+  {
+   "file": "sections/experiments.tex",
+   "line": 110,
+   "slot": "gft:UAUC\\_post\\_T\\_mean\\_over\\_seeds",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "(mean post-$T_d$ UAUC",
+   "text": "0.742$\\pm$.019",
+   "from": [
+    "gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
+    "gft/gate_ft.json:UAUC_post_T_seed_averaged_ci95"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 114,
+   "slot": "gate:n\\_users",
+   "kind": "caption",
+   "table": "tab:gate-outcomes",
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "text": "1,683",
+   "from": [
+    "gate/gate.json:n_users"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 128,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: ML-1M UAUC",
+   "column": 1,
+   "blocks": [],
+   "text": "0.588",
+   "from": [
+    "sel/selection.json:table.V0.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 128,
+   "slot": "sel:UAUC of v\\_star",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: ML-1M UAUC",
+   "column": 2,
+   "blocks": [],
+   "text": "0.612",
+   "from": [
+    "sel/selection.json:v_star",
+    "sel/selection.json:table.V1.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 128,
+   "slot": "sel:decision",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: ML-1M UAUC",
+   "column": 4,
+   "blocks": [],
+   "text": "FIX\\_FOUND",
+   "from": [
+    "sel/selection.json:decision"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 129,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: Toys UAUC",
+   "column": 1,
+   "blocks": [],
+   "text": "0.540",
+   "from": [
+    "sel/selection.json:table.V0.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 129,
+   "slot": "sel:UAUC of v\\_star",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: Toys UAUC",
+   "column": 2,
+   "blocks": [],
+   "text": "0.544",
+   "from": [
+    "sel/selection.json:v_star",
+    "sel/selection.json:table.V1.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 129,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G5 dev: Toys UAUC",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:v_star",
+    "sel/selection.json:table.V1.E2"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 130,
+   "slot": "gate:v0\\_context.UAUC",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G6 confirm: ML-1M UAUC",
+   "column": 1,
+   "blocks": [],
+   "text": "0.576{\\scriptsize$\\pm$.009}",
+   "from": [
+    "gate/gate.json:v0_context.UAUC",
+    "gate/gate.json:v0_context.ci95"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 130,
+   "slot": "gate:UAUC, ci95",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G6 confirm: ML-1M UAUC",
+   "column": 2,
+   "blocks": [],
+   "text": "0.603{\\scriptsize$\\pm$.009}",
+   "from": [
+    "gate/gate.json:UAUC",
+    "gate/gate.json:ci95"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 130,
+   "slot": "gate:decision",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "G6 confirm: ML-1M UAUC",
+   "column": 4,
+   "blocks": [],
+   "text": "GATE\\_PASS",
+   "from": [
+    "gate/gate.json:decision"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 134,
+   "slot": "gft:UAUC\\_post\\_T\\_per\\_seed",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "LoRA seeds 0 / 1 / 2",
+   "column": 2,
+   "blocks": [],
+   "text": "0.740 / 0.745 / 0.743",
+   "from": [
+    "gft/gate_ft.json:UAUC_post_T_per_seed"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 135,
+   "slot": "gft:zero\\_shot\\_context.UAUC\\_post\\_T",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "mean over seeds",
+   "column": 1,
+   "blocks": [],
+   "text": "0.596{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 135,
+   "slot": "gft:UAUC\\_post\\_T\\_mean\\_over\\_seeds, ci95",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "mean over seeds",
+   "column": 2,
+   "blocks": [],
+   "text": "0.742{\\scriptsize$\\pm$.019\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:UAUC_post_T_seed_averaged_ci95",
+    "gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
+    "gft/gate_ft.json:UAUC_post_T_sd_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 135,
+   "slot": "gft:decision",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "mean over seeds",
+   "column": 4,
+   "blocks": [],
+   "text": "GATE\\_FT\\_PASS",
+   "from": [
+    "gft/gate_ft.json:decision"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 136,
+   "slot": "gft:dUAUC\\_finetuned\\_minus\\_zeroshot\\_post\\_T",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "paired $\\Delta$ (LoRA $-$ zero-shot)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.147{\\scriptsize$\\pm$.022\\,(.002)}",
+   "from": [
+    "grid/qwen/ml1m.json:E_B",
+    "grid/qwen/ml1m.json:E_B.per_seed.s0.est",
+    "grid/qwen/ml1m.json:E_B.per_seed.s1.est",
+    "grid/qwen/ml1m.json:E_B.per_seed.s2.est",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 137,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:gate-outcomes",
+   "row": "item mean, MF (same rows)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.759{\\scriptsize$\\pm$.021} / 0.791{\\scriptsize$\\pm$.018}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.q_hat",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 186,
+   "slot": "aud:temperature.T",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Temperature $T$",
+   "column": 1,
+   "blocks": [],
+   "text": "11.043",
+   "from": [
+    "aud/sports.json:temperature.next.T"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 186,
+   "slot": "aud:temperature.T",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Temperature $T$",
+   "column": 2,
+   "blocks": [],
+   "text": "11.043",
+   "from": [
+    "aud/sports.json:temperature.next.T"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 187,
+   "slot": "aud:C.ece",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "ECE (top label)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.021{\\scriptsize$\\pm$.014}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.list_normalised.ece"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 187,
+   "slot": "aud:C.ece",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "ECE (top label)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.019{\\scriptsize$\\pm$.006}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.list_normalised.ece"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 188,
+   "slot": "aud:C.brier",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Brier",
+   "column": 1,
+   "blocks": [],
+   "text": "0.972{\\scriptsize$\\pm$.004}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.list_normalised.brier"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 188,
+   "slot": "aud:C.brier",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Brier",
+   "column": 2,
+   "blocks": [],
+   "text": "0.972{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.list_normalised.brier"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 189,
+   "slot": "aud:C.unsure\\_correct\\_rate",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "$\\mathrm{acc}_{\\rm low}$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.048{\\scriptsize$\\pm$.023}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.error_anatomy.unsure_correct_rate"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 189,
+   "slot": "aud:C.unsure\\_correct\\_rate",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "$\\mathrm{acc}_{\\rm low}$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.039{\\scriptsize$\\pm$.007}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.error_anatomy.unsure_correct_rate"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 190,
+   "slot": "aud:C.tertile2\\_accuracy",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "$\\mathrm{acc}_{\\rm high}$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.180{\\scriptsize$\\pm$.042}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.error_anatomy.tertiles.2.accuracy"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 190,
+   "slot": "aud:C.tertile2\\_accuracy",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "$\\mathrm{acc}_{\\rm high}$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.157{\\scriptsize$\\pm$.013}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.error_anatomy.tertiles.2.accuracy"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 191,
+   "slot": "aud:C.share\\_errors\\_in\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Errors in high tertile",
+   "column": 1,
+   "blocks": [],
+   "text": "0.301{\\scriptsize$\\pm$.029}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.error_anatomy.share_errors_in_top_tertile"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 191,
+   "slot": "aud:C.share\\_errors\\_in\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Errors in high tertile",
+   "column": 2,
+   "blocks": [],
+   "text": "0.308{\\scriptsize$\\pm$.010}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.error_anatomy.share_errors_in_top_tertile"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 192,
+   "slot": "aud:C.auroc\\_p\\_max\\_top1",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "AUROC($p_{\\max}$)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.713{\\scriptsize$\\pm$.061}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.auroc_discrimination.top1.auroc.p_max"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 192,
+   "slot": "aud:C.auroc\\_p\\_max\\_top1",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "AUROC($p_{\\max}$)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.701{\\scriptsize$\\pm$.021}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.auroc_discrimination.top1.auroc.p_max"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 193,
+   "slot": "aud:C.pointwise.pooled\\_auroc",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "AUROC($\\ell$), pooled",
+   "column": 1,
+   "blocks": [],
+   "text": "0.710{\\scriptsize$\\pm$.016}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.pointwise.pooled_auroc"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 193,
+   "slot": "aud:C.pointwise.pooled\\_auroc",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "AUROC($\\ell$), pooled",
+   "column": 2,
+   "blocks": [],
+   "text": "0.712{\\scriptsize$\\pm$.005}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.pointwise.pooled_auroc"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 194,
+   "slot": "aud:C.pointwise.uauc",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "UAUC (per event)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.719{\\scriptsize$\\pm$.017}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.C_calibration.pointwise.uauc"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 194,
+   "slot": "aud:C.pointwise.uauc",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "UAUC (per event)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.721{\\scriptsize$\\pm$.006}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.C_calibration.pointwise.uauc"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 195,
+   "slot": "aud:A.ranking.ndcg10",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10",
+   "column": 1,
+   "blocks": [],
+   "text": "0.210{\\scriptsize$\\pm$.019}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.A_ranking.ranking.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 195,
+   "slot": "aud:A.ranking.ndcg10",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10",
+   "column": 2,
+   "blocks": [],
+   "text": "0.207{\\scriptsize$\\pm$.007}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.A_ranking.ranking.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 198,
+   "slot": "aud:E.head\\_minus\\_tail\\_mean\\_p",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Mean $p$, head $-$ tail",
+   "column": 1,
+   "blocks": [],
+   "text": "0.001{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.E_popularity.head_minus_tail_mean_p"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 198,
+   "slot": "aud:E.head\\_minus\\_tail\\_mean\\_p",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Mean $p$, head $-$ tail",
+   "column": 2,
+   "blocks": [],
+   "text": "0.001{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.E_popularity.head_minus_tail_mean_p"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 199,
+   "slot": "aud:E.bias\\_index.head\\_minus\\_tail",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Bias Index, head $-$ tail",
+   "column": 1,
+   "blocks": [],
+   "text": "$-$0.012{\\scriptsize$\\pm$.014}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.E_popularity.bias_index.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 199,
+   "slot": "aud:E.bias\\_index.head\\_minus\\_tail",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Bias Index, head $-$ tail",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.001{\\scriptsize$\\pm$.005}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.E_popularity.bias_index.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 200,
+   "slot": "aud:E.top1\\_head\\_fraction",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Top-1 is head (share)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.755{\\scriptsize$\\pm$.026}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.E_popularity.top1_head_fraction"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 200,
+   "slot": "aud:E.top1\\_head\\_fraction",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Top-1 is head (share)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.758{\\scriptsize$\\pm$.009}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.E_popularity.top1_head_fraction"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 203,
+   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10 gain, $p_{\\max}$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.054",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.D_selective_serving.signals.p_max.gain_at_50_vs_full.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 203,
+   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10 gain, $p_{\\max}$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.062",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.gain_at_50_vs_full.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 204,
+   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10 gain, random",
+   "column": 1,
+   "blocks": [],
+   "text": "$-$0.001",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.D_selective_serving.signals.random.gain_at_50_vs_full.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 204,
+   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "NDCG@10 gain, random",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.006",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.gain_at_50_vs_full.ndcg10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 205,
+   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Niche $-$ mainstream, $p_{\\max}$",
+   "column": 1,
+   "blocks": [],
+   "text": "$-$0.081",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.D_selective_serving.signals.p_max.niche.niche_minus_mainstream_served_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 205,
+   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Niche $-$ mainstream, $p_{\\max}$",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.012",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.niche.niche_minus_mainstream_served_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 206,
+   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Niche $-$ mainstream, random",
+   "column": 1,
+   "blocks": [],
+   "text": "0.066",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.D_selective_serving.signals.random.niche.niche_minus_mainstream_served_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 206,
+   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
+   "kind": "table",
+   "table": "tab:anatomy",
+   "row": "Niche $-$ mainstream, random",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.021",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.niche.niche_minus_mainstream_served_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 273,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\ell$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.596{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 273,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\ell$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.742{\\scriptsize$\\pm$.019\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 274,
+   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "LoRA $-$ ZS (paired)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.147{\\scriptsize$\\pm$.022\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_B",
+    "grid/qwen/ml1m.json:E_B.per_seed.s0.est",
+    "grid/qwen/ml1m.json:E_B.per_seed.s1.est",
+    "grid/qwen/ml1m.json:E_B.per_seed.s2.est",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 275,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "prior-only item mean (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.759{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 276,
+   "slot": "cpu:UAUC\\_popularity",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "popularity (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.616{\\scriptsize$\\pm$.020}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.popularity"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 277,
+   "slot": "cpu:UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "temporal biased MF (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.791{\\scriptsize$\\pm$.018}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 278,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "ECE (after Platt)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.020{\\scriptsize$\\pm$.012}",
+   "from": [
+    "grid/qwen/ml1m.json:E_C.ZS",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 278,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "ECE (after Platt)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.026{\\scriptsize$\\pm$.009\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_C.FT",
+    "grid/qwen/ml1m.json:E_C.FT.per_model",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.ECE",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.ECE",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.ECE",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 279,
+   "slot": "grid:platt\\_slope",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Platt slope",
+   "column": 1,
+   "blocks": [],
+   "text": "0.079{\\scriptsize$\\pm$.008}",
+   "from": [
+    "grid/qwen/ml1m.json:E_C.ZS",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.platt_slope"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 279,
+   "slot": "grid:platt\\_slope",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Platt slope",
+   "column": 2,
+   "blocks": [],
+   "text": "0.940{\\scriptsize$\\pm$.038\\,(.021)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_C.FT",
+    "grid/qwen/ml1m.json:E_C.FT.per_model",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.platt_slope",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.platt_slope",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.platt_slope",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.platt_slope"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 280,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Correct decisions in bottom tertile",
+   "column": 1,
+   "blocks": [],
+   "text": "0.276{\\scriptsize$\\pm$.009}",
+   "from": [
+    "grid/qwen/ml1m.json:E_C.ZS",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 280,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Correct decisions in bottom tertile",
+   "column": 2,
+   "blocks": [],
+   "text": "0.264{\\scriptsize$\\pm$.006\\,(.006)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_C.FT",
+    "grid/qwen/ml1m.json:E_C.FT.per_model",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.share_correct_bottom",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.share_correct_bottom",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.share_correct_bottom",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 281,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Errors in top tertile",
+   "column": 1,
+   "blocks": [],
+   "text": "0.214{\\scriptsize$\\pm$.018}",
+   "from": [
+    "grid/qwen/ml1m.json:E_C.ZS",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 281,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Errors in top tertile",
+   "column": 2,
+   "blocks": [],
+   "text": "0.133{\\scriptsize$\\pm$.015\\,(.006)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_C.FT",
+    "grid/qwen/ml1m.json:E_C.FT.per_model",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.share_errors_top",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.share_errors_top",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.share_errors_top",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 282,
+   "slot": "grid:auroc\\_margin\\_correct, aurc\\_margin",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Margin AUROC / AURC",
+   "column": 1,
+   "blocks": [],
+   "text": "0.633{\\scriptsize$\\pm$.017} / 0.244{\\scriptsize$\\pm$.019}",
+   "from": [
+    "grid/qwen/ml1m.json:E_C.ZS",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.AUROC_margin_correct",
+    "grid/qwen/ml1m.json:E_C.ZS.per_model.zeroshot.AURC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 282,
+   "slot": "grid:auroc\\_margin\\_correct, aurc\\_margin",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Margin AUROC / AURC",
+   "column": 2,
+   "blocks": [],
+   "text": "0.706{\\scriptsize$\\pm$.014\\,(.008)} / 0.135{\\scriptsize$\\pm$.013\\,(.000)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_C.FT",
+    "grid/qwen/ml1m.json:E_C.FT.per_model",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.AUROC_margin_correct",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.AUROC_margin_correct",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.AUROC_margin_correct",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.AUROC_margin_correct",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s0.AURC",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s1.AURC",
+    "grid/qwen/ml1m.json:E_C.FT.per_model.s2.AURC",
+    "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.AURC"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 283,
+   "slot": "grid:n\\_users",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users ($n$)",
+   "column": 1,
+   "blocks": [],
+   "text": "366",
+   "from": [
+    "grid/qwen/ml1m_split.json:eval.users_both_classes_test"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 283,
+   "slot": "grid:n\\_users",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users ($n$)",
+   "column": 3,
+   "blocks": [],
+   "text": "943",
+   "from": [
+    "grid/qwen/toys_split.json:eval.users_both_classes_test"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 283,
+   "slot": "grid:n\\_users",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users ($n$)",
+   "column": 5,
+   "blocks": [],
+   "text": "820",
+   "from": [
+    "grid/qwen/games_split.json:eval.users_both_classes_test"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 283,
+   "slot": "grid:n\\_users",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users ($n$)",
+   "column": 7,
+   "blocks": [],
+   "text": "997",
+   "from": [
+    "grid/qwen/sports_split.json:eval.users_both_classes_test"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 286,
+   "slot": "grid:uauc\\_L\\_Sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\ell$ on $S_d$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.596{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.UAUC.L.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 286,
+   "slot": "grid:uauc\\_L\\_Sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\ell$ on $S_d$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.742{\\scriptsize$\\pm$.019\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.L.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.L.per_model.s0",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.L.per_model.s1",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.L.per_model.s2",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.L.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 287,
+   "slot": "grid:uauc\\_pi",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\hat\\pi$ alone",
+   "column": 1,
+   "blocks": [],
+   "text": "0.621{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.UAUC.pi.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 287,
+   "slot": "grid:uauc\\_pi",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\hat\\pi$ alone",
+   "column": 2,
+   "blocks": [],
+   "text": "0.728{\\scriptsize$\\pm$.021\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.pi.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.pi.per_model.s0",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.pi.per_model.s1",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.pi.per_model.s2",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.pi.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 288,
+   "slot": "grid:uauc\\_evidence",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\hat e$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.505{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.UAUC.e_hat.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 288,
+   "slot": "grid:uauc\\_evidence",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC of $\\hat e$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.557{\\scriptsize$\\pm$.021\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.e_hat.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.e_hat.per_model.s0",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.e_hat.per_model.s1",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.e_hat.per_model.s2",
+    "grid/qwen/ml1m.json:E_D.FT.UAUC.e_hat.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 289,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.773{\\scriptsize$\\pm$.012}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.shares.per_model.zeroshot.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 289,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.969{\\scriptsize$\\pm$.002\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s0.r8c",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s1.r8c",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s2.r8c",
+    "grid/qwen/ml1m.json:E_D.FT.shares.mean_over_seeds.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 290,
+   "slot": "grid:non\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Non-prior share $1-\\rho^2/r_8$",
+   "column": 1,
+   "blocks": [],
+   "text": "0.607{\\scriptsize$\\pm$.063}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.shares.per_model.zeroshot.non_prior_share",
+    "grid/qwen/ml1m.json:E_D.ZS.shares.per_model.zeroshot.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 290,
+   "slot": "grid:non\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Non-prior share $1-\\rho^2/r_8$",
+   "column": 2,
+   "blocks": [],
+   "text": "0.098{\\scriptsize$\\pm$.012\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s0.non_prior_share",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s1.non_prior_share",
+    "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s2.non_prior_share",
+    "grid/qwen/ml1m.json:E_D.FT.shares.mean_over_seeds.non_prior_share",
+    "grid/qwen/ml1m.json:E_D.FT.shares.mean_over_seeds.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 291,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1)",
+   "column": 1,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.006}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.information_gain.per_model.zeroshot.G"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 291,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.010{\\scriptsize$\\pm$.007\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s0.G.est",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s1.G.est",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s2.G.est",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.G_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 292,
+   "slot": "grid:G\\_CF",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "$\\mathcal G_{\\rm CF}=\\Delta$UAUC(M3$-$M0)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.036{\\scriptsize$\\pm$.013}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 292,
+   "slot": "grid:G\\_CF",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "$\\mathcal G_{\\rm CF}=\\Delta$UAUC(M3$-$M0)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.036{\\scriptsize$\\pm$.013}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 293,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 1,
+   "blocks": [],
+   "text": "0.011{\\scriptsize$\\pm$.008}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.star_permutation.per_model.zeroshot.dUAUC_L_minus_perm"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 293,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 2,
+   "blocks": [],
+   "text": "0.009{\\scriptsize$\\pm$.006\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.star_permutation.per_model",
+    "grid/qwen/ml1m.json:E_D.FT.star_permutation.per_model.s0.dUAUC_L_minus_perm.est",
+    "grid/qwen/ml1m.json:E_D.FT.star_permutation.per_model.s1.dUAUC_L_minus_perm.est",
+    "grid/qwen/ml1m.json:E_D.FT.star_permutation.per_model.s2.dUAUC_L_minus_perm.est",
+    "grid/qwen/ml1m.json:E_D.FT.star_permutation.dUAUC_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 294,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Popularity link of $\\hat\\pi$ (partial Spearman)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.368{\\scriptsize$\\pm$.040}",
+   "from": [
+    "grid/qwen/ml1m.json:E_E.ZS",
+    "grid/qwen/ml1m.json:E_E.ZS.partial_spearman.pi_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 294,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Popularity link of $\\hat\\pi$ (partial Spearman)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.125{\\scriptsize$\\pm$.048\\,(.032)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_E.FT",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model.s0",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model.s1",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model.s2",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.pi_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 295,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Popularity link of $\\ell$ (partial Spearman)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.266{\\scriptsize$\\pm$.040}",
+   "from": [
+    "grid/qwen/ml1m.json:E_E.ZS",
+    "grid/qwen/ml1m.json:E_E.ZS.partial_spearman.L_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 295,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Popularity link of $\\ell$ (partial Spearman)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.148{\\scriptsize$\\pm$.046\\,(.021)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_E.FT",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.L_item.per_model",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.L_item.per_model.s0",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.L_item.per_model.s1",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.L_item.per_model.s2",
+    "grid/qwen/ml1m.json:E_E.FT.partial_spearman.L_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 296,
+   "slot": "grid:P1",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "P1: $\\mathcal G_{\\rm FT}-\\mathcal G_{\\rm ZS}$ (ML-1M)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.010 / 0.011 / 0.013; 0.011{\\scriptsize$\\pm$.008}, $p$ 0.004",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:P1.decision.verdict",
+    "grid/qwen/ml1m.json:P1.available",
+    "grid/qwen/ml1m.json:P1.per_seed.s0.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s1.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s2.est",
+    "grid/qwen/ml1m.json:P1.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 297,
+   "slot": "grid:n\\_sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users in $S_d$ ($n$)",
+   "column": 1,
+   "blocks": [],
+   "text": "366",
+   "from": [
+    "grid/qwen/ml1m_split.json:sd.users"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 297,
+   "slot": "grid:n\\_sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users in $S_d$ ($n$)",
+   "column": 3,
+   "blocks": [],
+   "text": "943",
+   "from": [
+    "grid/qwen/toys_split.json:sd.users"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 297,
+   "slot": "grid:n\\_sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users in $S_d$ ($n$)",
+   "column": 5,
+   "blocks": [],
+   "text": "820",
+   "from": [
+    "grid/qwen/games_split.json:sd.users"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 297,
+   "slot": "grid:n\\_sd",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "Users in $S_d$ ($n$)",
+   "column": 7,
+   "blocks": [],
+   "text": "997",
+   "from": [
+    "grid/qwen/sports_split.json:sd.users"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 299,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC, prior-only item mean (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.759{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 300,
+   "slot": "cpu:UAUC\\_popularity",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC, popularity (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.616{\\scriptsize$\\pm$.020}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.popularity"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 301,
+   "slot": "cpu:UAUC\\_mf\\_personal\\_residual",
+   "kind": "table",
+   "table": "tab:reliability",
+   "row": "UAUC, MF personal residual (ref.)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.653{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS.mf_personal_residual_warm_pairs_only"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 335,
+   "slot": "aud:B.pool\\_head\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Pool (level)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.688{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.pool_head_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 335,
+   "slot": "aud:B.pool\\_head\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Pool (level)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.690{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.pool_head_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 335,
+   "slot": "aud:B.pool\\_tail\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Pool (level)",
+   "column": 13,
+   "blocks": [],
+   "text": "0.099",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.pool_tail_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 335,
+   "slot": "aud:B.pool\\_tail\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Pool (level)",
+   "column": 14,
+   "blocks": [],
+   "text": "0.097",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.pool_tail_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 336,
+   "slot": "aud:B.target\\_head\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Target head share (level)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.719{\\scriptsize$\\pm$.028}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.target_head_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 336,
+   "slot": "aud:B.target\\_head\\_share",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "Target head share (level)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.727{\\scriptsize$\\pm$.009}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.target_head_share"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.057{\\scriptsize$\\pm$.008}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.058{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.974",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.904",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.076",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.next.B_exposure.llm.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 338,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{next}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.075",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.next.B_exposure.llm.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.055{\\scriptsize$\\pm$.008}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.like.B_exposure.llm.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.057{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.like.B_exposure.llm.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.973",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.like.B_exposure.llm.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.900",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.like.B_exposure.llm.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.076",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.questions.like.B_exposure.llm.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 339,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM, \\textsf{like}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.075",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.questions.like.B_exposure.llm.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 1,
+   "blocks": [],
+   "text": "0.049{\\scriptsize$\\pm$.008}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.ccrp_v3.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 2,
+   "blocks": [],
+   "text": "0.055{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.ccrp_v3.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.972",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.ccrp_v3.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 8,
+   "blocks": [],
+   "text": "0.889",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.ccrp_v3.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 13,
+   "blocks": [],
+   "text": "0.077",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.ccrp_v3.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 340,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "C-CRP (verbalised)",
+   "column": 14,
+   "blocks": [],
+   "text": "0.076",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.ccrp_v3.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.133{\\scriptsize$\\pm$.007}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.elmrec_graph.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.128{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.elmrec_graph.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.974",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.elmrec_graph.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.909",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.elmrec_graph.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.052",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.elmrec_graph.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 341,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ELMRec~\\citep{wang2024elmrec}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.054",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.elmrec_graph.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.275{\\scriptsize$\\pm$.004}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.irllrec_intent.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.275{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.irllrec_intent.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.985",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.irllrec_intent.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.970",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.irllrec_intent.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.006",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.irllrec_intent.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 342,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "IRLLRec~\\citep{wang2025irllrec}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.006",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.irllrec_intent.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.185{\\scriptsize$\\pm$.007}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llm2rec_sasrec.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.186{\\scriptsize$\\pm$.002}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llm2rec_sasrec.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.985",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llm2rec_sasrec.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.959",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llm2rec_sasrec.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.035",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llm2rec_sasrec.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 343,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM2Rec~\\citep{he2025llm2rec}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.033",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llm2rec_sasrec.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.102{\\scriptsize$\\pm$.008}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmemb.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.106{\\scriptsize$\\pm$.003}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmemb.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.976",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmemb.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.913",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmemb.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.062",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmemb.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 344,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLMEmb~\\citep{liu2025llmemb}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.060",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmemb.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.280{\\scriptsize$\\pm$.004}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmesr_sasrec.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.278{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmesr_sasrec.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.991",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmesr_sasrec.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.986",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmesr_sasrec.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.004",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.llmesr_sasrec.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 345,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "LLM-ESR~\\citep{liu2024llmesr}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.005",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.llmesr_sasrec.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.253{\\scriptsize$\\pm$.005}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.proex_profile.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.256{\\scriptsize$\\pm$.002}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.proex_profile.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.984",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.proex_profile.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.967",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.proex_profile.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.014",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.proex_profile.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 346,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProEx~\\citep{zhang2026proex}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.012",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.proex_profile.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.275{\\scriptsize$\\pm$.004}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.promax_profile.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.275{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.promax_profile.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.985",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.promax_profile.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.971",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.promax_profile.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.004",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.promax_profile.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 347,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "ProMax~\\citep{zhang2026promax}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.005",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.promax_profile.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 1,
+   "blocks": [],
+   "text": "0.286{\\scriptsize$\\pm$.004}",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.rlmrec_graphcl.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.delta\\_head",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 2,
+   "blocks": [],
+   "text": "0.283{\\scriptsize$\\pm$.001}",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.rlmrec_graphcl.B_exposure.delta_head"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 7,
+   "blocks": [],
+   "text": "0.987",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.rlmrec_graphcl.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.gini\\_exposure",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 8,
+   "blocks": [],
+   "text": "0.976",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.rlmrec_graphcl.B_exposure.gini_exposure"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 13,
+   "blocks": [],
+   "text": "0.003",
+   "from": [
+    "aud/sports.json:segments.events_1_1000.reference.rlmrec_graphcl.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 348,
+   "slot": "aud:B.tail\\_share\\_top10",
+   "kind": "table",
+   "table": "tab:exposure",
+   "row": "RLMRec~\\citep{ren2024rlmrec}",
+   "column": 14,
+   "blocks": [],
+   "text": "0.004",
+   "from": [
+    "aud/sports.json:segments.events_1001_10000.reference.rlmrec_graphcl.B_exposure.tail_share_top10"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 370,
+   "slot": "holds / does not hold",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "and P1",
+   "text": "holds",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:P1.decision.verdict"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 371,
+   "slot": "grid:P1",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "(mean $\\mathcal G_{\\rm FT}-\\mathcal G_{\\rm ZS}$",
+   "text": "0.011$\\pm$.008, $p$ 0.004",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:P1.decision.verdict",
+    "grid/qwen/ml1m.json:P1.available",
+    "grid/qwen/ml1m.json:P1.per_seed.s0.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s1.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s2.est",
+    "grid/qwen/ml1m.json:P1.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 371,
+   "slot": "n of 3",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "\\mathcal G_{\\rm ZS}$ [S];",
+   "text": "3 of 3",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:P1.decision.verdict",
+    "grid/qwen/ml1m.json:P1.per_seed.s0.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s1.est",
+    "grid/qwen/ml1m.json:P1.per_seed.s2.est"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 444,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_popularity, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:pruning",
+   "row": "Item mean, popularity, MF (ref.)",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.759{\\scriptsize$\\pm$.021} / 0.616{\\scriptsize$\\pm$.020} / 0.791{\\scriptsize$\\pm$.018}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.q_hat",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.popularity",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 1,
+   "blocks": [],
+   "text": "0.588",
+   "from": [
+    "sel/selection.json:table.V0.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 2,
+   "blocks": [],
+   "text": "0.540",
+   "from": [
+    "sel/selection.json:table.V0.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V0.ml1m.E1",
+    "sel/selection.json:table.V0.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V0.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V0.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 71,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V0",
+   "column": 6,
+   "blocks": [],
+   "text": "no",
+   "from": [
+    "sel/selection.json:table.V0.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 1,
+   "blocks": [],
+   "text": "0.612",
+   "from": [
+    "sel/selection.json:table.V1.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 2,
+   "blocks": [],
+   "text": "0.544",
+   "from": [
+    "sel/selection.json:table.V1.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V1.ml1m.E1",
+    "sel/selection.json:table.V1.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V1.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V1.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 72,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V1",
+   "column": 6,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V1.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 1,
+   "blocks": [],
+   "text": "0.611",
+   "from": [
+    "sel/selection.json:table.V2.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 2,
+   "blocks": [],
+   "text": "0.543",
+   "from": [
+    "sel/selection.json:table.V2.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V2.ml1m.E1",
+    "sel/selection.json:table.V2.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V2.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V2.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 73,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V2",
+   "column": 6,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V2.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 1,
+   "blocks": [],
+   "text": "0.598",
+   "from": [
+    "sel/selection.json:table.V3.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 2,
+   "blocks": [],
+   "text": "0.541",
+   "from": [
+    "sel/selection.json:table.V3.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V3.ml1m.E1",
+    "sel/selection.json:table.V3.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V3.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V3.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 74,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V3",
+   "column": 6,
+   "blocks": [],
+   "text": "no",
+   "from": [
+    "sel/selection.json:table.V3.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 1,
+   "blocks": [],
+   "text": "0.540",
+   "from": [
+    "sel/selection.json:table.V4.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 2,
+   "blocks": [],
+   "text": "0.547",
+   "from": [
+    "sel/selection.json:table.V4.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V4.ml1m.E1",
+    "sel/selection.json:table.V4.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V4.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V4.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 75,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V4",
+   "column": 6,
+   "blocks": [],
+   "text": "no",
+   "from": [
+    "sel/selection.json:table.V4.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 1,
+   "blocks": [],
+   "text": "0.595",
+   "from": [
+    "sel/selection.json:table.V5.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 2,
+   "blocks": [],
+   "text": "0.540",
+   "from": [
+    "sel/selection.json:table.V5.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V5.ml1m.E1",
+    "sel/selection.json:table.V5.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V5.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V5.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 76,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V5",
+   "column": 6,
+   "blocks": [],
+   "text": "no",
+   "from": [
+    "sel/selection.json:table.V5.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 1,
+   "blocks": [],
+   "text": "0.585",
+   "from": [
+    "sel/selection.json:table.V7.ml1m.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:UAUC",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 2,
+   "blocks": [],
+   "text": "0.544",
+   "from": [
+    "sel/selection.json:table.V7.toys.UAUC"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:E1",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 3,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V7.ml1m.E1",
+    "sel/selection.json:table.V7.toys.E1"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:E2",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 4,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V7.E2"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:eligible",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 5,
+   "blocks": [],
+   "text": "yes",
+   "from": [
+    "sel/selection.json:table.V7.eligible"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 77,
+   "slot": "sel:tied\\_with\\_max",
+   "kind": "table",
+   "table": "tab:app-sens",
+   "row": "V7",
+   "column": 6,
+   "blocks": [],
+   "text": "no",
+   "from": [
+    "sel/selection.json:table.V7.tied_with_max"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 102,
+   "slot": "grid:UAUC; cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:corrections",
+   "row": "0",
+   "column": 2,
+   "blocks": [],
+   "text": "0.596{\\scriptsize$\\pm$.022} / 0.759{\\scriptsize$\\pm$.021} / 0.791{\\scriptsize$\\pm$.018}",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat",
+    "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 103,
+   "slot": "corr:max\\_abs\\_dAUC\\_user",
+   "kind": "table",
+   "table": "tab:corrections",
+   "row": "1",
+   "column": 2,
+   "blocks": [],
+   "text": "0.000",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 104,
+   "slot": "corr:dAUC\\_pooled\\_offset\\_removal",
+   "kind": "table",
+   "table": "tab:corrections",
+   "row": "2",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.039",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.dAUC_pooled_offset_removal"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 105,
+   "slot": "corr:dUAUC\\_nohist\\_minus\\_raw",
+   "kind": "table",
+   "table": "tab:corrections",
+   "row": "3",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.036{\\scriptsize$\\pm$.014}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.corrections.dUAUC_nohist_minus_raw.per_seed.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 106,
+   "slot": "corr:dUAUC\\_evidence\\_minus\\_raw",
+   "kind": "table",
+   "table": "tab:corrections",
+   "row": "4",
+   "column": 2,
+   "blocks": [],
+   "text": "$-$0.091{\\scriptsize$\\pm$.023}",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.corrections.dUAUC_evidence_minus_raw.per_seed.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 130,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+   "column": 1,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.742{\\scriptsize$\\pm$.019\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 135,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "Item mean / MF (ref.)",
+   "column": 1,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.759{\\scriptsize$\\pm$.021} / 0.791{\\scriptsize$\\pm$.018}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.q_hat",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.740",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.745",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.743",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC\\_all\\_rows seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.733",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.secondary.UAUC_all_rows.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC\\_all\\_rows seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.734",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.secondary.UAUC_all_rows.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "grid:UAUC\\_all\\_rows seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.734",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT",
+    "grid/qwen/ml1m.json:E_A.FT.secondary.UAUC_all_rows.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 190,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "ML-1M",
+   "column": 3,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.759{\\scriptsize$\\pm$.021}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.q_hat"
+   ]
+  }
+ ]
+}

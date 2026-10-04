@@ -1,0 +1,300 @@
+{
+    "schema":  "pull_results_v1",
+    "server":  "lumen-gpu:/root/autodl-tmp/lumen-rec",
+    "note":  "cpu, ko and corr (rated panels) are fields of the grid reports; every number of the paper is read from these files by scripts/sigir/fill_paper.py (docs/sigir/PAPER_DATA_MAP.md)",
+    "files":  [
+                  {
+                      "alias":  "aud",
+                      "local_path":  "aud/sports.json",
+                      "server_path":  "outputs/confrec/nextitem_audit/sports.json",
+                      "size":  412988,
+                      "sha1":  "a7406bd2509464352eac2e390dfcb7ab5784c837",
+                      "server_mtime_utc":  "2026-10-04T11:03:50Z"
+                  },
+                  {
+                      "alias":  "gate",
+                      "local_path":  "gate/gate.json",
+                      "server_path":  "outputs/confrec/gatefix/confirm/gate.json",
+                      "size":  4574,
+                      "sha1":  "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
+                      "server_mtime_utc":  "2026-10-04T12:23:10Z"
+                  },
+                  {
+                      "alias":  "gft",
+                      "local_path":  "gft/gate_ft.json",
+                      "server_path":  "outputs/confrec/gateft/gate_ft.json",
+                      "size":  3522,
+                      "sha1":  "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
+                      "server_mtime_utc":  "2026-10-04T15:27:27Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/llama/ml1m_split.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/panels/ml1m/ftgrid_split.json",
+                      "size":  2070,
+                      "sha1":  "c75ef45b134b3427244b839a251b26dbd875ea95",
+                      "server_mtime_utc":  "2026-10-04T12:43:28Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/llama/toys_split.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/panels/toys/ftgrid_split.json",
+                      "size":  2021,
+                      "sha1":  "eda0ff39c0e110836844a1a679190153c53c36e4",
+                      "server_mtime_utc":  "2026-10-04T12:43:45Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/games_split.json",
+                      "server_path":  "outputs/confrec/ftgrid/panels/games/ftgrid_split.json",
+                      "size":  2009,
+                      "sha1":  "dfd01e9e4012d19a958c154e848c546774d62121",
+                      "server_mtime_utc":  "2026-10-04T12:27:31Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/ml1m.json",
+                      "server_path":  "outputs/confrec/ftgrid/report/ml1m.json",
+                      "size":  165533,
+                      "sha1":  "bf76f48414ac99a887dbc63a4e2f29617269a46e",
+                      "server_mtime_utc":  "2026-10-04T16:50:26Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/ml1m_split.json",
+                      "server_path":  "outputs/confrec/ftgrid/panels/ml1m/ftgrid_split.json",
+                      "size":  2057,
+                      "sha1":  "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
+                      "server_mtime_utc":  "2026-10-04T12:26:10Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/ml1m_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid/report/ml1m_tables.csv",
+                      "size":  27068,
+                      "sha1":  "4274485237bb2314c41f3aae2a4998d5f22379aa",
+                      "server_mtime_utc":  "2026-10-04T16:50:26Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/sports_split.json",
+                      "server_path":  "outputs/confrec/ftgrid/panels/sports/ftgrid_split.json",
+                      "size":  1998,
+                      "sha1":  "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
+                      "server_mtime_utc":  "2026-10-04T12:30:48Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/toys_split.json",
+                      "server_path":  "outputs/confrec/ftgrid/panels/toys/ftgrid_split.json",
+                      "size":  2008,
+                      "sha1":  "e43416bb960cb86ae6fb1ed7a2ad16f063de5e28",
+                      "server_mtime_utc":  "2026-10-04T12:26:25Z"
+                  },
+                  {
+                      "alias":  "sel",
+                      "local_path":  "sel/selection.json",
+                      "server_path":  "outputs/confrec/gatefix/dev/selection.json",
+                      "size":  47500,
+                      "sha1":  "7cd3972e7fedccfc0059e4ecfcfcdf12b5212a0e",
+                      "server_mtime_utc":  "2026-10-04T12:09:16Z"
+                  }
+              ],
+    "missing":  [
+                    {
+                        "alias":  "aud",
+                        "server_path":  "outputs/confrec/nextitem_audit/home.json",
+                        "local_path":  "aud/home.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud",
+                        "server_path":  "outputs/confrec/nextitem_audit/summary.json",
+                        "local_path":  "aud/summary.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud",
+                        "server_path":  "outputs/confrec/nextitem_audit/tools.json",
+                        "local_path":  "aud/tools.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud",
+                        "server_path":  "outputs/confrec/nextitem_audit/toys.json",
+                        "local_path":  "aud/toys.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2l",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/llama_home.json",
+                        "local_path":  "aud2l/home.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2l",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/llama_sports.json",
+                        "local_path":  "aud2l/sports.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2l",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/llama_tools.json",
+                        "local_path":  "aud2l/tools.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2l",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/llama_toys.json",
+                        "local_path":  "aud2l/toys.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2q",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/qwen_home.json",
+                        "local_path":  "aud2q/home.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2q",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/qwen_sports.json",
+                        "local_path":  "aud2q/sports.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2q",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/qwen_tools.json",
+                        "local_path":  "aud2q/tools.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "aud2q",
+                        "server_path":  "outputs/confrec/nextitem_audit_z2/qwen_toys.json",
+                        "local_path":  "aud2q/toys.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "corr",
+                        "server_path":  "outputs/confrec/ftgrid/corrections_sports.json",
+                        "local_path":  "corr/sports.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m.json",
+                        "local_path":  "grid/llama/ml1m.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m_tables.csv",
+                        "local_path":  "grid/llama/ml1m_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid_llama/report/toys.json",
+                        "local_path":  "grid/llama/toys.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid_llama/report/toys_tables.csv",
+                        "local_path":  "grid/llama/toys_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/games.json",
+                        "local_path":  "grid/qwen/games.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/games_tables.csv",
+                        "local_path":  "grid/qwen/games_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/sports.json",
+                        "local_path":  "grid/qwen/sports.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/sports_tables.csv",
+                        "local_path":  "grid/qwen/sports_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/toys.json",
+                        "local_path":  "grid/qwen/toys.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "grid",
+                        "server_path":  "outputs/confrec/ftgrid/report/toys_tables.csv",
+                        "local_path":  "grid/qwen/toys_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "mir",
+                        "server_path":  "outputs/confrec/gatefix/stage3/decision.json",
+                        "local_path":  "mir/decision.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "prn",
+                        "server_path":  "outputs/confrec/ftprune/pruning_ml1m.csv",
+                        "local_path":  "prn/pruning_ml1m.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "prn",
+                        "server_path":  "outputs/confrec/ftprune/pruning_ml1m.json",
+                        "local_path":  "prn/pruning_ml1m.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/games/report.json",
+                        "local_path":  "slot/games.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/ml1m/report.json",
+                        "local_path":  "slot/ml1m.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/slot.json",
+                        "local_path":  "slot/slot.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/slot_tables.csv",
+                        "local_path":  "slot/slot_tables.csv",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/sports/report.json",
+                        "local_path":  "slot/sports.json",
+                        "stale_local_copy_kept":  false
+                    },
+                    {
+                        "alias":  "slot",
+                        "server_path":  "outputs/confrec/ftmethod/toys/report.json",
+                        "local_path":  "slot/toys.json",
+                        "stale_local_copy_kept":  false
+                    }
+                ],
+    "errors":  [
+
+               ]
+}

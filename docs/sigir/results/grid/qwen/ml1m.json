@@ -1,0 +1,5273 @@
+{
+  "spec": "idea-stage/PREREG_AMENDMENT_3.md sections 1, 3, 5, 9, 11; docs/sigir/FTGRID_IMPL_SPEC.md",
+  "meta": {
+    "domain": "ml1m",
+    "backbone": "Qwen3-8B",
+    "backbones_seen": [
+      "Qwen3-8B"
+    ],
+    "T": 977099602.0,
+    "variant": "V1",
+    "quantile": 0.8,
+    "split_sha1": "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
+    "split_counts": {
+      "train": {
+        "users": 1500,
+        "user_ids_sha1": "442889764de9adc81b37a2fa72bc7af12ece2ff3",
+        "candidates_total": 29365,
+        "examples_pre_T": 23348,
+        "cap": 24000,
+        "cap_applied": false,
+        "examples_written": 23348,
+        "overlength": {
+          "max_len_registered": 1024,
+          "share_above_1024": 0.0,
+          "p995": 294.0,
+          "max_len_used": 1024,
+          "micro_bsz": 8,
+          "grad_accum": 4
+        }
+      },
+      "eval": {
+        "users": 1683,
+        "user_ids_sha1": "104107a568f1167ccef31118dd62d4b79a23f0eb",
+        "candidates": 33043,
+        "cal_candidates": 26577,
+        "test_candidates": 6466,
+        "users_both_classes_test": 366,
+        "users_both_classes_test_tail": 204,
+        "users_both_classes_all_rows": 1683,
+        "share_test_pairs_item_seen_in_train": 0.9659758738014228
+      },
+      "sd": {
+        "users": 366,
+        "user_ids_sha1": "f1c53bc8a1b6349d53cc72bd88efc69101e79105",
+        "user_ids_path": "sd_users.txt"
+      }
+    },
+    "split_args": {
+      "seed": 0,
+      "n_train": 1500,
+      "n_eval_max": 3000,
+      "s_max": 1000,
+      "train_cap": 24000,
+      "tokenizer_used": true,
+      "tokenizer": "Qwen3-8B",
+      "dev_users_sha1_checked": true,
+      "gateft_split_checked": true
+    },
+    "gateft_T_match": true,
+    "split_code_sha1": {
+      "ftgrid_data.py": "cc8e1c4d07360aa75ce5e62782a4f3a89fb10716",
+      "gateft_data.py": "226835415ce0fd1c0240693b3227ffa065a70a6e",
+      "build_rated_panels.py": "3aa60f1d3541826cbfc3abbff755d06c43486e8a"
+    },
+    "panel_sha1": {
+      "eval.jsonl": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+      "eval_placebo.jsonl": null,
+      "eval_pseudo.jsonl": null,
+      "eval_sd_test.jsonl": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+      "eval_sd_test_starperm0.jsonl": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+      "eval_sd_test_starperm1.jsonl": "64ba3256b95927d70b412bd8f38e5515df577da4",
+      "eval_users.txt": "104107a568f1167ccef31118dd62d4b79a23f0eb",
+      "sd_users.txt": "f1c53bc8a1b6349d53cc72bd88efc69101e79105",
+      "train.jsonl": "1d1079ccd03a1be3494f8ee88afd956cd761b38e"
+    },
+    "n_boot": 2000,
+    "seed": 0,
+    "min_n": 150,
+    "models_requested": [
+      "zeroshot",
+      "s0",
+      "s1",
+      "s2"
+    ],
+    "regimes": {
+      "ZS": {
+        "models": [
+          "zeroshot"
+        ],
+        "missing_or_excluded": [],
+        "n_registered": 1
+      },
+      "FT": {
+        "models": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "missing_or_excluded": [],
+        "n_registered": 3
+      },
+      "PERM": {
+        "models": [],
+        "missing_or_excluded": [],
+        "n_registered": 2
+      }
+    },
+    "n_eval_pairs": 33043,
+    "n_test_pairs": 6466,
+    "n_cal_pairs": 26577,
+    "n_sd_users": 366,
+    "n_sd_test_pairs": 6365,
+    "n_users_both_classes_test": 366,
+    "n_users_both_classes_test_tail": 204
+  },
+  "input_checks": {
+    "problems": [],
+    "eval_user_ids_sha1_match": true,
+    "sd_user_ids_sha1_match": true,
+    "eval_sd_test_pairs_equal_sd_test_rows": true,
+    "sd_users_are_eval_users_with_both_classes_in_test": true,
+    "adapters_distinct_across_models": true
+  },
+  "excluded_runs": [],
+  "runs": {
+    "zeroshot": {
+      "like": {
+        "run": "zeroshot/like",
+        "integrity": {
+          "n_rows": 33043.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9999887477225267,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "panel_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": false,
+        "adapter_id": null,
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "43d6827cf70abb400c763e0fdc55b67d01b52870",
+        "scores_censoring": {
+          "like": {
+            "n": 33043,
+            "0": 33043
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "swap": {
+        "run": "zeroshot/swap",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9999868300078221,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "swap": {
+            "n_rows": 15688.0,
+            "n_censored2": 0.0,
+            "censored2_share": 0.0,
+            "overlength": 0.0,
+            "censored2_share_le_0.005": true,
+            "overlength_eq_0": true
+          },
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": false,
+        "adapter_id": null,
+        "hist_len": 10,
+        "swap_k": 8,
+        "run_key_sha1": "e9ba4d8202ae65e91b0ddb552a5f09bc61b909fe",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "nohist": {
+        "run": "zeroshot/nohist",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 1.0,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": false,
+        "adapter_id": null,
+        "hist_len": 0,
+        "swap_k": null,
+        "run_key_sha1": "bf864b7b1e83ae68ad2c5dded218d7e8702e5e0a",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm0": {
+        "run": "zeroshot/starperm0",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9999860015710598,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "panel_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": false,
+        "adapter_id": null,
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "30bc430710c3c28c5178824c305b892fa072e2e7",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm1": {
+        "run": "zeroshot/starperm1",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9999853786331208,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "panel_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": false,
+        "adapter_id": null,
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "bc41d46ae722b1614e2037cf2a143ab9842a0acc",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "pseudo": {
+        "run": "zeroshot/pseudo",
+        "status": "ABSENT",
+        "reason": "no scoring directory zeroshot/pseudo"
+      },
+      "placebo": {
+        "run": "zeroshot/placebo",
+        "status": "ABSENT",
+        "reason": "no scoring directory zeroshot/placebo"
+      }
+    },
+    "s0": {
+      "like": {
+        "run": "s0/like",
+        "integrity": {
+          "n_rows": 33043.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997359800260195,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "panel_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "6f5e976a6c54",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "43707df08ac8a46a1ee5b3d91318f09b5fee4d62",
+        "scores_censoring": {
+          "like": {
+            "n": 33043,
+            "0": 33043
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "swap": {
+        "run": "s0/swap",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997332909662204,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "swap": {
+            "n_rows": 15688.0,
+            "n_censored2": 0.0,
+            "censored2_share": 0.0,
+            "overlength": 0.0,
+            "censored2_share_le_0.005": true,
+            "overlength_eq_0": true
+          },
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "6f5e976a6c54",
+        "hist_len": 10,
+        "swap_k": 8,
+        "run_key_sha1": "b812b938a0dc159adbb583352aa12efd39d3a674",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "nohist": {
+        "run": "s0/nohist",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9995560268656657,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "6f5e976a6c54",
+        "hist_len": 0,
+        "swap_k": null,
+        "run_key_sha1": "2888115ceca612f4b32a2ebf274a7cf6dcdb4147",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm0": {
+        "run": "s0/starperm0",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997238537313488,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "panel_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "6f5e976a6c54",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "c2b7d5c4db9a15d65b248e3ca93d18e7b3a4c886",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm1": {
+        "run": "s0/starperm1",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997236040848443,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "panel_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "6f5e976a6c54",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "c9acb3c1552d4c55caf52f10f050a654da26f74c",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "pseudo": {
+        "run": "s0/pseudo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s0/pseudo"
+      },
+      "placebo": {
+        "run": "s0/placebo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s0/placebo"
+      }
+    },
+    "s1": {
+      "like": {
+        "run": "s1/like",
+        "integrity": {
+          "n_rows": 33043.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997673270889363,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "panel_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "1ced9d20216c",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "e3bc7bed3715c2ec305f3532cceabda1cc80e0aa",
+        "scores_censoring": {
+          "like": {
+            "n": 33043,
+            "0": 33043
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "swap": {
+        "run": "s1/swap",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997654427337016,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "swap": {
+            "n_rows": 15688.0,
+            "n_censored2": 0.0,
+            "censored2_share": 0.0,
+            "overlength": 0.0,
+            "censored2_share_le_0.005": true,
+            "overlength_eq_0": true
+          },
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "1ced9d20216c",
+        "hist_len": 10,
+        "swap_k": 8,
+        "run_key_sha1": "d04fbb5ac3cf795c7cffc281905c7719030e7066",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "nohist": {
+        "run": "s1/nohist",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9995947172034606,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "1ced9d20216c",
+        "hist_len": 0,
+        "swap_k": null,
+        "run_key_sha1": "a84e7e4aa0157acb71a503d8018e7c426386d2ed",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm0": {
+        "run": "s1/starperm0",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.999758750039283,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "panel_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "1ced9d20216c",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "6765444aba3be1fbd485c10056ed1e032ffbf0e1",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm1": {
+        "run": "s1/starperm1",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997569054202712,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "panel_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "1ced9d20216c",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "973df4a90e059cfadaabaa401148b284c7ee1cc4",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "pseudo": {
+        "run": "s1/pseudo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s1/pseudo"
+      },
+      "placebo": {
+        "run": "s1/placebo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s1/placebo"
+      }
+    },
+    "s2": {
+      "like": {
+        "run": "s2/like",
+        "integrity": {
+          "n_rows": 33043.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997651006264408,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "panel_sha1": "e9a55be3354dd150e9383e75c4795ab8d785b924",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "dcf2c15bd828",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "7399359c83ab00a898587b14b054c6366acf3211",
+        "scores_censoring": {
+          "like": {
+            "n": 33043,
+            "0": 33043
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "swap": {
+        "run": "s2/swap",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997642087981141,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "swap": {
+            "n_rows": 15688.0,
+            "n_censored2": 0.0,
+            "censored2_share": 0.0,
+            "overlength": 0.0,
+            "censored2_share_le_0.005": true,
+            "overlength_eq_0": true
+          },
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "dcf2c15bd828",
+        "hist_len": 10,
+        "swap_k": 8,
+        "run_key_sha1": "16369c6640297fb5c78ded0fe87943363719dcc1",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "nohist": {
+        "run": "s2/nohist",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9995504436763557,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "panel_sha1": "ace4d0a3c5611b7a383138a528ebd94fa5700296",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "dcf2c15bd828",
+        "hist_len": 0,
+        "swap_k": null,
+        "run_key_sha1": "9db60257badcc1294fa5970f9b803d637fd5e48c",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm0": {
+        "run": "s2/starperm0",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997557277297752,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "panel_sha1": "f519a590b39018b3c6e42ad7e87be9a70fcaa32d",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "dcf2c15bd828",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "fc66b6c882d8c845ed7a9d688d25b4d6c7855b8a",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "starperm1": {
+        "run": "s2/starperm1",
+        "integrity": {
+          "n_rows": 6365.0,
+          "n_censored2": 0.0,
+          "censored2_share": 0.0,
+          "overlength": 0.0,
+          "mean_yes_no_mass": 0.9997561677926189,
+          "censored2_share_le_0.005": true,
+          "overlength_eq_0": true,
+          "mean_yes_no_mass_ge_0.95": true,
+          "E1": true
+        },
+        "panel_identity": {
+          "report_data_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "panel_sha1": "64ba3256b95927d70b412bd8f38e5515df577da4",
+          "match": true
+        },
+        "backbone": "Qwen3-8B",
+        "variant": "V1",
+        "adapter": true,
+        "adapter_id": "dcf2c15bd828",
+        "hist_len": 10,
+        "swap_k": null,
+        "run_key_sha1": "250bb64ffdc18af3559f81bb8fd191ee635340f8",
+        "scores_censoring": {
+          "like": {
+            "n": 6365,
+            "0": 6365
+          }
+        },
+        "status": "OK",
+        "reason": null
+      },
+      "pseudo": {
+        "run": "s2/pseudo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s2/pseudo"
+      },
+      "placebo": {
+        "run": "s2/placebo",
+        "status": "ABSENT",
+        "reason": "no scoring directory s2/placebo"
+      }
+    }
+  },
+  "joins": {
+    "zeroshot": {
+      "like": {},
+      "swap": {},
+      "nohist": {},
+      "starperm0": {},
+      "starperm1": {}
+    },
+    "s0": {
+      "like": {},
+      "swap": {},
+      "nohist": {},
+      "starperm0": {},
+      "starperm1": {}
+    },
+    "s1": {
+      "like": {},
+      "swap": {},
+      "nohist": {},
+      "starperm0": {},
+      "starperm1": {}
+    },
+    "s2": {
+      "like": {},
+      "swap": {},
+      "nohist": {},
+      "starperm0": {},
+      "starperm1": {}
+    }
+  },
+  "references": {
+    "source": "computed from --raw",
+    "cf_block": {
+      "candidate_timestamps": "panel candidate_timestamps",
+      "n_pairs": 33043,
+      "n_users": 1683,
+      "n_raw_events": 1000209,
+      "n_first_events": 1000209,
+      "n_candidate_pairs_not_in_raw": 0,
+      "item_mean_prior": {
+        "definition": "mean of other users' first ratings of the item strictly before the candidate timestamp (leave-user-out, prior-only); pairs with no such rating are NaN and drop out of UAUC",
+        "UAUC": {
+          "est": 0.7494459507872693,
+          "lo": 0.7411976854225107,
+          "hi": 0.7578367788398906,
+          "n_users": 1683,
+          "n_pairs": 32908
+        },
+        "share_pairs_without_prior_rating": 0.004085585449263074,
+        "n_prior_median": 253.0
+      },
+      "item_mean_prior_shrunk": {
+        "definition": "(sum + k g) / (n + k), k = 5.0, g = mean of all other users' first ratings strictly before the candidate timestamp (full coverage)",
+        "UAUC": {
+          "est": 0.7485147148369443,
+          "lo": 0.7401740550733953,
+          "hi": 0.756877359184402,
+          "n_users": 1683,
+          "n_pairs": 33043
+        }
+      },
+      "mf_temporal": {
+        "definition": "PRIMARY (amendment 2 A3 'temporal biased MF'): item parameters (mu, b_i, q_i) trained on every first (user, item) rating with ts < T, except all panel users' candidate events; T = numpy linear 0.8-quantile of all panel candidate timestamps (amendment 1 D, split_panel --time_split); each panel user's (b_u, p_u) folded in (fold_in_user) from the user's own non-candidate first events strictly before the user's first candidate (users who joined after T have no ts < T rating). residual = MF - mu - b_u - b_i = p_u.q_i; UAUCs over warm pairs (item with a ts < T rating, user with a fold-in event on such an item). test_pairs_t_ge_T (the wording flag) = pairs with t >= T: non-transductive (no other user's rating at or after T is used; the user's own events predate the candidates). all_pairs_sensitivity adds the pairs before T (their items' parameters see other users' ratings in [t, T)); test_pairs_t_ge_T_no_fold_in keeps the ts < T fit's own user parameters",
+        "cutoff": {
+          "quantile": 0.8,
+          "T": 977099602.0,
+          "n_panel_pairs_t_ge_T": 6466,
+          "n_users_with_pairs_t_ge_T": 404,
+          "explicit": true
+        },
+        "solver": "CCD++ (fit_biased_mf)",
+        "dim": 32,
+        "iters": 15,
+        "lambda": 0.05,
+        "lambda_bias": 5.0,
+        "seed": 0,
+        "n_train": 849896,
+        "n_users_train": 5858,
+        "n_items_train": 3670,
+        "train_rmse": 0.6701680243782121,
+        "fold_in": {
+          "n_panel_users": 1683,
+          "n_users_warm": 1648,
+          "events_per_user_median": 80.0,
+          "n_users_without_events": 35
+        },
+        "test_pairs_t_ge_T": {
+          "n_pairs": 6466,
+          "n_pairs_warm": 6457,
+          "n_pairs_cold_item": 9,
+          "n_pairs_cold_user": 0,
+          "heldout_candidate_rmse": 1.1061646032783536,
+          "UAUC_mf": {
+            "est": 0.791154644804984,
+            "lo": 0.7723332468705609,
+            "hi": 0.8092007969791558,
+            "n_users": 366,
+            "n_pairs": 6457
+          },
+          "UAUC_personal_residual": {
+            "est": 0.6529677219850099,
+            "lo": 0.6299770622440244,
+            "hi": 0.6747482195241553,
+            "n_users": 366,
+            "n_pairs": 6457
+          },
+          "UAUC_item_bias": {
+            "est": 0.7570709880103058,
+            "lo": 0.7362058661345238,
+            "hi": 0.778778290744114,
+            "n_users": 366,
+            "n_pairs": 6457
+          },
+          "UAUC_personal_residual_incl_cold": {
+            "est": 0.6526224808993517,
+            "lo": 0.6295924805024222,
+            "hi": 0.67443578674795,
+            "n_users": 366,
+            "n_pairs": 6466
+          }
+        },
+        "all_pairs_sensitivity": {
+          "n_pairs": 33043,
+          "n_pairs_warm": 32452,
+          "n_pairs_cold_item": 13,
+          "n_pairs_cold_user": 578,
+          "heldout_candidate_rmse": 1.132861690444121,
+          "UAUC_mf": {
+            "est": 0.7798580990578643,
+            "lo": 0.7722034168808418,
+            "hi": 0.7875269774636164,
+            "n_users": 1648,
+            "n_pairs": 32452
+          },
+          "UAUC_personal_residual": {
+            "est": 0.6385736403395136,
+            "lo": 0.6283499262904993,
+            "hi": 0.6483957373120662,
+            "n_users": 1648,
+            "n_pairs": 32452
+          },
+          "UAUC_item_bias": {
+            "est": 0.7528992574851786,
+            "lo": 0.7445976401426598,
+            "hi": 0.7608922204946794,
+            "n_users": 1648,
+            "n_pairs": 32452
+          },
+          "UAUC_personal_residual_incl_cold": {
+            "est": 0.6355860537433476,
+            "lo": 0.6265074239012636,
+            "hi": 0.6448319085764661,
+            "n_users": 1683,
+            "n_pairs": 33043
+          }
+        },
+        "test_pairs_t_ge_T_no_fold_in": {
+          "n_pairs": 6466,
+          "n_pairs_warm": 5182,
+          "n_pairs_cold_item": 9,
+          "n_pairs_cold_user": 1276,
+          "heldout_candidate_rmse": 1.1358603194177521,
+          "UAUC_mf": {
+            "est": 0.7770629158889149,
+            "lo": 0.7537211102984079,
+            "hi": 0.8001313772278377,
+            "n_users": 302,
+            "n_pairs": 5182
+          },
+          "UAUC_personal_residual": {
+            "est": 0.6326306938132339,
+            "lo": 0.6059906617003344,
+            "hi": 0.6568443778467103,
+            "n_users": 302,
+            "n_pairs": 5182
+          },
+          "UAUC_item_bias": {
+            "est": 0.7607286362041946,
+            "lo": 0.7367125025179044,
+            "hi": 0.7839686428755408,
+            "n_users": 302,
+            "n_pairs": 5182
+          },
+          "UAUC_personal_residual_incl_cold": {
+            "est": 0.6090851240494499,
+            "lo": 0.5868598385368118,
+            "hi": 0.6309677438359462,
+            "n_users": 366,
+            "n_pairs": 6466
+          }
+        }
+      }
+    }
+  },
+  "operationalizations": [
+    "pairs: one per (user_id, item_id) of eval.jsonl (one row per user, distinct items in a row); every scoring arm is joined on that key, so the TEST-only panels (eval_sd_test*.jsonl, whose cand_idx are renumbered) align with eval.jsonl; a score row whose label differs from the panel's is excluded and counted",
+    "TEST = candidate_timestamps >= T, CAL = < T, with T read from ftgrid_split.json (never recomputed)",
+    "integrity (A3 section 2, E1) from each report.json, the scores' censoring counts standing in for an absent field: censored = 2 share of the main rows <= 0.005, overlength = max(n_overlength, censored = 3 rows) = 0, mean Yes+No mass >= 0.95; a swap run's donor prompts also need a censored = 2 share <= 0.005 and no overlength prompt (their mass is not recorded); unknown values fail. Excluded and listed, never replaced: FAILED_INTEGRITY (E1), INCOMPLETE (no report.json or scores), UNREADABLE, PANEL_MISMATCH (report.json data_sha1 differs from the sha1 of the arm's panel file), VARIANT_MISMATCH (variant differs from the split's), MODEL_MISMATCH (zeroshot scored with an adapter, or an adapter model without one); an ABSENT arm gives null blocks with the reason",
+    "identical users and rows: each regime block (and each contrast) is computed on the rows finite for every model it involves, so each listed seed and the mean over seeds use the same users and rows; the mean over seeds of the per-seed UAUCs is then exactly the seed-averaged UAUC (mean over users of the per-user AUC averaged over seeds)",
+    "UAUC: mean over users with both classes among the rows of the per-user AUC with average ranks (ties 1/2)",
+    "CIs: 95% percentile, 2,000 user resamples, seed 0; per-user statistics use stats.paired_bootstrap's draws (sorted user ids, one rng.integers(0, n, n) per resample), statistics re-estimated on resampled rows use stats.cluster_bootstrap's draws (users), item-level correlations resample items (forensics.unit_bootstrap); a regime's seeds share the draws, so the CI of the mean over seeds is that of the per-draw mean",
+    "p = min(1, 2 min((#{d* <= 0} + 1)/(B + 1), (#{d* >= 0} + 1)/(B + 1))) over the B finite resamples (B = 2,000)",
+    "minimum n (A3 section 1): an endpoint on fewer than 150 users has descriptive_min_n = true and no p-value or CI-based claim (p and ci_excludes_0 null; the interval is still printed as a description)",
+    "sigma_seed = SD (ddof 1) of the per-seed values; sigma_seed_rule = every registered seed present, every seed of the mean's sign and |mean| > 2 sigma_seed (A3 section 11, Amendment 2 F)",
+    "E-A references on the regime's rows (rows finite in every reference too): q-hat = forensics.prior_means mean_prior_shrunk (k = 5, other users' first ratings strictly before the candidate's timestamp); popularity = candidate_popularity; the temporal biased MF = forensics.cf_references(EVAL panel, cutoff = T): item parameters on the first ratings with ts < T except every EVAL candidate event, each EVAL user folded in from the user's own non-candidate events strictly before the user's first candidate; cold pairs keep residual 0 on the identical rows, the warm-pair residual UAUC is the forensics convention (secondary)",
+    "seen = the candidate's item occurs among the candidates of train.jsonl (after the cap)",
+    "E-A lemma checks (reported, not tested): on the regime's TEST rows, max over users of |AUC_u(sigmoid(a L + b)) - AUC_u(L)| with the E-C CAL-fit Platt map and of |AUC_u(L - the user's mean over those rows) - AUC_u(L)|; max_abs_dAUC_user = the larger; dAUC_pooled_offset_removal = pooled AUC (metrics.auroc over every TEST row) after minus before removing the user means",
+    "E-C: Platt = stats.platt_fit on every CAL row of the regime's rows; Brier skill = 1 - Brier / Brier(CAL base rate) on TEST; reliability: the 10 equal-mass bins of the adaptive ECE (sum of share x |gap| = ECE) and metrics.reliability_bins with 10 equal-width bins; anatomy on TEST rows of users with both classes: k = TEST likes, c_u = midpoint of the k-th and (k+1)-th largest logits, decision = 1[L >= c_u] (a tie at c_u is decided 1, no random break), tertiles = stats.rank_bins(margin, 3) over the anatomy pairs (0 = smallest margins = bottom); AUROC = metrics.auroc(margin, correct); AURC = metrics.risk_coverage(margin, correct)[2]; the user resamples refit the Platt map and recut the tertiles",
+    "E-D: L = the like logit of the model's like arm (eval.jsonl) on S_d's TEST rows (the swap arm's own like scores are a consistency check); pi = mean of the finite donor logits of swap_prior.csv.gz, halves = donor rows 1-4 vs 5-8 in file order (forensics.load_swap_positions); L_nohist = the item mean of the nohist arm's like logit; shares on the rows where L, pi and both halves are finite, every variable centred within user on those rows",
+    "E-D stackers: logistic regressions with intercept (Newton, features standardised on the fitting fold, L2 1e-4 on the slopes as stats.platt_fit), fold A = stats.user_halves(S_d users, 0), each fold's rows scored by the fit on the other fold's rows; UAUC of the pooled cross-fitted linear predictors on the rows where every feature is finite",
+    "E-D star permutation (diag_battery convention): dUAUC = UAUC(L) - mean over users of the per-user mean over k of AUC(L_perm_k) (the UAUC of the mean permuted logit is reported beside it); tau_P = L - mean_k L_perm_k on the rows finite in L and every copy; within-user SD pooled with divisor N - n_users",
+    "popularity bins: stats.rank_bins(candidate_popularity, 5) cut over ALL EVAL candidates (CAL u TEST, A3 section 1); head = bin 4, tail = bin 0",
+    "E-E: pair level on the TEST rows (user-cluster CI), item level on item means over those rows (item bootstrap); pi at item level over S_d's TEST items; controls = q-hat (shrunk) + release_year (ml1m) or desc_len and has_store (toys, sports; desc_len from the raw meta description, else from candidate_texts as forensics); games: q-hat only (the domain is not named in A3), with desc_len and has_store as a point-estimate sensitivity; Bias Index = metrics.bias_index(conf, label, head/mid/tail, 10 bins, residual-adjusted) on TEST rows, conf = the E-C Platt map",
+    "P1: on S_d's TEST rows finite for ZS and the 3 FT seeds, stackers M1 and M2 cross-fitted per model; per user G_m = AUC(M2_m) - AUC(M1_m); the contrast of seed s is mean over users of G_s - G_ZS",
+    "knockout: models zeroshot, s0, s1, s2 with OK like (real), pseudo and placebo arms; rows = the (source_event_id, cand_idx) keys finite in every arm of every such model; pilot_pseudonym.analyze unchanged (n_boot, seed, Bias Index bootstrap 1000 = its CLI default); treated flags from eval_pseudo.jsonl (pilot_pseudonym.treated_from_panel)"
+  ],
+  "E_A": {
+    "ZS": {
+      "models": [
+        "zeroshot"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "UAUC_TEST": {
+        "rows": {
+          "n_users": 366,
+          "n_pairs": 6365
+        },
+        "per_model": {
+          "zeroshot": {
+            "est": 0.5958827069982499,
+            "lo": 0.5733706936565278,
+            "hi": 0.6179673713365044,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "mean_over_seeds": {
+          "est": 0.5958827069982499,
+          "lo": 0.5733706936565278,
+          "hi": 0.6179673713365044,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "seeds": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.5958827069982499
+          ],
+          "sigma_seed": null
+        },
+        "references": {
+          "q_hat": {
+            "est": 0.7586119349096629,
+            "lo": 0.7371140400665879,
+            "hi": 0.7795605491585087,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "popularity": {
+            "est": 0.6161332827012596,
+            "lo": 0.5962052943931263,
+            "hi": 0.636682073656429,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mf": {
+            "est": 0.7907218399718658,
+            "lo": 0.7720092516984423,
+            "hi": 0.8087331758356489,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mf_personal_residual": {
+            "est": 0.6526224808993517,
+            "lo": 0.6295924805024222,
+            "hi": 0.6744357867479495,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        }
+      },
+      "mf_personal_residual_warm_pairs_only": {
+        "est": 0.6529677219850099,
+        "lo": 0.6299770622440244,
+        "hi": 0.6747482195241553,
+        "n_users": 366,
+        "n_pairs": 6356,
+        "n_boot": 2000,
+        "descriptive_min_n": false
+      },
+      "secondary": {
+        "UAUC_all_rows": {
+          "rows": {
+            "n_users": 1683,
+            "n_pairs": 33043
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.6032507035223247,
+              "lo": 0.5944451938189681,
+              "hi": 0.6123815213826126,
+              "n_users": 1683,
+              "n_pairs": 33043,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.6032507035223247,
+            "lo": 0.5944451938189681,
+            "hi": 0.6123815213826126,
+            "n_users": 1683,
+            "n_pairs": 33043,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.6032507035223247
+            ],
+            "sigma_seed": null
+          }
+        },
+        "UAUC_TEST_seen": {
+          "rows": {
+            "n_users": 364,
+            "n_pairs": 6135
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.5961299730391237,
+              "lo": 0.5723039697943165,
+              "hi": 0.6193131053322417,
+              "n_users": 364,
+              "n_pairs": 6135,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.5961299730391237,
+            "lo": 0.5723039697943165,
+            "hi": 0.6193131053322417,
+            "n_users": 364,
+            "n_pairs": 6135,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.5961299730391237
+            ],
+            "sigma_seed": null
+          }
+        },
+        "UAUC_TEST_unseen": {
+          "rows": {
+            "n_users": 26,
+            "n_pairs": 80
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.5032051282051282,
+              "lo": 0.34935897435897434,
+              "hi": 0.6602564102564101,
+              "n_users": 26,
+              "n_pairs": 80,
+              "n_boot": 2000,
+              "descriptive_min_n": true
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.5032051282051282,
+            "lo": 0.34935897435897434,
+            "hi": 0.6602564102564101,
+            "n_users": 26,
+            "n_pairs": 80,
+            "n_boot": 2000,
+            "descriptive_min_n": true
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.5032051282051282
+            ],
+            "sigma_seed": null
+          }
+        }
+      },
+      "invariance": {
+        "definition": "lemma checks (A3 section 3, reported, not tested): max over users of |AUC_u(Platt(L)) - AUC_u(L)| (CAL-fit map of E-C) and of |AUC_u(L - user mean) - AUC_u(L)|; max_abs_dAUC_user = the larger of the two (expected 0 up to 1e-12; a negative Platt slope reverses every user); dAUC_pooled_offset_removal = pooled AUC over the TEST rows after minus before removing each user's mean logit over those rows",
+        "per_model": {
+          "zeroshot": {
+            "max_abs_dAUC_user": 0.0,
+            "max_abs_dAUC_user_platt": 0.0,
+            "max_abs_dAUC_user_centred": 0.0,
+            "dAUC_pooled_offset_removal": -0.039060419636232635,
+            "AUC_pooled": 0.6347095064721237,
+            "AUC_pooled_offset_removed": 0.595649086835891,
+            "platt_slope": 0.07889601543386605,
+            "n_users": 366,
+            "n_pairs": 6466
+          }
+        },
+        "max_abs_dAUC_user_over_models": 0.0,
+        "dAUC_pooled_offset_removal_mean_over_seeds": -0.039060419636232635
+      }
+    },
+    "FT": {
+      "models": [
+        "s0",
+        "s1",
+        "s2"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "UAUC_TEST": {
+        "rows": {
+          "n_users": 366,
+          "n_pairs": 6365
+        },
+        "per_model": {
+          "s0": {
+            "est": 0.740006226084526,
+            "lo": 0.7197097257611503,
+            "hi": 0.7584675391530367,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s1": {
+            "est": 0.7446659443846868,
+            "lo": 0.7255967531803283,
+            "hi": 0.7634985860037943,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s2": {
+            "est": 0.7427260253041084,
+            "lo": 0.7228576200588448,
+            "hi": 0.7614921853643041,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "mean_over_seeds": {
+          "est": 0.7424660652577738,
+          "lo": 0.723185032184527,
+          "hi": 0.7609435924260278,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "seeds": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.740006226084526,
+            0.7446659443846868,
+            0.7427260253041084
+          ],
+          "sigma_seed": 0.0023407110198572154
+        },
+        "references": {
+          "q_hat": {
+            "est": 0.7586119349096629,
+            "lo": 0.7371140400665879,
+            "hi": 0.7795605491585087,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "popularity": {
+            "est": 0.6161332827012596,
+            "lo": 0.5962052943931263,
+            "hi": 0.636682073656429,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mf": {
+            "est": 0.7907218399718658,
+            "lo": 0.7720092516984423,
+            "hi": 0.8087331758356489,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mf_personal_residual": {
+            "est": 0.6526224808993517,
+            "lo": 0.6295924805024222,
+            "hi": 0.6744357867479495,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        }
+      },
+      "mf_personal_residual_warm_pairs_only": {
+        "est": 0.6529677219850099,
+        "lo": 0.6299770622440244,
+        "hi": 0.6747482195241553,
+        "n_users": 366,
+        "n_pairs": 6356,
+        "n_boot": 2000,
+        "descriptive_min_n": false
+      },
+      "secondary": {
+        "UAUC_all_rows": {
+          "rows": {
+            "n_users": 1683,
+            "n_pairs": 33043
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.7330344446493904,
+              "lo": 0.7251662995495199,
+              "hi": 0.7411842354389429,
+              "n_users": 1683,
+              "n_pairs": 33043,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.7340993390506507,
+              "lo": 0.7262556419367442,
+              "hi": 0.7421391085688911,
+              "n_users": 1683,
+              "n_pairs": 33043,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.7340464177780646,
+              "lo": 0.7261759727279982,
+              "hi": 0.7422965726537408,
+              "n_users": 1683,
+              "n_pairs": 33043,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7337267338260351,
+            "lo": 0.7257211301515162,
+            "hi": 0.7415906354971079,
+            "n_users": 1683,
+            "n_pairs": 33043,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.7330344446493904,
+              0.7340993390506507,
+              0.7340464177780646
+            ],
+            "sigma_seed": 0.0006001236483823384
+          }
+        },
+        "UAUC_TEST_seen": {
+          "rows": {
+            "n_users": 364,
+            "n_pairs": 6135
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.7396703538514324,
+              "lo": 0.7187971142683197,
+              "hi": 0.7585123083511246,
+              "n_users": 364,
+              "n_pairs": 6135,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.7441522354386658,
+              "lo": 0.7242826336557148,
+              "hi": 0.7628020382563396,
+              "n_users": 364,
+              "n_pairs": 6135,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.7432228060221758,
+              "lo": 0.72246463601165,
+              "hi": 0.7621414911580328,
+              "n_users": 364,
+              "n_pairs": 6135,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7423484651040915,
+            "lo": 0.7219637219066163,
+            "hi": 0.7610533093925086,
+            "n_users": 364,
+            "n_pairs": 6135,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.7396703538514324,
+              0.7441522354386658,
+              0.7432228060221758
+            ],
+            "sigma_seed": 0.0023654110998456543
+          }
+        },
+        "UAUC_TEST_unseen": {
+          "rows": {
+            "n_users": 26,
+            "n_pairs": 80
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.7387820512820513,
+              "lo": 0.5977564102564102,
+              "hi": 0.8702323717948716,
+              "n_users": 26,
+              "n_pairs": 80,
+              "n_boot": 2000,
+              "descriptive_min_n": true
+            },
+            "s1": {
+              "est": 0.7756410256410255,
+              "lo": 0.6474358974358976,
+              "hi": 0.891025641025641,
+              "n_users": 26,
+              "n_pairs": 80,
+              "n_boot": 2000,
+              "descriptive_min_n": true
+            },
+            "s2": {
+              "est": 0.7179487179487178,
+              "lo": 0.5769230769230769,
+              "hi": 0.8461538461538461,
+              "n_users": 26,
+              "n_pairs": 80,
+              "n_boot": 2000,
+              "descriptive_min_n": true
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7441239316239316,
+            "lo": 0.6223290598290597,
+            "hi": 0.8530982905982905,
+            "n_users": 26,
+            "n_pairs": 80,
+            "n_boot": 2000,
+            "descriptive_min_n": true
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.7387820512820513,
+              0.7756410256410255,
+              0.7179487179487178
+            ],
+            "sigma_seed": 0.029214762636485717
+          }
+        }
+      },
+      "invariance": {
+        "definition": "lemma checks (A3 section 3, reported, not tested): max over users of |AUC_u(Platt(L)) - AUC_u(L)| (CAL-fit map of E-C) and of |AUC_u(L - user mean) - AUC_u(L)|; max_abs_dAUC_user = the larger of the two (expected 0 up to 1e-12; a negative Platt slope reverses every user); dAUC_pooled_offset_removal = pooled AUC over the TEST rows after minus before removing each user's mean logit over those rows",
+        "per_model": {
+          "s0": {
+            "max_abs_dAUC_user": 0.0,
+            "max_abs_dAUC_user_platt": 0.0,
+            "max_abs_dAUC_user_centred": 0.0,
+            "dAUC_pooled_offset_removal": -0.04357902532421831,
+            "AUC_pooled": 0.7724321840321603,
+            "AUC_pooled_offset_removed": 0.728853158707942,
+            "platt_slope": 0.9589161896675906,
+            "n_users": 366,
+            "n_pairs": 6466
+          },
+          "s1": {
+            "max_abs_dAUC_user": 0.0,
+            "max_abs_dAUC_user_platt": 0.0,
+            "max_abs_dAUC_user_centred": 0.0,
+            "dAUC_pooled_offset_removal": -0.0444695943121608,
+            "AUC_pooled": 0.772079419731761,
+            "AUC_pooled_offset_removed": 0.7276098254196002,
+            "platt_slope": 0.9171405614449198,
+            "n_users": 366,
+            "n_pairs": 6466
+          },
+          "s2": {
+            "max_abs_dAUC_user": 0.0,
+            "max_abs_dAUC_user_platt": 0.0,
+            "max_abs_dAUC_user_centred": 0.0,
+            "dAUC_pooled_offset_removal": -0.04277252755542771,
+            "AUC_pooled": 0.7741935466994958,
+            "AUC_pooled_offset_removed": 0.7314210191440681,
+            "platt_slope": 0.9451486267682943,
+            "n_users": 366,
+            "n_pairs": 6466
+          }
+        },
+        "max_abs_dAUC_user_over_models": 0.0,
+        "dAUC_pooled_offset_removal_mean_over_seeds": -0.04360704906393561
+      }
+    },
+    "PERM": {
+      "available": false,
+      "reason": "PERM models not requested"
+    }
+  },
+  "E_C": {
+    "ZS": {
+      "models": [
+        "zeroshot"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "rows": {
+        "n_users_test": 404,
+        "n_pairs_test": 6466,
+        "n_users_anatomy": 366,
+        "n_pairs_anatomy": 6365,
+        "n_pairs_cal": 26577
+      },
+      "per_model": {
+        "zeroshot": {
+          "platt_slope": {
+            "est": 0.07889601543386605,
+            "lo": 0.07131207926811262,
+            "hi": 0.08668454395364096,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "platt_intercept": {
+            "est": 0.7174435553518946,
+            "lo": 0.6749460840982444,
+            "hi": 0.7599524165281092,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "ECE": {
+            "est": 0.02030254488362932,
+            "lo": 0.016633369684955216,
+            "hi": 0.039678400532087946,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier": {
+            "est": 0.21735734264690978,
+            "lo": 0.21187859872842524,
+            "hi": 0.2232479829862259,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier_skill": {
+            "est": 0.049775257626176406,
+            "lo": 0.03546011107507279,
+            "hi": 0.06400634874562919,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_bottom": {
+            "est": 0.4533018867924528,
+            "lo": 0.43177154524060113,
+            "hi": 0.4756875637058191,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_middle": {
+            "est": 0.3469868173258004,
+            "lo": 0.3229111933692396,
+            "hi": 0.36760544858082456,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_top": {
+            "est": 0.21735030645921735,
+            "lo": 0.19584825598486022,
+            "hi": 0.24027323218343735,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_errors_top": {
+            "est": 0.21352477999073646,
+            "lo": 0.19694800742643415,
+            "hi": 0.23263652721123682,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_correct_bottom": {
+            "est": 0.2755587256300523,
+            "lo": 0.26617407590855563,
+            "hi": 0.284924719282264,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AUROC_margin_correct": {
+            "est": 0.6330058605265598,
+            "lo": 0.6152024129201806,
+            "hi": 0.6495836547163606,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AURC": {
+            "est": 0.2441976711099236,
+            "lo": 0.22558039716700212,
+            "hi": 0.26371676309941877,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "topk_error_rate": {
+            "est": 0.3391987431264729,
+            "lo": 0.3252746357710079,
+            "hi": 0.35271716661071695,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "base_rate_cal": 0.6584640854874515,
+          "n_cal_rows": 26577,
+          "reliability_equal_mass": [
+            {
+              "bin": 0,
+              "n": 644,
+              "share": 0.09959789669038045,
+              "mean_p": 0.480003846027729,
+              "frac_like": 0.4673913043478261,
+              "abs_gap": 0.012612541679902889
+            },
+            {
+              "bin": 1,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.544808830833687,
+              "frac_like": 0.5526315789473685,
+              "abs_gap": 0.007822748113681444
+            },
+            {
+              "bin": 2,
+              "n": 643,
+              "share": 0.09944324157129601,
+              "mean_p": 0.5828755166503684,
+              "frac_like": 0.5567651632970451,
+              "abs_gap": 0.026110353353323346
+            },
+            {
+              "bin": 3,
+              "n": 651,
+              "share": 0.10068048252397155,
+              "mean_p": 0.6147578453881043,
+              "frac_like": 0.5929339477726574,
+              "abs_gap": 0.021823897615446897
+            },
+            {
+              "bin": 4,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.6403716354659527,
+              "frac_like": 0.5925925925925926,
+              "abs_gap": 0.0477790428733601
+            },
+            {
+              "bin": 5,
+              "n": 641,
+              "share": 0.09913393133312713,
+              "mean_p": 0.6660686933316335,
+              "frac_like": 0.6630265210608425,
+              "abs_gap": 0.003042172270791066
+            },
+            {
+              "bin": 6,
+              "n": 653,
+              "share": 0.10098979276214043,
+              "mean_p": 0.6906990965340684,
+              "frac_like": 0.6906584992343032,
+              "abs_gap": 4.059729976513271e-05
+            },
+            {
+              "bin": 7,
+              "n": 640,
+              "share": 0.09897927621404269,
+              "mean_p": 0.716766139212177,
+              "frac_like": 0.75,
+              "abs_gap": 0.03323386078782298
+            },
+            {
+              "bin": 8,
+              "n": 649,
+              "share": 0.10037117228580265,
+              "mean_p": 0.7476538762936104,
+              "frac_like": 0.7889060092449923,
+              "abs_gap": 0.04125213295138197
+            },
+            {
+              "bin": 9,
+              "n": 651,
+              "share": 0.10068048252397155,
+              "mean_p": 0.7970440843218217,
+              "frac_like": 0.8064516129032258,
+              "abs_gap": 0.009407528581404034
+            }
+          ],
+          "reliability_equal_width": [
+            {
+              "lo": 0.2,
+              "hi": 0.30000000000000004,
+              "n": 1,
+              "mean_p": 0.28653917567009307,
+              "frac_like": 0.0
+            },
+            {
+              "lo": 0.30000000000000004,
+              "hi": 0.4,
+              "n": 23,
+              "mean_p": 0.3705912107264179,
+              "frac_like": 0.34782608695652173
+            },
+            {
+              "lo": 0.4,
+              "hi": 0.5,
+              "n": 385,
+              "mean_p": 0.4680522132170893,
+              "frac_like": 0.4597402597402597
+            },
+            {
+              "lo": 0.5,
+              "hi": 0.6000000000000001,
+              "n": 1544,
+              "mean_p": 0.5562407477225112,
+              "frac_like": 0.5479274611398963
+            },
+            {
+              "lo": 0.6000000000000001,
+              "hi": 0.7000000000000001,
+              "n": 2480,
+              "mean_p": 0.651567281617965,
+              "frac_like": 0.6318548387096774
+            },
+            {
+              "lo": 0.7000000000000001,
+              "hi": 0.8,
+              "n": 1791,
+              "mean_p": 0.7419647100817651,
+              "frac_like": 0.7654941373534339
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.9,
+              "n": 242,
+              "mean_p": 0.8233241499953187,
+              "frac_like": 0.8677685950413223
+            }
+          ]
+        }
+      },
+      "mean_over_seeds": {
+        "platt_slope": {
+          "est": 0.07889601543386605,
+          "lo": 0.07131207926811262,
+          "hi": 0.08668454395364096,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "platt_intercept": {
+          "est": 0.7174435553518946,
+          "lo": 0.6749460840982444,
+          "hi": 0.7599524165281092,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "ECE": {
+          "est": 0.02030254488362932,
+          "lo": 0.016633369684955216,
+          "hi": 0.039678400532087946,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "Brier": {
+          "est": 0.21735734264690978,
+          "lo": 0.21187859872842524,
+          "hi": 0.2232479829862259,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "Brier_skill": {
+          "est": 0.049775257626176406,
+          "lo": 0.03546011107507279,
+          "hi": 0.06400634874562919,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_bottom": {
+          "est": 0.4533018867924528,
+          "lo": 0.43177154524060113,
+          "hi": 0.4756875637058191,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_middle": {
+          "est": 0.3469868173258004,
+          "lo": 0.3229111933692396,
+          "hi": 0.36760544858082456,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_top": {
+          "est": 0.21735030645921735,
+          "lo": 0.19584825598486022,
+          "hi": 0.24027323218343735,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "share_errors_top": {
+          "est": 0.21352477999073646,
+          "lo": 0.19694800742643415,
+          "hi": 0.23263652721123682,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "share_correct_bottom": {
+          "est": 0.2755587256300523,
+          "lo": 0.26617407590855563,
+          "hi": 0.284924719282264,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "AUROC_margin_correct": {
+          "est": 0.6330058605265598,
+          "lo": 0.6152024129201806,
+          "hi": 0.6495836547163606,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "AURC": {
+          "est": 0.2441976711099236,
+          "lo": 0.22558039716700212,
+          "hi": 0.26371676309941877,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "topk_error_rate": {
+          "est": 0.3391987431264729,
+          "lo": 0.3252746357710079,
+          "hi": 0.35271716661071695,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        }
+      },
+      "seeds": {
+        "ECE": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.02030254488362932
+          ],
+          "sigma_seed": null
+        },
+        "Brier_skill": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.049775257626176406
+          ],
+          "sigma_seed": null
+        },
+        "AUROC_margin_correct": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.6330058605265598
+          ],
+          "sigma_seed": null
+        }
+      }
+    },
+    "FT": {
+      "models": [
+        "s0",
+        "s1",
+        "s2"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "rows": {
+        "n_users_test": 404,
+        "n_pairs_test": 6466,
+        "n_users_anatomy": 366,
+        "n_pairs_anatomy": 6365,
+        "n_pairs_cal": 26577
+      },
+      "per_model": {
+        "s0": {
+          "platt_slope": {
+            "est": 0.9589161896675906,
+            "lo": 0.9203647125358081,
+            "hi": 0.998687756716979,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "platt_intercept": {
+            "est": 0.0935001810957131,
+            "lo": 0.04399122879676645,
+            "hi": 0.13972344568379946,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "ECE": {
+            "est": 0.02592174523282525,
+            "lo": 0.01956623857189376,
+            "hi": 0.042404714943885695,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier": {
+            "est": 0.17847914393780184,
+            "lo": 0.171634748504029,
+            "hi": 0.1855343827330823,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier_skill": {
+            "est": 0.2197397313469156,
+            "lo": 0.19081604291192625,
+            "hi": 0.24694172362367983,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_bottom": {
+            "est": 0.42648444863336477,
+            "lo": 0.4036762212384978,
+            "hi": 0.4474428483521666,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_middle": {
+            "est": 0.23986804901036757,
+            "lo": 0.21613167589668725,
+            "hi": 0.2638139728050669,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_top": {
+            "est": 0.09712399811409712,
+            "lo": 0.08383247565454105,
+            "hi": 0.11427238020941699,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_errors_top": {
+            "est": 0.1271604938271605,
+            "lo": 0.113086637816833,
+            "hi": 0.1448130574707744,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_correct_bottom": {
+            "est": 0.2564805057955743,
+            "lo": 0.24887576771231887,
+            "hi": 0.26403763790017337,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AUROC_margin_correct": {
+            "est": 0.7145847480778987,
+            "lo": 0.6994989908823483,
+            "hi": 0.7294458586339759,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AURC": {
+            "est": 0.13516544580436493,
+            "lo": 0.12277074289340249,
+            "hi": 0.14829255599152416,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "topk_error_rate": {
+            "est": 0.2545168892380204,
+            "lo": 0.240888919646815,
+            "hi": 0.2680938210389617,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "base_rate_cal": 0.6584640854874515,
+          "n_cal_rows": 26577,
+          "reliability_equal_mass": [
+            {
+              "bin": 0,
+              "n": 645,
+              "share": 0.09975255180946489,
+              "mean_p": 0.2238828722262055,
+              "frac_like": 0.16744186046511628,
+              "abs_gap": 0.05644101176108923
+            },
+            {
+              "bin": 1,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.3990075956693844,
+              "frac_like": 0.38117283950617287,
+              "abs_gap": 0.017834756163211507
+            },
+            {
+              "bin": 2,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.5228308762337951,
+              "frac_like": 0.5502318392581144,
+              "abs_gap": 0.02740096302431927
+            },
+            {
+              "bin": 3,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.6161492969586873,
+              "frac_like": 0.5789473684210527,
+              "abs_gap": 0.0372019285376346
+            },
+            {
+              "bin": 4,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.6866662654686361,
+              "frac_like": 0.6718266253869969,
+              "abs_gap": 0.014839640081639183
+            },
+            {
+              "bin": 5,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.7461902583625,
+              "frac_like": 0.7089783281733746,
+              "abs_gap": 0.037211930189125386
+            },
+            {
+              "bin": 6,
+              "n": 644,
+              "share": 0.09959789669038045,
+              "mean_p": 0.7934118440186595,
+              "frac_like": 0.7934782608695652,
+              "abs_gap": 6.641685090569283e-05
+            },
+            {
+              "bin": 7,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.8343390603875706,
+              "frac_like": 0.816358024691358,
+              "abs_gap": 0.017981035696212566
+            },
+            {
+              "bin": 8,
+              "n": 649,
+              "share": 0.10037117228580265,
+              "mean_p": 0.8679186029552696,
+              "frac_like": 0.8536209553158706,
+              "abs_gap": 0.014297647639399003
+            },
+            {
+              "bin": 9,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.9037267544239179,
+              "frac_like": 0.9397217928902627,
+              "abs_gap": 0.035995038466344775
+            }
+          ],
+          "reliability_equal_width": [
+            {
+              "lo": 0.0,
+              "hi": 0.1,
+              "n": 42,
+              "mean_p": 0.07594511340644292,
+              "frac_like": 0.023809523809523808
+            },
+            {
+              "lo": 0.1,
+              "hi": 0.2,
+              "n": 183,
+              "mean_p": 0.15670421306102508,
+              "frac_like": 0.07103825136612021
+            },
+            {
+              "lo": 0.2,
+              "hi": 0.30000000000000004,
+              "n": 315,
+              "mean_p": 0.2530391012315102,
+              "frac_like": 0.21587301587301588
+            },
+            {
+              "lo": 0.30000000000000004,
+              "hi": 0.4,
+              "n": 426,
+              "mean_p": 0.3511958067031981,
+              "frac_like": 0.3004694835680751
+            },
+            {
+              "lo": 0.4,
+              "hi": 0.5,
+              "n": 510,
+              "mean_p": 0.45092520690489013,
+              "frac_like": 0.4725490196078431
+            },
+            {
+              "lo": 0.5,
+              "hi": 0.6000000000000001,
+              "n": 644,
+              "mean_p": 0.5526096298053333,
+              "frac_like": 0.5729813664596274
+            },
+            {
+              "lo": 0.6000000000000001,
+              "hi": 0.7000000000000001,
+              "n": 909,
+              "mean_p": 0.6509663874524336,
+              "frac_like": 0.6116611661166117
+            },
+            {
+              "lo": 0.7000000000000001,
+              "hi": 0.8,
+              "n": 1273,
+              "mean_p": 0.7536348149984132,
+              "frac_like": 0.7336999214454045
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.9,
+              "n": 1812,
+              "mean_p": 0.8525219291637677,
+              "frac_like": 0.8471302428256071
+            },
+            {
+              "lo": 0.9,
+              "hi": 1.0,
+              "n": 352,
+              "mean_p": 0.9135766451639727,
+              "frac_like": 0.9488636363636364
+            }
+          ]
+        },
+        "s1": {
+          "platt_slope": {
+            "est": 0.9171405614449198,
+            "lo": 0.8799379384506164,
+            "hi": 0.9550454856668157,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "platt_intercept": {
+            "est": 0.07676550946837749,
+            "lo": 0.029576014357991287,
+            "hi": 0.1227293572230725,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "ECE": {
+            "est": 0.027348313515044225,
+            "lo": 0.017597264547078578,
+            "hi": 0.04005774268977227,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier": {
+            "est": 0.1790033615432215,
+            "lo": 0.17226888257632067,
+            "hi": 0.18607442181900985,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier_skill": {
+            "est": 0.21744800044428447,
+            "lo": 0.18957528857598716,
+            "hi": 0.24396394051045348,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_bottom": {
+            "est": 0.39726672950047126,
+            "lo": 0.3747021776606818,
+            "hi": 0.41862006836339677,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_middle": {
+            "est": 0.24658180103724658,
+            "lo": 0.22457702861438286,
+            "hi": 0.2721211293765142,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_top": {
+            "est": 0.09802073515551367,
+            "lo": 0.08412572971911399,
+            "hi": 0.11245587225888105,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_errors_top": {
+            "est": 0.13214739517153748,
+            "lo": 0.11632319138423641,
+            "hi": 0.14733017526712128,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_correct_bottom": {
+            "est": 0.2669588812356502,
+            "lo": 0.2596257259625726,
+            "hi": 0.27455962088545444,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AUROC_margin_correct": {
+            "est": 0.7002911006633838,
+            "lo": 0.6844722259800455,
+            "hi": 0.7162552410854169,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AURC": {
+            "est": 0.13461995485628797,
+            "lo": 0.12248802892069573,
+            "hi": 0.14705896865940749,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "topk_error_rate": {
+            "est": 0.24728986645718776,
+            "lo": 0.23348893926589903,
+            "hi": 0.26098773295263383,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "base_rate_cal": 0.6584640854874515,
+          "n_cal_rows": 26577,
+          "reliability_equal_mass": [
+            {
+              "bin": 0,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.22614288417997658,
+              "frac_like": 0.18238021638330756,
+              "abs_gap": 0.043762667796669014
+            },
+            {
+              "bin": 1,
+              "n": 645,
+              "share": 0.09975255180946489,
+              "mean_p": 0.40548586079933774,
+              "frac_like": 0.3689922480620155,
+              "abs_gap": 0.03649361273732221
+            },
+            {
+              "bin": 2,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.5233565052155534,
+              "frac_like": 0.5478395061728395,
+              "abs_gap": 0.02448300095728606
+            },
+            {
+              "bin": 3,
+              "n": 644,
+              "share": 0.09959789669038045,
+              "mean_p": 0.6097356151360857,
+              "frac_like": 0.5869565217391305,
+              "abs_gap": 0.022779093396955163
+            },
+            {
+              "bin": 4,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.6797490817502175,
+              "frac_like": 0.6547987616099071,
+              "abs_gap": 0.0249503201403104
+            },
+            {
+              "bin": 5,
+              "n": 645,
+              "share": 0.09975255180946489,
+              "mean_p": 0.7407855429864126,
+              "frac_like": 0.7162790697674418,
+              "abs_gap": 0.024506473218970815
+            },
+            {
+              "bin": 6,
+              "n": 651,
+              "share": 0.10068048252397155,
+              "mean_p": 0.7924757581553371,
+              "frac_like": 0.7772657450076805,
+              "abs_gap": 0.015210013147656576
+            },
+            {
+              "bin": 7,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.8334176847825568,
+              "frac_like": 0.8003095975232198,
+              "abs_gap": 0.033108087259337005
+            },
+            {
+              "bin": 8,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.8693797816693414,
+              "frac_like": 0.8823529411764706,
+              "abs_gap": 0.012973159507129184
+            },
+            {
+              "bin": 9,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.9091792251031489,
+              "frac_like": 0.9444444444444444,
+              "abs_gap": 0.03526521934129556
+            }
+          ],
+          "reliability_equal_width": [
+            {
+              "lo": 0.0,
+              "hi": 0.1,
+              "n": 60,
+              "mean_p": 0.07290181086090149,
+              "frac_like": 0.03333333333333333
+            },
+            {
+              "lo": 0.1,
+              "hi": 0.2,
+              "n": 155,
+              "mean_p": 0.1536020641489608,
+              "frac_like": 0.07096774193548387
+            },
+            {
+              "lo": 0.2,
+              "hi": 0.30000000000000004,
+              "n": 298,
+              "mean_p": 0.2543975914352981,
+              "frac_like": 0.2483221476510067
+            },
+            {
+              "lo": 0.30000000000000004,
+              "hi": 0.4,
+              "n": 408,
+              "mean_p": 0.3493675726332071,
+              "frac_like": 0.30392156862745096
+            },
+            {
+              "lo": 0.4,
+              "hi": 0.5,
+              "n": 546,
+              "mean_p": 0.45090385147559753,
+              "frac_like": 0.4340659340659341
+            },
+            {
+              "lo": 0.5,
+              "hi": 0.6000000000000001,
+              "n": 696,
+              "mean_p": 0.5527460607292871,
+              "frac_like": 0.5545977011494253
+            },
+            {
+              "lo": 0.6000000000000001,
+              "hi": 0.7000000000000001,
+              "n": 943,
+              "mean_p": 0.6509191306530164,
+              "frac_like": 0.6320254506892895
+            },
+            {
+              "lo": 0.7000000000000001,
+              "hi": 0.8,
+              "n": 1194,
+              "mean_p": 0.7527591713882128,
+              "frac_like": 0.7319932998324958
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.9,
+              "n": 1742,
+              "mean_p": 0.8510209262296229,
+              "frac_like": 0.8473019517795637
+            },
+            {
+              "lo": 0.9,
+              "hi": 1.0,
+              "n": 424,
+              "mean_p": 0.9177120132375217,
+              "frac_like": 0.9410377358490566
+            }
+          ]
+        },
+        "s2": {
+          "platt_slope": {
+            "est": 0.9451486267682943,
+            "lo": 0.9068819796450075,
+            "hi": 0.9836776034592816,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "platt_intercept": {
+            "est": 0.04962901300966415,
+            "lo": 0.0014857252790146205,
+            "hi": 0.09597792501121906,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "ECE": {
+            "est": 0.02336403084822849,
+            "lo": 0.01677980238111617,
+            "hi": 0.037736778113254016,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier": {
+            "est": 0.1780503263731133,
+            "lo": 0.1715022681255271,
+            "hi": 0.1849528671427874,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "Brier_skill": {
+            "est": 0.22161440029055224,
+            "lo": 0.19323174660156972,
+            "hi": 0.24801327148501953,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_bottom": {
+            "est": 0.39491046182846373,
+            "lo": 0.37399402116872993,
+            "hi": 0.4171569166771741,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_middle": {
+            "est": 0.24375294672324374,
+            "lo": 0.22132560993060793,
+            "hi": 0.2666674675636713,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "P_wrong_top": {
+            "est": 0.10273327049952875,
+            "lo": 0.0869922969187675,
+            "hi": 0.11785048188470462,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_errors_top": {
+            "est": 0.1385886840432295,
+            "lo": 0.12034520580198439,
+            "hi": 0.1548346664625512,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "share_correct_bottom": {
+            "est": 0.2679465776293823,
+            "lo": 0.26041338678425957,
+            "hi": 0.2748942267758473,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AUROC_margin_correct": {
+            "est": 0.7024584441965683,
+            "lo": 0.6869117357619643,
+            "hi": 0.7174702280121025,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "AURC": {
+            "est": 0.13476658394398697,
+            "lo": 0.12238667154832904,
+            "hi": 0.1474492329578121,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "topk_error_rate": {
+            "est": 0.24713275726630007,
+            "lo": 0.23384995391669822,
+            "hi": 0.2606608337238916,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "base_rate_cal": 0.6584640854874515,
+          "n_cal_rows": 26577,
+          "reliability_equal_mass": [
+            {
+              "bin": 0,
+              "n": 645,
+              "share": 0.09975255180946489,
+              "mean_p": 0.23187662976693754,
+              "frac_like": 0.17519379844961241,
+              "abs_gap": 0.05668283131732513
+            },
+            {
+              "bin": 1,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.3973661526122697,
+              "frac_like": 0.3601236476043277,
+              "abs_gap": 0.03724250500794202
+            },
+            {
+              "bin": 2,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.5145425950745411,
+              "frac_like": 0.541795665634675,
+              "abs_gap": 0.02725307056013382
+            },
+            {
+              "bin": 3,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.6039427838099777,
+              "frac_like": 0.5913312693498453,
+              "abs_gap": 0.012611514460132422
+            },
+            {
+              "bin": 4,
+              "n": 648,
+              "share": 0.10021651716671821,
+              "mean_p": 0.6778809283436626,
+              "frac_like": 0.6697530864197531,
+              "abs_gap": 0.008127841923909584
+            },
+            {
+              "bin": 5,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.740111192274818,
+              "frac_like": 0.7156105100463679,
+              "abs_gap": 0.024500682228450144
+            },
+            {
+              "bin": 6,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.7913470555808939,
+              "frac_like": 0.7897990726429676,
+              "abs_gap": 0.001547982937926351
+            },
+            {
+              "bin": 7,
+              "n": 646,
+              "share": 0.09990720692854933,
+              "mean_p": 0.83414624223507,
+              "frac_like": 0.8126934984520123,
+              "abs_gap": 0.021452743783057615
+            },
+            {
+              "bin": 8,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.8708695787468987,
+              "frac_like": 0.8608964451313755,
+              "abs_gap": 0.009973133615523211
+            },
+            {
+              "bin": 9,
+              "n": 647,
+              "share": 0.10006186204763377,
+              "mean_p": 0.9099975939114335,
+              "frac_like": 0.9443585780525502,
+              "abs_gap": 0.03436098414111666
+            }
+          ],
+          "reliability_equal_width": [
+            {
+              "lo": 0.0,
+              "hi": 0.1,
+              "n": 31,
+              "mean_p": 0.07981028253589753,
+              "frac_like": 0.0
+            },
+            {
+              "lo": 0.1,
+              "hi": 0.2,
+              "n": 170,
+              "mean_p": 0.1574886951932345,
+              "frac_like": 0.12941176470588237
+            },
+            {
+              "lo": 0.2,
+              "hi": 0.30000000000000004,
+              "n": 322,
+              "mean_p": 0.2543242209412051,
+              "frac_like": 0.18012422360248448
+            },
+            {
+              "lo": 0.30000000000000004,
+              "hi": 0.4,
+              "n": 453,
+              "mean_p": 0.35161697305590406,
+              "frac_like": 0.2980132450331126
+            },
+            {
+              "lo": 0.4,
+              "hi": 0.5,
+              "n": 545,
+              "mean_p": 0.452099505749237,
+              "frac_like": 0.45504587155963305
+            },
+            {
+              "lo": 0.5,
+              "hi": 0.6000000000000001,
+              "n": 736,
+              "mean_p": 0.5551908612585597,
+              "frac_like": 0.5855978260869565
+            },
+            {
+              "lo": 0.6000000000000001,
+              "hi": 0.7000000000000001,
+              "n": 881,
+              "mean_p": 0.6546019490851954,
+              "frac_like": 0.626560726447219
+            },
+            {
+              "lo": 0.7000000000000001,
+              "hi": 0.8,
+              "n": 1173,
+              "mean_p": 0.7531482868715105,
+              "frac_like": 0.7348678601875532
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.9,
+              "n": 1707,
+              "mean_p": 0.8518451230205959,
+              "frac_like": 0.8471001757469244
+            },
+            {
+              "lo": 0.9,
+              "hi": 1.0,
+              "n": 448,
+              "mean_p": 0.916772479427148,
+              "frac_like": 0.9486607142857143
+            }
+          ]
+        }
+      },
+      "mean_over_seeds": {
+        "platt_slope": {
+          "est": 0.9404017926269349,
+          "lo": 0.9032504072418608,
+          "hi": 0.9791156282822109,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "platt_intercept": {
+          "est": 0.07329823452458491,
+          "lo": 0.02585768922641261,
+          "hi": 0.11885858190857024,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "ECE": {
+          "est": 0.025544696532032656,
+          "lo": 0.019984118379636158,
+          "hi": 0.03884156087027218,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "Brier": {
+          "est": 0.17851094395137887,
+          "lo": 0.17186756588486546,
+          "hi": 0.18542126937716083,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "Brier_skill": {
+          "est": 0.21960071069391743,
+          "lo": 0.19154664814608494,
+          "hi": 0.24645656752455236,
+          "n_users": 404,
+          "n_pairs": 6466,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_bottom": {
+          "est": 0.40622054665409996,
+          "lo": 0.3877651145443423,
+          "hi": 0.42451974116064123,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_middle": {
+          "est": 0.2434009322569526,
+          "lo": 0.2224034265118121,
+          "hi": 0.26599866794991184,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "P_wrong_top": {
+          "est": 0.09929266792304652,
+          "lo": 0.08578483679915612,
+          "hi": 0.11389416754746044,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "share_errors_top": {
+          "est": 0.1326321910139758,
+          "lo": 0.11807723777059673,
+          "hi": 0.14800639357589523,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "share_correct_bottom": {
+          "est": 0.2637953215535356,
+          "lo": 0.2576133526647069,
+          "hi": 0.2699179055937488,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "AUROC_margin_correct": {
+          "est": 0.7057780976459503,
+          "lo": 0.6917275976706934,
+          "hi": 0.7194828431554473,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "AURC": {
+          "est": 0.13485066153487998,
+          "lo": 0.12247425179100684,
+          "hi": 0.14759471833291143,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "topk_error_rate": {
+          "est": 0.24964650432050273,
+          "lo": 0.2364583434257197,
+          "hi": 0.26303535721891796,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        }
+      },
+      "seeds": {
+        "ECE": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.02592174523282525,
+            0.027348313515044225,
+            0.02336403084822849
+          ],
+          "sigma_seed": 0.002018725187921605
+        },
+        "Brier_skill": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.2197397313469156,
+            0.21744800044428447,
+            0.22161440029055224
+          ],
+          "sigma_seed": 0.002086676059242316
+        },
+        "AUROC_margin_correct": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.7145847480778987,
+            0.7002911006633838,
+            0.7024584441965683
+          ],
+          "sigma_seed": 0.007703386487163438
+        }
+      }
+    },
+    "PERM": {
+      "available": false,
+      "reason": "PERM models not requested"
+    }
+  },
+  "E_D": {
+    "ZS": {
+      "models": [
+        "zeroshot"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "swap_models": [
+        "zeroshot"
+      ],
+      "UAUC": {
+        "pi": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.621249238777341,
+              "lo": 0.5983224680491823,
+              "hi": 0.6430374224862603,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.621249238777341,
+            "lo": 0.5983224680491823,
+            "hi": 0.6430374224862603,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.621249238777341
+            ],
+            "sigma_seed": null
+          }
+        },
+        "e_hat": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.505129053435349,
+              "lo": 0.4835822512054736,
+              "hi": 0.5267773837588081,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.505129053435349,
+            "lo": 0.4835822512054736,
+            "hi": 0.5267773837588081,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.505129053435349
+            ],
+            "sigma_seed": null
+          }
+        },
+        "L": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.5958827069982499,
+              "lo": 0.5733706936565282,
+              "hi": 0.6179673713365045,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.5958827069982499,
+            "lo": 0.5733706936565282,
+            "hi": 0.6179673713365045,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.5958827069982499
+            ],
+            "sigma_seed": null
+          }
+        },
+        "L_nohist": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "zeroshot": {
+              "est": 0.5399749093961905,
+              "lo": 0.5195919882130685,
+              "hi": 0.5602621015055759,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.5399749093961905,
+            "lo": 0.5195919882130685,
+            "hi": 0.5602621015055759,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.5399749093961905
+            ],
+            "sigma_seed": null
+          }
+        }
+      },
+      "shares": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "n_users_with_2_or_more_pairs": 366
+        },
+        "per_model": {
+          "zeroshot": {
+            "r_c": {
+              "est": 0.6301417471406688,
+              "lo": 0.6139464430052414,
+              "hi": 0.6465841452181265,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "r8c": {
+              "est": 0.7731128268397047,
+              "lo": 0.7608015068623708,
+              "hi": 0.7853642306649711,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "rho": {
+              "est": 0.5509123163372739,
+              "lo": 0.5059887475037587,
+              "hi": 0.5945054067629649,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "item_prior_share": {
+              "est": 0.3925744985149863,
+              "lo": 0.3308434723569197,
+              "hi": 0.4568074838209462,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "non_prior_share": {
+              "est": 0.6074255014850136,
+              "lo": 0.5431925161790536,
+              "hi": 0.6691565276430803,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "shares_reading": "interpretable"
+          }
+        },
+        "mean_over_seeds": {
+          "r_c": {
+            "est": 0.6301417471406688,
+            "lo": 0.6139464430052414,
+            "hi": 0.6465841452181265,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "r8c": {
+            "est": 0.7731128268397047,
+            "lo": 0.7608015068623708,
+            "hi": 0.7853642306649711,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "rho": {
+            "est": 0.5509123163372739,
+            "lo": 0.5059887475037587,
+            "hi": 0.5945054067629649,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "item_prior_share": {
+            "est": 0.3925744985149863,
+            "lo": 0.3308434723569197,
+            "hi": 0.4568074838209462,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "non_prior_share": {
+            "est": 0.6074255014850136,
+            "lo": 0.5431925161790536,
+            "hi": 0.6691565276430803,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "shares_reading": "interpretable"
+        },
+        "seeds": {
+          "item_prior_share": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.3925744985149863
+            ],
+            "sigma_seed": null
+          },
+          "r8c": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              0.7731128268397047
+            ],
+            "sigma_seed": null
+          }
+        }
+      },
+      "information_gain": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "fold_a_users": 171,
+          "fold_b_users": 195
+        },
+        "per_model": {
+          "zeroshot": {
+            "G": {
+              "est": -0.001750950074855456,
+              "lo": -0.00758722237074397,
+              "hi": 0.003837635885662831,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.5657171414292853,
+              "ci_excludes_0": false
+            },
+            "UAUC": {
+              "M0": 0.7586119349096629,
+              "M1": 0.7582340897850189,
+              "M2": 0.7564831397101635,
+              "M3": 0.7947697315221013
+            }
+          }
+        },
+        "G_mean_over_seeds": {
+          "est": -0.001750950074855456,
+          "lo": -0.00758722237074397,
+          "hi": 0.003837635885662831,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.5657171414292853,
+          "ci_excludes_0": false
+        },
+        "G_CF": {
+          "est": 0.03615779661243816,
+          "lo": 0.02280500176526709,
+          "hi": 0.04944626262771155,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0009995002498750624,
+          "ci_excludes_0": true
+        },
+        "seeds": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            -0.001750950074855456
+          ],
+          "sigma_seed": null,
+          "all_seeds_same_sign_as_mean": true,
+          "abs_mean_gt_2_sigma_seed": false,
+          "sigma_seed_rule": false
+        },
+        "G_over_G_CF": {
+          "zeroshot": {
+            "est": -0.048425242655774414,
+            "lo": -0.22569049040876257,
+            "hi": 0.10844992542534326,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mean_over_seeds": {
+            "est": -0.048425242655774414,
+            "lo": -0.22569049040876257,
+            "hi": 0.10844992542534326,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "G_over_G_CF_reported": true,
+        "G_over_G_CF_rule": "reported only when G_CF's CI excludes 0 (A3 section 3), so never when G_CF is descriptive"
+      },
+      "swap_arm_like_consistency": {
+        "zeroshot": {
+          "n_pairs": 6365,
+          "max_abs_diff": 0.09375,
+          "pearson": 0.999998511334217
+        }
+      },
+      "corrections": {
+        "definition": "the item-dependent corrections relative to L on S_d's TEST rows: dUAUC_nohist_minus_raw = UAUC(L - L_nohist) - UAUC(L), dUAUC_evidence_minus_raw = UAUC(e-hat) - UAUC(L)",
+        "dUAUC_nohist_minus_raw": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_seed": {
+            "zeroshot": {
+              "est": -0.03631946218014183,
+              "lo": -0.0502922321415787,
+              "hi": -0.02135182790393272,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.559563244818108,
+              "UAUC_b": 0.5958827069982499
+            }
+          },
+          "mean_over_seeds": {
+            "est": -0.03631946218014183,
+            "lo": -0.0502922321415787,
+            "hi": -0.02135182790393272,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              -0.03631946218014183
+            ],
+            "sigma_seed": null,
+            "all_seeds_same_sign_as_mean": true,
+            "abs_mean_gt_2_sigma_seed": false,
+            "sigma_seed_rule": false
+          }
+        },
+        "dUAUC_evidence_minus_raw": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_seed": {
+            "zeroshot": {
+              "est": -0.09075365356290088,
+              "lo": -0.11397697908585978,
+              "hi": -0.06702478352399883,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.505129053435349,
+              "UAUC_b": 0.5958827069982499
+            }
+          },
+          "mean_over_seeds": {
+            "est": -0.09075365356290088,
+            "lo": -0.11397697908585978,
+            "hi": -0.06702478352399883,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          },
+          "seeds": {
+            "n_seeds": 1,
+            "n_seeds_registered": 1,
+            "complete": true,
+            "per_seed": [
+              -0.09075365356290088
+            ],
+            "sigma_seed": null,
+            "all_seeds_same_sign_as_mean": true,
+            "abs_mean_gt_2_sigma_seed": false,
+            "sigma_seed_rule": false
+          }
+        }
+      },
+      "star_permutation": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "n_pairs_tau": 6365
+        },
+        "K": 2,
+        "per_model": {
+          "zeroshot": {
+            "dUAUC_L_minus_perm": {
+              "est": 0.01099968573039239,
+              "lo": 0.0033862232721471796,
+              "hi": 0.018805558000891755,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0069965017491254375,
+              "ci_excludes_0": true
+            },
+            "dUAUC_L_minus_mean_perm_logit": {
+              "est": 0.010715149044588743,
+              "lo": 0.003362377399189694,
+              "hi": 0.01849279318747458,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.004997501249375313,
+              "ci_excludes_0": true
+            },
+            "UAUC_L": 0.5958827069982499,
+            "UAUC_perm_k": [
+              0.5852980394798023,
+              0.5844680030559126
+            ],
+            "tau_mean": 0.0831107619795758,
+            "tau_sd_within_user": 0.9747401675866443,
+            "wording_flag_model_ignores_user_ratings": false
+          }
+        },
+        "dUAUC_mean_over_seeds": {
+          "est": 0.01099968573039239,
+          "lo": 0.0033862232721471796,
+          "hi": 0.018805558000891755,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0069965017491254375,
+          "ci_excludes_0": true
+        },
+        "tau_sd_within_user_mean_over_seeds": 0.9747401675866443,
+        "seeds": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.01099968573039239
+          ],
+          "sigma_seed": null,
+          "all_seeds_same_sign_as_mean": true,
+          "abs_mean_gt_2_sigma_seed": false,
+          "sigma_seed_rule": false
+        },
+        "flags": {
+          "abs_dUAUC_lt": 0.005,
+          "within_user_sd_tau_lt": 0.1
+        },
+        "flags_note": "Amendment 2 D thresholds: wording flags, never gates"
+      },
+      "models_per_sub_block": {
+        "swap": [
+          "zeroshot"
+        ],
+        "nohist": [
+          "zeroshot"
+        ],
+        "star_permutation": [
+          "zeroshot"
+        ]
+      },
+      "holm_family_E_D": {
+        "members": [
+          "G (G_mean_over_seeds)",
+          "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+        ],
+        "p": {
+          "G": 0.5657171414292853,
+          "star_permutation": 0.0069965017491254375
+        },
+        "p_holm": {
+          "G": 0.5657171414292853,
+          "star_permutation": 0.013993003498250875
+        },
+        "confirmed": {
+          "G": false,
+          "star_permutation": true
+        },
+        "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+      }
+    },
+    "FT": {
+      "models": [
+        "s0",
+        "s1",
+        "s2"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "swap_models": [
+        "s0",
+        "s1",
+        "s2"
+      ],
+      "UAUC": {
+        "pi": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.726090748492365,
+              "lo": 0.7040729897483948,
+              "hi": 0.7482350849873225,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.7281429952839247,
+              "lo": 0.707500561035357,
+              "hi": 0.7494922174920594,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.7290797756952273,
+              "lo": 0.7076881775808453,
+              "hi": 0.7495436528919144,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7277711731571722,
+            "lo": 0.7070499590319514,
+            "hi": 0.7490313349904992,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.726090748492365,
+              0.7281429952839247,
+              0.7290797756952273
+            ],
+            "sigma_seed": 0.001528809888547203
+          }
+        },
+        "e_hat": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.5530476091148426,
+              "lo": 0.5302717712766398,
+              "hi": 0.5743955784189475,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.5555042206630417,
+              "lo": 0.5320788739575848,
+              "hi": 0.5782006645711822,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.5609857432090225,
+              "lo": 0.5399773992841042,
+              "hi": 0.5819557229068248,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.5565125243289689,
+            "lo": 0.5343659745696697,
+            "hi": 0.5770519191692254,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.5530476091148426,
+              0.5555042206630417,
+              0.5609857432090225
+            ],
+            "sigma_seed": 0.004063988242642556
+          }
+        },
+        "L": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.740006226084526,
+              "lo": 0.7197097257611503,
+              "hi": 0.7584675391530367,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.7446659443846868,
+              "lo": 0.7255967531803283,
+              "hi": 0.7634985860037943,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.7427260253041084,
+              "lo": 0.7228576200588448,
+              "hi": 0.7614921853643041,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7424660652577738,
+            "lo": 0.723185032184527,
+            "hi": 0.7609435924260278,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.740006226084526,
+              0.7446659443846868,
+              0.7427260253041084
+            ],
+            "sigma_seed": 0.0023407110198572154
+          }
+        },
+        "L_nohist": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_model": {
+            "s0": {
+              "est": 0.7113062010352634,
+              "lo": 0.6904829490726988,
+              "hi": 0.7321645138377649,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.7051789684322048,
+              "lo": 0.6848486341522534,
+              "hi": 0.7258048878010133,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.7022716207659803,
+              "lo": 0.6816312767834161,
+              "hi": 0.722705534930794,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.7062522634111494,
+            "lo": 0.6860932279168435,
+            "hi": 0.7263474195923221,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.7113062010352634,
+              0.7051789684322048,
+              0.7022716207659803
+            ],
+            "sigma_seed": 0.0046119282024334515
+          }
+        }
+      },
+      "shares": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "n_users_with_2_or_more_pairs": 366
+        },
+        "per_model": {
+          "s0": {
+            "r_c": {
+              "est": 0.9369001945172534,
+              "lo": 0.9327611766180061,
+              "hi": 0.9408180575546614,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "r8c": {
+              "est": 0.9674222731448103,
+              "lo": 0.9652110026854788,
+              "hi": 0.969506702487737,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "rho": {
+              "est": 0.9332161165855523,
+              "lo": 0.9261458444229748,
+              "hi": 0.9390255159917078,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "item_prior_share": {
+              "est": 0.9002194227180647,
+              "lo": 0.8868959657926994,
+              "hi": 0.9110287745828333,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "non_prior_share": {
+              "est": 0.09978057728193535,
+              "lo": 0.08897122541716673,
+              "hi": 0.11310403420730065,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "shares_reading": "interpretable"
+          },
+          "s1": {
+            "r_c": {
+              "est": 0.9435125143080746,
+              "lo": 0.9396335871135085,
+              "hi": 0.9472672362687558,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "r8c": {
+              "est": 0.9709353630212997,
+              "lo": 0.9688774141221557,
+              "hi": 0.9729196061278301,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "rho": {
+              "est": 0.9359387558355549,
+              "lo": 0.9283986839181573,
+              "hi": 0.9419903931818981,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "item_prior_share": {
+              "est": 0.9022035740352262,
+              "lo": 0.8879602950300205,
+              "hi": 0.9137237589087458,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "non_prior_share": {
+              "est": 0.09779642596477378,
+              "lo": 0.08627624109125426,
+              "hi": 0.11203970496997952,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "shares_reading": "interpretable"
+          },
+          "s2": {
+            "r_c": {
+              "est": 0.9370121006146345,
+              "lo": 0.9330239460454741,
+              "hi": 0.9408824480622976,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "r8c": {
+              "est": 0.9674819277766107,
+              "lo": 0.9653516687717296,
+              "hi": 0.9695408900228791,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "rho": {
+              "est": 0.9344402855097916,
+              "lo": 0.926771055067773,
+              "hi": 0.9405157195138427,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "item_prior_share": {
+              "est": 0.9025270882219888,
+              "lo": 0.8885571472109819,
+              "hi": 0.9136043193679999,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "non_prior_share": {
+              "est": 0.0974729117780112,
+              "lo": 0.08639568063200007,
+              "hi": 0.11144285278901812,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "shares_reading": "interpretable"
+          }
+        },
+        "mean_over_seeds": {
+          "r_c": {
+            "est": 0.9391416031466542,
+            "lo": 0.9351927883001867,
+            "hi": 0.9428869673814447,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "r8c": {
+            "est": 0.9686131879809068,
+            "lo": 0.966508497798328,
+            "hi": 0.9706015214311418,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "rho": {
+            "est": 0.9345317193102995,
+            "lo": 0.9270703103990745,
+            "hi": 0.940322525644439,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "item_prior_share": {
+            "est": 0.9016500283250933,
+            "lo": 0.8881211559481011,
+            "hi": 0.912553884143428,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "non_prior_share": {
+            "est": 0.09834997167490678,
+            "lo": 0.08744611585657193,
+            "hi": 0.11187884405189887,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "shares_reading": "interpretable"
+        },
+        "seeds": {
+          "item_prior_share": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.9002194227180647,
+              0.9022035740352262,
+              0.9025270882219888
+            ],
+            "sigma_seed": 0.0012494557452768567
+          },
+          "r8c": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              0.9674222731448103,
+              0.9709353630212997,
+              0.9674819277766107
+            ],
+            "sigma_seed": 0.002011283758558504
+          }
+        }
+      },
+      "information_gain": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "fold_a_users": 171,
+          "fold_b_users": 195
+        },
+        "per_model": {
+          "s0": {
+            "G": {
+              "est": 0.008333806190164578,
+              "lo": 0.001125000221048014,
+              "hi": 0.01590577087069515,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.01899050474762619,
+              "ci_excludes_0": true
+            },
+            "UAUC": {
+              "M0": 0.7586119349096629,
+              "M1": 0.7574165831302949,
+              "M2": 0.7657503893204592,
+              "M3": 0.7947697315221013
+            }
+          },
+          "s1": {
+            "G": {
+              "est": 0.00952153366523076,
+              "lo": 0.00182574671550342,
+              "hi": 0.01813625885484801,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.010994502748625687,
+              "ci_excludes_0": true
+            },
+            "UAUC": {
+              "M0": 0.7586119349096629,
+              "M1": 0.7578809730543642,
+              "M2": 0.7674025067195948,
+              "M3": 0.7947697315221013
+            }
+          },
+          "s2": {
+            "G": {
+              "est": 0.011086993127683041,
+              "lo": 0.003324057978452168,
+              "hi": 0.01954433608146073,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0029985007496251873,
+              "ci_excludes_0": true
+            },
+            "UAUC": {
+              "M0": 0.7586119349096629,
+              "M1": 0.7569276237227467,
+              "M2": 0.7680146168504299,
+              "M3": 0.7947697315221013
+            }
+          }
+        },
+        "G_mean_over_seeds": {
+          "est": 0.009647444327692793,
+          "lo": 0.0025816127416874945,
+          "hi": 0.017281090381785304,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.00399800099950025,
+          "ci_excludes_0": true
+        },
+        "G_CF": {
+          "est": 0.03615779661243816,
+          "lo": 0.02280500176526709,
+          "hi": 0.04944626262771155,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0009995002498750624,
+          "ci_excludes_0": true
+        },
+        "seeds": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.008333806190164578,
+            0.00952153366523076,
+            0.011086993127683041
+          ],
+          "sigma_seed": 0.0013809053911915162,
+          "all_seeds_same_sign_as_mean": true,
+          "abs_mean_gt_2_sigma_seed": true,
+          "sigma_seed_rule": true
+        },
+        "G_over_G_CF": {
+          "s0": {
+            "est": 0.23048434835483797,
+            "lo": 0.032817083046831806,
+            "hi": 0.4618981549523912,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s1": {
+            "est": 0.263332795614968,
+            "lo": 0.05307929575268318,
+            "hi": 0.5251846676985487,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s2": {
+            "est": 0.30662800741207646,
+            "lo": 0.09116830796922815,
+            "hi": 0.5645860466202575,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "mean_over_seeds": {
+            "est": 0.2668150504606275,
+            "lo": 0.0719373075371933,
+            "hi": 0.5022871542252307,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "G_over_G_CF_reported": true,
+        "G_over_G_CF_rule": "reported only when G_CF's CI excludes 0 (A3 section 3), so never when G_CF is descriptive"
+      },
+      "swap_arm_like_consistency": {
+        "s0": {
+          "n_pairs": 6365,
+          "max_abs_diff": 0.031249000000000082,
+          "pearson": 0.9999666671073946
+        },
+        "s1": {
+          "n_pairs": 6365,
+          "max_abs_diff": 0.03124899999999986,
+          "pearson": 0.9999691735562249
+        },
+        "s2": {
+          "n_pairs": 6365,
+          "max_abs_diff": 0.03125,
+          "pearson": 0.999968083167531
+        }
+      },
+      "corrections": {
+        "definition": "the item-dependent corrections relative to L on S_d's TEST rows: dUAUC_nohist_minus_raw = UAUC(L - L_nohist) - UAUC(L), dUAUC_evidence_minus_raw = UAUC(e-hat) - UAUC(L)",
+        "dUAUC_nohist_minus_raw": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_seed": {
+            "s0": {
+              "est": -0.04035744012391536,
+              "lo": -0.05691063431924196,
+              "hi": -0.025330077451220356,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.6996487859606105,
+              "UAUC_b": 0.740006226084526
+            },
+            "s1": {
+              "est": -0.04590865391186784,
+              "lo": -0.062207309392880356,
+              "hi": -0.029969571145834147,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.6987572904728189,
+              "UAUC_b": 0.7446659443846868
+            },
+            "s2": {
+              "est": -0.03524035878233636,
+              "lo": -0.05086211259410071,
+              "hi": -0.019014426184289442,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.7074856665217721,
+              "UAUC_b": 0.7427260253041084
+            }
+          },
+          "mean_over_seeds": {
+            "est": -0.04050215093937319,
+            "lo": -0.056007461627249816,
+            "hi": -0.025593768367179078,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              -0.04035744012391536,
+              -0.04590865391186784,
+              -0.03524035878233636
+            ],
+            "sigma_seed": 0.005335619566440163,
+            "all_seeds_same_sign_as_mean": true,
+            "abs_mean_gt_2_sigma_seed": true,
+            "sigma_seed_rule": true
+          }
+        },
+        "dUAUC_evidence_minus_raw": {
+          "rows": {
+            "n_users": 366,
+            "n_pairs": 6365
+          },
+          "per_seed": {
+            "s0": {
+              "est": -0.1869586169696832,
+              "lo": -0.2152170280466028,
+              "hi": -0.16019372477931215,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.5530476091148426,
+              "UAUC_b": 0.740006226084526
+            },
+            "s1": {
+              "est": -0.189161723721645,
+              "lo": -0.21752196636072962,
+              "hi": -0.16133678567688403,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.5555042206630417,
+              "UAUC_b": 0.7446659443846868
+            },
+            "s2": {
+              "est": -0.18174028209508591,
+              "lo": -0.20906012467164176,
+              "hi": -0.15507982451346838,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true,
+              "UAUC_a": 0.5609857432090225,
+              "UAUC_b": 0.7427260253041084
+            }
+          },
+          "mean_over_seeds": {
+            "est": -0.1859535409288047,
+            "lo": -0.2132931295973316,
+            "hi": -0.15943547276812717,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          },
+          "seeds": {
+            "n_seeds": 3,
+            "n_seeds_registered": 3,
+            "complete": true,
+            "per_seed": [
+              -0.1869586169696832,
+              -0.189161723721645,
+              -0.18174028209508591
+            ],
+            "sigma_seed": 0.0038114409794809843,
+            "all_seeds_same_sign_as_mean": true,
+            "abs_mean_gt_2_sigma_seed": true,
+            "sigma_seed_rule": true
+          }
+        }
+      },
+      "star_permutation": {
+        "rows": {
+          "n_pairs": 6365,
+          "n_users": 366,
+          "n_pairs_tau": 6365
+        },
+        "K": 2,
+        "per_model": {
+          "s0": {
+            "dUAUC_L_minus_perm": {
+              "est": 0.007181693076650103,
+              "lo": 0.0013486491323849378,
+              "hi": 0.013274166984379238,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.01699150424787606,
+              "ci_excludes_0": true
+            },
+            "dUAUC_L_minus_mean_perm_logit": {
+              "est": 0.0042479169330056545,
+              "lo": -0.0015048073888495072,
+              "hi": 0.01020637662187585,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.1629185407296352,
+              "ci_excludes_0": false
+            },
+            "UAUC_L": 0.740006226084526,
+            "UAUC_perm_k": [
+              0.733212382108104,
+              0.7324366839076476
+            ],
+            "tau_mean": 0.02508877321288295,
+            "tau_sd_within_user": 0.28164067324721265,
+            "wording_flag_model_ignores_user_ratings": false
+          },
+          "s1": {
+            "dUAUC_L_minus_perm": {
+              "est": 0.010986722795608748,
+              "lo": 0.004603738828565155,
+              "hi": 0.01734918214611454,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0029985007496251873,
+              "ci_excludes_0": true
+            },
+            "dUAUC_L_minus_mean_perm_logit": {
+              "est": 0.010029455531655386,
+              "lo": 0.004116373115879477,
+              "hi": 0.01608507960427075,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0029985007496251873,
+              "ci_excludes_0": true
+            },
+            "UAUC_L": 0.7446659443846868,
+            "UAUC_perm_k": [
+              0.7345329433600913,
+              0.7328254998180646
+            ],
+            "tau_mean": 0.01456515137470542,
+            "tau_sd_within_user": 0.29455145553155354,
+            "wording_flag_model_ignores_user_ratings": false
+          },
+          "s2": {
+            "dUAUC_L_minus_perm": {
+              "est": 0.010271096640212425,
+              "lo": 0.004213576959531513,
+              "hi": 0.016551924415095173,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true
+            },
+            "dUAUC_L_minus_mean_perm_logit": {
+              "est": 0.008919009761928899,
+              "lo": 0.00279338056636138,
+              "hi": 0.01502294377897758,
+              "n_users": 366,
+              "n_pairs": 6365,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.00399800099950025,
+              "ci_excludes_0": true
+            },
+            "UAUC_L": 0.7427260253041084,
+            "UAUC_perm_k": [
+              0.7303467457812972,
+              0.7345631115464948
+            ],
+            "tau_mean": 0.026760643126472892,
+            "tau_sd_within_user": 0.2749027919419362,
+            "wording_flag_model_ignores_user_ratings": false
+          }
+        },
+        "dUAUC_mean_over_seeds": {
+          "est": 0.009479837504157092,
+          "lo": 0.0038509193091085148,
+          "hi": 0.015276885713865776,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0029985007496251873,
+          "ci_excludes_0": true
+        },
+        "tau_sd_within_user_mean_over_seeds": 0.2836983069069008,
+        "seeds": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.007181693076650103,
+            0.010986722795608748,
+            0.010271096640212425
+          ],
+          "sigma_seed": 0.0020221599975849833,
+          "all_seeds_same_sign_as_mean": true,
+          "abs_mean_gt_2_sigma_seed": true,
+          "sigma_seed_rule": true
+        },
+        "flags": {
+          "abs_dUAUC_lt": 0.005,
+          "within_user_sd_tau_lt": 0.1
+        },
+        "flags_note": "Amendment 2 D thresholds: wording flags, never gates"
+      },
+      "models_per_sub_block": {
+        "swap": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "nohist": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "star_permutation": [
+          "s0",
+          "s1",
+          "s2"
+        ]
+      },
+      "holm_family_E_D": {
+        "members": [
+          "G (G_mean_over_seeds)",
+          "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+        ],
+        "p": {
+          "G": 0.00399800099950025,
+          "star_permutation": 0.0029985007496251873
+        },
+        "p_holm": {
+          "G": 0.005997001499250375,
+          "star_permutation": 0.005997001499250375
+        },
+        "confirmed": {
+          "G": true,
+          "star_permutation": true
+        },
+        "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+      }
+    },
+    "PERM": {
+      "available": false,
+      "reason": "PERM models not requested"
+    }
+  },
+  "E_E": {
+    "ZS": {
+      "models": [
+        "zeroshot"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "definition": "partial Spearman (forensics.partial_spearman) against log1p(candidate_popularity) controlling for q-hat (shrunk) and the domain controls; Bias Index head vs tail with the CAL-fit Platt probability; tail-only UAUC (exploratory)",
+      "popularity_bins": "stats.rank_bins(candidate_popularity, 5) over all EVAL candidates; head = 4, tail = 0",
+      "controls": [
+        "q_hat",
+        "release_year"
+      ],
+      "partial_spearman": {
+        "L_pair": {
+          "per_model": {
+            "zeroshot": {
+              "est": 0.15515449462642322,
+              "lo": 0.11804691400219643,
+              "hi": 0.19088768247183333,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.15515449462642322,
+            "lo": 0.11804691400219643,
+            "hi": 0.19088768247183333,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "L_item": {
+          "per_model": {
+            "zeroshot": {
+              "est": 0.26606264947837127,
+              "lo": 0.2253644688957508,
+              "hi": 0.3062871917626391,
+              "n_users": 404,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1970
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.26606264947837127,
+            "lo": 0.2253644688957508,
+            "hi": 0.3062871917626391,
+            "n_users": 404,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "n_items": 1970
+          }
+        },
+        "pi_item": {
+          "per_model": {
+            "zeroshot": {
+              "est": 0.3684699863149627,
+              "lo": 0.3278936035565102,
+              "hi": 0.40872679280855506,
+              "n_users": 366,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1961
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.3684699863149627,
+            "lo": 0.3278936035565102,
+            "hi": 0.40872679280855506,
+            "n_users": 366,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "n_items": 1961
+          }
+        }
+      },
+      "bias_index": {
+        "rows": {
+          "n_pairs": 6466,
+          "n_users": 404,
+          "n_head": 1111,
+          "n_tail": 1501
+        },
+        "per_model": {
+          "zeroshot": {
+            "head": {
+              "est": 0.12204288041918152,
+              "lo": 0.09488757688205111,
+              "hi": 0.1474951500016233,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "tail": {
+              "est": -0.1016247850773403,
+              "lo": -0.12727603464224677,
+              "hi": -0.0736955765806856,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "head_minus_tail": {
+              "est": 0.2236676654965218,
+              "lo": 0.1790508731250334,
+              "hi": 0.2621034426869746,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.0009995002498750624,
+              "ci_excludes_0": true
+            }
+          }
+        },
+        "mean_over_seeds": {
+          "head": {
+            "est": 0.12204288041918152,
+            "lo": 0.09488757688205111,
+            "hi": 0.1474951500016233,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "tail": {
+            "est": -0.1016247850773403,
+            "lo": -0.12727603464224677,
+            "hi": -0.0736955765806856,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "head_minus_tail": {
+            "est": 0.2236676654965218,
+            "lo": 0.1790508731250334,
+            "hi": 0.2621034426869746,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        }
+      },
+      "tail_UAUC_exploratory": {
+        "rows": {
+          "n_users": 204,
+          "n_pairs": 1193
+        },
+        "per_model": {
+          "zeroshot": {
+            "est": 0.5839574579831932,
+            "lo": 0.5340339562908497,
+            "hi": 0.631804439484127,
+            "n_users": 204,
+            "n_pairs": 1193,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "mean_over_seeds": {
+          "est": 0.5839574579831932,
+          "lo": 0.5340339562908497,
+          "hi": 0.631804439484127,
+          "n_users": 204,
+          "n_pairs": 1193,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "seeds": {
+          "n_seeds": 1,
+          "n_seeds_registered": 1,
+          "complete": true,
+          "per_seed": [
+            0.5839574579831932
+          ],
+          "sigma_seed": null
+        }
+      }
+    },
+    "FT": {
+      "models": [
+        "s0",
+        "s1",
+        "s2"
+      ],
+      "missing_or_excluded": [],
+      "complete": true,
+      "definition": "partial Spearman (forensics.partial_spearman) against log1p(candidate_popularity) controlling for q-hat (shrunk) and the domain controls; Bias Index head vs tail with the CAL-fit Platt probability; tail-only UAUC (exploratory)",
+      "popularity_bins": "stats.rank_bins(candidate_popularity, 5) over all EVAL candidates; head = 4, tail = 0",
+      "controls": [
+        "q_hat",
+        "release_year"
+      ],
+      "partial_spearman": {
+        "L_pair": {
+          "per_model": {
+            "s0": {
+              "est": 0.0951112331884688,
+              "lo": 0.055529502670617875,
+              "hi": 0.13532893355237288,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s1": {
+              "est": 0.09583819777952957,
+              "lo": 0.0573961448293708,
+              "hi": 0.13459125883518042,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "s2": {
+              "est": 0.12604226656218037,
+              "lo": 0.08747721809206681,
+              "hi": 0.16589871863083358,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.10566389917672625,
+            "lo": 0.0667639492067448,
+            "hi": 0.14453852394072528,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "L_item": {
+          "per_model": {
+            "s0": {
+              "est": 0.1423845855196253,
+              "lo": 0.09443926627394034,
+              "hi": 0.18858254700635232,
+              "n_users": 404,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1970
+            },
+            "s1": {
+              "est": 0.1297361240078699,
+              "lo": 0.08049234573667009,
+              "hi": 0.17768791823343924,
+              "n_users": 404,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1970
+            },
+            "s2": {
+              "est": 0.1712667281035629,
+              "lo": 0.12626535627170477,
+              "hi": 0.21895317091268104,
+              "n_users": 404,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1970
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.14779581254368604,
+            "lo": 0.10152091965239474,
+            "hi": 0.19411426585839972,
+            "n_users": 404,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "n_items": 1970
+          }
+        },
+        "pi_item": {
+          "per_model": {
+            "s0": {
+              "est": 0.11131178404903537,
+              "lo": 0.06087514915912026,
+              "hi": 0.16074767315796745,
+              "n_users": 366,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1961
+            },
+            "s1": {
+              "est": 0.10322691915324704,
+              "lo": 0.05332999777131323,
+              "hi": 0.15250406092659594,
+              "n_users": 366,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1961
+            },
+            "s2": {
+              "est": 0.16188121867555152,
+              "lo": 0.11257579863984477,
+              "hi": 0.20893849989728816,
+              "n_users": 366,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "n_items": 1961
+            }
+          },
+          "mean_over_seeds": {
+            "est": 0.1254733072926113,
+            "lo": 0.07705892800937264,
+            "hi": 0.17291886656433347,
+            "n_users": 366,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "n_items": 1961
+          }
+        }
+      },
+      "bias_index": {
+        "rows": {
+          "n_pairs": 6466,
+          "n_users": 404,
+          "n_head": 1111,
+          "n_tail": 1501
+        },
+        "per_model": {
+          "s0": {
+            "head": {
+              "est": 0.004012572427907662,
+              "lo": -0.01757691164757163,
+              "hi": 0.026749700376936705,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "tail": {
+              "est": -0.02693724574092063,
+              "lo": -0.049336474989965066,
+              "hi": -0.004631681703640004,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "head_minus_tail": {
+              "est": 0.030949818168828292,
+              "lo": -0.0023103091030674937,
+              "hi": 0.0663612878420306,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.06796601699150424,
+              "ci_excludes_0": false
+            }
+          },
+          "s1": {
+            "head": {
+              "est": -0.0009807589235569468,
+              "lo": -0.023611362952652704,
+              "hi": 0.02128063869240622,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "tail": {
+              "est": -0.027879326866225164,
+              "lo": -0.050265910446614055,
+              "hi": -0.0054468179055818175,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "head_minus_tail": {
+              "est": 0.026898567942668216,
+              "lo": -0.007449973295182434,
+              "hi": 0.06066846600179754,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.11094452773613193,
+              "ci_excludes_0": false
+            }
+          },
+          "s2": {
+            "head": {
+              "est": -0.00013809317966169198,
+              "lo": -0.022583697852772765,
+              "hi": 0.022225989628630826,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "tail": {
+              "est": -0.020978928184038168,
+              "lo": -0.04356262785749678,
+              "hi": 0.0009788449685405947,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false
+            },
+            "head_minus_tail": {
+              "est": 0.020840835004376477,
+              "lo": -0.012762093492999577,
+              "hi": 0.05592833599612377,
+              "n_users": 404,
+              "n_pairs": 6466,
+              "n_boot": 2000,
+              "descriptive_min_n": false,
+              "p": 0.23088455772113944,
+              "ci_excludes_0": false
+            }
+          }
+        },
+        "mean_over_seeds": {
+          "head": {
+            "est": 0.0009645734415630078,
+            "lo": -0.020671373097443855,
+            "hi": 0.022960472132162953,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "tail": {
+            "est": -0.025265166930394656,
+            "lo": -0.04745487778584392,
+            "hi": -0.0029908130666508785,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "head_minus_tail": {
+            "est": 0.02622974037195766,
+            "lo": -0.006918611794922616,
+            "hi": 0.0600159259857022,
+            "n_users": 404,
+            "n_pairs": 6466,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.11694152923538231,
+            "ci_excludes_0": false
+          }
+        }
+      },
+      "tail_UAUC_exploratory": {
+        "rows": {
+          "n_users": 204,
+          "n_pairs": 1193
+        },
+        "per_model": {
+          "s0": {
+            "est": 0.7106125358392515,
+            "lo": 0.668565985927199,
+            "hi": 0.7510971869282221,
+            "n_users": 204,
+            "n_pairs": 1193,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s1": {
+            "est": 0.7229866475209612,
+            "lo": 0.6794988280034236,
+            "hi": 0.7654530411491194,
+            "n_users": 204,
+            "n_pairs": 1193,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          },
+          "s2": {
+            "est": 0.7007238408831546,
+            "lo": 0.6573767367005726,
+            "hi": 0.7420439629134481,
+            "n_users": 204,
+            "n_pairs": 1193,
+            "n_boot": 2000,
+            "descriptive_min_n": false
+          }
+        },
+        "mean_over_seeds": {
+          "est": 0.7114410080811224,
+          "lo": 0.6697741768564889,
+          "hi": 0.7514650458738491,
+          "n_users": 204,
+          "n_pairs": 1193,
+          "n_boot": 2000,
+          "descriptive_min_n": false
+        },
+        "seeds": {
+          "n_seeds": 3,
+          "n_seeds_registered": 3,
+          "complete": true,
+          "per_seed": [
+            0.7106125358392515,
+            0.7229866475209612,
+            0.7007238408831546
+          ],
+          "sigma_seed": 0.011154501985286204
+        }
+      }
+    },
+    "PERM": {
+      "available": false,
+      "reason": "PERM models not requested"
+    }
+  },
+  "E_B": {
+    "models": [
+      "s0",
+      "s1",
+      "s2"
+    ],
+    "missing_or_excluded": [],
+    "complete": true,
+    "holm_family": "E-B {dUAUC per Qwen domain} (A3 section 11)",
+    "rows": {
+      "n_users": 366,
+      "n_pairs": 6365
+    },
+    "per_seed": {
+      "s0": {
+        "est": 0.14412351908627605,
+        "lo": 0.12179144939167948,
+        "hi": 0.1663328637109958,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.0009995002498750624,
+        "ci_excludes_0": true,
+        "UAUC_a": 0.740006226084526,
+        "UAUC_b": 0.5958827069982499
+      },
+      "s1": {
+        "est": 0.14878323738643687,
+        "lo": 0.12642583637989005,
+        "hi": 0.1714206661225385,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.0009995002498750624,
+        "ci_excludes_0": true,
+        "UAUC_a": 0.7446659443846868,
+        "UAUC_b": 0.5958827069982499
+      },
+      "s2": {
+        "est": 0.1468433183058586,
+        "lo": 0.12419185688581122,
+        "hi": 0.16878136186505832,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.0009995002498750624,
+        "ci_excludes_0": true,
+        "UAUC_a": 0.7427260253041084,
+        "UAUC_b": 0.5958827069982499
+      }
+    },
+    "mean_over_seeds": {
+      "est": 0.14658335825952382,
+      "lo": 0.1243630663633283,
+      "hi": 0.16865819059211973,
+      "n_users": 366,
+      "n_pairs": 6365,
+      "n_boot": 2000,
+      "descriptive_min_n": false,
+      "p": 0.0009995002498750624,
+      "ci_excludes_0": true
+    },
+    "seeds": {
+      "n_seeds": 3,
+      "n_seeds_registered": 3,
+      "complete": true,
+      "per_seed": [
+        0.14412351908627605,
+        0.14878323738643687,
+        0.1468433183058586
+      ],
+      "sigma_seed": 0.002340711019857254,
+      "all_seeds_same_sign_as_mean": true,
+      "abs_mean_gt_2_sigma_seed": true,
+      "sigma_seed_rule": true
+    }
+  },
+  "P1": {
+    "role": "P1 confirmatory (ML-1M, Qwen3-8B)",
+    "definition": "per user G_m = AUC(M2_m) - AUC(M1_m) of the cross-fitted stackers on S_d's TEST rows finite for ZS and the 3 FT seeds; contrast_s = mean over users of G_s - G_ZS; P1's mean = mean over seeds (identical users and rows)",
+    "available": true,
+    "rows": {
+      "n_pairs": 6365,
+      "n_users": 366
+    },
+    "G_ZS": -0.001750950074855456,
+    "per_seed": {
+      "s0": {
+        "est": 0.010084756265020032,
+        "lo": 0.001748759248420468,
+        "hi": 0.01908485749364421,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.012993503248375811,
+        "ci_excludes_0": true,
+        "G_FT": 0.008333806190164578
+      },
+      "s1": {
+        "est": 0.011272483740086214,
+        "lo": 0.002941901339213558,
+        "hi": 0.02074402962575512,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.0069965017491254375,
+        "ci_excludes_0": true,
+        "G_FT": 0.00952153366523076
+      },
+      "s2": {
+        "est": 0.012837943202538497,
+        "lo": 0.004174351220368573,
+        "hi": 0.02206424648453663,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.0029985007496251873,
+        "ci_excludes_0": true,
+        "G_FT": 0.011086993127683041
+      }
+    },
+    "mean_over_seeds": {
+      "est": 0.01139839440254825,
+      "lo": 0.003327717464124875,
+      "hi": 0.01996185612942026,
+      "n_users": 366,
+      "n_pairs": 6365,
+      "n_boot": 2000,
+      "descriptive_min_n": false,
+      "p": 0.00399800099950025,
+      "ci_excludes_0": true
+    },
+    "decision": {
+      "verdict": "P1_HOLDS",
+      "holds": true,
+      "conditions": {
+        "three_seeds": true,
+        "not_descriptive_min_n": true,
+        "mean_gt_0": true,
+        "p_lt_0.05": true,
+        "all_seeds_positive": true,
+        "mean_gt_2_sigma_seed": true
+      },
+      "mean": 0.01139839440254825,
+      "p": 0.00399800099950025,
+      "per_seed": [
+        0.010084756265020032,
+        0.011272483740086214,
+        0.012837943202538497
+      ],
+      "sigma_seed": 0.0013809053911915173,
+      "wording": "supervised fine-tuning increases the personal information gain (P1)",
+      "rule": "P1 holds iff the mean over seeds of G_FT,s - G_ZS is > 0 with p < 0.05, all 3 seeds are positive and the mean exceeds 2 sigma_seed (A3 section 3); fewer than 150 users makes it descriptive"
+    },
+    "mean_sign": 1
+  },
+  "FT_C": {
+    "definition": "UAUC(real FT seed s) - UAUC(within-item permuted adapter p_s) on identical users and rows, TEST and all rows (CAL u TEST), with the E-A references on the TEST rows; descriptive, in no Holm family (A3 section 9)",
+    "descriptive": true,
+    "seed0": {
+      "available": false,
+      "reason": "needs usable like arms of s0 and p0"
+    },
+    "seed1": {
+      "available": false,
+      "reason": "needs usable like arms of s1 and p1"
+    }
+  },
+  "knockout": {
+    "definition": "pilot_pseudonym.analyze (unchanged) per model on the rows finite in every arm of every model; label = decide()'s verdict with AMBIGUOUS -> INDETERMINATE, UNDETERMINED -> INCOMPLETE; no --gate, no p-value, no Holm family",
+    "label_map": {
+      "AMBIGUOUS": "INDETERMINATE",
+      "UNDETERMINED": "INCOMPLETE"
+    },
+    "available": false,
+    "reason": "no eval_pseudo.jsonl / eval_placebo.jsonl for this domain (the knockout runs on toys and games, and on sports unless cut)"
+  }
+}

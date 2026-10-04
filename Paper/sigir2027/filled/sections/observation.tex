@@ -1,0 +1,110 @@
+% Section "Audit Protocol" (owner: protocol; integrated 2026-10-04). Reuses the file name observation.tex.
+% Labels provided: sec:protocol (= sec:observation), tab:rq (research questions).
+% External labels used: sec:tools (method.tex); sec:exp, tab:gate-outcomes (experiments.tex); app:prereg, app:prompts,
+% app:sensitivity, app:repro (appendix.tex).
+% Every threshold below is copied from PREREG_AMENDMENT_1/2/3 (G0--G9, F, A, N; fine-tuned program) and
+% docs/sigir/NEXTITEM_AUDIT_SPEC.md; no result appears here except the three registered gate outcomes.
+% Integration (page budget): the former Table tab:rules (registered gate rules) duplicated the rule column of tab:gate-outcomes and
+% Appendix app:sensitivity/app:prereg; it was replaced by the paragraph "Registered gates and the one-round remedy", which keeps
+% every constant of G0--G9 (eligibility, tie and simplicity-order details: Appendix app:sensitivity). E1 is defined in the readout
+% paragraph. LoRA hyperparameters are stated once, in app:repro.
+% Next-item provenance (PILOT_LOG 2026-10-04): scoring started under carve-out N before NEXTITEM_AUDIT_SPEC.md was written; the
+% spec was frozen before any audit score was analysed; the Registration paragraph says exactly that.
+% G9 anchor verified 2026-10-04 against CoLLM (TKDE 2025) Table 2, arXiv HTML v1-v3: ML-1M UAUC MF 0.6361, TALLRec 0.6818
+% (labels: rating > 3 positive, 3 stars negative; temporal 10/5/5-month split).
+\section{Audit Protocol}
+\label{sec:protocol}\label{sec:observation}
+
+\paragraph{Registration.}
+Three dated, binding amendments register the audit (Appendix~\ref{app:prereg}): operationalisations before any pilot data, the
+one-round prompt remedy after the pilot gates were read, and the fine-tuned programme before any adapter existed, each with hashes
+recorded before the runs it governs. The next-item panels were scored under a registered carve-out with endpoints declared
+beforehand; their analysis specification was written while the scoring ran and frozen before any audit score was analysed (one
+later addendum, made before any niche value was seen, redefined the niche bins).
+Quantities computed on design users are \emph{exploratory}: never findings, they are re-measured on fresh users.
+
+\paragraph{Panels, labels and user roles.}
+\emph{Rated panels} (MovieLens-1M~\citep{harper2015movielens}; Amazon Reviews 2023~\citep{hou2024bridging} Toys, Video Games,
+Sports) set $y=1$ for rating $\ge4$ and $y=0$ for $\le2$ (three-star items dropped, first rating per user and item); a user
+needs at least three history events and, among at most 20 candidates (the latest rated items), three likes and three dislikes.
+Eligible users are shuffled with seed 0: the first 1,500 are TRAIN users (on ML-1M and Toys the pilot users, i.e.\ the DEV users
+of the remedy), the next $\min(3{,}000,\text{eligible}-1{,}500)$ EVAL users, disjoint by id and never trained or selected on
+(1,683 on ML-1M, the CONFIRM users of the gates; 3,000, 2,609 and 3,000 on Toys, Video Games and Sports). With $T_d$ the 0.8-quantile
+of the candidate timestamps of a panel's TRAIN and EVAL users, training uses TRAIN candidates before $T_d$, calibrators EVAL
+candidates before $T_d$ (CAL), and every rated endpoint but the G6 gate EVAL candidates at or after $T_d$ (TEST). \emph{Next-item
+panels} are the frozen same-candidate panels of an existing benchmark protocol (Amazon Sports, Toys, Home, Tools; 10,000 test
+events, each with one positive and 100 popularity-sampled negatives), on which an existing verbalised reranker (C-CRP) and eight
+official baselines are evaluated; the first 2,000 VALID events fit temperatures only, and Sports TEST events 1--1,000 are
+quarantined and reported separately.
+
+\paragraph{Backbones, regimes and readout.}
+The primary backbone is Qwen3-8B~\citep{yang2025qwen3}. Llama-3.1-8B-Instruct~\citep{grattafiori2024llama3} replicates on ML-1M
+and Toys (both regimes) and on next-item TEST events 1,001--3,000 (zero-shot, V0, \textsf{next} and \textsf{like}, temperature from
+500 VALID events), subject to registered cut rules (\DATANEEDED{panels and regimes actually run on Llama}), and never rescues a Qwen
+result. Rated panels share the prompt chosen by the remedy ($V^\ast$ if a fix is found, else V0); next-item panels stay at V0
+and no adapter is scored on them. Scoring is one fp16 prefill pass in vLLM~\citep{kwon2023vllm} (chat template, thinking off)
+reading Yes and No by token id from the top-50 log-probabilities; every run must pass the integrity check E1 (at most 0.5\% of
+rows with neither answer token, no over-length prompt, mean Yes+No mass $\ge0.95$), is rerun once on failure and is otherwise
+reported missing, never replaced. The fine-tuned regime is TALLRec-style~\citep{bao2023tallrec} LoRA~\citep{hu2022lora} yes/no
+SFT on identical prompt tokens (seeds 0--2, five for pruning; hyperparameters fixed in advance, Appendix~\ref{app:repro}).
+
+\paragraph{Registered gates and the one-round remedy.}
+Amendment 2 fixes three immutable bars: ML-1M zero-shot rated UAUC $\ge0.60$ (point estimate), Sports next-item NDCG@10
+$\ge0.18632$ ($=0.8\times0.2329$, C-CRP on the same panel) and Gate-FT mean UAUC $\ge0.65$. Under V0 the zero-shot channel failed
+the rated bar ($0.587$) and passed the next-item bar ($0.2093$); the KuaiRec pilot~\citep{gao2022kuairec} returned NULL
+($0.469<0.58$), so no fully-observed-label claim is made and no dynamic loop is run. The response is one prompt-fix round, blind to
+\method{}, with the bars unchanged: V0 and six variants (Appendix~\ref{app:prompts}) are scored with \textsf{like} on the DEV users
+of ML-1M and Toys; a fix is found iff the variant $V^\ast$ selected by the registered eligibility and tie rules differs from V0 with
+a positive one-sided paired bootstrap lower bound of its ML-1M gain (level $1-0.05/6$), and is confirmed once on the fresh ML-1M
+users (GATE\_PASS iff UAUC$(V^\ast)\ge0.60$ and E1 holds). Only then are the \textsf{dislike} and paraphrase arms of \method{}
+scored; the swap-prior and no-history arms run on EVAL users in every branch. Without a fix (F0) or after a failed confirmation
+(F1) there is no second round, threshold change or backbone rescue, and zero-shot rated results are reported as ``below the
+registered bar''. Gate-FT runs in every branch (LoRA, seeds 0--2, prompt $V^\ast$ or V0 under F0, trained on the DEV users'
+ML-1M candidates before $T_d$, evaluated on the CONFIRM users' candidates at or after $T_d$) and passes iff the mean UAUC over the
+seeds is $\ge0.65$ and every run passes E1 (a broken run is rerun, no seed replaced), a bar between the published ML-1M UAUCs of
+MF (0.636) and fine-tuned TALLRec (0.682) under harder labels (3 stars as negatives)~\citep{zhang2025collm}; the fine-tuned
+programme runs only after a pass, otherwise the paper is the zero-shot audit plus the next-item audit.
+\DATANEEDED{G5/G6 and G9 outcomes: $V^\ast$, CONFIRM UAUC with 95\% interval, GATE\_PASS or the registered failure state,
+Gate-FT mean and seeds (Table~\ref{tab:gate-outcomes})}
+
+\paragraph{Non-LLM references.}
+Rated tables carry three references on identical rows, as context and never as gates: the prior-only item mean $m(i)$
+(Section~\ref{sec:prelim}; shrunk), popularity (all-time category event count, through ranks) and a temporal biased matrix
+factorisation (MF)~\citep{koren2009matrix} fitted before $T_d$, users folded in from earlier events, whose personal residual is the
+CF personal-signal reference. Next-item tables carry the ranks and top-10 lists of
+C-CRP and the eight official
+baselines~\citep{wang2024elmrec,wang2025irllrec,he2025llm2rec,liu2025llmemb,liu2024llmesr,zhang2026proex,zhang2026promax,ren2024rlmrec}
+as context, never as a state-of-the-art claim; every claim is a same-candidate claim.
+
+\paragraph{Statistics and claim admission.}
+Intervals are 95\% percentile bootstraps (2,000 resamples, seed 0) over users, events or, for item-level correlations, items;
+contrasts are paired and p-values are two-sided bootstrap p-values. Holm's correction~\citep{holm1979simple} applies within each
+registered family: the regime contrast over the four Qwen domains; $\mathcal G$ and the star-permutation contrast per domain and
+regime; the method slot over its datasets; each next-item endpoint over the four domains. The primary fine-tuning hypothesis P1
+(Table~\ref{tab:rq}) and the pruning contrast P2$-$P1 are single tests at $\alpha=0.05$; an endpoint on fewer than 150 users is
+descriptive. Every fine-tuned seed is reported, and a fine-tuned result is confirmed only if, beyond Holm $p<0.05$, it exceeds
+$2\sigma_{\rm seed}$ with all seeds agreeing in sign. No re-anchoring, reinterpretation, ``near-miss'' rule or arm promotion is
+allowed, selection never reads the mirrored, paraphrase or evidence arms, a CONFIRM failure is final, and a configuration
+matching no registered branch is INDETERMINATE. A finding enters the abstract only if it is confirmed on
+fresh users and replicated in sign on a fresh Amazon domain and on the second backbone (the Llama rated arms for rated findings,
+the Llama next-item sample for next-item findings; the single-backbone pruning test and method slot qualify only with a Llama
+replication); until then the wording stays direction-free. Table~\ref{tab:rq} maps the seed questions S1--S6 to RQ1--RQ6 and fixes
+their registered endpoints (estimators: Section~\ref{sec:tools}; results: Section~\ref{sec:exp}).
+
+\begin{table*}[t]
+\caption{Research questions (RQ$k$ answers seed question S$k$) and registered endpoints (both regimes; Qwen3-8B with Llama-3.1-8B replication). Rated endpoints use TEST candidates of EVAL users, next-item endpoints TEST events. $p$: list-normalised probability, $p_{\max}$ its maximum over the 101 candidates; estimators: Section~\ref{sec:tools}.}
+\label{tab:rq}
+\scriptsize
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{@{}p{0.14\textwidth}p{0.285\textwidth}p{0.285\textwidth}p{0.24\textwidth}@{}}
+\toprule
+RQ & Rated panels & Next-item panels & Rule\\\midrule
+\raggedright RQ1: sure when right? & AUROC, AURC of the margin for correctness of the per-user top-$k_u$ decision; share of correct decisions in the bottom margin tertile & AUROC of $p_{\max}$, margin, negative entropy for top-1 correctness; unsure-correct rate (bottom $p_{\max}$ tertile) & paired intervals\\
+\raggedright RQ2: wrong because unsure? & $P(\text{wrong}\mid\text{margin tertile})$; share of errors in the top tertile & confident-error rate (top tertile); share of top-1 errors in that tertile & as RQ1\\
+\raggedright RQ3: over-exposure (static)? & --- & $\Delta_{\rm head}$ (top-10 head share minus pool head share; also vs target share); Gini, tail share (APLT); at 50\% coverage: NDCG@10 gain, niche served share & versus random serving; $\Delta_{\rm head}$ excludes 0, one sign, in $\ge3$ of 4 domains; no dynamic claim\\
+\raggedright RQ4: confidence versus truth, and through what? & UAUC (TEST, all rows, seen/unseen items) beside the references and regime contrast; ECE, Brier skill, Platt slope; UAUC of $\hat\pi$ and $\hat e$; non-prior share; $\mathcal G=\Delta$UAUC(M2$-$M1) and $\mathcal G_{\rm CF}$; star-permutation $\Delta$UAUC & pooled AUROC, per-event AUC; top-label ECE, Brier of $p$; NDCG@10, HR@10, MRR & regimes paired on identical rows; $r_8<0.7$: uninterpretable; P1 (ML-1M, Qwen): mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}>0$, $p<0.05$, 3/3 seeds, $>2\sigma_{\rm seed}$\\
+\raggedright RQ5: popular means confident, and warranted? & partial Spearman link of $\ell$ and $\hat\pi$ with log popularity given $m(i)$; head--tail Bias Index; knockout: head$-$tail $\Delta_{\rm pseudo}\ge0.20$ (interval above 0), $|\Delta_{\rm placebo}|\le0.05$, $|\Delta$UAUC$_{\rm tail}|\le0.01$ & mean $p$ and residual $y-p$ by popularity group (top 10); head--tail Bias Index & ``familiarity'' only if Qwen is POSITIVE on Toys and Video Games, zero-shot and in all three seeds, and Llama on Toys has the same sign\\
+\raggedright RQ6: prune noisy data? & ML-1M TEST UAUC after removing 25\% per class (random P1, most uncertain P2, most prior-congruent P3) against full data P0, seeds 0--4 & --- & P2$-$P1 is the one test: beats iff interval above 0, mean $>2$ SD of paired differences, 5/5 positive; equal iff interval within $\pm0.01$\\
+\bottomrule
+\end{tabular}
+\end{table*}

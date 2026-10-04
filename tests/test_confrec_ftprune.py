@@ -718,7 +718,7 @@ def test_analyze_cli_writes_strict_json_and_csv_deterministically(tmp_path, caps
     assert res["claim"]["label"] == "BEATS_RANDOM" and res["contrasts"]["P2-P1"]["role"] == "confirmatory"
     csv_text = out.with_suffix(".csv").read_text(encoding="utf-8")
     assert csv_text.splitlines()[0].split(",") == list(fp.CSV_COLS)
-    assert "contrast,P2-P1,confirmatory,OK," in csv_text and csv_text.rstrip().count("\n") == 4 * 6 + 4
+    assert "contrast,P2-P1,confirmatory,OK," in csv_text and csv_text.rstrip().count("\n") == 4 * 6 + len(fp.CONTRASTS)
     mt = (out.stat().st_mtime_ns, out.with_suffix(".csv").stat().st_mtime_ns)
     assert fp.main(argv) == 0
     assert (out.stat().st_mtime_ns, out.with_suffix(".csv").stat().st_mtime_ns) == mt     # identical rerun: untouched

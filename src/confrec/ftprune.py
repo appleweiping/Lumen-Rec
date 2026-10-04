@@ -95,7 +95,7 @@ MIN_N = 150                              # A3 section 1: fewer users = descripti
 SEP = "::"
 CONFIRMATORY = ("P2", "P1")
 CONTRASTS = (("P2", "P1", "confirmatory"), ("P3", "P1", "descriptive"), ("P1", "P0", "descriptive"),
-             ("P2", "P0", "descriptive"))
+             ("P2", "P0", "descriptive"), ("P3", "P0", "descriptive"))
 SIGNAL_COLS = ("key", "user_id", "item_id", "source_event_id", "cand_idx", "timestamp", "label", "L_ZS", "q_hat", "u",
                "C", "tie_key")
 SIGNALS_FILE = "signals/ml1m_signals.csv.gz"

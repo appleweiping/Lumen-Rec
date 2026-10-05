@@ -1,5 +1,23 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Code record: the FT-Q control (addendum 8); recorded before any control adapter was trained or scored
+
+- `scripts/sigir/run_ftq.sh` = f8fa2e3a2d6e19a74494e526c8a004b2a7acfbba
+- `src/confrec/ftq_panel.py` = dab8d1a59021443f24988e49342cc5d06b4aed14
+- `tests/test_confrec_ftq.py` = 522781a770e454eeb84daed971451be1cac8819b
+
+Teacher panels (`train_q.jsonl`, sha1 of the byte-stable build from the method slot's TRAIN q-hat; built independently twice, by the implementer and by the reviewer
+with own code, byte-identical): ML-1M 43329ebebc8ea1878be2aac612bff81304fcaf24, Toys f0ef65d1a846c5706bf30365634e6c7359aeae88, Video_Games
+ea7b88dba06f3438aa666e7b16421389e494b4b7, Sports c2ac412ac25eb04cd12465aa3558051e04075c19 (teacher agreement with the real TRAIN labels 71.9%, 68.5%, 66.0%, 65.7%;
+beta 0.6601, 0.6887, 0.6601, 0.6914; k = 15,412, 10,337, 10,135, 10,851 of 23,348, 15,010, 15,353, 15,695 examples). Tie direction: finite q-hat descending, then the
+fixed seed-0 key ascending (as `ftprune.removal_mask`); one example sits at each cut, reversing the tie order changes 0 labels on all four. The code imports
+`src/confrec/ftprune.py` (`tie_key`, `train_examples`) and `src/confrec/ftgrid_extra.py` as they are (recorded separately). Written by an implementer agent; two rounds
+of independent same-family review (no blocker; one major and ten minor findings fixed and replayed as unit tests; the guard against writing outside
+`outputs/confrec/ftgrid_q` was attacked with 26 path spellings and link variants). Tests: 137 pass locally (FTQ_FAST: 133 plus 4 skipped chain tests); on the
+server's Linux the reviewer ran the previous test file (133 tests) in 25 s. No control adapter, score or report exists; the Toys fine-tuned job's outputs were not
+opened. The jobs are `run_ftq.sh ml1m` and `run_ftq.sh toys` (required) and `run_ftq.sh games` and `sports` (unless cut on 2026-10-29), queued after the
+audit that is running.
+
 ## 2026-10-05 · Wording rules record, update after editor pass 2 (recorded before any Toys, Video_Games, Sports, Llama, FT-C or FT-Q result was pulled or opened)
 
 `scripts/sigir/fill_paper.py` sha1 = d4948d21be28deefa22402bb42ee583c0bc8582f, `docs/sigir/PAPER_DATA_MAP.md` sha1 = cb35d6d4e27d399f133d211a486e3e63c3a7fdb9, `tests/test_confrec_fillpaper.py` sha1 = 856e3bdb1025039b03581d42c3138f070d7df3ad. The previous record is

@@ -1,5 +1,45 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Code record: the longer-training arm FT-L (addendum 9, exploratory); recorded before any 3-epoch adapter was trained
+
+- `scripts/sigir/run_ftlen.sh` = 439f0f1749925896bf1a0b9952fc230c17565a18
+- `src/confrec/ftlen_panel.py` = 76b715a35cc379b43f6e0857293cb96474a82e98
+- `tests/test_confrec_ftlen.py` = afdabd75b775e0b76846f657b5e1a3852f483ae6
+
+Implemented by the implementer of the FT-Q control on the same machinery (canonical-root guards, DRY allow-list, link sweep, E1 rerun-once rule with the same-key refinement, sticky
+FAILED_INTEGRITY with a logged override); `ftlen_panel.py` imports `src/confrec/ftq_panel.py` read-only (pinned by the FT-Q record). Trains s0 and s1 with the flags of the
+real adapters' recorded configuration except `--epochs 3` (ML-1M: Gate-FT's `--train`, bytes equal to the grid's TRAIN panel), scores `like` and the swap arm, links the registered
+zero-shot scores, and runs `ftgrid_report` (unchanged) with `--models zeroshot,s0,s1` into `outputs/confrec/ftgrid_len3/report/<d>.json` with a NOTE saying that these are two-seed,
+3-epoch, exploratory adapters. 124 of 126 tests pass (2 skipped by design); mutation checks (19 planted bugs in the script, 18 in the module) were caught. Estimated GPU time
+5.3 h (ML-1M) and 6.7 h (Toys). Exploratory-root rule: `run_ftextra.sh` refuses this root; `ftgrid_extra` is run by hand with `--root_label llama` (the safe label: summarize then refuses the file
+and no family or FT-C reading can use it). Not implemented as written: the paired 3-epoch minus 1-epoch contrast on identical rows (the two reports read the same panels and split, so their E-B, E-D
+and E-J numbers are compared side by side). One `git status` was run by the implementer in the working folder by mistake (it can only refresh the stat cache of `.git/index`); no other git command
+was run there.
+
+## 2026-10-05 · Code record: the S6 composition diagnostics (addendum 7 section 2); recorded before the S6 arms were built
+
+- `src/confrec/ftprune_compose.py` = d0573fc4906f870cae13ef83a00c908600dc9a93
+- `tests/test_confrec_ftprune_compose.py` = 4111cf3680d7f176db032cf3e3837254db3d370a
+
+`ftprune_compose` computes, for P0, P1 (mean over seeds), P2 and P3 from the prune manifest and the files it names (no scoring, no outcome): (a) the share of TRAIN items
+that keep no example, (b) the mean absolute change of the item label rate over items with at least two TRAIN examples (weights = full-TRAIN counts; an in-scope
+item that loses all its examples is counted in (a) and listed separately), (c) the share of ML-1M TEST pairs whose item keeps a TRAIN example (P0 must reproduce the
+split's recorded seen share), (d) the head-tercile example share (terciles over the full TRAIN set by `stats.rank_bins`, equal counts share a tercile). It refuses a
+manifest whose recorded sha1 does not match (28 refusal cases tested). 65 tests pass (19 injected bugs all caught); it imports `ftprune.py` read-only
+(ftprune.py d9dd0f10... at the time, recorded with the `prune` record) and writes only to its `--out_dir`. Run after stage B:
+`python -m src.confrec.ftprune_compose --manifest outputs/confrec/ftprune/prune_manifest.json --out_dir outputs/confrec/ftprune/compose`. The item-stratified arm P1s is
+not implemented (conditional on P2 - P1 reading BEATS, addendum 7 section 3).
+
+## 2026-10-05 · Amendment 3 addendum 9 (longer-training robustness arm FT-L, EXPLORATORY; written after the Toys fine-tuned results were read)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_9.md` sha1 = 04722f5ff9bfa393e32eb94bd900b9608b00a25b. First read of Toys results (2026-10-05, after the code and wording-rule hashes of addenda 6 and 8
+were recorded): Qwen3-8B on Toys: UAUC zero-shot 0.527, LoRA 0.558 (E-B +0.031 [0.006, 0.056]), item mean 0.684 (information-matched 0.633), temporal MF 0.539;
+dUAUC(L - q-hat) LoRA -0.126 [-0.153, -0.098]; G (pooled) -0.005, G_wu -0.003, G_{LLM|CF} -0.0002 (all intervals include 0); P1 replication NO_EVIDENCE (mean -0.003,
+p 0.67); item-prior share zero-shot 0.30 (uninterpretable, r8 0.69), LoRA 0.66; item share of MF 0.13 and of the labels 0.08; zero-shot knockout INDETERMINATE.
+Toys therefore does not replicate the ML-1M personal-gain pattern. FT-L (3 epochs, seeds 0 and 1, ML-1M and Toys, like and swap arms, root
+`outputs/confrec/ftgrid_len3`) is added as an exploratory answer to the objection that the registered recipe under-trains the model; it has no hypothesis and no
+role in claim admission. Code to be recorded before the first adapter is trained.
+
 ## 2026-10-05 · Code record: the FT-Q control (addendum 8); recorded before any control adapter was trained or scored
 
 - `scripts/sigir/run_ftq.sh` = f8fa2e3a2d6e19a74494e526c8a004b2a7acfbba

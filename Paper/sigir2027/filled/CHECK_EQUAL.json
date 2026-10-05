@@ -1,8 +1,8 @@
 {
  "schema": "fill_paper_check_equal_v1",
  "summary": {
-  "quantities_printed_more_than_once": 13,
-  "printed_in_more_than_one_table": 12,
+  "quantities_printed_more_than_once": 16,
+  "printed_in_more_than_one_table": 15,
   "estimates_differ": 0,
   "format_or_interval_differs": 5,
   "numbers_without_a_source": 0
@@ -555,6 +555,116 @@
      "source": "grid/qwen/ml1m.json:P1.mean_over_seeds",
      "estimate": "0.011",
      "printed": "0.011$\\pm$.008"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/toys.json:E_A.*.UAUC_TEST.references.mf",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 86,
+     "table": "tab:tracks",
+     "row": "temporal MF (ref.)",
+     "column": 3,
+     "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.mf",
+     "estimate": "0.539",
+     "printed": "0.539{\\scriptsize$\\pm$.021}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 2,
+     "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.mf",
+     "estimate": "0.539",
+     "printed": "0.539{\\scriptsize$\\pm$.021}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/toys.json:E_A.*.UAUC_TEST.references.q_hat",
+   "n_printed": 3,
+   "n_tables": 3,
+   "tables": [
+    "tab:app-seeds",
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 84,
+     "table": "tab:tracks",
+     "row": "item mean $m$ (ref.)",
+     "column": 3,
+     "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.q_hat",
+     "estimate": "0.684",
+     "printed": "0.684{\\scriptsize$\\pm$.021}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 2,
+     "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.684",
+     "printed": "0.684{\\scriptsize$\\pm$.021}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 178,
+     "table": "tab:app-seeds",
+     "row": "Toys",
+     "column": 3,
+     "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.684",
+     "printed": "0.684{\\scriptsize$\\pm$.021}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 82,
+     "table": "tab:tracks",
+     "row": "UAUC of $\\ell$",
+     "column": 4,
+     "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.558",
+     "printed": "0.558{\\scriptsize$\\pm$.020\\,(.002)}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 114,
+     "table": "tab:slot",
+     "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+     "column": 2,
+     "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.558",
+     "printed": "0.558{\\scriptsize$\\pm$.020\\,(.002)}"
     }
    ]
   },

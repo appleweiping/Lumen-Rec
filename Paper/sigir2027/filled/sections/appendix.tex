@@ -111,12 +111,12 @@ addendum $k$ of A3) or the commit history.}
 \toprule
  & ML-1M & Toys & Video Games & Sports\\
 \midrule
-SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & 0.742{\scriptsize$\pm$.019\,(.002)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
+SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & 0.742{\scriptsize$\pm$.019\,(.002)} & 0.558{\scriptsize$\pm$.020\,(.002)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
 Post-hoc stacking & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Prior-offset LoRA & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Offset $-$ stacking & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack}\\
 \midrule
-Item mean / MF (ref.) & 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal}\\
+Item mean / MF (ref.) & 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & 0.684{\scriptsize$\pm$.021} / 0.539{\scriptsize$\pm$.021} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal}\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -175,7 +175,7 @@ Knockout: registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:la
  & UAUC (seeds 0 / 1 / 2) & All rows (seeds 0 / 1 / 2) & Item mean (ref.)\\
 \midrule
 ML-1M & 0.740 / 0.745 / 0.743 & 0.733 / 0.734 / 0.734 & 0.759{\scriptsize$\pm$.021}\\
-Toys & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
+Toys & 0.559 / 0.556 / 0.559 & 0.579 / 0.578 / 0.581 & 0.684{\scriptsize$\pm$.021}\\
 Video Games & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 Sports & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 \midrule

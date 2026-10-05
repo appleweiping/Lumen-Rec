@@ -65,7 +65,7 @@
     "references_source": "computed from --raw (ftgrid_report.compute_refs)",
     "q_hat_T_source": "computed from --raw: forensics.prior_means(times = T_d, shrink_k = 5); not in the reference cache",
     "code_sha1": {
-      "ftgrid_extra.py": "70684526203e8d587106dd6a0ce2502a83719627",
+      "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
       "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
       "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
       "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
@@ -76,16 +76,16 @@
       "pilot_log_given": true,
       "pilot_log_readable": true,
       "sha1": {
-        "src/confrec/ftgrid_extra.py": "70684526203e8d587106dd6a0ce2502a83719627",
-        "scripts/sigir/run_ftextra.sh": "f9c38e099761b5bd19ce017f6e285069b12a560f",
-        "tests/test_confrec_ftgrid_extra.py": "6bc03b51b908c1d7dc7fad5dbd97c75ac5b4f0ea"
+        "src/confrec/ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "scripts/sigir/run_ftextra.sh": "b2d3826ec2d539672b0011d64f6e8477a8eef3a4",
+        "tests/test_confrec_ftgrid_extra.py": "4b99e214992318ea51b207427ee5b5630872ac6f"
       },
       "recorded": {
-        "src/confrec/ftgrid_extra.py": false,
-        "scripts/sigir/run_ftextra.sh": false,
-        "tests/test_confrec_ftgrid_extra.py": false
+        "src/confrec/ftgrid_extra.py": true,
+        "scripts/sigir/run_ftextra.sh": true,
+        "tests/test_confrec_ftgrid_extra.py": true
       },
-      "complete": false
+      "complete": true
     },
     "fingerprint": {
       "domain": "ml1m",
@@ -101,7 +101,7 @@
       "n_boot": 2000,
       "seed": 0,
       "code_sha1": {
-        "ftgrid_extra.py": "70684526203e8d587106dd6a0ce2502a83719627",
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
         "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
         "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
         "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
@@ -223,15 +223,15 @@
       "refs_cache_sha1": null,
       "x1_record": {
         "recorded": {
-          "src/confrec/ftgrid_extra.py": false,
-          "scripts/sigir/run_ftextra.sh": false,
-          "tests/test_confrec_ftgrid_extra.py": false
+          "src/confrec/ftgrid_extra.py": true,
+          "scripts/sigir/run_ftextra.sh": true,
+          "tests/test_confrec_ftgrid_extra.py": true
         },
-        "complete": false,
+        "complete": true,
         "sha1": {
-          "src/confrec/ftgrid_extra.py": "70684526203e8d587106dd6a0ce2502a83719627",
-          "scripts/sigir/run_ftextra.sh": "f9c38e099761b5bd19ce017f6e285069b12a560f",
-          "tests/test_confrec_ftgrid_extra.py": "6bc03b51b908c1d7dc7fad5dbd97c75ac5b4f0ea"
+          "src/confrec/ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+          "scripts/sigir/run_ftextra.sh": "b2d3826ec2d539672b0011d64f6e8477a8eef3a4",
+          "tests/test_confrec_ftgrid_extra.py": "4b99e214992318ea51b207427ee5b5630872ac6f"
         }
       }
     },
@@ -953,12 +953,12 @@
     "R11 q-hat_T = forensics.prior_means(scan_events(raw), users, items, times = T_d for every pair, shrink_k = 5) ['mean_prior_shrunk']: other users' first ratings strictly before T_d, the global shrinkage prior also before T_d; q-hat recomputed from the same scan at the candidate times must equal the reference array (recorded in the output).",
     "R12 E-C'. Rows and users are the oracle anatomy's (users with both classes among the regime's TEST rows with finite logits for every model), so both decisions are compared on identical rows; r_u = the like rate among all of the user's CAL rows (labels, whatever the model's censoring); fewer than 3 CAL rows: the pooled like rate of all CAL rows of the EVAL panel; round = half up, floor(r_u n_u + 1/2) (as addendum 4 item 1), in exact integer arithmetic; the resamples are E-C's (ftgrid_report.ec_block's cluster draws), so the oracle values equal the report's E-C anatomy.",
     "R13 FT-C / FT-Q (DEVIATION: stricter than the registered text, for the paper's deviations table). R is defined only when the registered E-B contrast (s0-s2 vs ZS on TEST) is positive with a CI excluding 0 (registered) and, beyond the registered text, E-B is complete (all 3 seeds; addendum 1 item 7) and the FT-C rows hold at least 150 users (the minimum-n rule of A3 section 1 applied to R's CI-based label); otherwise R is not reported and the label is NOT_DEFINED. A resample with a zero denominator gives a non-finite R, dropped from the percentile CI and counted.",
-    "R14 summarize, families. H-F and H-S are directional: a member is confirmed only with an estimate > 0; H-J is two-sided. FT members need the sigma_seed rule (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed). Only the registered minimum-n rule takes a listed member out of a family; a listed member whose statistic is unavailable stays in the family with p = 1 (m is never smaller than the list; such a member is flagged and never confirmed); an incomplete FT member keeps its p-value in the family and is never confirmed.",
+    "R14 summarize, families. H-F and H-S are directional: a member is confirmed only with an estimate > 0; H-J is two-sided. FT members need the sigma_seed rule (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed). The members are the panel runs and regimes that were run: a panel whose fine-tuned runs were not run (a registered cut of A3 section 10: every FT model s0-s2 without a scoring run) has no FT member in E-F, E-H or E-J, but only with --not_run <dataset> and a pilot-log line holding the exact token 'FTEXTRA_NOT_RUN <dataset>'; without them such a file is refused. Its ZS regime was run, so its ZS member of E-H stays ('per Qwen Amazon panel run and regime'); a dataset cut as a whole has no file and no member. The registered minimum-n rule takes a member out of a family; a member that was run but whose statistic is unavailable (its runs excluded, e.g. by E1) stays in the family with p = 1 (flagged, never confirmed); an incomplete FT member keeps its p-value and is never confirmed.",
     "R15 summarize, registered copies. The registered E-B / E-D results are copied through by applying the report's own functions (ftgrid_report.holm, ed_holm_family; the E-B family as fill_paper.eb_family computes it) to the files' registered_pooled blocks, which equal the report's blocks (tested). The E-B copy has p_holm and confirmed null unless ML-1M, Toys, Video_Games and Sports are all given with a complete, non-descriptive E-B (fill_paper.eb_family refuses otherwise). P1 is copied from the --ml1m file only (ML-1M, Qwen3-8B, main root); the Llama P1 replication goes to llama.P1_replication and P1_wu to sensitivity.P1_wu, never under registered.P1.",
-    "R16 summarize, inputs. Every file is validated and a bad one is refused (exit 2), never dropped: the schema; a known backbone (Qwen or Llama); empty input_checks.problems; n_boot = --n_boot (2,000 for a registered summary) and seed 0; the code sha1 of ftgrid_extra.py equal to the current file; the root and role: --files = main-root Qwen files of toys / games / sports eligible for the families, --ml1m and --ftc = the main-root Qwen ML-1M file, --llama = Llama-root files, --ftq = teacher-root Qwen files; no (root, domain) twice.",
+    "R16 summarize, inputs. Every file is validated and a bad one is refused (exit 2), never dropped: the schema; a known backbone (Qwen or Llama); empty input_checks.problems; n_boot = --n_boot (2,000 for a registered summary) and seed 0; the code sha1 of ftgrid_extra.py equal to the current file; the root and role: --files = main-root Qwen files of toys / games / sports eligible for the families, --ml1m and --ftc = the main-root Qwen ML-1M file, --llama = Llama-root files, --ftq = teacher-root Qwen files; models_requested holding the registered models of the role (zeroshot, s0-s2; with p0 and p1 for --ftc and --ftq); no (root, domain) twice. A build itself refuses a --root_label that differs from the registered root its --scores_root resolves into.",
     "R17 robust vs registered_confirmed. `robust` is the A3-6 item 2 reading rule on the unadjusted 95% intervals of the two estimators, not a Holm confirmation; `registered_confirmed` beside it is the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root; null elsewhere), the E-D Holm family for G (null in a domain file, which holds raw p-values only, and filled by summarize), none for G_CF (a reference in no family).",
     "R18 FT wording (addendum 8 section 2). fine_tuning_mostly_teaches_the_item is true iff FT-C reads ITEM_DRIVEN on ML-1M and FT-Q reads ITEM_DRIVEN on every dataset given (ML-1M and Toys required, addendum 8 section 3; the runner refuses a teacher-root dataset that was scored without its file); null with the reason when an input is missing or its block is unavailable (never true, and never decided, on partial input); NOT_DEFINED is a defined label that is not ITEM_DRIVEN. item_quality_from_item_text additionally needs FT-Q ITEM_DRIVEN on at least one Amazon dataset; evidence_mixed is true iff a label is USER_DRIVEN or MIXED (null on partial input).",
-    "R19 Integrity. A q-hat recomputed from the raw scan that differs from the reference array, a q-hat_T that cannot be computed although --raw is given, a backbone that does not match the root, or an unknown backbone is a problem (input_checks.problems), so summarize refuses the file."
+    "R19 Integrity. CF references or a q-hat_T that cannot be computed although --raw is given, a q-hat recomputed from the raw scan that differs from the reference array, a backbone that does not match the root, or an unknown backbone is a problem (input_checks.problems), so summarize refuses the file."
   ],
   "registered_pooled": {
     "definition": "the registered E-D numbers (ftgrid_report.shares_block, stacker_block, starperm_block), E-B (contrast_models) and P1 (p1_block) re-derived from the same files with the report's functions, rows and resamples: equal to the report's E_D, E_B and P1 blocks; no Holm adjustment here (summarize applies ftgrid_report.ed_holm_family)",
@@ -6836,7 +6836,7 @@
     "descriptive": true,
     "status": "registered, outcome-free: FT-C on ML-1M (A3 section 9; addendum 8)",
     "available": false,
-    "reason": "record missing: A3-6 item 11 requires the sha1 of src/confrec/ftgrid_extra.py, scripts/sigir/run_ftextra.sh, tests/test_confrec_ftgrid_extra.py in the pilot log (--pilot_log) before this registered, outcome-free block is computed",
+    "reason": "needs usable like arms of ['zeroshot', 's0', 's1', 'p0', 'p1']; missing or excluded: ['p0', 'p1']",
     "label": "NOT_DEFINED"
   }
 }

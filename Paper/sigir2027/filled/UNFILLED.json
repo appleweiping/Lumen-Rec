@@ -2,36 +2,37 @@
  "schema": "fill_paper_unfilled_v1",
  "summary": {
   "slots_total": 714,
-  "filled": 183,
-  "unfilled": 531,
+  "filled": 294,
+  "unfilled": 420,
   "unfilled_by_reason": {
    "branch_slot": 6,
    "free_text": 29,
-   "result_file_missing": 486,
+   "result_file_missing": 375,
    "result_not_in_report": 10
   },
   "filled_by_alias": {
-   "aud": 74,
+   "aud": 111,
    "corr": 4,
-   "cpu": 6,
-   "ext": 32,
+   "cpu": 11,
+   "ext": 62,
    "free": 2,
    "gate": 9,
    "gft": 6,
-   "grid": 43,
+   "grid": 74,
+   "ko": 8,
    "sel": 7
   },
   "unfilled_by_alias": {
-   "aud": 114,
+   "aud": 77,
    "aud2l": 1,
    "aud2q": 16,
    "branch": 6,
    "corr": 5,
-   "cpu": 19,
-   "ext": 125,
+   "cpu": 14,
+   "ext": 95,
    "free": 42,
-   "grid": 138,
-   "ko": 28,
+   "grid": 107,
+   "ko": 20,
    "mir": 7,
    "prn": 17,
    "slot": 13
@@ -87,24 +88,33 @@
    "a": 366,
    "b": 366,
    "ok": true
+  },
+  {
+   "check": "qwen toys: report meta n_users_both_classes_test = ftgrid_split eval.users_both_classes_test",
+   "a": 943,
+   "b": 943,
+   "ok": true
   }
  ],
  "check_equal_summary": {
-  "quantities_printed_more_than_once": 13,
-  "printed_in_more_than_one_table": 12,
+  "quantities_printed_more_than_once": 16,
+  "printed_in_more_than_one_table": 15,
   "estimates_differ": 0,
   "format_or_interval_differs": 5,
   "numbers_without_a_source": 0
  },
  "sources": {
   "aud/sports.json": "a7406bd2509464352eac2e390dfcb7ab5784c837",
-  "extra/ml1m.json": "14b5f48530e1ef1cb3c04fdffb59765ed89af271",
+  "aud/toys.json": "de15aa117b7811d7cea4d68d734a96434f50ce7a",
+  "extra/ml1m.json": "7f4a1da43c34d93e3516ed874c7e8831bc3631b1",
+  "extra/toys.json": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
   "grid/qwen/games_split.json": "dfd01e9e4012d19a958c154e848c546774d62121",
   "grid/qwen/ml1m.json": "bf76f48414ac99a887dbc63a4e2f29617269a46e",
   "grid/qwen/ml1m_split.json": "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
   "grid/qwen/sports_split.json": "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
+  "grid/qwen/toys.json": "a28f219b243e552dab3f753a4aaf64a172bb853d",
   "grid/qwen/toys_split.json": "e43416bb960cb86ae6fb1ed7a2ad16f063de5e28",
   "sel/selection.json": "7cd3972e7fedccfc0059e4ecfcfcdf12b5212a0e"
  },
@@ -202,30 +212,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "UAUC of $\\ell$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 82,
-   "slot": "grid:UAUC",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "UAUC of $\\ell$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 82,
-   "slot": "grid:UAUC",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "UAUC of $\\ell$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -274,18 +260,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "LoRA $-$ ZS (E-B)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 83,
-   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "LoRA $-$ ZS (E-B)",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -310,18 +284,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "item mean $m$ (ref.)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 84,
-   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "item mean $m$ (ref.)",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -346,18 +308,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "matched mean $m_T$ (ref.)$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 85,
-   "slot": "ext:E\\_J.UAUC\\_q\\_hat\\_T",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "matched mean $m_T$ (ref.)$^\\dagger$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -382,18 +332,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "temporal MF (ref.)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 86,
-   "slot": "cpu:UAUC\\_mf\\_temporal",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "temporal MF (ref.)",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -418,30 +356,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 87,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 87,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -482,30 +396,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 88,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 88,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -562,30 +452,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Reliability $r_8$ of $\\hat\\pi$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 92,
-   "slot": "grid:r8c",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Reliability $r_8$ of $\\hat\\pi$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 92,
-   "slot": "grid:r8c",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Reliability $r_8$ of $\\hat\\pi$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -634,30 +500,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Item-prior share $\\rho^2/r_8$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 93,
-   "slot": "grid:item\\_prior\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item-prior share $\\rho^2/r_8$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 93,
-   "slot": "grid:item\\_prior\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item-prior share $\\rho^2/r_8$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -698,30 +540,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 94,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "e-share$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 94,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "e-share$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -778,30 +596,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Item share of MF / label$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 95,
-   "slot": "ext:E\\_G.item\\_share\\_label",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item share of MF / label$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 95,
-   "slot": "ext:E\\_G.item\\_share\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item share of MF / label$^\\dagger$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -850,30 +644,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 96,
-   "slot": "grid:G",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 96,
-   "slot": "grid:G",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -914,30 +684,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 97,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 97,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -994,30 +740,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 98,
-   "slot": "ext:E\\_W.G\\_CF\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 98,
-   "slot": "grid:G\\_CF",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1066,18 +788,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "MF personal residual (ref.)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 99,
-   "slot": "cpu:UAUC\\_mf\\_personal\\_residual",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "MF personal residual (ref.)",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1102,30 +812,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Star permutation $\\Delta$UAUC",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 100,
-   "slot": "grid:starperm\\_dUAUC",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Star permutation $\\Delta$UAUC",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 100,
-   "slot": "grid:starperm\\_dUAUC",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Star permutation $\\Delta$UAUC",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1166,30 +852,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 101,
-   "slot": "grid:partial\\_rho\\_pi\\_logpop",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Popularity link of $\\hat\\pi$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 101,
-   "slot": "grid:partial\\_rho\\_pi\\_logpop",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Popularity link of $\\hat\\pi$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1246,30 +908,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Popularity link of $\\ell$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 102,
-   "slot": "grid:partial\\_rho\\_L\\_logpop",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Popularity link of $\\ell$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 102,
-   "slot": "grid:partial\\_rho\\_L\\_logpop",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Popularity link of $\\ell$",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1310,30 +948,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 107,
-   "slot": "grid:ece10\\_platt",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "ECE (after Platt)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 107,
-   "slot": "grid:ece10\\_platt",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "ECE (after Platt)",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1390,30 +1004,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Correct in bottom tertile, oracle",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 108,
-   "slot": "grid:share\\_correct\\_bottom\\_tertile",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Correct in bottom tertile, oracle",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 108,
-   "slot": "grid:share\\_correct\\_bottom\\_tertile",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Correct in bottom tertile, oracle",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1454,30 +1044,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 109,
-   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 109,
-   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1534,30 +1100,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Errors in top tertile, oracle",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 110,
-   "slot": "grid:share\\_errors\\_top\\_tertile",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Errors in top tertile, oracle",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 110,
-   "slot": "grid:share\\_errors\\_top\\_tertile",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Errors in top tertile, oracle",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1598,30 +1140,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 111,
-   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 111,
-   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1678,30 +1196,6 @@
    "kind": "table",
    "table": "tab:tracks",
    "row": "Margin AUROC, oracle",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 112,
-   "slot": "grid:auroc\\_margin\\_correct",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Margin AUROC, oracle",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 112,
-   "slot": "grid:auroc\\_margin\\_correct",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Margin AUROC, oracle",
    "column": 5,
    "blocks": [],
    "reason": "result_file_missing",
@@ -1742,30 +1236,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 113,
-   "slot": "ext:E\\_Cprime.AUROC\\_margin",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 113,
-   "slot": "ext:E\\_Cprime.AUROC\\_margin",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 4,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1826,7 +1296,7 @@
    "blocks": [],
    "anchor": "Fine-tuning",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1839,7 +1309,7 @@
    "blocks": [],
    "anchor": "(E-B, confirmed on",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1865,7 +1335,7 @@
    "blocks": [],
    "anchor": "is confirmed (E-D) on",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1878,7 +1348,7 @@
    "blocks": [],
    "anchor": "zero-shot and",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -1912,34 +1382,6 @@
    "kind": "table",
    "table": "tab:teaches",
    "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 161,
-   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 161,
-   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
    "column": 5,
    "blocks": [
     "BRANCH-GATEFT"
@@ -1988,34 +1430,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 162,
-   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 162,
-   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -2080,34 +1494,6 @@
    "kind": "table",
    "table": "tab:teaches",
    "row": "Sparse rows ($m$ from $<5$ ratings)",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 165,
-   "slot": "ext:E\\_H.sparse.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Sparse rows ($m$ from $<5$ ratings)",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 165,
-   "slot": "ext:E\\_H.sparse.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Sparse rows ($m$ from $<5$ ratings)",
    "column": 5,
    "blocks": [
     "BRANCH-GATEFT"
@@ -2156,34 +1542,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 166,
-   "slot": "ext:E\\_H.dense.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Dense rows",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 166,
-   "slot": "ext:E\\_H.dense.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Dense rows",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -2248,34 +1606,6 @@
    "kind": "table",
    "table": "tab:teaches",
    "row": "Unseen items (no TRAIN example)",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 167,
-   "slot": "ext:E\\_H.unseen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Unseen items (no TRAIN example)",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 167,
-   "slot": "ext:E\\_H.unseen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Unseen items (no TRAIN example)",
    "column": 5,
    "blocks": [
     "BRANCH-GATEFT"
@@ -2324,34 +1654,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 168,
-   "slot": "ext:E\\_H.seen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Seen items",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 168,
-   "slot": "ext:E\\_H.seen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Seen items",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -2421,7 +1723,7 @@
     "BRANCH-GATEFT"
    ],
    "reason": "result_not_in_report",
-   "detail": "extra/ml1m.json: FT_C_reading is not available (record missing: A3-6 item 11 requires the sha1 of src/confrec/ftgrid_extra.py, scripts/sigir/run_ftextra.sh, tests/test_confrec_ftgrid_extra.py in the pilot log (--pilot_log) before this registered, outcome-free block is computed)"
+   "detail": "extra/ml1m.json: FT_C_reading is not available (needs usable like arms of ['zeroshot', 's0', 's1', 'p0', 'p1']; missing or excluded: ['p0', 'p1'])"
   },
   {
    "file": "sections/experiments.tex",
@@ -2435,7 +1737,7 @@
     "BRANCH-GATEFT"
    ],
    "reason": "result_not_in_report",
-   "detail": "extra/ml1m.json: FT_C_reading is not available (record missing: A3-6 item 11 requires the sha1 of src/confrec/ftgrid_extra.py, scripts/sigir/run_ftextra.sh, tests/test_confrec_ftgrid_extra.py in the pilot log (--pilot_log) before this registered, outcome-free block is computed)"
+   "detail": "extra/ml1m.json: FT_C_reading is not available (needs usable like arms of ['zeroshot', 's0', 's1', 'p0', 'p1']; missing or excluded: ['p0', 'p1'])"
   },
   {
    "file": "sections/experiments.tex",
@@ -2612,34 +1914,6 @@
    "kind": "table",
    "table": "tab:teaches",
    "row": "Head $-$ tail drop of $\\ell$",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 176,
-   "slot": "ko:head\\_minus\\_tail.delta",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Head $-$ tail drop of $\\ell$",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 176,
-   "slot": "ko:head\\_minus\\_tail.delta",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Head $-$ tail drop of $\\ell$",
    "column": 5,
    "blocks": [
     "BRANCH-GATEFT"
@@ -2688,34 +1962,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 177,
-   "slot": "ko:placebo.delta",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Placebo drop",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 177,
-   "slot": "ko:placebo.delta",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Placebo drop",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -2780,34 +2026,6 @@
    "kind": "table",
    "table": "tab:teaches",
    "row": "Tail $\\Delta$UAUC",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 178,
-   "slot": "ko:tail\\_dUAUC",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Tail $\\Delta$UAUC",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 178,
-   "slot": "ko:tail\\_dUAUC",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Tail $\\Delta$UAUC",
    "column": 5,
    "blocks": [
     "BRANCH-GATEFT"
@@ -2856,34 +2074,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 179,
-   "slot": "ko:label",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Registered label",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 179,
-   "slot": "ko:label",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Registered label",
-   "column": 4,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3004,7 +2194,7 @@
    "blocks": [],
    "anchor": "the Qwen3-8B knockout is labelled",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3025,18 +2215,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Pool (level)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 216,
-   "slot": "aud:B.pool\\_head\\_share",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Pool (level)",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3061,18 +2239,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Pool (level)",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 216,
-   "slot": "aud:B.pool\\_tail\\_share",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Pool (level)",
    "column": 16,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3097,18 +2263,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "LLM, \\textsf{next}",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 217,
-   "slot": "aud:B.delta\\_head",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{next}",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3133,18 +2287,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "LLM, \\textsf{next}",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 217,
-   "slot": "aud:B.gini\\_exposure",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{next}",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3161,18 +2303,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 217,
-   "slot": "aud:B.tail\\_share\\_top10",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{next}",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3205,18 +2335,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "LLM, \\textsf{like}",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 218,
-   "slot": "aud:B.delta\\_head",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{like}",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3241,18 +2359,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "LLM, \\textsf{like}",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 218,
-   "slot": "aud:B.gini\\_exposure",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{like}",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3269,18 +2375,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 218,
-   "slot": "aud:B.tail\\_share\\_top10",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "LLM, \\textsf{like}",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3313,18 +2407,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Verbalised reranker",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 219,
-   "slot": "aud:B.delta\\_head",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Verbalised reranker",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3349,18 +2431,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Verbalised reranker",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 219,
-   "slot": "aud:B.gini\\_exposure",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Verbalised reranker",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3377,18 +2447,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 219,
-   "slot": "aud:B.tail\\_share\\_top10",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Verbalised reranker",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3421,18 +2479,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, min",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 220,
-   "slot": "aud:B.delta\\_head, min of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, min",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3457,18 +2503,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, min",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 220,
-   "slot": "aud:B.gini\\_exposure, min of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, min",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3485,18 +2519,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 220,
-   "slot": "aud:B.tail\\_share\\_top10, min of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, min",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3529,18 +2551,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, median",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 221,
-   "slot": "aud:B.delta\\_head, median of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, median",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3565,18 +2575,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, median",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 221,
-   "slot": "aud:B.gini\\_exposure, median of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, median",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3593,18 +2591,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 221,
-   "slot": "aud:B.tail\\_share\\_top10, median of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, median",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3637,18 +2623,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, max",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 222,
-   "slot": "aud:B.delta\\_head, max of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, max",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3673,18 +2647,6 @@
    "kind": "table",
    "table": "tab:exposure",
    "row": "Published, max",
-   "column": 9,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 222,
-   "slot": "aud:B.gini\\_exposure, max of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, max",
    "column": 10,
    "blocks": [],
    "reason": "result_file_missing",
@@ -3701,18 +2663,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 222,
-   "slot": "aud:B.tail\\_share\\_top10, max of 8",
-   "kind": "table",
-   "table": "tab:exposure",
-   "row": "Published, max",
-   "column": 15,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -3991,7 +2941,7 @@
    "blocks": [],
    "anchor": "$\\mathrm{acc}_{\\rm low}$ (difference",
    "reason": "result_file_missing",
-   "detail": "aud/toys.json"
+   "detail": "aud/home.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -4030,19 +2980,7 @@
    "blocks": [],
    "anchor": "one third of the time (share",
    "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 281,
-   "slot": "aud:temperature.T",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Temperature $T$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
+   "detail": "aud/home.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -4075,18 +3013,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "ECE (top label)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 282,
-   "slot": "aud:C.ece",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "ECE (top label)",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4111,18 +3037,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Brier",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 283,
-   "slot": "aud:C.brier",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Brier",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4147,18 +3061,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "$\\mathrm{acc}_{\\rm low}$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 284,
-   "slot": "aud:C.unsure\\_correct\\_rate",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "$\\mathrm{acc}_{\\rm low}$",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4183,18 +3085,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "$\\mathrm{acc}_{\\rm high}$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 285,
-   "slot": "aud:C.tertile2\\_accuracy",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "$\\mathrm{acc}_{\\rm high}$",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4219,18 +3109,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Errors in high tertile",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 286,
-   "slot": "aud:C.share\\_errors\\_in\\_top\\_tertile",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Errors in high tertile",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4255,18 +3133,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "AUROC($p_{\\max}$)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 287,
-   "slot": "aud:C.auroc\\_p\\_max\\_top1",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "AUROC($p_{\\max}$)",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4291,18 +3157,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "AUROC($\\ell$), pooled",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 288,
-   "slot": "aud:C.pointwise.pooled\\_auroc",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "AUROC($\\ell$), pooled",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4327,18 +3181,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "UAUC (per event)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 289,
-   "slot": "aud:C.pointwise.uauc",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "UAUC (per event)",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4363,18 +3205,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "NDCG@10",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 290,
-   "slot": "aud:A.ranking.ndcg10",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "NDCG@10",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4399,18 +3229,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Mean $p$, head $-$ tail",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 293,
-   "slot": "aud:E.head\\_minus\\_tail\\_mean\\_p",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Mean $p$, head $-$ tail",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4435,18 +3253,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Bias Index, head $-$ tail",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 294,
-   "slot": "aud:E.bias\\_index.head\\_minus\\_tail",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Bias Index, head $-$ tail",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4471,18 +3277,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Top-1 is head (share)",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 295,
-   "slot": "aud:E.top1\\_head\\_fraction",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Top-1 is head (share)",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4507,18 +3301,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "NDCG@10 gain, $p_{\\max}$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 298,
-   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "NDCG@10 gain, $p_{\\max}$",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4543,18 +3325,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "NDCG@10 gain, random",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 299,
-   "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "NDCG@10 gain, random",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4579,18 +3349,6 @@
    "kind": "table",
    "table": "tab:anatomy",
    "row": "Niche $-$ mainstream, $p_{\\max}$",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 300,
-   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Niche $-$ mainstream, $p_{\\max}$",
    "column": 4,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4607,18 +3365,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "aud/tools.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 301,
-   "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
-   "kind": "table",
-   "table": "tab:anatomy",
-   "row": "Niche $-$ mainstream, random",
-   "column": 3,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "aud/toys.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -4681,7 +3427,7 @@
    "blocks": [],
    "anchor": "0 on [S] domains (",
    "reason": "result_file_missing",
-   "detail": "aud/toys.json"
+   "detail": "aud/home.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -4733,7 +3479,7 @@
    "blocks": [],
    "anchor": "change per-user AUC by at most",
    "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
+   "detail": "grid/qwen/games.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -5277,20 +4023,6 @@
    "kind": "table",
    "table": "tab:slot",
    "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
-   "column": 2,
-   "blocks": [
-    "METHOD-SLOT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 114,
-   "slot": "grid:UAUC",
-   "kind": "table",
-   "table": "tab:slot",
-   "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
    "column": 3,
    "blocks": [
     "METHOD-SLOT"
@@ -5479,20 +4211,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "slot/slot.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 119,
-   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
-   "kind": "table",
-   "table": "tab:slot",
-   "row": "Item mean / MF (ref.)",
-   "column": 2,
-   "blocks": [
-    "METHOD-SLOT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -6193,104 +4911,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC seed 2",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC\\_all\\_rows seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC\\_all\\_rows seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "grid:UAUC\\_all\\_rows seed 2",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 178,
-   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "Toys",
-   "column": 3,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "grid/qwen/toys.json"
   },
   {
    "file": "sections/appendix.tex",

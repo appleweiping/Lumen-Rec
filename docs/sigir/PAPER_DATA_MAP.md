@@ -12,7 +12,7 @@ that day). The live state is always `Paper/sigir2027/filled/UNFILLED.json`.
 | pull | `powershell -NoProfile -File scripts\sigir\pull_results.ps1 [-ListOnly]` | `docs/sigir/results/<alias>/...`, `docs/sigir/results/MANIFEST.json` (path, size, sha1, server mtime; missing files listed) |
 | fill | `python scripts\sigir\fill_paper.py [--check_equal]` | `Paper/sigir2027/filled/{main.tex, references.bib, sections/*.tex, UNFILLED.json, FILLED.json, CHECK_EQUAL.json}` |
 | compile | in `Paper/sigir2027/filled/`: pdflatex, bibtex, pdflatex x2 | `filled/main.pdf` (unfilled slots stay red) |
-| test | `python -m pytest tests\test_confrec_fillpaper.py -q -p no:cacheprovider` | 35 tests, CPU, about 2 minutes |
+| test | `python -m pytest tests\test_confrec_fillpaper.py -q -p no:cacheprovider` | 41 tests, CPU, about 2 minutes (the ext tests use the real `extra/ml1m.json` and summarize synthetic copies of it with `src.confrec.ftgrid_extra` itself) |
 | page budget | `python scripts\sigir\page_budget.py --results <dir> --out <dir>` (Git's `usr\bin` on PATH for latexmk's perl) | the pages used before the references with typical fillers; since 2026-10-05 it measures to the later of the text end and the last float end |
 
 - The pull is read-only on the server: one `stat` listing through `scripts\sigir\remote.ps1 -ScriptFile`, then one `scp` per
@@ -81,12 +81,26 @@ Cell formats (FILL RULE 2):
 | prn | `src.confrec.ftprune analyze` (run_ftprune.sh stage E) | `outputs/confrec/ftprune/pruning_ml1m.json` (+ `.csv`) | `prn/pruning_ml1m.json` |
 | slot | `src.confrec.ftmethod_report dataset` / `slot` (run_ftmethod.sh stage 5) | `outputs/confrec/ftmethod/<d>/report.json`, `outputs/confrec/ftmethod/slot.json` | `slot/<d>.json`, `slot/slot.json` |
 | mir | `scripts/sigir/pilot1_gate.py --stage3_gate` (run_gatefix_stage3.sh) | `outputs/confrec/gatefix/stage3/decision.json` | `mir/decision.json` |
-| ext | `src.confrec.ftgrid_extra build` / `summarize` (run_ftextra.sh; A3-6 items 2-8; interface: `docs/sigir/FTEXTRA_IMPL_SPEC.md`) | `outputs/confrec/ftgrid/extra/<d>.json`, `extra/summary.json`; Llama `outputs/confrec/ftgrid_llama/extra/<d>.json` | PROPOSED `extra/<d>.json`, `extra/summary.json`, `extra/llama/<d>.json` (fixed when `pull_results.ps1` is extended) |
+| ext | `src.confrec.ftgrid_extra build` / `summarize` (run_ftextra.sh; A3-6 items 2-8, addendum 8; interface: `docs/sigir/FTEXTRA_IMPL_SPEC.md`) | Qwen main root `outputs/confrec/ftgrid/extra/<d>.json`; Llama root `outputs/confrec/ftgrid_llama/extra/<d>.json`; FT-Q teacher root `outputs/confrec/ftgrid_q/extra/<d>.json`; `outputs/confrec/ftgrid/extra/summary.json` | `extra/<d>.json`, `extra/llama/<d>.json` (ML-1M, Toys), `extra/ftq/<d>.json`, `extra/summary.json` (as `pull_results.ps1`) |
 
-The `ext` specs written by the editor pass of 2026-10-05 are placeholders: every `ext:` slot checks its slot text and stays red with
-`result_file_missing` ("extra-analysis file not produced yet") until the file exists; editor pass 2 replaces them with handlers
-written against the real schema of `ftgrid_extra.py`. The list of `ext:` slots is in section 4b below and in
-`tests/test_confrec_fillpaper.py` (`EXT_TABLE_SLOTS`, `EXT_PROSE_SLOTS`).
+The `ext` specs (editor pass 2, 2026-10-05) are written against the real schema of `ftgrid_extra.py` (its readings R1-R19,
+`summarize`, `tests/test_confrec_ftgrid_extra.py`) and the real ML-1M file. Rules:
+
+- A per-regime cell reads `<block>.<reg>.<sub>`: ZS is the `zeroshot` record of `per_model` (`per_seed` in E-J); LoRA is
+  `mean_over_seeds` with the s.d. (ddof 1) of the three seed estimates. A missing seed or a regime with `complete: false` reads
+  `incomplete_regime` (never replaced); a zero-shot run excluded for E1 (`runs.zeroshot.{like,swap}.status`) reads FAILED_INTEGRITY.
+- Italics: a value is set in italics exactly when the file's own `status.items_2_to_7` is `exploratory` (ML-1M, either backbone;
+  A3-6 Consequence); `registered_outcome_free` is plain; any other status reads `field_not_produced`.
+- A block the file marks unavailable stays red (`result_not_in_report`) with the file's own reason.
+- FT-C is read from `extra/ml1m.json` only, FT-Q from the teacher root `extra/ftq/<d>.json`; both are the `FT_C_reading` block, and
+  a block of the other control reads `field_not_produced`. A retention the file records as not defined prints "not defined" with
+  its NOT_DEFINED label.
+- The prose counts and the addendum-8 wording come from `extra/summary.json` only (summarize's Holm families, `not_run`,
+  `robust_readings` and `ft_wording`); nothing is confirmed that summarize did not confirm, and a direction word appears only for a
+  confirmed family member.
+
+The 157 `ext:` slots are listed in tables 3 and 4b below and in `tests/test_confrec_fillpaper.py` (`EXT_TABLE_SLOTS`,
+`EXT_PROSE_SLOTS`, `EXT_N_SLOTS`).
 
 Where the skeleton's PROPOSED path differs from the script, the alias follows the script (FILL RULE: "the alias follows the
 script"):
@@ -130,23 +144,23 @@ s.d. of the three `per_model.s0-s2` estimates; a span cell holds one value per p
 | UAUC of l | `E_A.<reg>.UAUC_TEST` |
 | LoRA - ZS (E-B; span) | `E_B.mean_over_seeds` (s.d. of `E_B.per_seed`) |
 | item mean m / temporal MF (ref.; span) | cpu: `E_A.ZS.UAUC_TEST.references.{q_hat, mf}` (FT rows when the ZS block is unavailable) |
-| matched mean m_T (ref.; span) | ext `E_J.UAUC_q_hat_T` (pending) |
-| dUAUC(l - m), E-J; dUAUC(l - MF), warm | ext `E_J.dUAUC_L_minus_q_hat`, `E_J.dUAUC_L_minus_mf` (pending; per regime) |
+| matched mean m_T (ref.; span) | ext `E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b` (an estimate; the file holds no interval for it; `E_J.FT....per_seed.s0.UAUC_b` when the ZS block is unavailable) |
+| dUAUC(l - m), E-J; dUAUC(l - MF), warm | ext `E_J.<reg>.dUAUC_L_minus_q_hat`, `E_J.<reg>.dUAUC_L_minus_MF_warm` (per regime) |
 | Users: TEST / S_d (span) | `ftgrid_split.eval.users_both_classes_test` / `ftgrid_split.sd.users` (two slots in one cell) |
 | Reliability r8 | `E_D.<reg>.shares.r8c` |
 | Item-prior share rho^2/r8 | `E_D.<reg>.shares.item_prior_share` (new grid spec; "uninterpretable" when `shares_reading` says so; the non-prior share is its complement) |
-| e-share; item share of MF / label (span) | ext `E_G.e_share`; `E_G.item_share_mf` / `E_G.item_share_label` (pending) |
+| e-share; item share of MF / label (span) | ext `E_G.<reg>.e_share` (per-model leaf `e_share`); `E_G.MF_score_item_bias.item_share` / `E_G.label_q_hat.item_share` |
 | G, E-D | `E_D.<reg>.information_gain.per_model.<m>.G`, `G_mean_over_seeds` |
-| G_wu (E-W) | ext `E_W.G_wu` (pending) |
-| G_CF: E-D / E-W (span) | `E_D.ZS.information_gain.G_CF` (FT rows when the ZS block is unavailable) / ext `E_W.G_CF_wu` (pending) |
+| G_wu (E-W) | ext `E_W.<reg>.G_wu` |
+| G_CF: E-D / E-W (span) | `E_D.ZS.information_gain.G_CF` (FT rows when the ZS block is unavailable) / ext `E_W.ZS.G_CF_wu` (FT when the ZS block is unavailable) |
 | MF personal residual (ref.; span) | cpu: `E_A.ZS.mf_personal_residual_warm_pairs_only` |
 | star permutation | `E_D.<reg>.star_permutation.per_model.<m>.dUAUC_L_minus_perm`, `dUAUC_mean_over_seeds` |
 | popularity link of pi / l | `E_E.<reg>.partial_spearman.{pi_item, L_item}` |
 | P1 (span, ML-1M) | `P1.per_seed.s0-s2`, `P1.mean_over_seeds` (est, CI, p) |
-| P1_wu (span, ML-1M) | ext `E_W.P1_wu` (pending) |
+| P1_wu (span, ML-1M) | ext `E_W.P1_wu.per_seed.s0-s2`, `E_W.P1_wu.mean_over_seeds` (est, CI, p) |
 | ECE (after Platt) | `E_C.<reg>.ECE` |
 | correct in bottom / errors in top / margin AUROC, oracle | `E_C.<reg>.{share_correct_bottom, share_errors_top, AUROC_margin_correct}` |
-| deployable (three rows, one label; the slot text names the statistic) | ext `E_Cprime.{share_correct_bottom, share_errors_top, AUROC_margin}` (pending) |
+| deployable (three rows, one label; the slot text names the statistic) | ext `E_Cprime.<reg>.deployable` (per-model and mean leaf `share_correct_bottom`, `share_errors_top`, `AUROC_margin_correct`) |
 | tab:app-llama only: knockout head - tail drop, registered label (Toys) | `knockout.analyses.<m>.delta.pseudo.head_minus_tail`, `knockout.labels.<m>.label` |
 
 Kept in the released files since the editor pass (page budget): the UAUC of pi-hat and e-hat alone (the latter is also row 4 of
@@ -156,9 +170,11 @@ tab:corrections), the Platt slope, the AURC, popularity as a rated reference.
 
 | row | field |
 |---|---|
-| G_LLM\|CF = dUAUC(M4 - M3), G_CF\|LLM = dUAUC(M4 - M2) | ext `E_F.G_LLM_given_CF`, `E_F.G_CF_given_LLM` (pending) |
-| G_prior on sparse / dense / unseen / seen rows | ext `E_H.<stratum>.G_prior` (pending; minimum-n rule per stratum) |
-| retention R, reading (LoRA columns of ML-1M and Toys) | ext `FT_C_reading.R`, `FT_C_reading.label` (pending) |
+| G_LLM\|CF = dUAUC(M4 - M3), G_CF\|LLM = dUAUC(M4 - M2) | ext `E_F.<reg>.G_LLM_given_CF`, `E_F.<reg>.G_CF_given_LLM` (E-W's within-user stackers) |
+| G_prior on sparse / dense / unseen / seen rows | ext `E_H.<reg>.strata.<stratum>.G_prior` (minimum-n rule per stratum) |
+| FT-C (permuted): R / reading (the ML-1M LoRA cell only; addendum 8 withdrew the Toys run) | ext `extra/ml1m.json` `FT_C_reading.R` ("not defined" when `defined` is false) / `FT_C_reading.label`, control `FT-C` |
+| FT-Q (teacher): R_Q / reading (LoRA cells) | ext `extra/ftq/<d>.json` `FT_C_reading.R` / `FT_C_reading.label`, control `FT-Q` |
+| UAUC of q_0 / q_1 / m (LoRA cells; addendum 8's descriptive companion) | ext `extra/ftq/<d>.json` `FT_C_reading.UAUC.p0.est` / `UAUC.p1.est` / `UAUC_q_hat.est` |
 | knockout: head - tail drop, placebo drop, tail dUAUC, registered label (Toys, Video Games, Sports) | ko: `knockout.analyses.<m>.{delta.pseudo.head_minus_tail, delta.placebo.head_minus_tail, dUAUC.real_minus_pseudo.tail}`, `knockout.labels.<m>.label` |
 
 A LoRA knockout cell is the mean of the three seed estimates with their s.d. (no interval exists for that mean). ML-1M has no store
@@ -207,8 +223,9 @@ uncertainty-selected, P3 prior-congruent):
 
 `arms.P3.status = NOT_RUN` makes the P3 row read "not run".
 
-**tab:deviations** (new; appendix). The 18 rows of `docs/sigir/DEVIATIONS.md`, condensed (what happened with its evidence, effect on
-claims). Row 7 carries three estimates: `sel.table[v_star].ml1m.UAUC` (DEV), `gate.UAUC` (CONFIRM), grid ml1m
+**tab:deviations** (new; appendix). The 20 rows of `docs/sigir/DEVIATIONS.md` (rows 19-20 since editor pass 2: the withdrawn Toys
+FT-C run with FT-Q, and the conservative readings of the extra-analysis code), condensed (what happened with its evidence, effect on
+claims); a test keeps the table and the record row for row. Row 7 carries three estimates: `sel.table[v_star].ml1m.UAUC` (DEV), `gate.UAUC` (CONFIRM), grid ml1m
 `E_A.ZS.UAUC_TEST.per_model.zeroshot` (TEST, zero-shot).
 
 **tab:app-sens** (dormant). The table was cut to two sentences and a pointer to the artefact; its spec is kept, so the table can be
@@ -275,19 +292,35 @@ that repeated table cells were dropped). Direction words are filled only by the 
 | method slot | `slot.json holm.confirmed` and the sign of dUAUC; the per-dataset gains as a list |
 | introduction and conclusion gate sentences | gate.json / gate_ft.json after GATE_PASS / GATE_FT_PASS (anchors follow the introduction as rewritten on 2026-10-04) |
 
-**4b. ext prose slots (pending; editor pass 2 writes their handlers).** `ext:E_J.H_J_count` (family E-J: k of 3 Amazon panels and
-the sign of each confirmed member), `ext:E_W.robust_count` (the reading rule of E-W per regime: robust or estimator-dependent),
-`ext:E_W.P1_wu_verdict` (P1 on the within-user values), `ext:FT_C_reading.wording` ("fine-tuning mostly teaches the item" only if the
-reading is ITEM_DRIVEN on every dataset run), `ext:E_F.H_F_count` (family E-F: k of 3), `ext:E_H.H_S_count_ZS` and
-`ext:E_H.H_S_count_FT` (family E-H per regime: k of the members with at least 150 users).
+**4b. ext prose slots (editor pass 2).** All read `extra/summary.json` except the P1 reading. Panels in summarize's `not_run` (a
+recorded cut) are named beside every count that concerns fine-tuning ("Sports: fine-tuning not run").
+
+| slot | handler and field |
+|---|---|
+| `ext:summary.families.E_J count` | `c_ext_ej`: `families.E_J` (H-J, two-sided): confirmed members of the members, "k of m Qwen Amazon panels", the sign of each confirmed member as found ("below it on Toys; above it on Video Games") |
+| `ext:summary.robust_readings count` | `c_ext_robust`: `robust_readings.<d>:<reg>.G.reading` of the three Amazon panels, "robust on a of n zero-shot and b of m fine-tuned Qwen Amazon panels", the estimator-dependent ones named |
+| `ext:E_W.P1_wu.reading_P1` | `p_ext_p1_reading`: `extra/ml1m.json` `E_W.P1_wu.reading_P1.reading` (+ " (exploratory)" by the file's status) |
+| `ext:summary.ft_wording (the wording it allows, ...)` | `c_ext_ft_wording`: `ft_wording`; never decided unless `complete` (`not_decided` with summarize's reason); "fine-tuning mostly teaches the item[, and the adapter learns item quality from item text]" only when summarize sets it, else "the evidence is mixed" (a USER_DRIVEN or MIXED label) or "the labels do not support saying that fine-tuning mostly teaches the item"; always followed by the labels per control and dataset |
+| `ext:summary.families.E_F count` | `c_ext_ef`: `families.E_F` (H-F), "k of m Qwen Amazon panels" |
+| `ext:summary.families.E_H count ZS` / `FT` | `c_ext_eh`: the `families.E_H` members of the regime, "k of m zero-shot / fine-tuned panel runs", the runs outside by the minimum-n rule named ("Video Games below 150 users"); "none of the ... panel runs (...)" when every run is outside; `not_decided` when the regime has no run |
 
 ## 5. State at the last pull (2026-10-04, about 17:00 UTC) and what is still needed
 
 **Update (editor pass 1, 2026-10-05; same result files).** The restructured skeleton has **704 slots**: 151 filled (sel 7, gate 9,
-gft 6, aud 74, grid 43, cpu 6, corr 4, free 2) and 553 unfilled (esult_file_missing 510, of which 147 are ext: slots of addendum
-6; esult_not_in_report 8, the ML-1M FT-C rows; ree_text 29; ranch_slot 6). mbiguous_slot and interpretive are 0: the
+gft 6, aud 74, grid 43, cpu 6, corr 4, free 2) and 553 unfilled (`result_file_missing` 510, of which 147 are ext: slots of addendum
+6; `result_not_in_report` 8, the ML-1M FT-C rows; `free_text` 29; `branch_slot` 6). `ambiguous_slot` and `interpretive` are 0: the
 prose no longer carries number slots whose panel or regime it does not fix (the tables carry the numbers). skeleton_changed 0;
 CHECK_EQUAL: 13 quantities printed more than once, estimates differ for 0. The counts below are those of 2026-10-04.
+
+**Update (editor pass 2, 2026-10-05; the real ML-1M extra-analysis file `extra/ml1m.json` added, exploratory per addendum 6).**
+**714 slots**: 183 filled (aud 74, corr 4, cpu 6, ext 32, free 2, gate 9, gft 6, grid 43, sel 7; the ext 32 are the ML-1M columns of
+tab:tracks and tab:teaches, in italics, and the P1 reading) and 531 unfilled: `result_file_missing` 486, `result_not_in_report` 10,
+`free_text` 29, `branch_slot` 6; `skeleton_changed` 0. The 125 red ext slots wait for: `extra/{toys,games,sports}.json` (30 each),
+`extra/llama/ml1m.json` (8), `extra/llama/toys.json` (7), `extra/summary.json` (6 prose slots), `extra/ftq/<d>.json` (3 per dataset);
+2 read `result_not_in_report` with the file's own reason (the ML-1M `FT_C_reading`: "record missing: A3-6 item 11 requires the sha1 of
+src/confrec/ftgrid_extra.py, scripts/sigir/run_ftextra.sh, tests/test_confrec_ftgrid_extra.py in the pilot log"). The other 8
+`result_not_in_report` are the grid FT-C rows of tab:app-seeds (no p0/p1 runs yet). A dataset whose FT-Q runs are cut has no
+`extra/ftq/<d>.json`: its three cells stay red (`result_file_missing`) until the main session marks the cut in the skeleton.
 
 Pulled:
 
@@ -425,7 +458,9 @@ Not yet reviewed:
 Consistency checks (`UNFILLED.json` "checks"; printed when they fail):
 
 - grid ml1m FT seeds = gft `UAUC_post_T_per_seed`;
-- report `meta.n_users_both_classes_test` = split `eval.users_both_classes_test`.
+- report `meta.n_users_both_classes_test` = split `eval.users_both_classes_test`;
+- (editor pass 2) every input listed in `extra/summary.json` `inputs` that is present locally has the sha1 summarize recorded for it,
+  so the prose counts and the ext table cells come from one build.
 
 The broader duplicate check is `CHECK_EQUAL.json` (section 1). The grid E-B vs gate_ft.json zero-shot-context comparison is
 no longer a check: decision 1 prints only the grid value, and the gate_ft.json values are recorded in FILLED.json "notes".

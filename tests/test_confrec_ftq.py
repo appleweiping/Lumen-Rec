@@ -7,7 +7,15 @@ src/confrec/ftq_panel.py and scripts/sigir/run_ftq.sh. CPU only, deterministic, 
     examples, and every misalignment is refused;
   * the training and scoring argument vectors of p0 / p1 equal the real adapters' recorded ones except --train, --out, --seed (and
     --lora / --output), for the Amazon layout and for ML-1M, whose real adapters are Gate-FT's; the recorded-input refusals;
-  * the links of the real scores into the FT-Q root (symlinks, never copies; a copy only in DRY_RUN without symlinks);
+  * the links of the real scores into the FT-Q root (symlinks, never copies; a copy only in DRY_RUN without symlinks), each asserted to
+    resolve to its target, and a scores directory that is not a directory of its own refused;
+  * the output roots (review finding M1): a DRY_RUN refuses every spelling (// . .. absolute, native, letter case) of the registered
+    roots and of anything at, under or above outputs/confrec before it writes anything, a real run takes the registered FT-Q root in
+    any spelling and no other directory, no link may lie between the repo root and the files a run writes (symlinks; NTFS junctions
+    on a Windows box without the symlink privilege), and DRY_RUN is 0 or 1;
+  * the teacher panel on disk is recomputed before any training or scoring and must equal train_q.jsonl and its manifest byte for
+    byte (m2: the real labels swapped in with the manifest re-tagged are refused); the E1 rerun-once rule counts only the failures of
+    the same run.key (m1); the sidecar report/NOTE_FTQ.txt (m3); the record of three files and the printed teacher sha1 (m5);
   * the script is LF, `bash -n` clean, passes the flag audit, mirrors run_ftgrid.sh's helpers and E1 rule, refuses (wrong dataset,
     model or root, no Gate-FT PASS, a missing real adapter, a missing or stale freeze or FT-Q record, a wrong recorded input);
   * run_ftq.sh DRY_RUN=1 end to end on run_ftgrid.sh's own synthetic worlds of Toys (the Amazon layout) and ML-1M (Gate-FT's adapters),
@@ -448,6 +456,125 @@ def test_the_verification_catches_every_kind_of_corruption(built):
         assert name
 
 
+def test_verify_teacher_recomputes_the_teacher_and_requires_byte_equality(built, tmp_path, capsys):
+    """The reviewer's plant at the module level: train_q.jsonl replaced by the REAL-label train.jsonl with its manifest re-tagged.
+    No step marker and no manifest can vouch for a panel that is not the teacher recomputed from train.jsonl and the q-hat file."""
+    out, split = built["out"], built["out"] / "ftgrid_split.json"
+    args = (out / "train.jsonl", built["qcsv"], built["qman"])
+
+    def fresh(name: str) -> Path:
+        d = tmp_path / name
+        shutil.copytree(built["ftq"], d)
+        return d
+
+    def verify(d: Path):
+        return fq.verify_teacher(*args, d, domain="toys", split=split)
+
+    def swap_panel(d: Path, data: bytes) -> None:                              # the panel replaced and its manifest re-tagged
+        (d / "train_q.jsonl").write_bytes(data)
+        m = read_json(d / "train_q.manifest.json")
+        m["train_q"]["sha1"] = sha1(data)
+        (d / "train_q.manifest.json").write_bytes(fq.json_bytes(m))
+
+    assert verify(built["ftq"]) == built["man"]                                # what build wrote is the recomputed teacher
+    assert fq.compute_teacher(*args, domain="toys", split=split)[1] == built["man"]
+    d = fresh("real_labels")                                                   # the plant: the real labels as the teacher panel
+    swap_panel(d, (out / "train.jsonl").read_bytes())
+    with pytest.raises(fq.FtqError, match="train_q.jsonl is not the teacher recomputed"):
+        verify(d)
+    d = fresh("one_label")                                                     # one label flipped
+    rows = jsonl(d / "train_q.jsonl")
+    rows[0]["candidate_labels"][0] = 1 - rows[0]["candidate_labels"][0]
+    swap_panel(d, b"".join(fd.row_bytes(r) for r in rows))
+    with pytest.raises(fq.FtqError, match="train_q.jsonl is not the teacher recomputed"):
+        verify(d)
+    d = fresh("a_byte")                                                        # one more byte
+    swap_panel(d, (built["ftq"] / "train_q.jsonl").read_bytes() + b"\n")
+    with pytest.raises(fq.FtqError, match="is not the teacher recomputed"):
+        verify(d)
+    for name, edit in (("beta", lambda m: m.update(beta=0.5)), ("code", lambda m: m["code_sha1"].update({"ftq_panel.py": "0" * 40})),
+                       ("key", lambda m: m.pop("checks")), ("hash", lambda m: m["qhat"].update(sha1="1" * 40))):
+        d = fresh("manifest_" + name)                                          # a manifest that says something else
+        m = read_json(d / "train_q.manifest.json")
+        edit(m)
+        (d / "train_q.manifest.json").write_bytes(fq.json_bytes(m))
+        with pytest.raises(fq.FtqError, match="train_q.manifest.json is not the teacher recomputed"):
+            verify(d)
+    for name in ("train_q.jsonl", "train_q.manifest.json"):
+        d = fresh("missing_" + name)
+        (d / name).unlink()
+        with pytest.raises(fq.FtqError, match=r"missing \(stage 1"):
+            verify(d)
+    rows_q = tlo.panel_examples(tlo.read_rows(out / "train.jsonl"), "train.jsonl")  # another, consistent q-hat file: the stored teacher
+    qcsv, qman = write_stage1(tmp_path / "q_other", out / "train.jsonl", split, q=list(reversed(q_of(rows_q))))   # is not its teacher
+    with pytest.raises(fq.FtqError, match="is not the teacher recomputed"):
+        fq.verify_teacher(out / "train.jsonl", qcsv, qman, built["ftq"], domain="toys", split=split)
+    base = ["verify_teacher", "--domain", "toys", "--train", str(out / "train.jsonl"), "--qhat", str(built["qcsv"]), "--qmanifest",
+            str(built["qman"]), "--split", str(split), "--out_dir"]
+    capsys.readouterr()
+    assert fq.main(base + [str(built["ftq"])]) == 0 and "byte for byte the teacher recomputed" in capsys.readouterr().out
+    assert fq.main(base + [str(tmp_path / "real_labels")]) == 1 and "is not the teacher recomputed" in capsys.readouterr().err
+    assert fq.main(["verify_teacher", "--domain", "toys"]) == 2                       # usage
+    assert fq.main(["verify_teacher", "--domain", "beauty", "--train", "a", "--qhat", "b", "--qmanifest", "c", "--out_dir", "d"]) == 2
+    assert fq.main(base[:-1] + ["--out_dir", str(tmp_path / "nowhere")]) == 1       # no panel: stage 1 has not run
+
+
+def test_the_teacher_is_described_as_using_no_label_of_the_example_and_no_user_preference_information(built):
+    """q-hat leaves the example's own user out of the global prior (a user-free recomputation moves 2 of 23,348 ML-1M labels), so the
+    claim is 'no label of the example and no user preference information', not 'no user information'."""
+    phrase = "no label of the example and no user preference information"
+    flat = lambda text: re.sub(r"\s+", " ", re.sub(r"(?m)^\s*#", "", text))      # a comment or docstring, rewrapped
+    for name, text in (("module", PANEL.read_text(encoding="utf-8")), ("script", SCRIPT.read_text(encoding="utf-8"))):
+        assert phrase in flat(text), name
+        assert "no user " + "information" not in flat(text), name
+    assert phrase in built["man"]["teacher"]["information"] and "no user " + "information" not in json.dumps(built["man"])
+    assert "no label of the example" in inspect.getdoc(fq.teacher_labels) and "no user preference information" in flat(
+        inspect.getdoc(fq.teacher_labels))
+
+
+def test_the_header_names_what_is_used_as_it_is_and_the_files_the_record_needs():
+    head = re.sub(r"\s+", " ", re.sub(r"(?m)^\s*#", "", SCRIPT.read_text(encoding="utf-8").split("set -euo pipefail")[0]))
+    assert "the sha1 of this script, of src/confrec/ftq_panel.py and of tests/test_confrec_ftq.py are in docs/sigir/PILOT_LOG.md" in head
+    assert "Imported or used as they are, and recorded separately (not part of that record): src/confrec/ftprune.py (tie_key, " \
+           "train_examples" in head and "src/confrec/ftgrid_extra.py" in head
+    assert "DRY_RUN 0 or 1 (any other value is refused with exit 2)" in head and "NOTE_FTQ.txt" in head
+    assert "tmp_outputs/ftq_dryrun" in head
+    # review round 3: the DRY_RUN guard is an allow-list on lower-case canonical forms; a relative OUT_ROOT resolves from the repo root
+    assert "The DRY_RUN guard is an allow-list" in head and "lie under tmp_outputs of the repo, or outside the repo's parent directory" in head
+    assert "A relative OUT_ROOT resolves from the repo root" in head and "every comparison is made on lower-case canonical forms" in head
+    # m1: what the sweep and the removal of stale temporary files cover, and what they do not
+    assert "find OUT_ROOT -type l" in head and "report/D.json.tmp" in head and "like/*.tmp" in head and "are not enumerated" in head
+    # m4: the sticky FAILED_INTEGRITY and its logged override
+    assert "FAILED_INTEGRITY is sticky per seed" in head and "FTQ_ALLOW_RETRY" in head and "NOTE_FTQ_overrides.txt" in head
+
+
+def test_the_ftq_scores_directory_is_a_directory_of_its_own_and_every_link_is_asserted(tmp_path, monkeypatch):
+    real = make_real_scores(tmp_path / "grid" / "scores" / "toys")
+    for q in (real, real / "sub", tmp_path / "grid" / "scores", tmp_path / "grid"):     # the registered scores, below it, above it
+        with pytest.raises(fq.FtqError, match="root of its own"):
+            fq.link_models(real, q, ["s0"])
+    assert not (real / "sub").exists() and not (real / "s0" / "s0").exists()               # nothing was made
+    assert fq.main(["link", "--real_scores", str(real), "--q_scores", str(real)]) == 1
+    probe = tmp_path / "probe"
+    (probe / "t").mkdir(parents=True)
+    if link_dir(probe / "l", probe / "t"):                                                # where directory links can be made:
+        unlink_dir(probe / "l")
+        assert link_dir(tmp_path / "alias", real)                                         # an alias of the registered scores ...
+        with pytest.raises(fq.FtqError, match="root of its own"):
+            fq.link_models(real, tmp_path / "alias", ["s0"])
+        with pytest.raises(fq.FtqError, match="root of its own"):
+            fq.link_models(real, tmp_path / "alias" / "sub", ["s0"])
+        unlink_dir(tmp_path / "alias")
+        (tmp_path / "elsewhere").mkdir()
+        assert link_dir(tmp_path / "q_link", tmp_path / "elsewhere")                      # ... and a scores directory that is a link
+        with pytest.raises(fq.FtqError, match="is itself a link"):
+            fq.link_models(real, tmp_path / "q_link", ["s0"])
+        unlink_dir(tmp_path / "q_link")
+    monkeypatch.setattr(os, "symlink", lambda src, dst, target_is_directory=False: Path(dst).mkdir())   # a link that is none
+    with pytest.raises(fq.FtqError, match="was made but resolves to"):
+        fq.link_models(real, tmp_path / "q" / "scores" / "toys", ["s0"])
+
+
 def test_the_build_command_prints_the_manifest_and_the_module_needs_no_torch(built, tmp_path, capsys):
     argv = ["build", "--domain", "toys", "--train", str(built["out"] / "train.jsonl"), "--qhat", str(built["qcsv"]),
             "--qmanifest", str(built["qman"]), "--split", str(built["out"] / "ftgrid_split.json"), "--out_dir",
@@ -886,8 +1013,10 @@ def test_the_ftq_record_gate_needs_the_sha1_of_the_files_in_the_pilot_log(tmp_pa
     assert fq.main(base + ["--append"]) == 0 and len(log.read_text(encoding="utf-8").splitlines()) == 3
     assert fq.main(["record", "--pilot_log", str(tmp_path / "none.md"), "--files", "a.sh", "--root", str(tmp_path)]) == 4
     assert fq.main(["record", "--files", "a.sh"]) == 2                                 # usage
-    assert fq.record_lines(["scripts/sigir/run_ftq.sh", "src/confrec/ftq_panel.py"]) == [
-        f"scripts/sigir/run_ftq.sh = {sha1_file(SCRIPT)}", f"src/confrec/ftq_panel.py = {sha1_file(PANEL)}"]
+    assert fq.record_lines(list(FTQ_LINES)) == [
+        f"scripts/sigir/run_ftq.sh = {sha1_file(SCRIPT)}", f"src/confrec/ftq_panel.py = {sha1_file(PANEL)}",
+        f"tests/test_confrec_ftq.py = {sha1_file(__file__)}"]                  # the record the script needs: three files
+    assert "FTQ_FILES=(scripts/sigir/run_ftq.sh src/confrec/ftq_panel.py tests/test_confrec_ftq.py)" in SCRIPT.read_text(encoding="utf-8")
 
 
 def test_info_reads_the_decisions_the_gates_use(tmp_path, capsys):
@@ -903,7 +1032,8 @@ def test_info_reads_the_decisions_the_gates_use(tmp_path, capsys):
 
 
 def test_the_command_line_is_one_flat_parser_with_every_command_and_exit_codes(capsys):
-    assert set(fq.COMMANDS) == {"build", "recipe", "scoring", "verify_adapter", "verify_scores", "link", "record", "info"}
+    assert set(fq.COMMANDS) == {"build", "verify_teacher", "recipe", "scoring", "verify_adapter", "verify_scores", "link", "record",
+                                "info"}
     for cmd in fq.COMMANDS:
         assert fq.main([cmd]) == 2 and "needs" in capsys.readouterr().err        # a missing flag is a usage refusal
     with pytest.raises(SystemExit):
@@ -982,9 +1112,17 @@ def test_the_helpers_mirrored_from_run_ftgrid_are_its_text_and_the_e1_rule_is_th
     for name in ("fresh", "step", "adapter_done", "e1_ok"):
         assert shell_function(mine, name) == shell_function(theirs, name), name
     needles = ('key="$(', 'wsha=$(', "run.key", "$dir.stale", "$dir.e1fail", "FAILED_INTEGRITY", 'e1_ok "$dir"',
-               'score "$data" "$dir" "$@"', "compgen -G")
-    keep = lambda text: [ln for ln in shell_function(text, "score").splitlines() if any(n in ln for n in needles)]
-    assert keep(mine) == keep(theirs) and len(keep(mine)) >= 10                # key, skip, stale, E1 rerun-once, FAILED
+               'score "$data" "$dir" "$@"')
+    keep = lambda text: [ln for ln in shell_function(text, "score").splitlines()
+                         if any(n in ln for n in needles) and "compgen" not in ln and "e1_failed_before" not in ln]
+    assert keep(mine) == keep(theirs) and len(keep(mine)) >= 8                 # key, skip, stale, E1 rerun-once, FAILED
+    # ... except the ONE deliberate deviation (review finding m1): run_ftgrid.sh counts every DIR.e1fail.*, so an e1fail left by an
+    # earlier run (another panel, adapter or arguments) turns a transient first failure into the final one; here the rerun is used
+    # up only by an e1fail directory of the same run.key
+    assert 'if compgen -G "$dir.e1fail.*" > /dev/null; then' in shell_function(theirs, "score")
+    assert 'if e1_failed_before "$dir" "$key"; then' in shell_function(mine, "score") and "compgen" not in shell_function(mine, "score")
+    helper = shell_function(mine, "e1_failed_before")
+    assert 'for d in "$1".e1fail.*; do' in helper and '[ "$(cat "$d/run.key")" = "$2" ]' in helper
     for line in ('if [ "$SEL_DECISION" = FIX_FOUND ] && [ ! -f "$G/confirm/gate.json" ]; then',
                  'SEL="$G/dev/selection.json"', 'VARIANT="${VARIANT:-$SEL_PROMPT}"'):
         assert line in theirs and line in mine, line
@@ -1024,12 +1162,14 @@ def make_ftq_repo(dest: Path) -> Path:
     """The repo parts the chain runs (run_ftgrid.sh's copy with the real ftgrid_report) plus this script."""
     FR.make_repo(dest, real_f2=True)
     shutil.copy2(SCRIPT, dest / "scripts" / "sigir" / "run_ftq.sh")
+    (dest / "tests").mkdir(exist_ok=True)
+    shutil.copy2(Path(__file__), dest / "tests" / "test_confrec_ftq.py")        # the third file of the FT-Q record
     return dest
 
 
 def run_ftq(repo: Path, *args, dry: bool = True, **env) -> subprocess.CompletedProcess:
     e = {k: v for k, v in os.environ.items() if k not in (
-        "MODEL", "OUT_ROOT", "VARIANT", "STAGES", "DRY_RUN", "DRY_GATE", "DRY_E1_FAIL", "DRY_NO_RECORD", "DRY_NO_WORLD", "PYTHONPATH")}
+        "MODEL", "OUT_ROOT", "VARIANT", "STAGES", "DRY_RUN", "DRY_GATE", "DRY_E1_FAIL", "DRY_NO_RECORD", "DRY_NO_WORLD", "FTQ_ALLOW_RETRY", "FTQ_RETRY_REASON", "PYTHONPATH")}
     e.update(PYTHON=sys.executable.replace("\\", "/"), PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     if dry:
         e["DRY_RUN"] = "1"
@@ -1048,31 +1188,256 @@ LLAMA_PATH = "/models/Llama-3.1-8B-Instruct"
     (["toys"], True, {"STAGES": "5"}, 2, "unknown stage"),
     (["toys"], True, {"OUT_ROOT": "outputs/confrec/ftgrid_q"}, 2, "never writes to a registered output root"),
     (["toys"], True, {"OUT_ROOT": "./outputs/confrec/ftgrid/"}, 2, "never writes to a registered output root"),
-    (["toys"], True, {"OUT_ROOT": "outputs/confrec/ftgrid_dryrun"}, 2, "never writes to a registered output root"),
-    (["toys"], True, {"OUT_ROOT": "outputs/confrec/ftmethod"}, 2, "never writes to a registered output root"),
     (["toys"], True, {"MODEL": LLAMA_PATH}, 2, "is not Qwen3-8B"), (["games"], False, {"MODEL": LLAMA_PATH}, 2, "is not Qwen3-8B"),
     (["toys"], False, {"MODEL": "/models/Qwen3-8B", "OUT_ROOT": "outputs/confrec/ftgrid_q_dryrun"}, 2, "one registered root"),
     (["toys"], False, {"MODEL": "/models/Qwen3-8B", "OUT_ROOT": "outputs/confrec/ftgrid"}, 2, "one registered root"),
     (["ml1m"], False, {"MODEL": "/models/Qwen3-8B"}, 1, "missing outputs/confrec/gatefix/dev/selection.json"),
-    (["sports"], False, {"MODEL": "/models/Qwen3-8B"}, 1, "missing outputs/confrec/gatefix/dev/selection.json")])
+    (["sports"], False, {"MODEL": "/models/Qwen3-8B"}, 1, "missing outputs/confrec/gatefix/dev/selection.json"),
+    (["sports"], False, {"MODEL": "/models/Qwen3-8B", "DRY_RUN": "0"}, 1, "missing outputs/confrec/gatefix/dev/selection.json"),
+    # the switches are 0 or 1: DRY_RUN=yes must not become a real run (nor an empty DRY_RUN a rehearsal)
+    (["toys"], False, {"DRY_RUN": "yes"}, 2, "DRY_RUN must be 0 or 1"), (["toys"], False, {"DRY_RUN": "true"}, 2, "DRY_RUN must be 0 or 1"),
+    (["toys"], False, {"DRY_RUN": "2"}, 2, "DRY_RUN must be 0 or 1"), (["toys"], False, {"DRY_RUN": ""}, 2, "DRY_RUN must be 0 or 1"),
+    (["toys"], False, {"DRY_RUN": "01"}, 2, "DRY_RUN must be 0 or 1"), (["toys"], False, {"DRY_RUN": " 1"}, 2, "DRY_RUN must be 0 or 1"),
+    (["toys"], True, {"DRY_NO_RECORD": "yes"}, 2, "DRY_NO_RECORD must be 0 or 1"),
+    (["toys"], True, {"DRY_NO_WORLD": "true"}, 2, "DRY_NO_WORLD must be 0 or 1"),
+    # the override of the sticky FAILED_INTEGRITY names a seed and needs a reason, before anything starts
+    (["toys"], True, {"FTQ_ALLOW_RETRY": "p0"}, 2, "needs a non-empty FTQ_RETRY_REASON"),
+    (["toys"], True, {"FTQ_ALLOW_RETRY": "p0", "FTQ_RETRY_REASON": ""}, 2, "needs a non-empty FTQ_RETRY_REASON"),
+    (["toys"], True, {"FTQ_ALLOW_RETRY": "p2", "FTQ_RETRY_REASON": "why"}, 2, "FTQ_ALLOW_RETRY must be p0, p1 or p0,p1"),
+    (["toys"], True, {"FTQ_ALLOW_RETRY": "all", "FTQ_RETRY_REASON": "why"}, 2, "FTQ_ALLOW_RETRY must be p0, p1 or p0,p1")])
 def test_input_guards_refuse_before_anything_is_written(guard_repo, args, dry, env, rc, msg):
     r = run_ftq(guard_repo, *args, dry=dry, **env)
     assert r.returncode == rc and msg in r.stderr, FR.tail(r)
-    assert not (guard_repo / "outputs").exists()
+    assert not (guard_repo / "outputs").exists() and not (guard_repo / "tmp_outputs").exists()
+
+
+# ---------------------------------------------------------------- the output roots: canonical forms decide, never the spelling
+REGISTERED_FILES = {                                  # what a registered tree holds: a refused run must leave all of it as it is
+    "outputs/confrec/ftgrid/report/toys.json": b"registered report\n",
+    "outputs/confrec/ftgrid/adapters/toys/s0/train_config.json": b"{}\n",
+    "outputs/confrec/ftgrid/scores/toys/s0/like/report.json": b"{}\n",
+    "outputs/confrec/ftgrid/panels/toys/train.jsonl": b"rows\n",
+    "outputs/confrec/ftgrid_q/report/toys.json": b"registered FT-Q report\n",
+    "outputs/confrec/ftmethod/toys/train_qhat.csv.gz": b"q-hat\n",
+    "outputs/confrec/gateft/gate_ft.json": b"{}\n",
+    "outputs/confrec/gatefix/dev/note.txt": b"gate fix\n"}
+
+
+def registered_repo(dest: Path) -> Path:
+    """A scratch repo whose registered roots (the grid, the FT-Q root, the nested slot, Gate-FT, the gate fix) hold files."""
+    repo = make_ftq_repo(dest)
+    for rel, data in REGISTERED_FILES.items():
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        (repo / rel).write_bytes(data)
+    return repo
+
+
+def registered_state(repo: Path) -> dict:
+    """{path: (size, mtime_ns, sha1)} of everything below the registered roots other than the FT-Q root, names included."""
+    out = {}
+    for rel in ("ftgrid", "ftmethod", "gateft", "gatefix"):
+        base = repo / "outputs" / "confrec" / rel
+        for p in sorted(base.rglob("*")) if base.exists() else []:
+            out[p.relative_to(repo).as_posix()] = (p.stat().st_size, p.stat().st_mtime_ns, sha1_file(p)) if p.is_file() else "dir"
+    return out
+
+
+def link_dir(link: Path, target: Path) -> bool:
+    """A directory link at `link` to `target`: a symlink, or an NTFS junction where the symlink privilege is missing (a Windows
+    box). False when neither can be made (the test then skips)."""
+    link.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.symlink(str(target), str(link), target_is_directory=True)
+        return True
+    except (OSError, NotImplementedError):
+        pass
+    if os.name == "nt":
+        made = subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(target)], capture_output=True)
+        return made.returncode == 0 and link.exists()
+    return False
+
+
+def unlink_dir(link: Path) -> None:
+    """Remove a directory link (or an empty directory) without touching what it points to."""
+    try:
+        os.unlink(link)
+    except OSError:
+        os.rmdir(link)
+
+
+def run_many(repo: Path, cases: list, *, dry: bool, **env) -> list:
+    """[(OUT_ROOT spelling, result)], the script runs concurrently (every run is dominated by process starts)."""
+    with cf.ThreadPoolExecutor(max_workers=6) as ex:
+        return list(ex.map(lambda oc: (oc, run_ftq(repo, "toys", dry=dry, OUT_ROOT=oc, **env)), cases))
+
+
+def spellings(repo: Path, rel: str) -> list:
+    """The spellings of a path below the repo that a string comparison does not equate with `rel` (// . .. absolute, native)."""
+    absolute = (repo / rel).as_posix()
+    head, _, tail = rel.rpartition("/")
+    out = [rel + "//", rel.replace("/", "//", 1), head + "/./" + tail, "tmp_outputs/../" + rel, absolute, str(repo / rel)]
+    if os.name == "nt":                                # D:\... spellings and a case-insensitive filesystem
+        out += [absolute.replace("/", "\\"), absolute.upper(), rel.upper()]
+    return out
+
+
+@needs_bash
+def test_a_dry_run_never_writes_under_outputs_confrec_in_any_spelling(tmp_path):
+    """The reviewer's plant: DRY_RUN=1 OUT_ROOT=outputs/confrec/ftgrid// (and its relatives) used to write placeholder adapters, links
+    and a marker under the registered root and to overwrite its report. Now every spelling of every registered root, and
+    anything at, under or above outputs/confrec, is refused (exit 2) before anything is written."""
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    cases = spellings(repo, "outputs/confrec/ftgrid") + spellings(repo, "outputs/confrec/ftgrid_q") + [
+        "outputs/confrec/ftgrid", "outputs/confrec/ftgrid_q", "outputs/confrec/gateft", "outputs/confrec/ftgrid/sub",
+        "outputs/confrec/ftmethod", "outputs/confrec/gatefix", "outputs/confrec/ftgrid/../ftgrid_q", "outputs/confrec/ftgrid_dryrun",
+        "outputs/confrec/ftgrid_q_dryrun", "outputs/confrec/ftmethod_dryrun", "outputs/confrec", "outputs/confrec/other",
+        "outputs", ".", "/",
+        # the allow-list (review round 3, m3): nothing in the repo but tmp_outputs, nothing beside it, nothing above it
+        "outputs/summary", "outputs/baselines/x", "data/raw", "data", "src", "scripts", "docs", "tests", "idea-stage", "Paper",
+        "../outside_repo", "../repo/src", "..", "tmp_outputs/../src", "tmp_outputs/../../outside_repo"]
+    bad = [(oc, FR.tail(r)) for oc, r in run_many(repo, cases, dry=True)
+           if r.returncode != 2 or not ("never writes to a registered output root" in r.stderr or "root is empty" in r.stderr
+                                        or "filesystem root" in r.stderr)]
+    assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{tail}" for oc, tail in bad)
+    assert registered_state(repo) == before and not (repo / "tmp_outputs").exists()
+    assert (repo / "outputs/confrec/ftgrid/report/toys.json").read_bytes() == REGISTERED_FILES["outputs/confrec/ftgrid/report/toys.json"]
+    assert not (repo / "outputs/confrec/ftgrid/adapters/toys/p0").exists() and not (repo / "adapters").exists()
+
+
+@needs_bash
+def test_a_dry_run_accepts_a_root_outside_outputs_confrec_in_any_spelling(tmp_path):
+    """Acceptance is as canonical as refusal: tmp_outputs of the repo, and a directory outside the repo's parent, are fine however they
+    are spelled (the run stops at the stage list here, after every guard has passed)."""
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    away = Path(tempfile.mkdtemp(prefix="ftq_dry_away_"))                    # outside the repo and outside its parent directory
+    try:
+        outside = (away / "ftq root").as_posix()
+        cases = [DRYB + "/ftgrid_q", DRYB + "/ftgrid_q//", "./" + DRYB + "/x", "tmp_outputs//ftq_dryrun/./y", "tmp_outputs/a/../b",
+                 outside, outside + "/", str(away / "ftq root")]
+        if os.name == "nt":                                                  # D:\... and a case-insensitive filesystem
+            cases += [DRYB.upper() + "/z", outside.replace("/", "\\")]
+        bad = [(oc, FR.tail(r)) for oc, r in run_many(repo, cases, dry=True, STAGES="9")
+               if r.returncode != 2 or "unknown stage" not in r.stderr]
+        assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{tail}" for oc, tail in bad)
+        assert registered_state(repo) == before and not (repo / "tmp_outputs").exists() and not (away / "ftq root").exists()
+    finally:
+        shutil.rmtree(away, ignore_errors=True)
+
+
+@needs_bash
+def test_a_real_run_takes_the_registered_ftq_root_in_any_spelling_and_no_other_directory(tmp_path):
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    real = {"MODEL": "/models/Qwen3-8B"}
+    refused = spellings(repo, "outputs/confrec/ftgrid") + [
+        "outputs/confrec/ftgrid", "outputs/confrec/ftgrid_q_dryrun", "outputs/confrec/ftgrid_q/sub", "outputs/confrec/ftgrid_q/..",
+        "outputs/confrec/ftgrid/../ftgrid", "outputs/confrec/gateft", "outputs/confrec/ftmethod", DRYB + "/ftgrid_q", "tmp_outputs/x",
+        "outputs/confrec", "."]
+    accepted = spellings(repo, "outputs/confrec/ftgrid_q") + [
+        "outputs/confrec/ftgrid_q", "./outputs/confrec/ftgrid_q", "outputs/confrec/./ftgrid_q/", "outputs/confrec/ftgrid/../ftgrid_q"]
+    bad = [(oc, FR.tail(r)) for oc, r in run_many(repo, refused, dry=False, **real)
+           if r.returncode != 2 or "one registered root" not in r.stderr]
+    bad += [(oc, FR.tail(r)) for oc, r in run_many(repo, accepted, dry=False, **real)       # the guards pass: the next refusal is
+            if r.returncode != 1 or "missing outputs/confrec/gatefix/dev/selection.json" not in r.stderr]    # the missing selection
+    assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{tail}" for oc, tail in bad)
+    assert registered_state(repo) == before and not (repo / "tmp_outputs").exists()
+
+
+@needs_bash
+def test_a_link_between_the_registered_roots_and_the_files_a_run_writes_is_refused(tmp_path):
+    """Planted links (symlinks, or junctions on a Windows box): an alias of the registered grid as a DRY root, the synthetic world's
+    own path leading into the grid, a link below the DRY root, the registered FT-Q root itself a link to the grid, and a link below
+    the registered FT-Q root that would carry the adapters, the scores or the report into the grid. Every one is refused with
+    exit 2 before anything is written, and the registered tree is left as it was."""
+    base = registered_repo(tmp_path / "base")
+    probe = tmp_path / "probe"
+    (probe / "t").mkdir(parents=True)
+    if not link_dir(probe / "l", probe / "t"):
+        pytest.skip("no directory links can be made here (no symlink privilege, no junctions)")
+    unlink_dir(probe / "l")
+    grid, state, real = "outputs/confrec/ftgrid", registered_state(base), {"MODEL": "/models/Qwen3-8B"}
+
+    def clone_of(name: str) -> Path:
+        dest = tmp_path / name / "repo"
+        shutil.copytree(base, dest)
+        return dest
+
+    def plant(repo: Path, rel: str, target: str) -> None:
+        link = repo / rel
+        if link.exists():
+            shutil.rmtree(link)                                            # a real directory is replaced by the link
+        assert link_dir(link, repo / target), rel
+
+    def refused(repo: Path, name: str, r, msg: str) -> list:
+        ok = r.returncode == 2 and msg in r.stderr and registered_state(repo) == state
+        return [] if ok else [(name, FR.tail(r) + "\nregistered tree unchanged: " + str(registered_state(repo) == state))]
+
+    def dry_cases() -> list:
+        repo, bad = clone_of("dry"), []
+        plant(repo, "tmp_outputs/alias", grid)                             # an alias of the registered grid root as the DRY root
+        bad += refused(repo, "alias", run_ftq(repo, "toys", OUT_ROOT="tmp_outputs/alias/sub"), "never writes to a registered")
+        bad += [] if os.listdir(repo / "tmp_outputs") == ["alias"] else [("alias", "something was written")]
+        unlink_dir(repo / "tmp_outputs" / "alias")
+        plant(repo, DRYB + "/ftgrid", grid)                                # the synthetic world's own path leads into the grid
+        bad += refused(repo, "world", run_ftq(repo, "toys"), "never writes to a registered")
+        unlink_dir(repo / DRYB / "ftgrid")
+        plant(repo, DRYB + "/ftgrid_q/scores", grid + "/scores")           # a link below the DRY root
+        r = run_ftq(repo, "toys")
+        bad += refused(repo, "dry child", r, "resolves to") + ([] if not (repo / DRYB / "ftgrid").exists() else [("dry child", "built")])
+        unlink_dir(repo / DRYB / "ftgrid_q" / "scores")
+        plant(repo, DRYB + "/ftgrid/panels", grid + "/panels")             # a link inside the synthetic world
+        bad += refused(repo, "world child", run_ftq(repo, "toys"), "never writes to a registered")
+        unlink_dir(repo / DRYB / "ftgrid" / "panels")
+        return bad
+
+    def registered_cases() -> list:
+        repo = clone_of("registered")
+        shutil.rmtree(repo / "outputs/confrec/ftgrid_q")
+        plant(repo, "outputs/confrec/ftgrid_q", grid)                      # the registered FT-Q root is a link to the grid
+        r = run_ftq(repo, "toys", dry=False, **real)
+        out = refused(repo, "registered root", r, "one registered root")
+        unlink_dir(repo / "outputs/confrec/ftgrid_q")
+        return out
+
+    def ancestor_cases() -> list:
+        repo = clone_of("ancestor")
+        os.rename(repo / "outputs", repo / "real_outputs")                 # the whole outputs tree is reached through a link
+        assert link_dir(repo / "outputs", repo / "real_outputs")
+        out = refused(repo, "outputs is a link", run_ftq(repo, "toys", dry=False, **real), "one registered root")
+        unlink_dir(repo / "outputs")
+        return out
+
+    def child_cases() -> list:
+        repo, bad = clone_of("child"), []
+        for child in ("adapters", "report"):                               # a link below the registered FT-Q root
+            plant(repo, "outputs/confrec/ftgrid_q/" + child, grid + "/adapters")
+            r = run_ftq(repo, "toys", dry=False, **real)
+            bad += refused(repo, "child " + child, r, "redirect")
+            unlink_dir(repo / "outputs/confrec/ftgrid_q" / child)
+        return bad
+
+    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+        bad = [x for found in [f.result() for f in [ex.submit(fn) for fn in (dry_cases, registered_cases, ancestor_cases, child_cases)]]
+               for x in found]
+    assert not bad, "\n\n".join(f"== {name}\n{tail}" for name, tail in bad)
 
 
 # ================================================================ 7. the DRY_RUN chains (the worlds are cached across sessions)
-GRID = "outputs/confrec/ftgrid_dryrun"                # run_ftgrid.sh's DRY_RUN root: the world the script reads
-QHD = "outputs/confrec/ftmethod_dryrun"               # the nested slot's DRY_RUN root: its stage-1 files
-QROOT_DRY = "outputs/confrec/ftgrid_q_dryrun"         # the FT-Q root of a DRY_RUN
+DRYB = "tmp_outputs/ftq_dryrun"                       # a DRY_RUN's temporary directory: outside outputs/confrec
+GRID = f"{DRYB}/ftgrid"                               # run_ftgrid.sh's DRY_RUN root: the world the script reads
+QHD = f"{DRYB}/ftmethod"                              # the nested slot's DRY_RUN root: its stage-1 files
+QROOT_DRY = f"{DRYB}/ftgrid_q"                        # the FT-Q root of a DRY_RUN
 WORLD_DIRS = (GRID, QHD)
 SENTINEL = b'{"registered": "report", "never": "touched"}\n'
-FTQ_LINES = ("scripts/sigir/run_ftq.sh", "src/confrec/ftq_panel.py")
+FTQ_LINES = ("scripts/sigir/run_ftq.sh", "src/confrec/ftq_panel.py", "tests/test_confrec_ftq.py")   # the record the script needs
 
 
 def world_key() -> str:
     """sha1 over the code that builds a DRY world (everything but ftq_panel.py and the tests): a changed key rebuilds it."""
     h = hashlib.sha1(sys.version.encode())
+    h.update("|".join(WORLD_DIRS).encode())
     files = [p for p in sorted((ROOT / "src" / "confrec").glob("*.py")) if p.name != "ftq_panel.py"]
     files += [ROOT / "scripts" / "sigir" / n for n in ("run_ftgrid.sh", "run_ftmethod.sh", "starperm_panel.py")]
     files += [ROOT / FR.ff.AMENDMENT]
@@ -1194,7 +1559,7 @@ def check_chain(c: dict) -> None:
     assert {p.name for p in (root / "ftq" / d).iterdir()} == {"train_q.jsonl", "train_q.manifest.json"}
     assert {p.name for p in (root / "adapters" / d).iterdir()} == {"p0", "p1"}
     assert {p.name for p in (root / "scores" / d).iterdir()} == {"zeroshot", "s0", "s1", "s2", "p0", "p1"}
-    assert {p.name for p in (root / "report").iterdir()} == {f"{d}.json", f"{d}_tables.csv"}
+    assert {p.name for p in (root / "report").iterdir()} == {f"{d}.json", f"{d}_tables.csv", "NOTE_FTQ.txt"}
     assert {p.name for p in root.iterdir()} == {"ftq", "adapters", "scores", "report", "build"}
     # the registered grid world and the nested slot's files were not written (the stand-in registered report included)
     assert c["after"] == c["before"]
@@ -1212,6 +1577,18 @@ def check_chain(c: dict) -> None:
     assert man["train"]["sha1"] == sha1_file(grid / "panels" / d / "train.jsonl") == read_json(
         repo / QHD / d / "qhat_manifest.json")["train"]["sha1"]
     assert man["train_q"]["sha1"] == sha1_file(root / "ftq" / d / "train_q.jsonl") and man["beta"] == k / man["n"]
+    # stage 1 verified the panel on disk by recomputation (once per run) and printed its sha1 as a line for the pilot log
+    assert out.count("byte for byte the teacher recomputed") == 1
+    assert f"[stage 1] pilot-log line for the teacher panel of {d}: {QROOT_DRY}/ftq/{d}/train_q.jsonl = {man['train_q']['sha1']}" in out
+    # the sidecar that says what the reports of this root are
+    note = re.sub(r"\s+", " ", (root / "report" / "NOTE_FTQ.txt").read_text(encoding="utf-8"))
+    for phrase in ("FT-Q TEACHER adapters", "not the within-item permutation adapters of FT-C",
+                   "The names FT_C and FT-PERM (and the 'within-item permuted adapter' wording) are the permutation control's",
+                   "every number under FT_C / PERM in these reports is FT-Q's",
+                   "The ZS, FT and P1 blocks duplicate outputs/confrec/ftgrid/report/<D>.json and are cited only from there",
+                   "FT_C_reading", "FT-Q control, root label teacher"):
+        assert phrase in note, phrase
+    assert "ML-1M's P1" not in note and "Nothing in this root is a permutation result" not in note      # the old, inaccurate point 2
     # the adapters: the real adapters' recorded arguments except --train, --out, --seed; provenance of the teacher panel
     real_cfg = read_json(repo / ra / "s0" / "train_config.json")
     assert real_cfg["train"] == train_ref
@@ -1291,6 +1668,7 @@ def test_toys_second_run_skips_everything_and_touches_nothing(chain_toys):
     out = c["r2"].stdout
     assert "dry-run trainer" not in out and "scores chunk" not in out and out.count(": scored") == 2
     assert out.count("[skip] adapter") == 2 and "[skip] run_ftgrid.sh's DRY_RUN world for toys" in out
+    assert out.count("byte for byte the teacher recomputed") == 1 and "[stage 1] pilot-log line for the teacher panel of toys" in out
     for product in ("ftq/toys/train_q.manifest.json", "report/toys.json"):
         assert f"[skip] {QROOT_DRY}/{product}" in out, product
     assert "[dry] gate rehearsal" not in out                                   # the rehearsal runs once per world
@@ -1328,7 +1706,7 @@ def scenario_records(c, repo):
     r = run_ftq(repo, "toys", DRY_NO_RECORD="1")
     errs += [] if r.returncode == 4 and "stage amendment" in r.stderr else [FR.tail(r)]
     keep = [x for x in original.splitlines() if not x.startswith(FTQ_LINES)]
-    assert len(keep) == len(original.splitlines()) - 2
+    assert len(keep) == len(original.splitlines()) - len(FTQ_LINES)
     log.write_text("\n".join(keep) + "\n", encoding="utf-8")                     # (b) only the FT-Q record is missing
     r = run_ftq(repo, "toys", DRY_NO_RECORD="1")
     errs += [] if r.returncode == 4 and "FT-Q record" in r.stderr and "stage core" not in r.stderr else [FR.tail(r)]
@@ -1338,10 +1716,13 @@ def scenario_records(c, repo):
     r = run_ftq(repo, "toys")
     errs += [] if r.returncode == 4 and "stage core" in r.stderr else [FR.tail(r)]
     shutil.copy2(ROOT / "src" / "confrec" / "metrics.py", bound)
-    script = repo / "scripts" / "sigir" / "run_ftq.sh"                           # (d) an FT-Q file changed since its record
-    script.write_bytes(script.read_bytes() + b"\n# changed after its record\n")
-    r = run_ftq(repo, "toys", DRY_NO_RECORD="1")
-    errs += [] if r.returncode == 4 and "FT-Q record" in r.stderr and "== stage" not in r.stdout else [FR.tail(r)]
+    for rel in FTQ_LINES:                                                        # (d) an FT-Q file changed since its record
+        path = repo / rel
+        good = path.read_bytes()
+        path.write_bytes(good + b"\n# changed after its record\n")
+        r = run_ftq(repo, "toys", DRY_NO_RECORD="1")
+        errs += [] if r.returncode == 4 and "FT-Q record" in r.stderr and rel in r.stderr and "== stage" not in r.stdout else [FR.tail(r)]
+        path.write_bytes(good)
     return errs + ([] if FR.snapshot(repo / QROOT_DRY) == before else ["a refused run wrote to the FT-Q root"])
 
 
@@ -1383,7 +1764,7 @@ def scenario_provenance(c, repo):
     teacher = root / "ftq" / "toys" / "train_q.jsonl"
     teacher.write_bytes(teacher.read_bytes() + b" ")                               # the panel on disk is not the manifest's
     r = run_ftq(repo, "toys", STAGES="2")
-    errs += [] if r.returncode == 1 and "is not the file" in r.stderr else [FR.tail(r)]
+    errs += [] if r.returncode == 1 and "is not the teacher recomputed" in r.stderr and forbid_training(r) == "" else [FR.tail(r)]
     return errs
 
 
@@ -1428,9 +1809,204 @@ def scenario_e1(c, repo):
     return errs
 
 
+def scenario_teacher_swap(c, repo):
+    """The reviewer's plant: train_q.jsonl replaced by the REAL-label train.jsonl and its manifest re-tagged with the new sha1, the
+    file's mtime and the step marker untouched. Stages 2 and 3 used to trust it ('provenance OK': p0 and p1 trained on real labels);
+    now the teacher is recomputed from train.jsonl and the stage-1 q-hat file and the panel on disk must equal it byte for byte."""
+    root, errs = repo / QROOT_DRY, []
+    for k in (0, 1):
+        shutil.rmtree(root / "adapters" / "toys" / f"p{k}")                        # so that stage 2 would train
+    teacher, man = root / "ftq" / "toys" / "train_q.jsonl", root / "ftq" / "toys" / "train_q.manifest.json"
+    real = (repo / GRID / "panels" / "toys" / "train.jsonl").read_bytes()
+    st = teacher.stat()
+    teacher.write_bytes(real)
+    os.utime(teacher, ns=(st.st_atime_ns, st.st_mtime_ns))                         # no marker can notice a newer file
+    m = read_json(man)
+    m["train_q"]["sha1"] = sha1(real)
+    man.write_bytes(fq.json_bytes(m))
+    before = FR.snapshot(root)
+    for stages in ("1", "2", "3"):
+        r = run_ftq(repo, "toys", STAGES=stages)
+        errs += [] if r.returncode == 1 and "is not the teacher recomputed" in r.stderr and forbid_training(r) == "" else [FR.tail(r)]
+    errs += [] if FR.snapshot(root) == before else ["a refused run wrote to the FT-Q root"]
+    return errs + ([] if not (root / "adapters" / "toys" / "p0").exists() else ["an adapter was trained on the swapped panel"])
+
+
+def patch_fakes_for_a_transient_failure(repo: Path) -> None:
+    """Test only: in this scratch repo's copy of run_ftgrid.sh's scorer stand-in DRY_E1_FAIL fails just the FIRST run of a run.key
+    (a transient failure): once a DIR.e1fail.* sibling with the same run.key exists, the rerun passes."""
+    fakes = repo / GRID / "_dry" / "ftgrid_fakes.py"
+    text = fakes.read_text(encoding="utf-8")
+    helper = ("def _failed_before(output):\n"
+              "    out = Path(str(output))\n"
+              "    key = (out / 'run.key').read_text(encoding='utf-8') if (out / 'run.key').is_file() else None\n"
+              "    return any((d / 'run.key').is_file() and (d / 'run.key').read_text(encoding='utf-8') == key\n"
+              "               for d in out.parent.glob(out.name + '.e1fail.*'))\n\n\n")
+    assert text.count("def fake_model(args):") == 1
+    text = text.replace("def fake_model(args):", helper + "def fake_model(args):")
+    text, n = re.subn(r"(mass = 0\.5 if fail and fail in str\(args\.output\)\.replace\(.*?\))( else 0\.99999)",
+                      r"\1 and not _failed_before(args.output)\2", text)
+    assert n == 1
+    fakes.write_text(text, encoding="utf-8")
+
+
+def leftover_e1fail(root: Path, run_key: str | None) -> Path:
+    """Move p0's finished like pass aside as p0/like.e1fail.<an old time>, with the given run.key (None: the current one), so that
+    p0 is scored again and a failed run of some earlier time is left next to it."""
+    like = root / "scores" / "toys" / "p0" / "like"
+    left = like.parent / "like.e1fail.20200101000000"
+    shutil.copytree(like, left)
+    if run_key is not None:
+        (left / "run.key").write_text(run_key, encoding="utf-8")
+    shutil.rmtree(like)
+    return left
+
+
+def scenario_e1_leftover_of_an_earlier_run(c, repo):
+    """The reviewer's plant: a p0/like.e1fail.<time> left by an earlier run (another panel, adapter or argument vector: another
+    run.key) used to turn a TRANSIENT first E1 failure into the final one (FAILED_INTEGRITY without the rerun). Now only an e1fail
+    directory of the current run.key uses the rerun up."""
+    root, errs = repo / QROOT_DRY, []
+    left = leftover_e1fail(root, f"{'0' * 40} {MODEL} {VARIANT} {'1' * 40} --lora elsewhere/p0\n")
+    patch_fakes_for_a_transient_failure(repo)
+    r = run_ftq(repo, "toys", STAGES="3,4", DRY_E1_FAIL="p0/like")
+    like = root / "scores" / "toys" / "p0" / "like"
+    errs += [] if r.returncode == 0 else [FR.tail(r)]
+    errs += [] if r.stderr.count("[E1 failed]") == 1 and "failed E1 twice" not in r.stderr else ["no rerun: " + FR.tail(r)]
+    errs += [] if (like / "report.json").is_file() and not (like / "FAILED_INTEGRITY").exists() else ["p0's rerun did not stand"]
+    errs += [] if left.is_dir() and len(list(like.parent.glob("like.e1fail.*"))) == 2 else ["the leftover and this run's e1fail"]
+    rep = read_json(root / "report" / "toys.json")
+    return errs + ([] if rep["runs"]["p0"]["like"]["status"] == "OK" and not [e for e in rep["excluded_runs"] if e["model"] == "p0"]
+                   else ["p0 is excluded from the report"])
+
+
+def scenario_e1_failure_of_the_same_run_key_uses_the_rerun_up(c, repo):
+    """The rule itself, as run_ftgrid.sh has it: an e1fail directory of the CURRENT run.key (an earlier failed attempt of the very
+    same panel, adapter and arguments) leaves no rerun: the next failure is final."""
+    root, errs = repo / QROOT_DRY, []
+    leftover_e1fail(root, None)
+    r = run_ftq(repo, "toys", STAGES="3,4", DRY_E1_FAIL="p0/like")
+    like = root / "scores" / "toys" / "p0" / "like"
+    errs += [] if r.returncode == 0 else [FR.tail(r)]
+    errs += [] if r.stderr.count("[E1 failed]") == 0 and r.stderr.count("failed E1 twice") == 1 else ["no immediate FAILED_INTEGRITY: " + FR.tail(r)]
+    return errs + ([] if (like / "FAILED_INTEGRITY").is_file() and len(list(like.parent.glob("like.e1fail.*"))) == 1
+                   else ["no FAILED_INTEGRITY"])
+
+
+def scenario_temporary_files_of_the_bound_tools(c, repo):
+    """Review round 3, m1: ftgrid_report and the scorer write <name>.tmp beside their products. A planted temporary name that leads to
+    a registered file (a hard link, or a symlink where those can be made) used to be written through: the registered report, its
+    tables or a real score file were overwritten. Now a stale temporary file is removed before the tool runs, and any link below the
+    FT-Q root other than scores/D/{zeroshot,s0,s1,s2} (those resolved to the registered real score directory) is refused with
+    exit 2 before anything is written."""
+    root, errs = repo / QROOT_DRY, []
+    reg_rep, reg_tab = repo / GRID / "report" / "toys.json", repo / GRID / "report" / "toys_tables.csv"
+    s0_scores = repo / GRID / "scores" / "toys" / "s0" / "like" / "scores.csv.gz"
+    before = {p: sha1_file(p) for p in (reg_rep, reg_tab, s0_scores)}
+    for name in ("toys.json", "toys_tables.csv"):                                  # (a) the report is made again ...
+        (root / "report" / name).unlink()
+    os.link(reg_rep, root / "report" / "toys.json.tmp")                            # ... through temporary names that are the
+    os.link(reg_tab, root / "report" / "toys_tables.csv.tmp")                      # registered report and tables (hard links)
+    r = run_ftq(repo, "toys", STAGES="4")
+    errs += [] if r.returncode == 0 and (root / "report" / "toys.json").is_file() and not list((root / "report").glob("*.tmp")) else [FR.tail(r)]
+    like = root / "scores" / "toys" / "p0" / "like"                                # (b) p0 is scored again in place (no report, the
+    (like / "report.json").unlink()                                                # run.key is current) through a temporary name that
+    os.link(s0_scores, like / "scores.csv.gz.tmp")                                 # is the real s0's score file
+    r = run_ftq(repo, "toys", STAGES="3")
+    errs += [] if r.returncode == 0 and (like / "report.json").is_file() and not (like / "scores.csv.gz.tmp").exists() else [FR.tail(r)]
+    errs += [] if {p: sha1_file(p) for p in before} == before else ["a registered file was written through a temporary name"]
+    try:                                                                           # (c) the same as symlinks: refused by the sweep
+        os.symlink(reg_rep, root / "report" / "toys.json.tmp")
+        made = True
+    except (OSError, NotImplementedError):
+        made = False                                                               # (no symlink privilege: the hard links stand in)
+    if made:
+        (root / "report" / "toys.json").unlink()
+        r = run_ftq(repo, "toys", STAGES="4")
+        refusal = "is a link" in r.stderr or "redirect" in r.stderr              # the sweep, or the tree check that lists this name
+        errs += [] if r.returncode == 2 and refusal and sha1_file(reg_rep) == before[reg_rep] else [FR.tail(r)]
+        (root / "report" / "toys.json.tmp").unlink()
+    wrong = root / "scores" / "toys" / "s1"                                        # (d) a link with an allowed name that leads
+    if wrong.is_symlink() or getattr(os.path, "isjunction", lambda p: False)(wrong):                            # to the wrong score directory is refused too
+        unlink_dir(wrong)
+    else:
+        shutil.rmtree(wrong)
+    if link_dir(wrong, repo / GRID / "scores" / "toys" / "s2"):
+        r = run_ftq(repo, "toys", STAGES="4")
+        errs += [] if r.returncode == 2 and "not to the registered real score directory" in r.stderr else [FR.tail(r)]
+    return errs
+
+
+def scenario_failed_integrity_is_sticky_when_the_adapter_is_made_again(c, repo):
+    """Review round 3, m4, stage 2: making an adapter again used to start a fresh E1 budget (the like pass of the new weights is a
+    new run.key). While scores/D/p<k>/like or a like.stale.* of that seed holds FAILED_INTEGRITY, stage 2 refuses to train p<k>
+    (exit 1, naming the directory) unless FTQ_ALLOW_RETRY=p<k> and a non-empty FTQ_RETRY_REASON are set; the override is logged."""
+    root, errs = repo / QROOT_DRY, []
+    like = root / "scores" / "toys" / "p0" / "like"
+    (like / "FAILED_INTEGRITY").write_text("", encoding="utf-8")                   # p0's like pass failed E1 twice
+    before = FR.snapshot(root)
+    r = run_ftq(repo, "toys", STAGES="3")                                          # a finished failed state is resumed, not refused
+    errs += [] if r.returncode == 0 and "[skip]" in r.stdout and FR.snapshot(root) == before else [FR.tail(r)]
+    shutil.rmtree(root / "adapters" / "toys" / "p0")                               # p0 would be made again
+    before = FR.snapshot(root)
+    r = run_ftq(repo, "toys", STAGES="2")
+    errs += [] if (r.returncode == 1 and f"{QROOT_DRY}/scores/toys/p0/like" in r.stderr and "FTQ_ALLOW_RETRY=p0" in r.stderr
+                   and forbid_training(r) == "" and FR.snapshot(root) == before) else [FR.tail(r)]
+    r = run_ftq(repo, "toys", STAGES="2", FTQ_ALLOW_RETRY="p1", FTQ_RETRY_REASON="another seed")      # the seed must be named
+    errs += [] if r.returncode == 1 and forbid_training(r) == "" else [FR.tail(r)]
+    r = run_ftq(repo, "toys", STAGES="2", FTQ_ALLOW_RETRY="p0")                    # and the reason must be given
+    errs += [] if r.returncode == 2 and "FTQ_RETRY_REASON" in r.stderr and forbid_training(r) == "" else [FR.tail(r)]
+    errs += [] if not (root / "report" / "NOTE_FTQ_overrides.txt").exists() and FR.snapshot(root) == before else ["a refusal wrote"]
+    reason = "the trainer was killed at step 40; the weights were never used"
+    r = run_ftq(repo, "toys", STAGES="2", FTQ_ALLOW_RETRY="p0", FTQ_RETRY_REASON=reason)
+    errs += [] if r.returncode == 0 and FR.trained(r) == ["p0"] and "[retry] p0" in r.stderr else [FR.tail(r)]
+    log = (root / "report" / "NOTE_FTQ_overrides.txt").read_text(encoding="utf-8").splitlines()
+    errs += [] if len(log) == 1 and re.fullmatch(r"p0\t\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\t" + re.escape(reason), log[0]) else [f"log: {log}"]
+    return errs
+
+
+def scenario_failed_integrity_is_sticky_when_the_like_pass_changes_its_key(c, repo):
+    """Review round 3, m4, stage 3: a like pass that would be scored under another run.key (the adapter was made again) while like/
+    or a like.stale.* of that seed holds FAILED_INTEGRITY is refused (exit 1, naming the directory), unless the override is set;
+    the other seed is not affected, and the marker that moved aside with the stale directory keeps the seed sticky."""
+    root, errs = repo / QROOT_DRY, []
+    like = root / "scores" / "toys" / "p0" / "like"
+    (like / "FAILED_INTEGRITY").write_text("", encoding="utf-8")
+    w0, w1 = (root / "adapters" / "toys" / f"p{k}" / "adapter_model.safetensors" for k in (0, 1))
+    w0.write_bytes(w0.read_bytes() + b" made again")                               # the adapter was made again: another run.key
+    before = FR.snapshot(root)
+    r = run_ftq(repo, "toys", STAGES="3")
+    errs += [] if (r.returncode == 1 and f"{QROOT_DRY}/scores/toys/p0/like" in r.stderr and "scores chunk" not in r.stdout
+                   and FR.snapshot(root) == before) else [FR.tail(r)]
+    stale = like.parent / "like.stale.20200101000000"                              # the marker of an earlier, moved-aside pass
+    shutil.move(like, stale)
+    before = FR.snapshot(root)
+    r = run_ftq(repo, "toys", STAGES="3")
+    errs += [] if r.returncode == 1 and f"{QROOT_DRY}/scores/toys/p0/like.stale.20200101000000" in r.stderr and FR.snapshot(root) == before \
+        else [FR.tail(r)]
+    reason = "the E1 failure was a full disk, see the log"
+    r = run_ftq(repo, "toys", STAGES="3", FTQ_ALLOW_RETRY="p0", FTQ_RETRY_REASON=reason)
+    errs += [] if r.returncode == 0 and (like / "report.json").is_file() and (stale / "FAILED_INTEGRITY").is_file() else [FR.tail(r)]
+    log = (root / "report" / "NOTE_FTQ_overrides.txt").read_text(encoding="utf-8").splitlines()
+    errs += [] if len(log) == 1 and log[0].startswith("p0\t") and log[0].endswith("\t" + reason) else [f"log: {log}"]
+    w1.write_bytes(w1.read_bytes() + b" made again")                               # p1 never failed: scored again without override
+    r = run_ftq(repo, "toys", STAGES="3")
+    errs += [] if r.returncode == 0 and "[skip]" in r.stdout else [FR.tail(r)]
+    errs += [] if len((root / "report" / "NOTE_FTQ_overrides.txt").read_text(encoding="utf-8").splitlines()) == 1 else ["p1 was logged"]
+    w0.write_bytes(w0.read_bytes() + b" and again")                                # the moved-aside marker keeps p0 sticky
+    r = run_ftq(repo, "toys", STAGES="3")
+    errs += [] if r.returncode == 1 and "like.stale.20200101000000" in r.stderr else [FR.tail(r)]
+    return errs
+
+
 SCENARIOS = {"gate_ft": scenario_gate_ft, "records": scenario_records, "missing_real_adapter": scenario_missing_real_adapter,
              "wrong_recorded_input": scenario_wrong_recorded_input, "provenance": scenario_provenance,
-             "stage_order": scenario_stage_order, "e1": scenario_e1}
+             "teacher_swap": scenario_teacher_swap, "stage_order": scenario_stage_order, "e1": scenario_e1,
+             "e1_leftover": scenario_e1_leftover_of_an_earlier_run,
+             "e1_same_key": scenario_e1_failure_of_the_same_run_key_uses_the_rerun_up,
+             "tmp_files": scenario_temporary_files_of_the_bound_tools,
+             "sticky_stage2": scenario_failed_integrity_is_sticky_when_the_adapter_is_made_again,
+             "sticky_stage3": scenario_failed_integrity_is_sticky_when_the_like_pass_changes_its_key}
 
 
 @needs_chain
@@ -1440,7 +2016,7 @@ def test_refusals_and_the_e1_rule_on_clones_of_the_toys_chain(chain_toys, tmp_pa
         sub = tmp_path / name
         sub.mkdir()
         return name, SCENARIOS[name](chain_toys, clone(chain_toys, sub))
-    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+    with cf.ThreadPoolExecutor(max_workers=6) as ex:
         results = dict(ex.map(work, SCENARIOS))
     failed = {name: errs for name, errs in results.items() if errs}
     assert not failed, "\n\n".join(f"== {name}\n" + "\n".join(map(str, errs)) for name, errs in failed.items())

@@ -34,9 +34,8 @@ main results and the zero-shot regime is the contrast. Table~\ref{tab:guide} con
 One LoRA recipe (rank 16, one epoch) on two 8B backbones is audited, and no sampling-based or verbalised uncertainty estimator.
 Scores are pointwise, the next-item panels hold sampled candidates under same-candidate scope~\citep{krichene2020sampled}, and exposure
 is static. The knockout replaces store names only, and its registered thresholds are on the logit scale, hence unit-dependent. The
-item-only controls are partial: the permutation control is informative on ML-1M only, where 97.7\% of the TRAIN examples sit in
-repeated items, and the FT-Q teacher is defined by the item mean, whose labels depart from the real ones on part of the TRAIN examples,
-so a high $R_Q$ shows what an item-level target can teach, not what the real labels taught. The item mean may use ratings in $[T_d,t)$
-that the LLMs never see ($m_T$ stands beside it). The ML-1M values of the addendum-6 endpoints are exploratory, and item text, ML-1M
+item-only controls are partial: permutation informs on ML-1M only (97.7\% of its TRAIN examples sit in repeated items), and the FT-Q
+teacher, set by the item mean, departs from the real labels, so a high $R_Q$ shows what an item-level target can teach, not what the
+real labels taught. The ML-1M values of the addendum-6 endpoints are exploratory, and item text, ML-1M
 included, may have been seen in pre-training~\citep{dipalma2025memorize}. The registration is a set of dated, hash-chained project
 documents rather than a public-registry entry, and the reviews behind addenda 6 and 7 were internal, not independent.

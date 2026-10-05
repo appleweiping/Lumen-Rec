@@ -41,14 +41,14 @@ $\ell-\bar\ell_{\rm perm}$ is below $0.10$.
 \paragraph{Strata, matched mean and item-only controls.}
 E-H$^\dagger$ splits TEST rows into \emph{sparse} ($m$ from fewer than 5 earlier ratings) and dense rows and into \emph{unseen} (no
 TRAIN example) and seen items, and evaluates $\mathcal G_{\rm prior}=\Delta$UAUC(M1$-$M0) per stratum with predictors fitted on all
-rows. E-J$^\dagger$ pairs $\ell$ with $m$, with $m_T$ and, on warm pairs, with MF. Two controls train two adapters each (seeds 0, 1,
-the same recipe) without user--item evidence: FT-C on labels permuted within each item, which keeps every item's label rate (ML-1M
-only, as a permutation cannot change an item with one TRAIN example), and FT-Q on the labels of an item-only teacher, which marks
-as positive the round($\beta n$) TRAIN examples with the largest $m$ ($\beta$ the TRAIN like rate; ties by a seed-0 key), so it uses no
-label, user or post-$T_d$ information. The retention $R$ (FT-Q: $R_Q$) averages
-$[\mathrm{UAUC}(p_s)-\mathrm{UAUC}_{\rm ZS}]/[\mathrm{UAUC}(s)-\mathrm{UAUC}_{\rm ZS}]$ over the real adapters $s$ and their control
-twins $p_s$, is defined when the regime contrast is positive with an interval excluding 0, and reads$^\dagger$ ITEM\_DRIVEN if its
-interval lies above 0.5, USER\_DRIVEN if below, and MIXED otherwise.
+rows. E-J$^\dagger$ pairs $\ell$ with $m$, with $m_T$ and, on warm pairs, with MF. Two item-only controls train two adapters each
+(seeds 0, 1, same recipe) without user--item evidence: FT-C on labels permuted within each item (ML-1M only: a permutation cannot
+change an item with one TRAIN example) and FT-Q on the labels of an item-only teacher, positive for the round($\beta n$) TRAIN
+examples with the largest $m$ ($\beta$: TRAIN like rate), so it uses no label of the example itself, no user information and nothing
+after $T_d$. The retention $R$
+(FT-Q: $R_Q$) averages $[\mathrm{UAUC}(p_s)-\mathrm{UAUC}_{\rm ZS}]/[\mathrm{UAUC}(s)-\mathrm{UAUC}_{\rm ZS}]$ over the adapters $s$
+and their control twins $p_s$, is defined when the regime contrast is positive with an interval excluding 0, and reads$^\dagger$
+ITEM\_DRIVEN if its interval lies above 0.5, USER\_DRIVEN if below, MIXED otherwise.
 
 \paragraph{Popularity and the store-name knockout.}
 Popularity $n_i$ is the all-time category event count, used through ranks. \emph{Level}: the partial Spearman correlation of $\ell$

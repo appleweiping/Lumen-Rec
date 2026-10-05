@@ -31,8 +31,8 @@ highest ML-1M UAUC among those meeting E1 on both panels and E2 (Toys UAUC at le
 Toys and then by simplicity; all $7\times2$ development UAUCs are released, and Table~\ref{tab:gate-outcomes} gives V0 and $V^\ast$.
 
 \begin{table}[!htbp]
-\caption{Deviations, post-hoc degrees of freedom and disclosures, each checkable in the dated pilot log (log), the amendments (A$k$;
-A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
+\caption{Deviations, post-hoc choices and disclosures, each checkable in the dated pilot log (log), the amendments (A$k$; A3-$k$:
+addendum $k$ of A3) or the commit history.}
 \label{tab:deviations}
 \centering\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.88}
 % ROWS: the 20 rows of the deviations record, in its order, condensed (what happened with its evidence | effect on claims). Row 7
@@ -42,26 +42,26 @@ A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
 \toprule
  & What happened (evidence) & Effect on claims\\
 \midrule
-1 & A method paper (\method{}) became an audit after the Pilot-1 gate failed (0.587 $<$ 0.60); A2 closed a hole of its decision table after that result (A2 \S3.1). & The audit design postdates the first data.\\
+1 & A method paper became an audit when the Pilot-1 gate failed (0.587 $<$ 0.60); A2 then closed a gap in its decision table (\S3.1). & The audit design postdates the first data.\\
 2 & P1 and E-D were written after exploratory forensics on the burned pilot users (log 10-04). & Only P1's fine-tuned side is confirmatory.\\
 3 & The stage-3 ensemble null is the code's binormal prediction, not A2 G7's literal z-sum (logged before stage 3). & \method{}'s null follows the code.\\
 4 & The wording rules were written after the ML-1M results, hashed before any later file was pulled (A3-6 \S9.3). & The ML-1M wording was set with its numbers known.\\
 5 & A comment rule allowed direction words on unadjusted intervals; never implemented (A3-6 \S1.2). & None.\\
-6 & The Gate-FT bar is anchored to published ML-1M UAUCs with 3-star negatives (A2 G9). & A pass licenses the programme, not competence.\\
+6 & The Gate-FT bar is anchored to published ML-1M UAUCs with 3-star negatives (A2 G9). & It licenses the programme, not competence.\\
 7 & V1 was selected on burned DEV users (also TRAIN users): DEV \DATANEEDED{sel:UAUC of v\_star}, CONFIRM \DATANEEDED{gate:UAUC}, zero-shot on TEST rows \DATANEEDED{grid:UAUC}, against the 0.60 bar applied to CONFIRM users. & Gate met on the point estimate; zero-shot rated results are scoped to V1.\\
 8 & Which arm a GPU-hour cut drops is chosen with ML-1M results in view (A3 \S10). & Each cut is logged before the affected result is read.\\
-9 & An INCOMPLETE method-slot dataset needs a dated addendum (A3-5). & Method slot only.\\
-10 & The niche and mainstream bins were redefined after the Sports analysis, before any other niche value (spec G). & Not a quintile contrast; group sizes differ by domain.\\
+9 & An INCOMPLETE method-slot dataset needs an addendum (A3-5). & Method slot only.\\
+10 & The niche and mainstream bins were redefined after the Sports analysis, before any other niche value (spec G). & Not quintiles; group sizes vary by domain.\\
 11 & The next-item specification was written while scoring ran and frozen before any analysis (log 10-03/04). & None known.\\
 12 & Amendment 1's hash was logged retroactively, from commit and pull times (log 10-04). & A1's timing rests on those times.\\
 13 & The non-prior share was called an upper bound on the personal share (A3); withdrawn (A3-6 \S1.1). & $\mathcal G$ measures personal information.\\
 14 & E-D's stackers are pooled and uncentred; E-W was added after a review (A3-6 \S2). & Disagreement: estimator-dependent.\\
 15 & Addendum 6 was written after the ML-1M report and two internal reviews (log 10-04). & Its ML-1M values ($^\dagger$) are exploratory.\\
 16 & $m$ may use ratings in $[T_d,t)$, which the LLMs never see (A3-1 item 2; A3-6 \S6). & $m_T$ is printed beside it.\\
-17 & E-C's top-$k_u$ decision takes $k_u$ from the TEST likes, an oracle (A3-6 \S7). & Only deployable rows describe a system.\\
+17 & E-C's top-$k_u$ takes $k_u$ from the TEST likes, an oracle (A3-6 \S7). & Only deployable rows describe a system.\\
 18 & Gate-FT's file holds a second scoring of the ML-1M zero-shot prompts (vLLM batching). & None: the grid scoring is printed.\\
-19 & A3-6 added Toys to FT-C, but only 5.1\% of its TRAIN labels can move; A3-8 withdrew it before any control adapter existed and added FT-Q, an item-only teacher. & FT-C informs on ML-1M only; ``teaches the item'' needs FT-C and FT-Q.\\
-20 & The extra-analysis code reads gaps strictly: $R$ needs a complete E-B and 150 users; an unavailable family member keeps $p=1$; deployable $k_u$ rounds half up; E-W keeps users with an AUC in all 20 splits. & Conservative; no threshold or family changes.\\
+19 & A3-6 added Toys to FT-C (5.1\% of TRAIN labels can move); A3-8 withdrew it before any control adapter and added FT-Q. & FT-C: ML-1M only; the wording needs FT-Q too.\\
+20 & Code readings: $R$ needs a complete E-B and 150 users; a missing member keeps $p=1$; $k_u$ rounds half up; E-W needs AUCs in all 20 splits. & No threshold or family changes.\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -70,8 +70,8 @@ A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
 % Per-panel tables.
 
 \begin{table}[!htbp]
-\caption{Corrections against controls: references (0), invariance checks (1--2), priors on $S_d$ (3--4), two-view contrast after
-GATE\_PASS (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sports: VALID events 1--1000.}
+\caption{Corrections against controls: references (0), invariance checks (1--2), priors on $S_d$ (3--4), two-view contrast
+(5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sports: VALID events 1--1000.}
 \label{tab:corrections}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS and sources. 0: "raw / item mean / MF" = grid:UAUC; cpu:UAUC_item_mean_prior; cpu:UAUC_mf_temporal (zero-shot, same rows).
@@ -123,8 +123,8 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 % METHOD-SLOT-END (appendix)
 
 \begin{table}[!htbp]
-\caption{Second backbone, Llama-3.1-8B-Instruct: key rows of Tables~\ref{tab:tracks} and \ref{tab:teaches} (``not run'' only under a
-registered cut rule; $^\dagger$: addendum 6).}
+\caption{Second backbone, Llama-3.1-8B-Instruct: key rows of Tables~\ref{tab:tracks} and \ref{tab:teaches} (``not run'': a
+registered cut; $^\dagger$: addendum 6).}
 \label{tab:app-llama}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % COLUMNS: ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA (the Llama report root; Amendment 3 sections 4, 5 and 8). Row sources exactly as
@@ -187,8 +187,7 @@ ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minu
 % BRANCH-GATEFT-END
 
 \begin{table}[!htbp]
-\caption{Second backbone, next-item (S1--S3, S5): Qwen3-8B / Llama-3.1-8B-Instruct on events 1,001--3,000 of each domain,
-\textsf{next}, V0.}
+\caption{Second backbone, next-item (S1--S3, S5): Qwen3-8B / Llama-3.1-8B-Instruct, events 1,001--3,000, \textsf{next}, V0.}
 \label{tab:app-z2}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
 % ROWS: the four Z2 endpoints that the second-backbone clause of claim admission uses (Amendment 3 section 4): S1 and S2 rest on the
@@ -210,22 +209,19 @@ Mean $p$, head $-$ tail & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l
 
 % ---------------------------------------------------------------------------------------------------------------------
 \paragraph{Registered amendments}\label{app:prereg}\label{app:pseudonym}\label{app:repro}
-(dated project documents, not public-registry entries). Amendment 1, before any pilot data: scoring, resampling, tie and split
-conventions. Amendment 2, after the pilot gates: the remedy round, Gate-FT, the next-item audit, an interpretive diagnosis battery
-(readings released) and the forking-path rules. Amendment 3, before any adapter existed: the fine-tuned programme, conditional on a
-Gate-FT pass except its zero-shot panels, with five implementation addenda, addendum 6 (after two internal reviews of a draft; the
-endpoints marked $^\dagger$ and the admission and wording rules), addendum 7 (S6 wording, composition diagnostics and a conditional
-item-stratified arm, before any S6 arm existed) and addendum 8 (FT-C stays ML-1M only; the FT-Q teacher control, before any control
-adapter existed); Table~\ref{tab:deviations} lists every deviation.
+(dated project documents, not public-registry entries; Section~\ref{sec:protocol}). A2 also registers Gate-FT, the next-item audit,
+a diagnosis battery (readings released) and the forking-path rules; A3 (conditional on Gate-FT except its zero-shot panels) has
+addenda 1--5 (implementation),
+6 (after two internal reviews: the $^\dagger$ endpoints, admission and wording rules), 7 (S6 wording, composition diagnostics, a
+conditional item-stratified arm; before any S6 arm) and 8 (FT-C on ML-1M only, FT-Q; before any control adapter).
 
 \paragraph{Store-name knockout.}
-Store strings in history and candidate text are replaced in one case-insensitive whole-word pass (generic stores and strings
-shorter than four characters or made of digits excepted), by injective pseudonyms that never equal a real store or, in the placebo arm,
-by a real store of the same tercile of category-wide review counts (history-only stores included). A model is NULL iff UAUC falls by
-more than 0.02 (real minus pseudonym) overall and in the tail; POSITIVE under the thresholds of Table~\ref{tab:rq}; NEGATIVE iff the
-interval of the pseudonym slope contains 0 and the head-minus-tail contrasts of pseudonym and placebo differ by at most 0.05;
-INDETERMINATE otherwise; INCOMPLETE if an input is missing. The thresholds are on the logit scale, hence unit-dependent; the
-registered seen/unseen-item split is not run.
+One case-insensitive whole-word pass replaces store strings in history and candidate text (generic stores and strings shorter than
+four characters or made of digits excepted); pseudonyms are injective and never a real store, and placebo stores include history-only
+stores. A model is NULL iff UAUC falls by more than 0.02 (real minus
+pseudonym) overall and in the tail; POSITIVE under the thresholds of Table~\ref{tab:rq}; NEGATIVE iff the pseudonym slope's interval
+contains 0 and the head-minus-tail contrasts of pseudonym and placebo differ by at most 0.05; INDETERMINATE otherwise; INCOMPLETE if
+an input is missing. The registered seen/unseen-item split is not run.
 
 \paragraph{Reproducibility checklist.}
 \emph{Scoring:} vLLM prefill, at most 4,096 tokens (3,072 next-item), 100-user chunks. \emph{Fine-tuning:} LoRA~\citep{hu2022lora} on
@@ -235,5 +231,4 @@ counted; FT-C and FT-Q controls: seeds 0 and 1. \emph{Data and hashes:} pilot ML
 registered V0 prompts on the pilot ML-1M panel 12e83c4f (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s,
 rendered prompt-bank sha1, user-id list sha1s and the time split $T_d$ of every domain from the freeze record and the split files}.
 \emph{Software, compute, artefact:} \DATANEEDED{package versions and GPU model from each report; total GPU hours}. Prompts, panel
-builders, scorers, analysis scripts and every result file are released with the anonymous artefact; every number in the paper is read
-from a committed result file.
+builders, scorers, analysis scripts and every result file are released with the anonymous artefact.

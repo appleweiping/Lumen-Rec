@@ -1097,14 +1097,15 @@ def ext_ftc(R, c, k, s):
     return ext_reading_cell(R, ext_rel("qwen", "ml1m"), "FT-C", kind)
 
 
-def ext_ftq(kind: str):
-    """The FT-Q rows (addendum 8): the LoRA cell of each dataset, read from the teacher root's file."""
+def ext_ftq(kinds: tuple):
+    """The FT-Q rows (addendum 8): the LoRA cell of each dataset, read from the teacher root's file; slot k of the cell is kinds[k]
+    ('R_Q / reading': R and label, as the FT-C cell; the descriptive companion: UAUC)."""
     def h(R, c, k, s):
         d, reg = c
-        if reg != "FT":
-            raise SpecError("FT-Q is a LoRA cell")
-        expect(s, f"ext:FT_Q_reading.{kind}")
-        return ext_reading_cell(R, ftq_rel(d), "FT-Q", kind)
+        if reg != "FT" or k >= len(kinds):
+            raise SpecError(f"FT-Q is a LoRA cell of {len(kinds)} slot(s)")
+        expect(s, f"ext:FT_Q_reading.{kinds[k]}")
+        return ext_reading_cell(R, ftq_rel(d), "FT-Q", kinds[k])
     return h
 
 
@@ -1563,9 +1564,8 @@ TEACH_ROWS = {
        for label, st in ((r"Sparse rows ($m$ from $<5$ ratings)", "sparse"), (r"Dense rows", "dense"),
                          (r"Unseen items (no TRAIN example)", "unseen"), (r"Seen items", "seen"))},
     r"FT-C (permuted): $R$ / reading": ext_ftc,
-    r"FT-Q (teacher): $R_Q$": ext_ftq("R"),
-    r"reading": ext_ftq("label"),
-    r"UAUC of $q_0$ / $q_1$ / $m$": ext_ftq("UAUC"),
+    r"FT-Q (teacher): $R_Q$ / reading": ext_ftq(("R", "label")),
+    r"UAUC of $q_0$ / $q_1$ / $m$": ext_ftq(("UAUC",)),
     r"Head $-$ tail drop of $\ell$": ko_handler(r"Head $-$ tail drop of $\ell$"),
     r"Placebo drop": ko_handler(r"Placebo drop (real-brand swap)"),
     r"Tail $\Delta$UAUC": ko_handler(r"Tail $\Delta$UAUC"),
@@ -2178,10 +2178,15 @@ def _ext_family(R, fam: str) -> tuple:
     return f.get("members") or {}, f.get("outside_family") or {}
 
 
-def _not_run_note(R) -> str:
-    """The panels whose fine-tuned runs are a registered cut recorded in the summary (not members of the FT families)."""
+def _not_run_part(R) -> list:
+    """The panels whose fine-tuned runs are a registered cut recorded in the summary (summarize --not_run: outside the FT members
+    of every family; their ZS runs stay members of E-H), as one parenthetical part."""
     cut = [d for d in AMAZON if d in (R.get(EXT_SUM, "not_run") or {})]
-    return f" ({_names(cut)}: fine-tuning not run)" if cut else ""
+    return [f"{_names(cut)}: fine-tuning not run"] if cut else []
+
+
+def _paren(parts: list) -> str:
+    return f" ({'; '.join(parts)})" if parts else ""
 
 
 def c_ext_ef(R, s):
@@ -2189,7 +2194,7 @@ def c_ext_ef(R, s):
     require_ft(R)
     mem, _ = _ext_family(R, "E_F")
     k = sum(1 for v in mem.values() if v.get("confirmed") is True)
-    return f"{k} of {len(mem)} Qwen Amazon panels" + _not_run_note(R)
+    return f"{k} of {len(mem)} Qwen Amazon panels" + _paren(_not_run_part(R))
 
 
 def c_ext_eh(reg: str):
@@ -2203,13 +2208,13 @@ def c_ext_eh(reg: str):
         mem, out = _ext_family(R, "E_H")
         mem = {k: v for k, v in mem.items() if k.endswith(":" + reg)}
         out = [k.split(":")[0] for k in out if k.endswith(":" + reg)]
-        below = f" ({_names([d for d in AMAZON if d in out])} below 150 users)" if out else ""
+        parts = ([f"{_names([d for d in AMAZON if d in out])} below 150 users"] if out else []) +             (_not_run_part(R) if reg == "FT" else [])
         if not mem:
             if not out:
                 raise Missing("not_decided", f"{EXT_SUM}: the E-H family has no {word} panel run")
-            return f"none of the {word} panel runs{below}"
+            return f"none of the {word} panel runs" + _paren(parts)
         k = sum(1 for v in mem.values() if v.get("confirmed") is True)
-        return f"{k} of {len(mem)} {word} panel runs{below}"
+        return f"{k} of {len(mem)} {word} panel runs" + _paren(parts)
     return h
 
 
@@ -2226,8 +2231,7 @@ def c_ext_ej(R, s):
     if len(below) + len(above) != len(conf):
         raise Missing("field_null", f"{EXT_SUM}: a confirmed E-J member has no sign")
     parts = ([f"below it on {_names(below)}"] if below else []) + ([f"above it on {_names(above)}"] if above else [])
-    return (f"{len(conf)} of {len(mem)} Qwen Amazon panels" + (f" ({'; '.join(parts)})" if parts else "")
-            + _not_run_note(R))
+    return f"{len(conf)} of {len(mem)} Qwen Amazon panels" + _paren(parts + _not_run_part(R))
 
 
 ROBUST_WORDS = {"robust": "robust", "estimator_dependent": "estimator-dependent",
@@ -2254,7 +2258,8 @@ def c_ext_robust(R, s):
                 dep.append(f"{RATED_NAME[d]} ({'zero-shot' if reg == 'ZS' else 'fine-tuned'})")
     if not (n["ZS"] or n["FT"]):
         raise Missing("not_decided", f"{EXT_SUM}: no Qwen Amazon panel has a reading of G")
-    out = (f"robust on {k['ZS']} of {n['ZS']} zero-shot and {k['FT']} of {n['FT']} fine-tuned Qwen Amazon panels")
+    out = (f"robust on {k['ZS']} of {n['ZS']} zero-shot and {k['FT']} of {n['FT']} fine-tuned Qwen Amazon panels"
+           + _paren(_not_run_part(R)))
     return out + (f"; estimator-dependent on {', '.join(dep)}" if dep else "")
 
 
@@ -2530,6 +2535,23 @@ def checks(R: Results) -> list:
             cmp(f"{bb} {d}: report meta n_users_both_classes_test = ftgrid_split eval.users_both_classes_test",
                 lambda bb=bb, d=d: R.get(grid_rel(bb, d), "meta", "n_users_both_classes_test"),
                 lambda bb=bb, d=d: R.get(split_rel(bb, d), "eval", "users_both_classes_test"), tol=0)
+    # alias ext (editor pass 2): the prose counts (extra/summary.json) and the table cells (the domain files) must come from the same
+    # build: every input summarize lists that is present locally has the sha1 summarize recorded for it
+    try:
+        inputs = R.get(EXT_SUM, "inputs")
+    except Missing:
+        inputs = []
+    local = {"main": ext_rel("qwen", "{d}"), "llama": ext_rel("llama", "{d}"), "teacher": ftq_rel("{d}")}
+    for inp in inputs if isinstance(inputs, list) else []:
+        if not isinstance(inp, dict) or inp.get("root_label") not in local or not inp.get("domain"):
+            continue
+        rel = local[inp["root_label"]].format(d=inp["domain"])
+        try:
+            R.load(rel)
+        except Missing:
+            continue
+        out.append({"check": f"{EXT_SUM} input ({inp.get('role')}, {inp['root_label']}, {inp['domain']}): sha1 = sha1 of {rel}",
+                    "a": inp.get("sha1"), "b": R.sha1[rel], "ok": inp.get("sha1") == R.sha1[rel]})
     return out
 
 

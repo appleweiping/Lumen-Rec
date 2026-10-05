@@ -1,19 +1,20 @@
 {
  "schema": "fill_paper_filled_v1",
  "summary": {
-  "slots_total": 704,
-  "filled": 151,
-  "unfilled": 553,
+  "slots_total": 714,
+  "filled": 183,
+  "unfilled": 531,
   "unfilled_by_reason": {
    "branch_slot": 6,
    "free_text": 29,
-   "result_file_missing": 510,
-   "result_not_in_report": 8
+   "result_file_missing": 486,
+   "result_not_in_report": 10
   },
   "filled_by_alias": {
    "aud": 74,
    "corr": 4,
    "cpu": 6,
+   "ext": 32,
    "free": 2,
    "gate": 9,
    "gft": 6,
@@ -27,7 +28,7 @@
    "branch": 6,
    "corr": 5,
    "cpu": 19,
-   "ext": 147,
+   "ext": 125,
    "free": 42,
    "grid": 138,
    "ko": 28,
@@ -57,6 +58,7 @@
  ],
  "sources": {
   "aud/sports.json": "a7406bd2509464352eac2e390dfcb7ab5784c837",
+  "extra/ml1m.json": "14b5f48530e1ef1cb3c04fdffb59765ed89af271",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
   "grid/qwen/games_split.json": "dfd01e9e4012d19a958c154e848c546774d62121",
@@ -150,7 +152,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 54,
+   "line": 53,
    "slot": "gate:n\\_users",
    "kind": "caption",
    "table": "tab:gate-outcomes",
@@ -164,7 +166,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 66,
+   "line": 65,
    "slot": "sel:UAUC",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -178,7 +180,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 66,
+   "line": 65,
    "slot": "sel:UAUC of v\\_star",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -193,7 +195,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 66,
+   "line": 65,
    "slot": "sel:decision",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -207,7 +209,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 67,
+   "line": 66,
    "slot": "sel:UAUC",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -221,7 +223,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 67,
+   "line": 66,
    "slot": "sel:UAUC of v\\_star",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -236,7 +238,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 67,
+   "line": 66,
    "slot": "sel:E2",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -251,7 +253,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 68,
+   "line": 67,
    "slot": "gate:v0\\_context.UAUC",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -266,7 +268,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 68,
+   "line": 67,
    "slot": "gate:UAUC, ci95",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -281,7 +283,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 68,
+   "line": 67,
    "slot": "gate:decision",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -295,7 +297,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 69,
+   "line": 68,
    "slot": "gft:UAUC\\_post\\_T\\_per\\_seed",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -309,7 +311,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 70,
+   "line": 69,
    "slot": "gft:UAUC\\_post\\_T\\_mean\\_over\\_seeds, ci95",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -325,7 +327,7 @@
   },
   {
    "file": "sections/observation.tex",
-   "line": 70,
+   "line": 69,
    "slot": "gft:decision",
    "kind": "table",
    "table": "tab:gate-outcomes",
@@ -407,6 +409,21 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 85,
+   "slot": "ext:E\\_J.UAUC\\_q\\_hat\\_T",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "matched mean $m_T$ (ref.)$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.756}",
+   "from": [
+    "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 86,
    "slot": "cpu:UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -417,6 +434,84 @@
    "text": "0.791{\\scriptsize$\\pm$.018}",
    "from": [
     "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{$-$0.163{\\scriptsize$\\pm$.026}}",
+   "from": [
+    "extra/ml1m.json:E_J.ZS",
+    "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_q_hat",
+    "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_q_hat.per_seed.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{$-$0.016{\\scriptsize$\\pm$.013\\,(.002)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_J.FT",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s0.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s1.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s2.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_q_hat.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{$-$0.195{\\scriptsize$\\pm$.027}}",
+   "from": [
+    "extra/ml1m.json:E_J.ZS",
+    "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_MF_warm",
+    "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_MF_warm.per_seed.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{$-$0.048{\\scriptsize$\\pm$.017\\,(.002)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_J.FT",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s0.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s1.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s2.est",
+    "extra/ml1m.json:E_J.FT.dUAUC_L_minus_MF_warm.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
    ]
   },
   {
@@ -605,6 +700,75 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.616{\\scriptsize$\\pm$.069}}",
+   "from": [
+    "extra/ml1m.json:E_G.ZS",
+    "extra/ml1m.json:E_G.ZS.e_share",
+    "extra/ml1m.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{0.098{\\scriptsize$\\pm$.012\\,(.001)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_G.FT",
+    "extra/ml1m.json:E_G.FT.e_share",
+    "extra/ml1m.json:E_G.FT.e_share.per_model",
+    "extra/ml1m.json:E_G.FT.e_share.per_model.s0.e_share.est",
+    "extra/ml1m.json:E_G.FT.e_share.per_model.s1.e_share.est",
+    "extra/ml1m.json:E_G.FT.e_share.per_model.s2.e_share.est",
+    "extra/ml1m.json:E_G.FT.e_share.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.615{\\scriptsize$\\pm$.033}}",
+   "from": [
+    "extra/ml1m.json:E_G.MF_score_item_bias.item_share",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_label",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.213{\\scriptsize$\\pm$.026}}",
+   "from": [
+    "extra/ml1m.json:E_G.label_q_hat.item_share",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 96,
    "slot": "grid:G",
    "kind": "table",
@@ -640,6 +804,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.003}}",
+   "from": [
+    "extra/ml1m.json:E_W.ZS",
+    "extra/ml1m.json:E_W.ZS.G_wu",
+    "extra/ml1m.json:E_W.ZS.G_wu.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{0.009{\\scriptsize$\\pm$.007\\,(.001)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_W.FT",
+    "extra/ml1m.json:E_W.FT.G_wu",
+    "extra/ml1m.json:E_W.FT.G_wu.per_model",
+    "extra/ml1m.json:E_W.FT.G_wu.per_model.s0.est",
+    "extra/ml1m.json:E_W.FT.G_wu.per_model.s1.est",
+    "extra/ml1m.json:E_W.FT.G_wu.per_model.s2.est",
+    "extra/ml1m.json:E_W.FT.G_wu.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 98,
    "slot": "grid:G\\_CF",
    "kind": "table",
@@ -651,6 +854,21 @@
    "from": [
     "grid/qwen/ml1m.json:E_D.ZS",
     "grid/qwen/ml1m.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 98,
+   "slot": "ext:E\\_W.G\\_CF\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.037{\\scriptsize$\\pm$.013}}",
+   "from": [
+    "extra/ml1m.json:E_W.ZS.G_CF_wu",
+    "extra/ml1m.json:status.items_2_to_7"
    ]
   },
   {
@@ -794,6 +1012,26 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 104,
+   "slot": "ext:E\\_W.P1\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "P1$_{\\rm wu}$$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.007 / 0.010 / 0.010; 0.009{\\scriptsize$\\pm$.006}, $p$ 0.002}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_W.P1_wu",
+    "extra/ml1m.json:E_W.P1_wu.per_seed.s0.est",
+    "extra/ml1m.json:E_W.P1_wu.per_seed.s1.est",
+    "extra/ml1m.json:E_W.P1_wu.per_seed.s2.est",
+    "extra/ml1m.json:E_W.P1_wu.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 107,
    "slot": "grid:ece10\\_platt",
    "kind": "table",
@@ -864,6 +1102,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.294{\\scriptsize$\\pm$.010}}",
+   "from": [
+    "extra/ml1m.json:E_Cprime.ZS",
+    "extra/ml1m.json:E_Cprime.ZS.deployable",
+    "extra/ml1m.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_correct_bottom",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{0.274{\\scriptsize$\\pm$.006\\,(.002)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_Cprime.FT",
+    "extra/ml1m.json:E_Cprime.FT.deployable",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s0.share_correct_bottom.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s1.share_correct_bottom.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s2.share_correct_bottom.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.mean_over_seeds.share_correct_bottom",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 110,
    "slot": "grid:share\\_errors\\_top\\_tertile",
    "kind": "table",
@@ -899,6 +1176,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.267{\\scriptsize$\\pm$.016}}",
+   "from": [
+    "extra/ml1m.json:E_Cprime.ZS",
+    "extra/ml1m.json:E_Cprime.ZS.deployable",
+    "extra/ml1m.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_errors_top",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{0.204{\\scriptsize$\\pm$.015\\,(.008)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_Cprime.FT",
+    "extra/ml1m.json:E_Cprime.FT.deployable",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s0.share_errors_top.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s1.share_errors_top.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s2.share_errors_top.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.mean_over_seeds.share_errors_top",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 112,
    "slot": "grid:auroc\\_margin\\_correct",
    "kind": "table",
@@ -930,6 +1246,45 @@
     "grid/qwen/ml1m.json:E_C.FT.per_model.s1.AUROC_margin_correct",
     "grid/qwen/ml1m.json:E_C.FT.per_model.s2.AUROC_margin_correct",
     "grid/qwen/ml1m.json:E_C.FT.mean_over_seeds.AUROC_margin_correct"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 1,
+   "blocks": [],
+   "text": "\\textit{0.579{\\scriptsize$\\pm$.016}}",
+   "from": [
+    "extra/ml1m.json:E_Cprime.ZS",
+    "extra/ml1m.json:E_Cprime.ZS.deployable",
+    "extra/ml1m.json:E_Cprime.ZS.deployable.per_model.zeroshot.AUROC_margin_correct",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 2,
+   "blocks": [],
+   "text": "\\textit{0.643{\\scriptsize$\\pm$.013\\,(.003)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_Cprime.FT",
+    "extra/ml1m.json:E_Cprime.FT.deployable",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s0.AUROC_margin_correct.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s1.AUROC_margin_correct.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.per_model.s2.AUROC_margin_correct.est",
+    "extra/ml1m.json:E_Cprime.FT.deployable.mean_over_seeds.AUROC_margin_correct",
+    "extra/ml1m.json:status.items_2_to_7"
    ]
   },
   {
@@ -990,7 +1345,282 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 212,
+   "line": 132,
+   "slot": "ext:E\\_W.P1\\_wu.reading\\_P1",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "seeds positive; within-user reading",
+   "text": "robust (exploratory)",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_W.P1_wu.reading_P1.reading",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.002}}",
+   "from": [
+    "extra/ml1m.json:E_F.ZS",
+    "extra/ml1m.json:E_F.ZS.G_LLM_given_CF",
+    "extra/ml1m.json:E_F.ZS.G_LLM_given_CF.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.004{\\scriptsize$\\pm$.005\\,(.000)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_F.FT",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF.per_model",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF.per_model.s0.est",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF.per_model.s1.est",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF.per_model.s2.est",
+    "extra/ml1m.json:E_F.FT.G_LLM_given_CF.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.037{\\scriptsize$\\pm$.013}}",
+   "from": [
+    "extra/ml1m.json:E_F.ZS",
+    "extra/ml1m.json:E_F.ZS.G_CF_given_LLM",
+    "extra/ml1m.json:E_F.ZS.G_CF_given_LLM.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.032{\\scriptsize$\\pm$.012\\,(.001)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_F.FT",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM.per_model",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM.per_model.s0.est",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM.per_model.s1.est",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM.per_model.s2.est",
+    "extra/ml1m.json:E_F.FT.G_CF_given_LLM.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.000}{\\scriptsize\\,(descriptive)}}",
+   "from": [
+    "extra/ml1m.json:E_H.ZS",
+    "extra/ml1m.json:E_H.ZS.strata.sparse.G_prior",
+    "extra/ml1m.json:E_H.ZS.strata.sparse.G_prior.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.000\\,(.000)}{\\scriptsize\\,(descriptive)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_H.FT",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior.per_model",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior.per_model.s0.est",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior.per_model.s1.est",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior.per_model.s2.est",
+    "extra/ml1m.json:E_H.FT.strata.sparse.G_prior.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{$-$0.001{\\scriptsize$\\pm$.001}}",
+   "from": [
+    "extra/ml1m.json:E_H.ZS",
+    "extra/ml1m.json:E_H.ZS.strata.dense.G_prior",
+    "extra/ml1m.json:E_H.ZS.strata.dense.G_prior.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.002\\,(.000)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_H.FT",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior.per_model",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior.per_model.s0.est",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior.per_model.s1.est",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior.per_model.s2.est",
+    "extra/ml1m.json:E_H.FT.strata.dense.G_prior.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.002{\\scriptsize$\\pm$.017}{\\scriptsize\\,(descriptive)}}",
+   "from": [
+    "extra/ml1m.json:E_H.ZS",
+    "extra/ml1m.json:E_H.ZS.strata.unseen.G_prior",
+    "extra/ml1m.json:E_H.ZS.strata.unseen.G_prior.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.054{\\scriptsize$\\pm$.076\\,(.014)}{\\scriptsize\\,(descriptive)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_H.FT",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior.per_model",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior.per_model.s0.est",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior.per_model.s1.est",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior.per_model.s2.est",
+    "extra/ml1m.json:E_H.FT.strata.unseen.G_prior.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.001}}",
+   "from": [
+    "extra/ml1m.json:E_H.ZS",
+    "extra/ml1m.json:E_H.ZS.strata.seen.G_prior",
+    "extra/ml1m.json:E_H.ZS.strata.seen.G_prior.per_model.zeroshot",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "\\textit{0.000{\\scriptsize$\\pm$.002\\,(.000)}}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ml1m.json:E_H.FT",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior.per_model",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior.per_model.s0.est",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior.per_model.s1.est",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior.per_model.s2.est",
+    "extra/ml1m.json:E_H.FT.strata.seen.G_prior.mean_over_seeds",
+    "extra/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 216,
    "slot": "aud:B.pool\\_head\\_share",
    "kind": "table",
    "table": "tab:exposure",
@@ -1004,7 +1634,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 212,
+   "line": 216,
    "slot": "aud:B.pool\\_head\\_share",
    "kind": "table",
    "table": "tab:exposure",
@@ -1018,7 +1648,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 212,
+   "line": 216,
    "slot": "aud:B.pool\\_tail\\_share",
    "kind": "table",
    "table": "tab:exposure",
@@ -1032,7 +1662,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 212,
+   "line": 216,
    "slot": "aud:B.pool\\_tail\\_share",
    "kind": "table",
    "table": "tab:exposure",
@@ -1046,7 +1676,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1060,7 +1690,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1074,7 +1704,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1088,7 +1718,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1102,7 +1732,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1116,7 +1746,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 213,
+   "line": 217,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1130,7 +1760,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1144,7 +1774,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1158,7 +1788,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1172,7 +1802,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1186,7 +1816,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1200,7 +1830,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 214,
+   "line": 218,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1214,7 +1844,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1228,7 +1858,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.delta\\_head",
    "kind": "table",
    "table": "tab:exposure",
@@ -1242,7 +1872,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1256,7 +1886,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.gini\\_exposure",
    "kind": "table",
    "table": "tab:exposure",
@@ -1270,7 +1900,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1284,7 +1914,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 215,
+   "line": 219,
    "slot": "aud:B.tail\\_share\\_top10",
    "kind": "table",
    "table": "tab:exposure",
@@ -1298,7 +1928,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.delta\\_head, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1319,7 +1949,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.delta\\_head, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1340,7 +1970,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.gini\\_exposure, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1361,7 +1991,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.gini\\_exposure, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1382,7 +2012,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.tail\\_share\\_top10, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1403,7 +2033,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 216,
+   "line": 220,
    "slot": "aud:B.tail\\_share\\_top10, min of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1424,7 +2054,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.delta\\_head, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1445,7 +2075,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.delta\\_head, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1466,7 +2096,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.gini\\_exposure, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1487,7 +2117,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.gini\\_exposure, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1508,7 +2138,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.tail\\_share\\_top10, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1529,7 +2159,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 217,
+   "line": 221,
    "slot": "aud:B.tail\\_share\\_top10, median of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1550,7 +2180,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.delta\\_head, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1571,7 +2201,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.delta\\_head, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1592,7 +2222,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.gini\\_exposure, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1613,7 +2243,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.gini\\_exposure, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1634,7 +2264,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.tail\\_share\\_top10, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1655,7 +2285,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 218,
+   "line": 222,
    "slot": "aud:B.tail\\_share\\_top10, max of 8",
    "kind": "table",
    "table": "tab:exposure",
@@ -1676,7 +2306,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 277,
+   "line": 281,
    "slot": "aud:temperature.T",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1690,7 +2320,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 277,
+   "line": 281,
    "slot": "aud:temperature.T",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1704,7 +2334,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 278,
+   "line": 282,
    "slot": "aud:C.ece",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1718,7 +2348,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 278,
+   "line": 282,
    "slot": "aud:C.ece",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1732,7 +2362,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 279,
+   "line": 283,
    "slot": "aud:C.brier",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1746,7 +2376,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 279,
+   "line": 283,
    "slot": "aud:C.brier",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1760,7 +2390,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 280,
+   "line": 284,
    "slot": "aud:C.unsure\\_correct\\_rate",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1774,7 +2404,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 280,
+   "line": 284,
    "slot": "aud:C.unsure\\_correct\\_rate",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1788,7 +2418,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 281,
+   "line": 285,
    "slot": "aud:C.tertile2\\_accuracy",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1802,7 +2432,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 281,
+   "line": 285,
    "slot": "aud:C.tertile2\\_accuracy",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1816,7 +2446,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 282,
+   "line": 286,
    "slot": "aud:C.share\\_errors\\_in\\_top\\_tertile",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1830,7 +2460,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 282,
+   "line": 286,
    "slot": "aud:C.share\\_errors\\_in\\_top\\_tertile",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1844,7 +2474,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 283,
+   "line": 287,
    "slot": "aud:C.auroc\\_p\\_max\\_top1",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1858,7 +2488,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 283,
+   "line": 287,
    "slot": "aud:C.auroc\\_p\\_max\\_top1",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1872,7 +2502,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 284,
+   "line": 288,
    "slot": "aud:C.pointwise.pooled\\_auroc",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1886,7 +2516,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 284,
+   "line": 288,
    "slot": "aud:C.pointwise.pooled\\_auroc",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1900,7 +2530,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 285,
+   "line": 289,
    "slot": "aud:C.pointwise.uauc",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1914,7 +2544,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 285,
+   "line": 289,
    "slot": "aud:C.pointwise.uauc",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1928,7 +2558,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 286,
+   "line": 290,
    "slot": "aud:A.ranking.ndcg10",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1942,7 +2572,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 286,
+   "line": 290,
    "slot": "aud:A.ranking.ndcg10",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1956,7 +2586,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 289,
+   "line": 293,
    "slot": "aud:E.head\\_minus\\_tail\\_mean\\_p",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1970,7 +2600,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 289,
+   "line": 293,
    "slot": "aud:E.head\\_minus\\_tail\\_mean\\_p",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1984,7 +2614,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 290,
+   "line": 294,
    "slot": "aud:E.bias\\_index.head\\_minus\\_tail",
    "kind": "table",
    "table": "tab:anatomy",
@@ -1998,7 +2628,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 290,
+   "line": 294,
    "slot": "aud:E.bias\\_index.head\\_minus\\_tail",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2012,7 +2642,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 291,
+   "line": 295,
    "slot": "aud:E.top1\\_head\\_fraction",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2026,7 +2656,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 291,
+   "line": 295,
    "slot": "aud:E.top1\\_head\\_fraction",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2040,7 +2670,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 294,
+   "line": 298,
    "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2054,7 +2684,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 294,
+   "line": 298,
    "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2068,7 +2698,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 295,
+   "line": 299,
    "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2082,7 +2712,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 295,
+   "line": 299,
    "slot": "aud:D.gain\\_at\\_50\\_vs\\_full",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2096,7 +2726,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 296,
+   "line": 300,
    "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2110,7 +2740,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 296,
+   "line": 300,
    "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2124,7 +2754,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 297,
+   "line": 301,
    "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2138,7 +2768,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 297,
+   "line": 301,
    "slot": "aud:D.niche\\_minus\\_mainstream\\_served\\_share",
    "kind": "table",
    "table": "tab:anatomy",
@@ -2152,7 +2782,7 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 342,
+   "line": 346,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_popularity, UAUC\\_mf\\_temporal",
    "kind": "table",
    "table": "tab:pruning",
@@ -2171,7 +2801,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 26,
+   "line": 28,
    "slot": "gate:UAUC",
    "kind": "prose",
    "table": null,
@@ -2187,7 +2817,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 27,
+   "line": 29,
    "slot": "gft:UAUC\\_post\\_T\\_mean\\_over\\_seeds",
    "kind": "prose",
    "table": null,
@@ -2247,7 +2877,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 86,
+   "line": 88,
    "slot": "grid:UAUC; cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
    "kind": "table",
    "table": "tab:corrections",
@@ -2264,7 +2894,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 87,
+   "line": 89,
    "slot": "corr:max\\_abs\\_dAUC\\_user",
    "kind": "table",
    "table": "tab:corrections",
@@ -2279,7 +2909,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 88,
+   "line": 90,
    "slot": "corr:dAUC\\_pooled\\_offset\\_removal",
    "kind": "table",
    "table": "tab:corrections",
@@ -2294,7 +2924,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 89,
+   "line": 91,
    "slot": "corr:dUAUC\\_nohist\\_minus\\_raw",
    "kind": "table",
    "table": "tab:corrections",
@@ -2309,7 +2939,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 90,
+   "line": 92,
    "slot": "corr:dUAUC\\_evidence\\_minus\\_raw",
    "kind": "table",
    "table": "tab:corrections",
@@ -2324,7 +2954,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 112,
+   "line": 114,
    "slot": "grid:UAUC",
    "kind": "table",
    "table": "tab:slot",
@@ -2346,7 +2976,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 117,
+   "line": 119,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
    "kind": "table",
    "table": "tab:slot",
@@ -2364,7 +2994,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC seed 0",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2382,7 +3012,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC seed 1",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2400,7 +3030,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC seed 2",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2418,7 +3048,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC\\_all\\_rows seed 0",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2436,7 +3066,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC\\_all\\_rows seed 1",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2454,7 +3084,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "grid:UAUC\\_all\\_rows seed 2",
    "kind": "table",
    "table": "tab:app-seeds",
@@ -2472,7 +3102,7 @@
   },
   {
    "file": "sections/appendix.tex",
-   "line": 175,
+   "line": 177,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior",
    "kind": "table",
    "table": "tab:app-seeds",

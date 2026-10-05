@@ -67,6 +67,72 @@ paths of the data map (alias `ext`). (3) `CITATION_MAP.md` (not part of the pape
 in two headers: strip them before any source upload. (4) The title is three lines long; "... Item Priors, Personal Evidence and
 Actionable Uncertainty" would fit two (the authors' decision).
 
+## 0b. Editor pass 2 (2026-10-05; the ext slots against the real schema, the FT-Q control, the page budget)
+
+Scope: every `ext:` slot written against the real schema of `src/confrec/ftgrid_extra.py` (sha1 8d0e5d86 during this pass; the
+summary's structure as `tests/test_confrec_ftgrid_extra.py` builds it) and the real ML-1M file `docs/sigir/results/extra/ml1m.json`
+(exploratory, addendum 6); the FT-Q control of addendum 8; rows 19-20 of the deviations record; the page budget. No Toys, Video
+Games or Sports result was read (none is pulled locally) and nothing was pulled.
+
+**Pages before the references** (the same tool, sha1 51c3cfaf, and the same synthetic sets as pass 1): 8.90 at the end of pass 1
+(8.91 typical); 9.17 once the pass-2 content was in (FT-Q rows and text, deviations rows 19-20, the limitation); 8.85 after the trims
+below (8.86 typical; 8.81 with synthetic extra-analysis files, built by the test module's `ext_synthetic_files` and summarized by
+`ftgrid_extra` itself, whose prose slots carry the handlers' real text instead of 30-word fillers). LaTeX errors 0, undefined
+references 0.
+
+**What changed.**
+- tab:teaches block C: FT-C is the ML-1M LoRA cell only ("Toys is added to FT-C" is gone, addendum 8); FT-Q rows "$R_Q$ / reading"
+  and "UAUC of $q_0$ / $q_1$ / $m$" (addendum 8's descriptive companion) in the LoRA cells of the four panels.
+- 6.2 names the two item-only controls with a pointer to Section 5 and carries one slot for summarize's addendum-8 wording with the
+  labels per control and dataset; the E-F, E-H, E-J and robust-reading counts of 6.1/6.2 are filled from `extra/summary.json`.
+- Section 5: FT-C (ML-1M only, and why) and FT-Q (positive for the round(beta n) TRAIN examples with the largest m; no label of the
+  example itself, no user information, nothing after T_d), and the retention R / R_Q with its reading.
+- Section 4: tab:rq RQ4 cells (FT-C, FT-Q retention; "teaches the item" needs FT-C (ML-1M) and FT-Q (each dataset run)
+  ITEM_DRIVEN); the registration paragraph's "two later addenda", wrong once addendum 8 exists, became "later addenda ... the
+  item-only teacher".
+- Introduction C1, findings slot (ii), abstract slot 2 and the conclusion slot name the item-only controls; limitations: the controls
+  are partial (the permutation informs on ML-1M only, 97.7% of its TRAIN examples in repeated items, from addendum 8's table; the
+  FT-Q teacher departs from the real labels, so a high R_Q shows what an item-level target can teach).
+- Appendix: tab:deviations rows 19-20 (condensed from DEVIATIONS.md); the amendments paragraph names addendum 8; the reproducibility
+  checklist gives the FT-Q seeds.
+
+**Trims for the page budget** (the guide and the three findings tables keep every row): the FT-C/FT-Q definitions live in Section 5
+only (6.2 points there; the tie rule of the teacher is left to addendum 8); limitations without the item-mean sentence (stated in
+Section 4 and deviation row 16); shorter captions of tab:rq (no estimator pointer), tab:tracks (the popularity-link definition is in
+Section 5), tab:teaches, tab:deviations, tab:corrections ("after GATE_PASS" dropped), tab:app-llama and tab:app-z2; shorter tab:rq
+cells (RQ4; RQ5 "every Qwen model ... is POSITIVE and Llama on Toys agrees"; RQ6 "arms match classes, not items (diagnostics; after a
+win, an item-stratified arm)"); the wording-flag sentence of 6.1 condensed; deviation rows 1, 6, 9, 10, 17, 19 and 20 condensed; the
+amendments paragraph condensed (the content of A1 and A2 stays in Section 4); the knockout paragraph condensed (the logit-scale
+clause is in the limitations); the reproducibility checklist without "every number ... committed result file" (stated at the head of
+Section 6).
+
+**fill_paper.py** (sha1 d4948d21be28deefa22402bb42ee583c0bc8582f). The ext section replaces the placeholder (`EXT_DETAIL` removed):
+per-regime cells, the matched-mean span, item shares, G_CF,wu, P1_wu, the deployable rows, FT-C (ML-1M) and FT-Q cells, and seven
+prose handlers (`c_ext_ej`, `c_ext_robust`, `p_ext_p1_reading`, `c_ext_ft_wording`, `c_ext_ef`, `c_ext_eh("ZS")`, `c_ext_eh("FT")`).
+Italics come from the file's `status.items_2_to_7`; a block the file marks unavailable stays red with the file's reason; counts are
+summarize's confirmations only, with the sign of each confirmed H-J member as found and recorded cuts (`not_run`) named; the wording
+is never decided on an incomplete `ft_wording`. New consistency check: every summarize input present locally has the sha1 summarize
+recorded (prose counts and table cells from one build). No existing decision function changed.
+
+**Tests** (41, all pass, about 1.5 minutes): the ext slots stay red with the file they need while no extra file exists (157 slots);
+the real ML-1M file fills the ML-1M columns (italics), the P1 reading, and keeps the FT-C cell red with the file's own reason;
+synthetic files of the real schema (copies of the real file, summarized by `ftgrid_extra.summarize`) fill the Amazon, Llama, FT-C and
+FT-Q cells and every count and wording branch (H-F 1 of 3; H-S per regime with the min-n note; H-J with both signs; robust and
+estimator-dependent readings; mixed, item, not-supported, incomplete and not-requested wording; a recorded cut; an empty and a missing
+regime; FAILED_INTEGRITY, incomplete_regime, R not defined; the sha1 check); the deviations table keeps the record's 20 rows; the
+pull script pulls every extra file to the path the fill reads.
+
+**Open for the main session.** (1) Record the sha1 of the edited `fill_paper.py` (above) in PILOT_LOG before any further result file
+is pulled (A3-6 section 9.3). (2) The real `extra/ml1m.json` was built by `ftgrid_extra.py` 70684526; the module is now 8d0e5d86 and
+`summarize` refuses a file built by another version, so ML-1M must be rebuilt by the final module, with `--pilot_log` once the A3-6
+item 11 sha1s are recorded (its `FT_C_reading` reads "record missing" now, so the FT-C cell and the wording stay red). (3) The
+agreement of the FT-Q teacher with the real labels (66-72% in this pass's brief) is in no registered document or result file, so the
+paper does not state it; record it (e.g. from the teacher panel's manifest) if it should be printed. (4) A cut FT-Q dataset has no
+file: its cells stay red (`result_file_missing`) until the main session decides how a cut FT-Q run is marked. (5) The TeX sources,
+`fill_paper.py` and the test file are LF: a Python `write_text` on Windows writes CRLF and breaks the unfilled-report test
+(multi-line slot texts); it happened once in this pass and was reverted. (6) The pass-1 paragraph of PAPER_DATA_MAP.md section 5
+carried five control characters from a PowerShell backtick escape; repaired.
+
 # Integration notes (text integrator, 2026-10-04)
 
 Scope: alignment with the binding texts, page budget, consistency audit, citations, compile check. No result slot was filled and

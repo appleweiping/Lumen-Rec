@@ -21,7 +21,7 @@
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 277,
+     "line": 281,
      "table": "tab:anatomy",
      "row": "Temperature $T$",
      "column": 1,
@@ -31,7 +31,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 277,
+     "line": 281,
      "table": "tab:anatomy",
      "row": "Temperature $T$",
      "column": 2,
@@ -66,7 +66,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 68,
+     "line": 67,
      "table": "tab:gate-outcomes",
      "row": "G6 CONFIRM: ML-1M UAUC ($\\ge0.60$)",
      "column": 2,
@@ -76,7 +76,7 @@
     },
     {
      "file": "sections/conclusion.tex",
-     "line": 26,
+     "line": 28,
      "table": null,
      "row": null,
      "column": null,
@@ -119,7 +119,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 54,
+     "line": 53,
      "table": "tab:gate-outcomes",
      "row": null,
      "column": null,
@@ -152,7 +152,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 68,
+     "line": 67,
      "table": "tab:gate-outcomes",
      "row": "G6 CONFIRM: ML-1M UAUC ($\\ge0.60$)",
      "column": 1,
@@ -187,7 +187,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 342,
+     "line": 346,
      "table": "tab:pruning",
      "row": "Item mean, popularity, MF (ref.)",
      "column": 1,
@@ -197,7 +197,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 86,
+     "line": 88,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -207,7 +207,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 117,
+     "line": 119,
      "table": "tab:slot",
      "row": "Item mean / MF (ref.)",
      "column": 1,
@@ -243,7 +243,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 342,
+     "line": 346,
      "table": "tab:pruning",
      "row": "Item mean, popularity, MF (ref.)",
      "column": 1,
@@ -253,7 +253,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 86,
+     "line": 88,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -263,7 +263,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 117,
+     "line": 119,
      "table": "tab:slot",
      "row": "Item mean / MF (ref.)",
      "column": 1,
@@ -273,7 +273,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 175,
+     "line": 177,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 3,
@@ -309,7 +309,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 70,
+     "line": 69,
      "table": "tab:gate-outcomes",
      "row": "G9 Gate-FT: mean ($\\ge0.65$)",
      "column": 2,
@@ -329,7 +329,7 @@
     },
     {
      "file": "sections/conclusion.tex",
-     "line": 27,
+     "line": 29,
      "table": null,
      "row": null,
      "column": null,
@@ -339,7 +339,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 112,
+     "line": 114,
      "table": "tab:slot",
      "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
      "column": 1,
@@ -373,7 +373,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 69,
+     "line": 68,
      "table": "tab:gate-outcomes",
      "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
@@ -383,7 +383,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 175,
+     "line": 177,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -417,7 +417,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 69,
+     "line": 68,
      "table": "tab:gate-outcomes",
      "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
@@ -427,7 +427,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 175,
+     "line": 177,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -461,7 +461,7 @@
     },
     {
      "file": "sections/observation.tex",
-     "line": 69,
+     "line": 68,
      "table": "tab:gate-outcomes",
      "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
@@ -471,7 +471,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 175,
+     "line": 177,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -515,7 +515,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 86,
+     "line": 88,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -571,7 +571,7 @@
    "occurrences": [
     {
      "file": "sections/observation.tex",
-     "line": 66,
+     "line": 65,
      "table": "tab:gate-outcomes",
      "row": "G5 DEV: ML-1M UAUC (bound $>0$)",
      "column": 2,

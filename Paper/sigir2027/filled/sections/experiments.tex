@@ -47,9 +47,10 @@
 %   aud2q, aud2l  the same audit on TEST events 1,001-3,000 (Z2): Qwen3-8B restricted, and Llama-3.1-8B-Instruct.
 %   grid  rated-grid report per domain and backbone (E-A..E-E, P1, FT_C, knockout); cpu, ko and corr are fields of it (the
 %         non-LLM references, the knockout block, the invariance checks and corrections).
-%   ext   the addendum-6 analysis per domain and backbone (registered_pooled, E_W, E_F, E_G, E_H, E_J, E_Cprime, FT_C_reading) and
-%         its cross-domain summary (Holm families E-F, E-H, E-J). Every ext slot is red until that file exists; pass 2 of the
-%         editing specifies it against the file's schema.
+%   ext   the addendum-6 analysis (src/confrec/ftgrid_extra.py): per domain extra/<d>.json (Qwen main root; blocks registered_pooled,
+%         E_W, E_F, E_G, E_H, E_J, E_Cprime, FT_C_reading = FT-C on ML-1M), extra/llama/<d>.json (Llama root), extra/ftq/<d>.json
+%         (the FT-Q teacher root of addendum 8: FT_C_reading = FT-Q) and extra/summary.json (Holm families E-F, E-H, E-J, the robust
+%         readings, the addendum-8 wording ft_wording). ML-1M values of items 2-7 are exploratory (status.items_2_to_7; set in italics).
 %   prn   pruning analysis (arms P0-P3, seeds 0-4, contrasts, claim label); slot  method-slot reports; mir  stage-3 decision.
 % =====================================================================================================================
 \section{Findings}
@@ -59,9 +60,8 @@
 % take the top of the next page and none is still deferred when the appendix floats are defined.
 \begin{table*}[tp]
 \caption{What the confidence tracks: rated panels, Qwen3-8B (Llama: Table~\ref{tab:app-llama}); ZS: zero-shot; LoRA: seed mean
-(s.d.); $m$: item mean, $m_T$: information-matched item mean; $^\dagger$: addendum 6 (ML-1M exploratory, Amazon registered
-outcome-free). Popularity link: partial Spearman with log popularity given $m$. P1: LoRA minus zero-shot $\mathcal G$ (seeds 0 / 1 / 2;
-mean, $p$). Estimators: Section~\ref{sec:tools}.}
+(s.d.); $m$: item mean, $m_T$: information-matched item mean; $^\dagger$: addendum 6 (Amazon: registered outcome-free; ML-1M, in
+italics: exploratory). P1: LoRA minus zero-shot $\mathcal G$ (seeds 0 / 1 / 2; mean, $p$). Estimators: Section~\ref{sec:tools}.}
 \label{tab:tracks}
 \centering\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{0.9}
 % COLUMNS: ML-1M, Toys, Video Games, Sports x {ZS, LoRA}; EVAL users of each panel, TEST rows (block B: S_d, here all TEST users
@@ -82,35 +82,35 @@ mean, $p$). Estimators: Section~\ref{sec:tools}.}
 UAUC of $\ell$ & 0.596{\scriptsize$\pm$.022} & 0.742{\scriptsize$\pm$.019\,(.002)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
 \quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{0.147{\scriptsize$\pm$.022\,(.002)}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
 \quad item mean $m$ (ref.) & \multicolumn{2}{c}{0.759{\scriptsize$\pm$.021}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
-\quad matched mean $m_T$ (ref.)$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}}\\
+\quad matched mean $m_T$ (ref.)$^\dagger$ & \multicolumn{2}{c}{\textit{0.756}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_J.UAUC\_q\_hat\_T}}\\
 \quad temporal MF (ref.) & \multicolumn{2}{c}{0.791{\scriptsize$\pm$.018}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
-$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
-$\Delta$UAUC($\ell-$MF), warm$^\dagger$ & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf}\\
+$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \textit{$-$0.163{\scriptsize$\pm$.026}} & \textit{$-$0.016{\scriptsize$\pm$.013\,(.002)}} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
+$\Delta$UAUC($\ell-$MF), warm$^\dagger$ & \textit{$-$0.195{\scriptsize$\pm$.027}} & \textit{$-$0.048{\scriptsize$\pm$.017\,(.002)}} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_mf}\\
 Users: TEST / $S_d$ & \multicolumn{2}{c}{366 / 366} & \multicolumn{2}{c}{943 / 943} & \multicolumn{2}{c}{820 / 820} & \multicolumn{2}{c}{997 / 997}\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{B. What the confidence is made of, and the information it adds ($S_d$)}}\\
 Reliability $r_8$ of $\hat\pi$ & 0.773{\scriptsize$\pm$.012} & 0.969{\scriptsize$\pm$.002\,(.002)} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c} & \DATANEEDED{grid:r8c}\\
 Item-prior share $\rho^2/r_8$ & 0.393{\scriptsize$\pm$.063} & 0.902{\scriptsize$\pm$.012\,(.001)} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share}\\
-e-share$^\dagger$ & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
-Item share of MF / label$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}}\\
+e-share$^\dagger$ & \textit{0.616{\scriptsize$\pm$.069}} & \textit{0.098{\scriptsize$\pm$.012\,(.001)}} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
+Item share of MF / label$^\dagger$ & \multicolumn{2}{c}{\textit{0.615{\scriptsize$\pm$.033}} / \textit{0.213{\scriptsize$\pm$.026}}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}} & \multicolumn{2}{c}{\DATANEEDED{ext:E\_G.item\_share\_mf} / \DATANEEDED{ext:E\_G.item\_share\_label}}\\
 $\mathcal G=\Delta$UAUC(M2$-$M1), E-D & $-$0.002{\scriptsize$\pm$.006} & 0.010{\scriptsize$\pm$.007\,(.001)} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
-$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
-$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{0.036{\scriptsize$\pm$.013} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
+$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \textit{0.000{\scriptsize$\pm$.003}} & \textit{0.009{\scriptsize$\pm$.007\,(.001)}} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
+$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{0.036{\scriptsize$\pm$.013} / \textit{0.037{\scriptsize$\pm$.013}}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
 \quad MF personal residual (ref.) & \multicolumn{2}{c}{0.653{\scriptsize$\pm$.022}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_personal\_residual}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_personal\_residual}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_personal\_residual}}\\
 Star permutation $\Delta$UAUC & 0.011{\scriptsize$\pm$.008} & 0.009{\scriptsize$\pm$.006\,(.002)} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC}\\
 Popularity link of $\hat\pi$ & 0.368{\scriptsize$\pm$.040} & 0.125{\scriptsize$\pm$.048\,(.032)} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
 Popularity link of $\ell$ & 0.266{\scriptsize$\pm$.040} & 0.148{\scriptsize$\pm$.046\,(.021)} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop} & \DATANEEDED{grid:partial\_rho\_L\_logpop}\\
 P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{0.010 / 0.011 / 0.013; 0.011{\scriptsize$\pm$.008}, $p$ 0.004} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--}\\
-P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{ext:E\_W.P1\_wu}} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--}\\
+P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\textit{0.007 / 0.010 / 0.010; 0.009{\scriptsize$\pm$.006}, $p$ 0.002}} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--} & \multicolumn{2}{c}{--}\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{C. Calibration and error anatomy of the per-user top-$k_u$ decision (TEST rows)}}\\
 ECE (after Platt) & 0.020{\scriptsize$\pm$.012} & 0.026{\scriptsize$\pm$.009\,(.002)} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
 Correct in bottom tertile, oracle & 0.276{\scriptsize$\pm$.009} & 0.264{\scriptsize$\pm$.006\,(.006)} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
-\quad deployable$^\dagger$ & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom}\\
+\quad deployable$^\dagger$ & \textit{0.294{\scriptsize$\pm$.010}} & \textit{0.274{\scriptsize$\pm$.006\,(.002)}} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom} & \DATANEEDED{ext:E\_Cprime.share\_correct\_bottom}\\
 Errors in top tertile, oracle & 0.214{\scriptsize$\pm$.018} & 0.133{\scriptsize$\pm$.015\,(.006)} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
-\quad deployable$^\dagger$ & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top}\\
+\quad deployable$^\dagger$ & \textit{0.267{\scriptsize$\pm$.016}} & \textit{0.204{\scriptsize$\pm$.015\,(.008)}} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top} & \DATANEEDED{ext:E\_Cprime.share\_errors\_top}\\
 Margin AUROC, oracle & 0.633{\scriptsize$\pm$.017} & 0.706{\scriptsize$\pm$.014\,(.008)} & \DATANEEDED{grid:auroc\_margin\_correct} & \DATANEEDED{grid:auroc\_margin\_correct} & \DATANEEDED{grid:auroc\_margin\_correct} & \DATANEEDED{grid:auroc\_margin\_correct} & \DATANEEDED{grid:auroc\_margin\_correct} & \DATANEEDED{grid:auroc\_margin\_correct}\\
-\quad deployable$^\dagger$ & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin}\\
+\quad deployable$^\dagger$ & \textit{0.579{\scriptsize$\pm$.016}} & \textit{0.643{\scriptsize$\pm$.013\,(.003)}} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin} & \DATANEEDED{ext:E\_Cprime.AUROC\_margin}\\
 \bottomrule
 \end{tabular}}
 \end{table*}
@@ -123,27 +123,30 @@ where a registered test decides it, and registered outputs that no table shows a
 \subsection{What the confidence tracks}\label{sec:exp-tracks}\label{sec:exp-rq4}
 Table~\ref{tab:tracks}A sets every LLM UAUC beside the item mean, the information-matched item mean and MF on the same rows.
 Fine-tuning \DATANEEDED{raises / leaves / lowers} UAUC (E-B, confirmed on \DATANEEDED{grid:E\_B confirmed, k of 4} Qwen panels), and
-in the fine-tuned regime the UAUC of $\ell$ differs from that of the item mean (H-J) on \DATANEEDED{ext:E\_J.H\_J\_count}.
+in the fine-tuned regime the UAUC of $\ell$ differs from that of the item mean (H-J) on \DATANEEDED{ext:summary.families.E\_J count}.
 Table~\ref{tab:tracks}B gives the share of the within-user variance of the confidence that the item prior explains (the non-prior
 share is its complement), beside the e-share and the item shares of MF and of the labels. The personal information gain
 $\mathcal G$ is confirmed (E-D) on \DATANEEDED{grid:G confirmed, k of 4 zero-shot} zero-shot and \DATANEEDED{grid:G confirmed, k of 4
 LoRA} fine-tuned panels, beside the CF reference gain $\mathcal G_{\rm CF}$, and the within-user estimator finds it
-\DATANEEDED{ext:E\_W.robust\_count}. P1 holds (mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$
-0.011$\pm$.008, $p$ 0.004; 3 of 3 seeds positive; within-user P1$_{\rm wu}$ \DATANEEDED{ext:E\_W.P1\_wu\_verdict}), so
+\DATANEEDED{ext:summary.robust\_readings count}. P1 holds (mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$
+0.011$\pm$.008, $p$ 0.004; 3 of 3 seeds positive; within-user reading robust (exploratory)), so
 \DATANEEDED{branch: supervision raises the personal information gain / there is no evidence that supervision adds personal evidence}.
-The wording flags apply: shares are uninterpretable if $r_8<0.7$, $\mathcal G/\mathcal G_{\rm CF}$ is reported only if the interval of
-$\mathcal G_{\rm CF}$ excludes 0, and an MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of
-consumed-item panels.
+Wording flags: shares need $r_8\ge0.7$, $\mathcal G/\mathcal G_{\rm CF}$ needs an interval of $\mathcal G_{\rm CF}$ excluding 0, and an
+MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of consumed-item panels.
 
 % BRANCH-GATEFT-BEGIN (tab:teaches: E-F, E-H, FT-C and the knockout belong to the fine-tuned programme, recorded GATE_FT_PASS)
 \begin{table*}[tp]
 \caption{What fine-tuning teaches: rated panels, Qwen3-8B; ZS: zero-shot; LoRA: seed mean (s.d.; knockout labels: seeds 0 / 1 / 2);
-$^\dagger$ as in Table~\ref{tab:tracks}; ML-1M has no store field (no knockout).}
+$^\dagger$ as in Table~\ref{tab:tracks}. C: LoRA gain retained under the item-only controls (registered, outcome-free). ML-1M has
+no store field.}
 \label{tab:teaches}
 \centering\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{0.9}
 % COLUMNS as tab:tracks. Block A (alias ext, E_F with E-W's within-user stackers): G_LLM_given_CF = dUAUC(M4 - M3), G_CF_given_LLM =
 % dUAUC(M4 - M2). Block B (ext, E_H): G_prior = dUAUC(M1 - M0) on the sparse / dense / unseen / seen TEST rows (minimum-n rule per
-% stratum). Block C (ext, FT_C_reading): retention R with its interval and the reading label, LoRA columns of ML-1M and Toys only.
+% stratum). Block C: FT-C (ext, extra/ml1m.json FT_C_reading, control FT-C; ML-1M only: addendum 8 withdrew the Toys run) and FT-Q
+% (ext, extra/ftq/<d>.json FT_C_reading, control FT-Q; addendum 8): retention R / R_Q with its interval and the reading label in one
+% cell (as FT-C), and the UAUC of the teacher adapters q_0, q_1 beside the item mean on the same rows (addendum 8's descriptive
+% companion); LoRA columns only.
 % Block D (alias ko, the knockout block of the grid report; the former tab:popularity): head-minus-tail drop of l (pseudonym),
 % placebo drop, tail dUAUC, registered label of decide() verbatim (AMBIGUOUS written INDETERMINATE, UNDETERMINED written
 % INCOMPLETE); LoRA cells: mean of the three seeds with their s.d. (no interval for that mean), label "s0 / s1 / s2".
@@ -155,18 +158,19 @@ $^\dagger$ as in Table~\ref{tab:tracks}; ML-1M has no store field (no knockout).
  & ZS & LoRA & ZS & LoRA & ZS & LoRA & ZS & LoRA\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{A. Complementarity to collaborative filtering (E-F$^\dagger$)}}\\
-$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3) & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF}\\
-$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2) & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM}\\
+$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3) & \textit{0.000{\scriptsize$\pm$.002}} & \textit{0.004{\scriptsize$\pm$.005\,(.000)}} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF} & \DATANEEDED{ext:E\_F.G\_LLM\_given\_CF}\\
+$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2) & \textit{0.037{\scriptsize$\pm$.013}} & \textit{0.032{\scriptsize$\pm$.012\,(.001)}} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM} & \DATANEEDED{ext:E\_F.G\_CF\_given\_LLM}\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{B. Where the item prior adds to the item mean: $\mathcal G_{\rm prior}=\Delta$UAUC(M1$-$M0) by stratum (E-H$^\dagger$)}}\\
-Sparse rows ($m$ from $<5$ ratings) & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior}\\
-Dense rows & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior}\\
-Unseen items (no TRAIN example) & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior}\\
-Seen items & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior}\\
+Sparse rows ($m$ from $<5$ ratings) & \textit{0.000{\scriptsize$\pm$.000}{\scriptsize\,(descriptive)}} & \textit{0.000{\scriptsize$\pm$.000\,(.000)}{\scriptsize\,(descriptive)}} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior} & \DATANEEDED{ext:E\_H.sparse.G\_prior}\\
+Dense rows & \textit{$-$0.001{\scriptsize$\pm$.001}} & \textit{0.000{\scriptsize$\pm$.002\,(.000)}} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G\_prior}\\
+Unseen items (no TRAIN example) & \textit{0.002{\scriptsize$\pm$.017}{\scriptsize\,(descriptive)}} & \textit{0.054{\scriptsize$\pm$.076\,(.014)}{\scriptsize\,(descriptive)}} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior}\\
+Seen items & \textit{0.000{\scriptsize$\pm$.001}} & \textit{0.000{\scriptsize$\pm$.002\,(.000)}} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior}\\
 \midrule
-\multicolumn{9}{@{}l}{\emph{C. Within-item label permutation (FT-C): retention of the regime gain by permuted adapters}}\\
-Retention $R$$^\dagger$ & -- & \DATANEEDED{ext:FT\_C\_reading.R} & -- & \DATANEEDED{ext:FT\_C\_reading.R} & -- & -- & -- & --\\
-Reading$^\dagger$ & -- & \DATANEEDED{ext:FT\_C\_reading.label} & -- & \DATANEEDED{ext:FT\_C\_reading.label} & -- & -- & -- & --\\
+\multicolumn{9}{@{}l}{\emph{C. Retention of the LoRA gain without user--item evidence}}\\
+FT-C (permuted): $R$ / reading & -- & \DATANEEDED{ext:FT\_C\_reading.R} / \DATANEEDED{ext:FT\_C\_reading.label} & -- & -- & -- & -- & -- & --\\
+FT-Q (teacher): $R_Q$ / reading & -- & \DATANEEDED{ext:FT\_Q\_reading.R} / \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.R} / \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.R} / \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.R} / \DATANEEDED{ext:FT\_Q\_reading.label}\\
+\quad UAUC of $q_0$ / $q_1$ / $m$ & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC}\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{D. Store-name knockout (pseudonym arm; placebo: real-store swap)}}\\
 Head $-$ tail drop of $\ell$ & -- & -- & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta}\\
@@ -180,12 +184,12 @@ Registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:label} & \DA
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{What fine-tuning teaches}\label{sec:exp-teach}\label{sec:exp-rq5}
-Table~\ref{tab:teaches} separates what LoRA adds. The within-item label permutation (FT-C) keeps every item's label rate and
-destroys the user--item evidence; by its reading rule \DATANEEDED{ext:FT\_C\_reading.wording}. Beside collaborative filtering, the
-fine-tuned LLM's prior and residual add to an MF stacker ($\mathcal G_{\rm LLM|CF}>0$, H-F) on \DATANEEDED{ext:E\_F.H\_F\_count} Qwen
-Amazon panels, and on sparse rows the item prior adds to the item mean ($\mathcal G_{\rm prior}>0$, H-S) in
-\DATANEEDED{ext:E\_H.H\_S\_count\_ZS} zero-shot and \DATANEEDED{ext:E\_H.H\_S\_count\_FT} fine-tuned panel runs; the other strata
-are descriptive. For store names, the Qwen3-8B knockout is labelled \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} on Toys
+Table~\ref{tab:teaches} separates what LoRA adds. Two item-only controls (Section~\ref{sec:tools}) remove the user--item evidence:
+FT-C on ML-1M and FT-Q. By the wording rule of addendum 8, \DATANEEDED{ext:summary.ft\_wording (the wording it allows, with the labels per control and dataset)}.
+Beside collaborative filtering, the fine-tuned LLM's prior and residual add to an MF stacker ($\mathcal G_{\rm LLM|CF}>0$, H-F) on
+\DATANEEDED{ext:summary.families.E\_F count}, and on sparse rows the item prior adds to the item mean
+($\mathcal G_{\rm prior}>0$, H-S) in \DATANEEDED{ext:summary.families.E\_H count ZS} and \DATANEEDED{ext:summary.families.E\_H count FT};
+the other strata are descriptive. For store names, the Qwen3-8B knockout is labelled \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} on Toys
 and Video Games in every model, so the confidence is called
 \DATANEEDED{branch: familiarity-linked / popularity-linked}; the knockout replaces store names only, and the Llama Toys knockout is in
 Table~\ref{tab:app-llama}. The popularity links (Table~\ref{tab:tracks}B) and the next-item popularity rows (Table~\ref{tab:anatomy}B)

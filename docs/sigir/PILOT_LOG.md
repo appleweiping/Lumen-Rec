@@ -1,5 +1,16 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Wording rules record, update after editor pass 2 (recorded before any Toys, Video_Games, Sports, Llama, FT-C or FT-Q result was pulled or opened)
+
+`scripts/sigir/fill_paper.py` sha1 = d4948d21be28deefa22402bb42ee583c0bc8582f, `docs/sigir/PAPER_DATA_MAP.md` sha1 = cb35d6d4e27d399f133d211a486e3e63c3a7fdb9, `tests/test_confrec_fillpaper.py` sha1 = 856e3bdb1025039b03581d42c3138f070d7df3ad. The previous record is
+eb85eb91ef799ebb26e8f3b7723fd710f099eae4 (public commit 1767783). Changes: the `ext` slots (the extra analyses of addenda 6 and 8) now have specs and handlers
+written against the real ML-1M extra file and a synthetic summary (no Amazon result existed locally); seven prose handlers (`c_ext_*`) turn the Holm families,
+the robust readings and the FT-C / FT-Q wording of `summary.json` into the counts and conditions registered in addendum 6 item 9 and addendum 8 section 2;
+`checks` gained a consistency test (every summarize input present locally must carry the sha1 that summarize recorded); the FT-Q rows were added. A
+mechanical comparison of the 183 top-level definitions of the recorded version with the current one (git blob 1767783) shows that no existing decision
+function changed; the removed definitions are the placeholder section of pass 1 (`EXT_DETAIL`, `EXT_PROSE`, `ext_pending`). The editor read no Toys,
+Video_Games or Sports result and had no server access.
+
 ## 2026-10-05 · Code record: the extra-analysis module (addendum 6 items 2-8, FT-Q reading of addendum 8); recorded before any non-ML-1M statistic was computed
 
 - `src/confrec/ftgrid_extra.py` = 8d0e5d86158b5f61c274d953d75ca63c169d44e5

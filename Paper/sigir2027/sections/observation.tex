@@ -16,8 +16,7 @@
 Three dated, binding amendments with addenda register the audit (Appendix~\ref{app:prereg}), each hashed before the runs it governs
 (Amendment 1 by its commit and pull times): operationalisations before any pilot data, the prompt remedy after the pilot gates, and
 the fine-tuned programme before any adapter existed. The next-item panels were scored under a registered carve-out and analysed by a specification frozen before any audit score
-was analysed. Two later addenda, written after two internal reviews of a draft, add the endpoints marked $^\dagger$ and the wording
-rules below; Appendix~\ref{app:deviations} lists every deviation and post-hoc choice. Quantities computed on design users are
+was analysed. Later addenda add the endpoints marked $^\dagger$, the item-only teacher and the wording rules below; Appendix~\ref{app:deviations} lists every deviation and post-hoc choice. Quantities computed on design users are
 \emph{exploratory}.
 
 \paragraph{Panels, labels and user roles.}
@@ -98,8 +97,8 @@ qualify only with a Llama replication). No re-anchoring, near-miss rule or arm p
 registered branch is INDETERMINATE. Table~\ref{tab:rq} maps S1--S6 to RQ1--RQ6.
 \begin{table*}[tp]
 \caption{Research questions (RQ$k$ answers seed question S$k$) and registered endpoints (Qwen3-8B, both regimes; Llama-3.1-8B
-replication). Rated endpoints use TEST candidates of EVAL users, next-item endpoints TEST events; $p$: list-normalised probability;
-$^\dagger$: addenda 6--8. Estimators: Section~\ref{sec:tools}.}
+replication): rated on TEST candidates of EVAL users, next-item on TEST events; $p$: list-normalised probability; $^\dagger$:
+addenda 6--8.}
 \label{tab:rq}
 \scriptsize
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{0.92}
@@ -109,9 +108,9 @@ RQ & Rated panels & Next-item panels & Rule\\\midrule
 \raggedright RQ1: sure when right? & margin AUROC and AURC for the correctness of the per-user top-$k_u$ decision (oracle; deployable$^\dagger$); correct decisions in the bottom margin tertile & AUROC of $p_{\max}$ for top-1 correctness; accuracy in the bottom and top $p_{\max}$ tertile & next-item: Holm over the four domains\\
 \raggedright RQ2: unsure when wrong? & errors in the top margin tertile & top-1 errors in the top tertile & as RQ1\\
 \raggedright RQ3: over-exposure? & --- & $\Delta_{\rm head}$, Gini, APLT; NDCG@10 gain and niche served share at 50\% coverage vs.\ random & $\Delta_{\rm head}$: one sign, interval excluding 0, in $\ge3$ of 4 domains; static only\\
-\raggedright RQ4: what is tracked? & UAUC beside $m$, $m_T^\dagger$ and MF (E-A, E-J$^\dagger$); regime contrast (E-B); ECE, Platt slope; item-prior share, e-share$^\dagger$; $\mathcal G$ (E-D) and $\mathcal G_{\rm wu}$ (E-W$^\dagger$) beside $\mathcal G_{\rm CF}$; E-F$^\dagger$; strata (E-H$^\dagger$); star permutation; retention under FT-C (ML-1M) and FT-Q$^\dagger$ & per-event AUC; top-label ECE, Brier; NDCG@10 & $r_8<0.7$: shares uninterpretable; P1 (ML-1M): mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}>0$, $p<0.05$, 3/3 seeds, $>2\sigma_{\rm seed}$; H-F, H-S, H-J$^\dagger$; ``teaches the item'' only if FT-C (ML-1M) and FT-Q (every dataset run) read ITEM\_DRIVEN$^\dagger$\\
-\raggedright RQ5: popular, so confident? & popularity link of $\ell$ and $\hat\pi$ given $m$; head--tail Bias Index; store-name knockout & mean $p$, residual $y-p$ and Bias Index by popularity group & knockout POSITIVE: head$-$tail $\Delta_{\rm pseudo}\ge0.20$ (interval above 0), $|\Delta_{\rm placebo}|\le0.05$, $|\Delta$UAUC$_{\rm tail}|\le0.01$; ``familiarity'' only if all Qwen models on Toys and Video Games are POSITIVE and Llama on Toys has the same sign\\
-\raggedright RQ6: does pruning help? & ML-1M TEST UAUC after removing 25\% of each label class at random (P1), uncertainty-selected (P2) or prior-congruent (P3); full data (P0); seeds 0--4 & --- & P2$-$P1 beats iff interval above 0, mean $>2$ SD of paired differences, 5/5 positive; equal iff interval within $\pm0.01$; arms matched per class only, so a win may reflect item composition: diagnostics and, after a win only, an item-stratified arm$^\dagger$\\
+\raggedright RQ4: what is tracked? & UAUC beside $m$, $m_T^\dagger$ and MF (E-A, E-J$^\dagger$); regime contrast (E-B); ECE, Platt slope; item-prior share, e-share$^\dagger$; $\mathcal G$ (E-D) and $\mathcal G_{\rm wu}$ (E-W$^\dagger$) beside $\mathcal G_{\rm CF}$; E-F$^\dagger$; strata (E-H$^\dagger$); star permutation; FT-C, FT-Q retention$^\dagger$ & per-event AUC; top-label ECE, Brier; NDCG@10 & $r_8<0.7$: shares uninterpretable; P1 (ML-1M): mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}>0$, $p<0.05$, 3/3 seeds, $>2\sigma_{\rm seed}$; H-F, H-S, H-J$^\dagger$; ``teaches the item'' needs FT-C (ML-1M) and FT-Q (each dataset run) ITEM\_DRIVEN$^\dagger$\\
+\raggedright RQ5: popular, so confident? & popularity link of $\ell$ and $\hat\pi$ given $m$; head--tail Bias Index; store-name knockout & mean $p$, residual $y-p$ and Bias Index by popularity group & knockout POSITIVE: head$-$tail $\Delta_{\rm pseudo}\ge0.20$ (interval above 0), $|\Delta_{\rm placebo}|\le0.05$, $|\Delta$UAUC$_{\rm tail}|\le0.01$; ``familiarity'' only if every Qwen model on Toys and Video Games is POSITIVE and Llama on Toys agrees\\
+\raggedright RQ6: does pruning help? & ML-1M TEST UAUC after removing 25\% of each label class at random (P1), uncertainty-selected (P2) or prior-congruent (P3); full data (P0); seeds 0--4 & --- & P2$-$P1 beats iff interval above 0, mean $>2$ SD of paired differences, 5/5 positive; equal iff interval within $\pm0.01$; arms match classes, not items (diagnostics; after a win, an item-stratified arm$^\dagger$)\\
 \bottomrule
 \end{tabular}
 \end{table*}

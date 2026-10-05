@@ -32,6 +32,7 @@ PAPER = ROOT / "Paper" / "sigir2027"
 RESULTS = ROOT / "docs" / "sigir" / "results"
 SCRIPT = ROOT / "scripts" / "sigir" / "fill_paper.py"
 PULL = ROOT / "scripts" / "sigir" / "pull_results.ps1"
+EXT_REAL = RESULTS / "extra" / "ml1m.json"           # the REAL ML-1M extra-analysis file (A3-6: exploratory)
 
 
 def _load(name: str, path: Path):
@@ -560,7 +561,7 @@ def real_grid(real, tmp_path_factory):
     shutil.copyfile(RESULTS / "grid/qwen/ml1m.json", res / "grid/qwen/ml1m.json")
     out = base / "filled"
     fill.run(PAPER, res, out)
-    return SimpleNamespace(out=out, doc=json.loads(read(out, "UNFILLED.json")),
+    return SimpleNamespace(res=res, out=out, doc=json.loads(read(out, "UNFILLED.json")),
                            rep=json.loads((res / "grid/qwen/ml1m.json").read_text(encoding="utf-8")), gft=real.j["gft/gate_ft.json"],
                            sel=real.j["sel/selection.json"], gate=real.j["gate/gate.json"])
 
@@ -891,44 +892,461 @@ def test_count_rule_reports_confirmed_members_per_regime(synth, tmp_path):
     assert u and u[0]["reason"] == "not_decided"                        # mixed: no single word
 
 
-EXT_TABLE_SLOTS = {   # alias ext (A3-6; editor pass 2026-10-05): table -> the slot texts that pass 2 specifies against the schema
+# ================================================================================================ alias ext (editor pass 2)
+EXT_TABLE_SLOTS = {   # alias ext (A3-6 items 2-8, addendum 8): table -> slot texts
     "tab:tracks": {"ext:E_J.UAUC_q_hat_T", "ext:E_J.dUAUC_L_minus_q_hat", "ext:E_J.dUAUC_L_minus_mf", "ext:E_G.e_share",
                    "ext:E_G.item_share_mf", "ext:E_G.item_share_label", "ext:E_W.G_wu", "ext:E_W.G_CF_wu", "ext:E_W.P1_wu",
                    "ext:E_Cprime.share_correct_bottom", "ext:E_Cprime.share_errors_top", "ext:E_Cprime.AUROC_margin"},
     "tab:teaches": {"ext:E_F.G_LLM_given_CF", "ext:E_F.G_CF_given_LLM", "ext:E_H.sparse.G_prior", "ext:E_H.dense.G_prior",
-                    "ext:E_H.unseen.G_prior", "ext:E_H.seen.G_prior", "ext:FT_C_reading.R", "ext:FT_C_reading.label"},
+                    "ext:E_H.unseen.G_prior", "ext:E_H.seen.G_prior", "ext:FT_C_reading.R", "ext:FT_C_reading.label",
+                    "ext:FT_Q_reading.R", "ext:FT_Q_reading.label", "ext:FT_Q_reading.UAUC"},
     "tab:app-llama": {"ext:E_J.dUAUC_L_minus_q_hat", "ext:E_G.e_share", "ext:E_W.G_wu", "ext:E_W.G_CF_wu", "ext:E_W.P1_wu"},
 }
-EXT_PROSE_SLOTS = {"ext:E_J.H_J_count", "ext:E_W.robust_count", "ext:E_W.P1_wu_verdict", "ext:FT_C_reading.wording",
-                   "ext:E_F.H_F_count", "ext:E_H.H_S_count_ZS", "ext:E_H.H_S_count_FT"}
+EXT_PROSE_SLOTS = {"ext:summary.families.E_J count", "ext:summary.robust_readings count", "ext:E_W.P1_wu.reading_P1",
+                   "ext:summary.ft_wording (the wording it allows, with the labels per control and dataset)",
+                   "ext:summary.families.E_F count", "ext:summary.families.E_H count ZS", "ext:summary.families.E_H count FT"}
+EXT_N_SLOTS = 157
 
 
-def test_ext_slots_stay_red_until_the_extra_analysis_exists(synth):
-    """Every slot of the addendum-6 analysis (alias ext) has a spec that checks its slot text and keeps it red with
-    result_file_missing until the file exists; nothing else is affected (the other cells of their rows are filled)."""
+def test_ext_slots_stay_red_while_no_extra_file_exists(synth):
+    """Without the extra-analysis files every ext slot reads result_file_missing with the file it needs; the other cells of
+    their rows are filled, and every slot text is known to the specs."""
     ext = [u for u in synth.doc["unfilled"] if fill.norm(u["slot"]).startswith("ext:")]
-    assert ext and {u["reason"] for u in ext} == {"result_file_missing"} and {u["detail"] for u in ext} == {fill.EXT_DETAIL}
+    assert ext and {u["reason"] for u in ext} == {"result_file_missing"}
+    assert {u["detail"] for u in ext} <= {"extra/summary.json", *(f"extra/{d}.json" for d in fill.RATED),
+                                          *(f"extra/llama/{d}.json" for d in ("ml1m", "toys")),
+                                          *(f"extra/ftq/{d}.json" for d in fill.RATED)}
     by_table: dict = {}
     for u in ext:
         if u["kind"] == "table":
             by_table.setdefault(u["table"], set()).add(fill.norm(u["slot"]))
     assert by_table == EXT_TABLE_SLOTS
     assert {fill.norm(u["slot"]) for u in ext if u["kind"] == "prose"} == EXT_PROSE_SLOTS
-    assert len(ext) == 147 and fill.ALIASES[-1] == "ext"
+    assert len(ext) == EXT_N_SLOTS and fill.ALIASES[-1] == "ext"
     assert synth.doc["summary"]["unfilled_by_alias"]["ext"] == len(ext)
     t = table_text(read(synth.out, "sections/experiments.tex"), "tab:tracks")
     assert row_cells(t, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[0].endswith(r" / \DATANEEDED{ext:E\_W.G\_CF\_wu}")
     assert not unfilled_of(synth.doc, reason="skeleton_changed")
 
 
+def _rec_at(doc, *path):
+    node = doc
+    for k in path:
+        node = node[k]
+    return node
+
+
+def _ext_regime(doc, block, reg, sub, leaf=None, mean_leaf=None):
+    """The independent reading of a per-regime ext cell: (estimate record, seed s.d. or None)."""
+    blk = _rec_at(doc, block, reg, *sub)
+    per = "per_model" if "per_model" in blk else "per_seed"
+    lf = [leaf] if leaf else []
+    if reg == "ZS":
+        return _rec_at(blk, per, "zeroshot", *lf), None
+    ml = [mean_leaf] if mean_leaf else []
+    return _rec_at(blk, "mean_over_seeds", *ml), sd1([_rec_at(blk, per, m, *lf)["est"] for m in ("s0", "s1", "s2")])
+
+
+def _it(text, doc):
+    """Italics exactly when the file's own status says exploratory (A3-6 Consequence)."""
+    return r"\textit{" + text + "}" if doc["status"]["items_2_to_7"] == "exploratory" else text
+
+
+TRACKS_EXT_ROWS = (   # (row label, block, sub, leaf, mean_leaf): the per-regime ext rows of tab:tracks / tab:app-llama
+    (r"$\Delta$UAUC($\ell-m$), E-J$^\dagger$", "E_J", ("dUAUC_L_minus_q_hat",), None, None),
+    (r"$\Delta$UAUC($\ell-$MF), warm$^\dagger$", "E_J", ("dUAUC_L_minus_MF_warm",), None, None),
+    (r"e-share$^\dagger$", "E_G", ("e_share",), "e_share", None),
+    (r"$\mathcal G_{\rm wu}$ (E-W)$^\dagger$", "E_W", ("G_wu",), None, None))
+TEACH_EXT_ROWS = (
+    (r"$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3)", "E_F", ("G_LLM_given_CF",)),
+    (r"$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2)", "E_F", ("G_CF_given_LLM",)),
+    (r"Sparse rows ($m$ from $<5$ ratings)", "E_H", ("strata", "sparse", "G_prior")),
+    (r"Dense rows", "E_H", ("strata", "dense", "G_prior")),
+    (r"Unseen items (no TRAIN example)", "E_H", ("strata", "unseen", "G_prior")),
+    (r"Seen items", "E_H", ("strata", "seen", "G_prior")))
+DEPLOYABLE = ("share_correct_bottom", "share_errors_top", "AUROC_margin_correct")
+
+
+def _check_ext_columns(text_tracks, text_teach, doc, j, teach=True):
+    """The ZS and LoRA cells of panel column j (0 = ML-1M ... 3 = Sports) of the ext rows equal an independent formatting of
+    the file doc (FILL RULE 2 and the italic rule)."""
+    t = table_text(text_tracks, "tab:tracks") if isinstance(text_tracks, str) else text_tracks
+    for label, block, sub, leaf, mleaf in TRACKS_EXT_ROWS:
+        cells = row_cells(t, label)
+        for k, reg in ((0, "ZS"), (1, "FT")):
+            rec, sd = _ext_regime(doc, block, reg, sub, leaf, mleaf)
+            assert cells[2 * j + k] == _it(rec_cell(rec, sd=sd), doc), (label, reg)
+    lines = [ln for ln in t.splitlines() if ln.strip().startswith(r"\quad deployable$^\dagger$ &")]   # three rows, one label
+    assert len(lines) == 3
+    for stat, line in zip(DEPLOYABLE, lines):
+        cells = row_cells(line, r"\quad deployable$^\dagger$")
+        for k, reg in ((0, "ZS"), (1, "FT")):
+            rec, sd = _ext_regime(doc, "E_Cprime", reg, ("deployable",), stat, stat)
+            assert cells[2 * j + k] == _it(rec_cell(rec, sd=sd), doc), (stat, reg)
+    span = row_cells(t, r"\quad matched mean $m_T$ (ref.)$^\dagger$")[j]
+    assert span == _it(n3(doc["E_J"]["ZS"]["dUAUC_L_minus_q_hat_T"]["per_seed"]["zeroshot"]["UAUC_b"]), doc)
+    shares = row_cells(t, r"Item share of MF / label$^\dagger$")[j]
+    assert shares == " / ".join(_it(rec_cell(doc["E_G"][b]["item_share"]), doc) for b in ("MF_score_item_bias", "label_q_hat"))
+    gcf = row_cells(t, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[j]
+    assert gcf.endswith(" / " + _it(rec_cell(doc["E_W"]["ZS"]["G_CF_wu"]), doc))
+    if teach:
+        tt = table_text(text_teach, "tab:teaches")
+        for label, block, sub in TEACH_EXT_ROWS:
+            cells = row_cells(tt, label)
+            for k, reg in ((0, "ZS"), (1, "FT")):
+                rec, sd = _ext_regime(doc, block, reg, sub)
+                assert cells[2 * j + k] == _it(rec_cell(rec, sd=sd), doc), (label, reg)
+
+
+@pytest.fixture(scope="module")
+def real_ext(real_grid, tmp_path_factory):
+    """The real files, the real Qwen ML-1M grid report and the REAL ML-1M extra-analysis file (exploratory, A3-6)."""
+    if not EXT_REAL.is_file():
+        pytest.skip("the ML-1M extra-analysis file is not pulled yet")
+    base = tmp_path_factory.mktemp("real_ext")
+    res = base / "results"
+    shutil.copytree(real_grid.res, res)
+    (res / "extra").mkdir()
+    shutil.copyfile(EXT_REAL, res / "extra" / "ml1m.json")
+    out = base / "filled"
+    fill.run(PAPER, res, out)
+    return SimpleNamespace(out=out, doc=json.loads(read(out, "UNFILLED.json")), filled=json.loads(read(out, "FILLED.json")),
+                           ext=json.loads(EXT_REAL.read_text(encoding="utf-8")))
+
+
+def test_ext_cells_fill_from_the_real_ml1m_extra_file(real_ext):
+    """The ML-1M columns of every ext row of tab:tracks and tab:teaches read the real extra file (italics: exploratory); the
+    FT-C cell stays red with the file's own reason while its block is unavailable; the P1 reading is filled; whatever needs
+    another file stays red with that file."""
+    ex, text = real_ext.ext, read(real_ext.out, "sections/experiments.tex")
+    assert ex["status"]["items_2_to_7"] == "exploratory"
+    _check_ext_columns(text, text, ex, 0)
+    p1 = row_cells(table_text(text, "tab:tracks"), r"P1$_{\rm wu}$$^\dagger$")[0]
+    pw = ex["E_W"]["P1_wu"]
+    p = pw["mean_over_seeds"]["p"]
+    assert p1 == _it(" / ".join(n3(pw["per_seed"][m]["est"]) for m in ("s0", "s1", "s2")) + "; "
+                     + rec_cell(pw["mean_over_seeds"]) + ", $p$ " + ("$<$0.001" if p < 0.0005 else f"{p:.3f}"), ex)
+    flat = " ".join(text.split())
+    word = fill.ROBUST_WORDS[pw["reading_P1"]["reading"]]
+    assert f"seeds positive; within-user reading {word} (exploratory))" in flat
+    ftc = unfilled_of(real_ext.doc, slot=r"ext:FT\_C\_reading.R")
+    assert ftc and ftc[0]["reason"] == "result_not_in_report" and "record missing" in ftc[0]["detail"]
+    assert ex["FT_C_reading"]["available"] is False
+    reds = {u["detail"] for u in real_ext.doc["unfilled"] if fill.norm(u["slot"]).startswith("ext:")
+            and u["reason"] == "result_file_missing"}
+    assert {"extra/summary.json", "extra/toys.json", "extra/ftq/ml1m.json", "extra/llama/ml1m.json"} <= reds
+    assert not unfilled_of(real_ext.doc, reason="skeleton_changed")
+    filled_ext = [f for f in real_ext.filled["filled"] if fill.norm(f["slot"]).startswith("ext:")]
+    assert len(filled_ext) == 32 and all(any(s.startswith("extra/ml1m.json:") for s in f["from"]) for f in filled_ext)
+
+
+def _ft_reading(control, est, lo, hi, n=366, defined=True):
+    """An FT-C / FT-Q reading block of the schema ftgrid_extra.ftc_reading writes (planted values)."""
+    from src.confrec import ftgrid_extra as fe
+
+    def rec(e, lo_, hi_):
+        return {"est": e, "lo": lo_, "hi": hi_, "n_users": n, "n_pairs": 17 * n, "n_boot": 2000, "descriptive_min_n": False}
+    out = {"definition": "planted", "control": control, "descriptive": True, "status": "registered, outcome-free",
+           "available": True, "rows": {"n_users": n, "n_pairs": 17 * n},
+           "UAUC": {m: rec(u, u - 0.02, u + 0.02) for m, u in zip(fe.FTC_MODELS, (0.596, 0.740, 0.745, 0.731, 0.722))},
+           "UAUC_q_hat": rec(0.759, 0.737, 0.780), "defined": defined}
+    if defined:
+        out["R"] = rec(est, lo, hi)
+        out["label"] = fe.ftc_label(out["R"])
+    else:
+        out.update(R={"available": False, "reason": "R is not defined: E_B_mean_gt_0 fails"}, label="NOT_DEFINED")
+    return out
+
+
+def _plant(doc, path, est, p, n=400, rule=True, desc=False):
+    """Plant a family statistic coherently in a copied domain file: ZS, the zeroshot record and its mean_over_seeds; FT, three
+    seed records (all of the mean's sign with |mean| > 2 sigma_seed when `rule`, else one of the other sign), their mean and
+    the seeds' summary as ftgrid_extra writes it."""
+    blk = _rec_at(doc, *path)
+
+    def rec(e):
+        return {**blk["mean_over_seeds"], "est": e, "lo": e - 0.004, "hi": e + 0.004, "p": None if desc else p,
+                "n_users": n, "n_pairs": 17 * n, "descriptive_min_n": desc,
+                "ci_excludes_0": None if desc else bool(e - 0.004 > 0 or e + 0.004 < 0)}
+    per = "per_model" if "per_model" in blk else "per_seed"
+    blk["mean_over_seeds"] = rec(est)
+    if path[1] == "ZS":
+        blk[per]["zeroshot"] = {**blk[per]["zeroshot"], **rec(est)}
+        return
+    d = abs(est) / 10 if rule else 2 * abs(est)
+    seeds = [est - d, est, est + d]
+    for m, e in zip(("s0", "s1", "s2"), seeds):
+        blk[per][m] = {**blk[per][m], **rec(e)}
+    sd = sd1(seeds)
+    same = all(np.sign(x) == np.sign(est) for x in seeds)
+    assert (same and abs(est) > 2 * sd) == rule
+    blk["seeds"] = {**blk["seeds"], "per_seed": seeds, "sigma_seed": sd, "all_seeds_same_sign_as_mean": same,
+                    "abs_mean_gt_2_sigma_seed": abs(est) > 2 * sd, "sigma_seed_rule": rule}
+
+
+def ext_synthetic_files(src: dict) -> dict:
+    """Synthetic extra-analysis files of the real schema, built from the real ML-1M file (the module's own test does the same:
+    the ML-1M file relabelled as Qwen Amazon panels): Qwen main root (ml1m with a planted FT-C reading; toys, games, sports
+    with planted family statistics), the Llama root (ml1m, toys) and the FT-Q teacher root (ml1m, toys, games; Sports not run).
+    The code sha1 is set to the current module so that summarize accepts the files."""
+    from src.confrec import ftgrid_extra as fe
+    sha = fe.code_sha1()
+
+    def copy_as(domain, root="main", backbone="Qwen3-8B"):
+        doc = copy.deepcopy(src)
+        doc["meta"].update(domain=domain, root_label=root, backbone=backbone, code_sha1=sha)
+        doc["status"] = fe.status_of(domain, backbone, root)
+        return doc
+    files = {}
+    ml = copy_as("ml1m")
+    ml["FT_C_reading"] = _ft_reading("FT-C", 0.90, 0.70, 1.10)                    # ITEM_DRIVEN
+    files["extra/ml1m.json"] = ml
+    for d in AMAZON_T:
+        doc = copy_as(d)
+        doc["FT_C_reading"] = {"control": "FT-C", "available": False, "label": "NOT_DEFINED",
+                               "reason": "FT-C is the registered ML-1M control only (addendum 8 section 1)"}
+        files[f"extra/{d}.json"] = doc
+    t, g, s = (files[f"extra/{d}.json"] for d in AMAZON_T)
+    _plant(t, ("E_F", "FT", "G_LLM_given_CF"), 0.020, 0.001)                    # E-F: Toys confirmed
+    _plant(s, ("E_F", "FT", "G_LLM_given_CF"), -0.010, 0.002)                   # Sports: the wrong sign
+    _plant(t, ("E_H", "ZS", "strata", "sparse", "G_prior"), 0.030, 0.001)       # E-H ZS: Toys confirmed
+    _plant(g, ("E_H", "ZS", "strata", "sparse", "G_prior"), 0.030, 0.001, n=120, desc=True)   # outside (min-n)
+    _plant(s, ("E_H", "ZS", "strata", "sparse", "G_prior"), 0.010, 0.400)
+    _plant(t, ("E_H", "FT", "strata", "sparse", "G_prior"), 0.020, 0.001)       # E-H FT: Toys confirmed
+    _plant(g, ("E_H", "FT", "strata", "sparse", "G_prior"), 0.020, 0.001, rule=False)
+    _plant(s, ("E_H", "FT", "strata", "sparse", "G_prior"), 0.020, 0.001, n=120, desc=True)   # outside (min-n)
+    _plant(t, ("E_J", "FT", "dUAUC_L_minus_q_hat"), -0.030, 0.001)              # E-J: Toys below, Video Games above
+    _plant(g, ("E_J", "FT", "dUAUC_L_minus_q_hat"), 0.020, 0.002)
+    _plant(s, ("E_J", "FT", "dUAUC_L_minus_q_hat"), -0.010, 0.300)
+    t["E_W"]["ZS"]["reading_G"] = {**t["E_W"]["ZS"]["reading_G"], "reading": "estimator_dependent", "robust": False}
+    for d in ("ml1m", "toys"):
+        doc = copy_as(d, "llama", "Llama-3.1-8B-Instruct")
+        doc["FT_C_reading"] = {"control": "FT-C", "available": False, "label": "NOT_DEFINED",
+                               "reason": "no FT-C or FT-Q control for the Llama backbone"}
+        files[f"extra/llama/{d}.json"] = doc
+    for d, (e, lo, hi) in (("ml1m", (0.95, 0.60, 1.30)), ("toys", (1.20, 0.90, 1.50)), ("games", (0.50, 0.20, 0.80))):
+        doc = copy_as(d, "teacher")
+        doc["FT_C_reading"] = _ft_reading("FT-Q", e, lo, hi)
+        files[f"extra/ftq/{d}.json"] = doc
+    return files
+
+
+AMAZON_T = ("toys", "games", "sports")
+
+
+def write_ext_results(res: Path, files: dict, summarize: bool = True) -> dict | None:
+    """Write the synthetic extra files into a results directory and summarize them with the module's own code."""
+    from src.confrec import ftgrid_extra as fe
+    for rel, doc in files.items():
+        _put(res, rel, doc)
+    if not summarize:
+        return None
+    ex = res / "extra"
+    args = ["summarize", "--files", *(str(ex / f"{d}.json") for d in AMAZON_T), "--ml1m", str(ex / "ml1m.json"),
+            "--ftc", str(ex / "ml1m.json"), "--ftq", *(str(ex / "ftq" / f"{d}.json") for d in ("ml1m", "toys", "games")),
+            "--llama", *(str(ex / "llama" / f"{d}.json") for d in ("ml1m", "toys")), "--out", str(ex / "summary.json")]
+    return fe.main(args)
+
+
+@pytest.fixture(scope="module")
+def synth_ext(synth, tmp_path_factory):
+    """The synthetic results plus synthetic extra-analysis files of the real schema and their summary.json (built by
+    src.confrec.ftgrid_extra.summarize itself)."""
+    if not EXT_REAL.is_file():
+        pytest.skip("the ML-1M extra-analysis file is not pulled yet")
+    base = tmp_path_factory.mktemp("synth_ext")
+    res = base / "results"
+    shutil.copytree(synth.res, res)
+    files = ext_synthetic_files(json.loads(EXT_REAL.read_text(encoding="utf-8")))
+    summary = write_ext_results(res, files)
+    out = base / "filled"
+    fill.run(PAPER, res, out)
+    return SimpleNamespace(res=res, out=out, doc=json.loads(read(out, "UNFILLED.json")), files=files, summary=summary,
+                           text=read(out, "sections/experiments.tex"))
+
+
+def test_ext_cells_from_synthetic_files_of_the_real_schema(synth_ext):
+    """Amazon columns read their own files (registered, outcome-free: no italics); the Llama table reads the Llama root (ML-1M
+    italic, Toys plain); FT-C (ML-1M) and FT-Q read their roots' readings; a dataset whose FT-Q file is absent stays red."""
+    f, text = synth_ext.files, synth_ext.text
+    for j, d in enumerate(fill.RATED):
+        _check_ext_columns(text, text, f[f"extra/{d}.json"], j)
+    la = table_text(read(synth_ext.out, "sections/appendix.tex"), "tab:app-llama")
+    for label, block, sub, leaf, mleaf in TRACKS_EXT_ROWS:
+        if "warm" in label:                                  # the Llama table has no warm-MF row
+            continue
+        cells = row_cells(la, label)
+        for j, d in enumerate(("ml1m", "toys")):
+            doc = f[f"extra/llama/{d}.json"]
+            for k, reg in ((0, "ZS"), (1, "FT")):
+                rec, sd = _ext_regime(doc, block, reg, sub, leaf, mleaf)
+                assert cells[2 * j + k] == _it(rec_cell(rec, sd=sd), doc), (label, d, reg)
+    assert row_cells(la, r"e-share$^\dagger$")[0].startswith(r"\textit{")
+    assert not row_cells(la, r"e-share$^\dagger$")[2].startswith(r"\textit{")
+    for j, d in enumerate(("ml1m", "toys")):
+        doc = f[f"extra/llama/{d}.json"]
+        gcf = row_cells(la, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[j]
+        assert gcf.endswith(" / " + _it(rec_cell(doc["E_W"]["ZS"]["G_CF_wu"]), doc))
+    pw = f["extra/llama/ml1m.json"]["E_W"]["P1_wu"]
+    assert row_cells(la, r"P1$_{\rm wu}$$^\dagger$")[0].startswith(
+        r"\textit{" + " / ".join(n3(pw["per_seed"][m]["est"]) for m in ("s0", "s1", "s2")) + "; ")
+    tt = table_text(text, "tab:teaches")
+    ftc = f["extra/ml1m.json"]["FT_C_reading"]
+    assert row_cells(tt, r"FT-C (permuted): $R$ / reading")[1] == rec_cell(ftc["R"]) + " / " + fill.tex(ftc["label"])
+    rq, uq = (row_cells(tt, x) for x in (r"FT-Q (teacher): $R_Q$ / reading", r"\quad UAUC of $q_0$ / $q_1$ / $m$"))
+    for j, d in enumerate(("ml1m", "toys", "games")):
+        b = f[f"extra/ftq/{d}.json"]["FT_C_reading"]
+        assert rq[2 * j + 1] == rec_cell(b["R"]) + " / " + fill.tex(b["label"])
+        assert uq[2 * j + 1] == " / ".join(n3(x) for x in (b["UAUC"]["p0"]["est"], b["UAUC"]["p1"]["est"],
+                                                             b["UAUC_q_hat"]["est"]))
+    assert [rq[j].split(" / ")[-1] for j in (1, 3, 5)] == ["ITEM\\_DRIVEN", "ITEM\\_DRIVEN", "MIXED"]
+    sports = [u for u in unfilled_of(synth_ext.doc, table="tab:teaches") if u["column"] == 8
+              and fill.norm(u["slot"]).startswith("ext:")]
+    assert sports and {u["detail"] for u in sports} == {"extra/ftq/sports.json"}
+    assert {fill.norm(u["slot"]) for u in sports} == {"ext:FT_Q_reading.R", "ext:FT_Q_reading.label", "ext:FT_Q_reading.UAUC"}
+    ext_red = [u for u in synth_ext.doc["unfilled"] if fill.norm(u["slot"]).startswith("ext:")]
+    assert len(ext_red) == 3 and not unfilled_of(synth_ext.doc, reason="skeleton_changed")
+
+
+def test_ext_counts_and_wording_from_the_summary(synth_ext):
+    """The prose counts are summarize's family confirmations (H-F, H-S per regime, H-J two-sided with its signs), the robust
+    readings of the Qwen Amazon panels, and the addendum-8 wording; the planted outcomes give each branch once."""
+    s, flat = synth_ext.summary, " ".join(synth_ext.text.split())
+    F, H, J = (s["families"][k] for k in ("E_F", "E_H", "E_J"))
+    assert [d for d in AMAZON_T if F["members"][d]["confirmed"]] == ["toys"]
+    assert "H-F) on 1 of 3 Qwen Amazon panels, and on sparse rows" in flat
+    assert H["members"]["toys:ZS"]["confirmed"] and H["members"]["toys:FT"]["confirmed"]
+    assert not H["members"]["games:FT"]["confirmed"] and set(H["outside_family"]) == {"games:ZS", "sports:FT"}
+    assert ("H-S) in 1 of 2 zero-shot panel runs (Video Games below 150 users) and 1 of 2 fine-tuned panel runs (Sports below "
+            "150 users);") in flat
+    assert J["members"]["toys"]["sign"] == -1 and J["members"]["games"]["sign"] == 1 and not J["members"]["sports"]["confirmed"]
+    assert ("(H-J) on 2 of 3 Qwen Amazon panels (below it on Toys; above it on Video Games).") in flat
+    assert ("finds it robust on 0 of 3 zero-shot and 3 of 3 fine-tuned Qwen Amazon panels; estimator-dependent on Toys "
+            "(zero-shot).") in flat
+    ext_checks = [c for c in synth_ext.doc["checks"] if c["check"].startswith("extra/summary.json input")]
+    assert len(ext_checks) == len(s["inputs"]) == 10 and all(c["ok"] for c in ext_checks)   # counts and cells: one build
+    w = s["ft_wording"]
+    assert w["complete"] is True and w["evidence_mixed"] is True and w["fine_tuning_mostly_teaches_the_item"] is False
+    assert ("By the wording rule of addendum 8, the evidence is mixed (FT-C on ML-1M ITEM\\_DRIVEN; FT-Q on ML-1M ITEM\\_DRIVEN, "
+            "Toys ITEM\\_DRIVEN, Video Games MIXED).") in flat
+
+
+def _summary_variant(synth_ext, tmp_path, edit):
+    res = tmp_path / "results"
+    shutil.copytree(synth_ext.res, res)
+    p = res / "extra" / "summary.json"
+    s = json.loads(p.read_text(encoding="utf-8"))
+    edit(s)
+    p.write_text(json.dumps(s), encoding="utf-8")
+    out = tmp_path / "filled"
+    fill.run(PAPER, res, out)
+    return SimpleNamespace(text=" ".join(read(out, "sections/experiments.tex").split()),
+                           doc=json.loads(read(out, "UNFILLED.json")))
+
+
+def test_ext_wording_branches_and_partial_input(synth_ext, tmp_path):
+    """Addendum 8: 'mostly teaches the item' only on a complete wording block whose condition holds (item text: FT-Q
+    ITEM_DRIVEN on an Amazon dataset); labels defined but not ITEM_DRIVEN: not supported; partial input: never decided."""
+    def item(s):
+        s["ft_wording"].update(fine_tuning_mostly_teaches_the_item=True, item_quality_from_item_text=True,
+                               evidence_mixed=False)
+        s["ft_wording"]["labels"]["FT-Q"]["games"] = "ITEM_DRIVEN"
+    v = _summary_variant(synth_ext, tmp_path / "a", item)
+    assert ("addendum 8, fine-tuning mostly teaches the item, and the adapter learns item quality from item text (FT-C on ML-1M "
+            "ITEM\\_DRIVEN;") in v.text
+
+    def undefined(s):
+        s["ft_wording"].update(fine_tuning_mostly_teaches_the_item=False, item_quality_from_item_text=False,
+                               evidence_mixed=False)
+        s["ft_wording"]["labels"]["FT-Q"]["games"] = "NOT_DEFINED"
+    v = _summary_variant(synth_ext, tmp_path / "b", undefined)
+    assert "the labels do not support saying that fine-tuning mostly teaches the item (FT-C on ML-1M" in v.text
+
+    def partial(s):
+        s["ft_wording"].update(complete=False, fine_tuning_mostly_teaches_the_item=None, reason="FT-Q toys: file not given")
+    v = _summary_variant(synth_ext, tmp_path / "c", partial)
+    u = [x for x in v.doc["unfilled"] if fill.norm(x["slot"]).startswith("ext:summary.ft_wording")]
+    assert u and u[0]["reason"] == "not_decided" and "toys" in u[0]["detail"]
+
+    def not_requested(s):
+        s["ft_wording"] = {"available": False, "reason": "not requested (give --ftc and --ftq)"}
+    v = _summary_variant(synth_ext, tmp_path / "d", not_requested)
+    u = [x for x in v.doc["unfilled"] if fill.norm(x["slot"]).startswith("ext:summary.ft_wording")]
+    assert u and u[0]["reason"] == "result_not_in_report"
+
+
+def test_ext_counts_name_cut_panels_and_empty_regimes(synth_ext, tmp_path):
+    """A panel whose fine-tuning is a recorded cut (summary not_run: no FT member of any family, its ZS run stays in E-H) is
+    named beside every FT count; a regime whose every panel run is below 150 users reads 'none ... (below 150 users)'."""
+    def cut(s):
+        s["not_run"] = {"sports": {"reason": "registered cut", "outside": ["E_F:sports", "E_H:sports:FT", "E_J:sports"]}}
+        for fam in ("E_F", "E_J"):
+            s["families"][fam]["members"].pop("sports")
+        s["families"]["E_H"]["members"].pop("sports:FT", None)
+        s["families"]["E_H"]["outside_family"].pop("sports:FT", None)
+        s["robust_readings"].pop("sports:FT")
+        for k in [k for k in s["families"]["E_H"]["members"] if k.endswith(":ZS")]:
+            s["families"]["E_H"]["outside_family"][k] = s["families"]["E_H"]["members"].pop(k)
+    v = _summary_variant(synth_ext, tmp_path, cut)
+    assert "H-F) on 1 of 2 Qwen Amazon panels (Sports: fine-tuning not run), and" in v.text
+    assert ("(H-J) on 2 of 2 Qwen Amazon panels (below it on Toys; above it on Video Games; Sports: fine-tuning not run)."
+            in v.text)
+    assert ("H-S) in none of the zero-shot panel runs (Toys, Video Games and Sports below 150 users) and 1 of 2 fine-tuned "
+            "panel runs (Sports: fine-tuning not run);") in v.text
+    assert ("finds it robust on 0 of 3 zero-shot and 2 of 2 fine-tuned Qwen Amazon panels (Sports: fine-tuning not run); "
+            "estimator-dependent on Toys (zero-shot).") in v.text
+
+    def empty(s):
+        s["families"]["E_H"]["outside_family"].update(s["families"]["E_H"]["members"])
+        s["families"]["E_H"]["members"] = {}
+    v = _summary_variant(synth_ext, tmp_path / "none", empty)
+    u = [x for x in v.doc["unfilled"] if "E\\_H count" in x["slot"]]
+    assert not u and "H-S) in none of the zero-shot panel runs (Toys, Video Games and Sports below 150 users)" in v.text
+
+    def no_family(s):
+        s["families"]["E_H"]["outside_family"] = {}
+        s["families"]["E_H"]["members"] = {}
+    v = _summary_variant(synth_ext, tmp_path / "nofam", no_family)
+    u = [x for x in v.doc["unfilled"] if "E\\_H count" in x["slot"]]
+    assert len(u) == 2 and {x["reason"] for x in u} == {"not_decided"}
+
+
+def test_ext_failed_integrity_incomplete_regime_and_an_unavailable_block(synth_ext, tmp_path):
+    """A zero-shot run excluded for E1 reads FAILED_INTEGRITY, an incomplete FT regime stays red (never replaced), and an
+    FT-C / FT-Q reading whose R is not defined reads 'not defined' with its NOT_DEFINED label."""
+    res = tmp_path / "results"
+    shutil.copytree(synth_ext.res, res)
+    toys = json.loads((res / "extra" / "toys.json").read_text(encoding="utf-8"))
+    toys["E_W"]["ZS"] = {"available": False, "reason": "no usable like arm for the ZS models ['zeroshot']"}
+    toys["runs"]["zeroshot"]["like"]["status"] = "FAILED_INTEGRITY"
+    toys["E_F"]["FT"]["complete"] = False
+    _put(res, "extra/toys.json", toys)
+    q = json.loads((res / "extra" / "ftq" / "games.json").read_text(encoding="utf-8"))
+    q["FT_C_reading"] = _ft_reading("FT-Q", 0, 0, 0, defined=False)
+    _put(res, "extra/ftq/games.json", q)
+    out = tmp_path / "filled"
+    fill.run(PAPER, res, out)
+    doc = json.loads(read(out, "UNFILLED.json"))
+    text = read(out, "sections/experiments.tex")
+    assert row_cells(table_text(text, "tab:tracks"), r"$\mathcal G_{\rm wu}$ (E-W)$^\dagger$")[2] == r"FAILED\_INTEGRITY"
+    u = [x for x in unfilled_of(doc, table="tab:teaches") if x["column"] == 4 and "E\\_F" in x["slot"]]
+    assert u and {x["reason"] for x in u} == {"incomplete_regime"}
+    tt = table_text(text, "tab:teaches")
+    assert row_cells(tt, r"FT-Q (teacher): $R_Q$ / reading")[5] == "not defined / NOT\\_DEFINED"
+    # the two rewritten files no longer match the build the summary was made from: the consistency check says so
+    bad = {c["check"] for c in doc["checks"] if c["check"].startswith("extra/summary.json input") and not c["ok"]}
+    assert bad == {"extra/summary.json input (files, main, toys): sha1 = sha1 of extra/toys.json",
+                   "extra/summary.json input (ftq, teacher, games): sha1 = sha1 of extra/ftq/games.json"}
+
+
 def test_the_deviations_table_keeps_every_row_of_the_record():
-    """tab:deviations condenses the 18 rows of the deviations record (none dropped); the introduction points to it."""
+    """tab:deviations condenses the rows of the deviations record (none dropped); the introduction points to it."""
     text = (PAPER / "sections" / "appendix.tex").read_text(encoding="utf-8")
     body = table_text(text, "tab:deviations")
     nums = [int(m) for m in re.findall(r"(?m)^(\d+) & ", body)]
-    assert nums == list(range(1, 19))
     record = (ROOT / "docs" / "sigir" / "DEVIATIONS.md").read_text(encoding="utf-8")
-    assert len(re.findall(r"(?m)^\| (\d+) \|", record)) == 18
+    rows = [int(m) for m in re.findall(r"(?m)^\| (\d+) \|", record)]
+    assert nums == rows == list(range(1, len(rows) + 1)) and len(rows) >= 20
     assert r"\label{app:deviations}" in text
     assert r"Appendix~\ref{app:deviations}" in (PAPER / "sections" / "introduction.tex").read_text(encoding="utf-8")
 
@@ -1134,7 +1552,9 @@ def test_pull_script_and_fill_agree_on_the_result_layout():
             *(f"aud/{d}.json" for d in fill.NEXT), *(f"aud2q/{d}.json" for d in fill.NEXT),
             *(f"aud2l/{d}.json" for d in fill.NEXT), *(f"grid/qwen/{d}.json" for d in fill.RATED),
             *(f"grid/qwen/{d}_split.json" for d in fill.RATED), *(f"slot/{d}.json" for d in fill.RATED),
-            *(f"grid/llama/{d}.json" for d in ("ml1m", "toys")), *(f"grid/llama/{d}_split.json" for d in ("ml1m", "toys"))}
+            *(f"grid/llama/{d}.json" for d in ("ml1m", "toys")), *(f"grid/llama/{d}_split.json" for d in ("ml1m", "toys")),
+            "extra/summary.json", *(f"extra/{d}.json" for d in fill.RATED), *(f"extra/llama/{d}.json" for d in ("ml1m", "toys")),
+            *(f"extra/ftq/{d}.json" for d in fill.RATED)}
     assert need <= local, need - local
     assert {a for a, _, _ in entries} <= set(fill.ALIASES)
     # the server is only listed (stat) and copied from (scp): no write, move or delete command is sent

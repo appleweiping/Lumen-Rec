@@ -5,7 +5,8 @@
 % FT-C reading rule; marked with a dagger in the text and the tables), addendum 7 (S6 wording) and the next-item analysis
 % specification (niche/mainstream = lowest/highest non-empty quintile). m(i) = the prior-only item mean (q-hat, shrunk with k = 5);
 % m_T(i) = q-hat_T. Decision thresholds live in Table tab:rq. Editor pass 2026-10-05: paragraphs on E-C', E-G, E-W, E-F, E-H, E-J and
-% FT-C added, the others shortened (page budget); the knockout's NEGATIVE/NULL rules are stated in the appendix.
+% FT-C added, the others shortened (page budget); the knockout's NEGATIVE/NULL rules are stated in the appendix. Editor pass 2: FT-C is
+% ML-1M only and FT-Q (the item-only teacher of addendum 8) is defined beside it.
 % The optional method is wrapped in METHOD-SLOT-BEGIN / METHOD-SLOT-END and can be deleted without touching anything else.
 \section{Measurement and Actionability Tools}
 \label{sec:tools}\label{sec:method}
@@ -37,14 +38,17 @@ P1$_{\rm wu}$; E-F and E-H use E-W). The star permutation shuffles the ``(rated 
 permutations); the model is said to ignore the ratings if $|\Delta\mathrm{UAUC}|<0.005$ and the within-user s.d.\ of
 $\ell-\bar\ell_{\rm perm}$ is below $0.10$.
 
-\paragraph{Strata, matched mean and permutation control.}
+\paragraph{Strata, matched mean and item-only controls.}
 E-H$^\dagger$ splits TEST rows into \emph{sparse} ($m$ from fewer than 5 earlier ratings) and dense rows and into \emph{unseen} (no
 TRAIN example) and seen items, and evaluates $\mathcal G_{\rm prior}=\Delta$UAUC(M1$-$M0) per stratum with predictors fitted on all
-rows. E-J$^\dagger$ pairs $\ell$ with $m$, with $m_T$ and, on warm pairs, with MF. FT-C trains two adapters (seeds 0, 1) on labels
-permuted within each item, which keeps every item's label rate and destroys the user--item evidence (ML-1M; Toys$^\dagger$); its
-retention $R$ averages $[\mathrm{UAUC}(p_s)-\mathrm{UAUC}_{\rm ZS}]/[\mathrm{UAUC}(s)-\mathrm{UAUC}_{\rm ZS}]$ over the real adapters
-$s$ and their permuted twins $p_s$, is defined when the regime contrast is positive with an interval excluding 0, and reads$^\dagger$
-ITEM\_DRIVEN if its interval lies above 0.5, USER\_DRIVEN if below, and MIXED otherwise.
+rows. E-J$^\dagger$ pairs $\ell$ with $m$, with $m_T$ and, on warm pairs, with MF. Two item-only controls train two adapters each
+(seeds 0, 1, same recipe) without user--item evidence: FT-C on labels permuted within each item (ML-1M only: a permutation cannot
+change an item with one TRAIN example) and FT-Q on the labels of an item-only teacher, positive for the round($\beta n$) TRAIN
+examples with the largest $m$ ($\beta$: TRAIN like rate), so it uses no label of the example itself, no user information and nothing
+after $T_d$. The retention $R$
+(FT-Q: $R_Q$) averages $[\mathrm{UAUC}(p_s)-\mathrm{UAUC}_{\rm ZS}]/[\mathrm{UAUC}(s)-\mathrm{UAUC}_{\rm ZS}]$ over the adapters $s$
+and their control twins $p_s$, is defined when the regime contrast is positive with an interval excluding 0, and reads$^\dagger$
+ITEM\_DRIVEN if its interval lies above 0.5, USER\_DRIVEN if below, MIXED otherwise.
 
 \paragraph{Popularity and the store-name knockout.}
 Popularity $n_i$ is the all-time category event count, used through ranks. \emph{Level}: the partial Spearman correlation of $\ell$

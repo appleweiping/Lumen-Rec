@@ -74,8 +74,8 @@ main object and the zero-shot regime its contrast.
 \item[C1] \emph{What the confidence encodes.} A decomposition of the yes/no log-odds into user offset, item prior and pair-specific
   residual, with the information gain over the prior-only item mean as the measure of personal information, benchmarked against an
   item mean and matrix factorisation on the same pairs; a within-user estimator and the complementarity to collaborative filtering;
-  and three controls for what fine-tuning teaches: a within-item label permutation, an item-only teacher, and a store-name
-  pseudonym knockout with a real-brand placebo.
+  and three controls for what fine-tuning teaches: within-item label permutation, an item-only teacher and a store-name knockout
+  with a real-brand placebo.
 \item[C2] \emph{Which uses of the confidence survive a control.} The invariance lemma and a controlled test of each route it
   leaves open: item-dependent corrections (including a two-view contrast~\citep{burns2023ccs} that we evaluate, not propose)
   against a paraphrase placebo and an ensemble null; selective serving~\citep{geifman2017selective} against random coverage;

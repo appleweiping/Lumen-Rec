@@ -5,6 +5,9 @@ CPU only, no torch; every bound module is imported read-only and none is changed
     python -m src.confrec.ftq_panel build --domain toys --train outputs/confrec/ftgrid/panels/toys/train.jsonl \
         --qhat outputs/confrec/ftmethod/toys/train_qhat.csv.gz --qmanifest outputs/confrec/ftmethod/toys/qhat_manifest.json \
         --split outputs/confrec/ftgrid/panels/toys/ftgrid_split.json --out_dir outputs/confrec/ftgrid_q/ftq/toys
+    python -m src.confrec.ftq_panel verify_teacher --domain toys --train outputs/confrec/ftgrid/panels/toys/train.jsonl \
+        --qhat outputs/confrec/ftmethod/toys/train_qhat.csv.gz --qmanifest outputs/confrec/ftmethod/toys/qhat_manifest.json \
+        --split outputs/confrec/ftgrid/panels/toys/ftgrid_split.json --out_dir outputs/confrec/ftgrid_q/ftq/toys
     python -m src.confrec.ftq_panel recipe --adapters outputs/confrec/ftgrid/adapters/toys --model M --variant V \
         --train_ref outputs/confrec/ftgrid/panels/toys/train.jsonl --train_file outputs/confrec/ftgrid/panels/toys/train.jsonl \
         --split outputs/confrec/ftgrid/panels/toys/ftgrid_split.json --split_recipe
@@ -18,7 +21,7 @@ CPU only, no torch; every bound module is imported read-only and none is changed
     python -m src.confrec.ftq_panel link --real_scores outputs/confrec/ftgrid/scores/toys \
         --q_scores outputs/confrec/ftgrid_q/scores/toys --models zeroshot,s0,s1,s2 [--allow_copy]
     python -m src.confrec.ftq_panel record --pilot_log docs/sigir/PILOT_LOG.md --files scripts/sigir/run_ftq.sh \
-        src/confrec/ftq_panel.py [--print]
+        src/confrec/ftq_panel.py tests/test_confrec_ftq.py [--print]
     python -m src.confrec.ftq_panel info --selection .../selection.json --split .../ftgrid_split.json --gate .../gate_ft.json
 
 build           train_q.jsonl = the registered train.jsonl with `candidate_labels` replaced by the teacher labels and nothing else
@@ -28,7 +31,11 @@ build           train_q.jsonl = the registered train.jsonl with `candidate_label
                 ties (and a non-finite q-hat, which sorts after every finite one) go by the fixed seed-0 random key per example of
                 ftprune.tie_key("<user_id>::<item_id>"), smallest key first, the order of ftprune.removal_mask. The label of an
                 example is a function of the q-hat and the tie key of the examples only (teacher_labels has no access to a label;
-                only k = round(beta n) depends on the labels, as registered), so the teacher rate equals beta exactly. Inputs are
+                only k = round(beta n) depends on the labels, as registered), so the teacher rate equals beta exactly. It uses no
+                label of the example and no user preference information: the q-hat is an item statistic whose global prior leaves
+                the example's own user out (the independent review of this control measured on ML-1M that a user-free
+                recomputation moves 2 of 23,348 labels), and the tie key is a seed-0 hash of the user and item ids, a random key
+                and not a preference. Inputs are
                 checked: the registered train.jsonl (its sha1 is ftgrid_split.json's and the nested slot's manifest's), the stage-1
                 files against the manifest (train_lora_offset.load_train_z: format, sha1s, one q-hat row per example with the same
                 timestamp and label, z recomputed), and the q-hat rows aligned one to one, in train.jsonl order, with the TRAIN
@@ -36,6 +43,10 @@ build           train_q.jsonl = the registered train.jsonl with `candidate_label
                 and a numpy lexsort) and the written file is re-read and compared with train.jsonl field by field. Writes
                 train_q.jsonl and train_q.manifest.json (sha1 of train.jsonl, train_qhat.csv.gz, its manifest and train_q.jsonl,
                 beta, n, k, the tie seed, the code sha1; strict JSON, no clock, host or path: a rerun is byte-identical).
+verify_teacher  recomputes the teacher from train.jsonl and train_qhat.csv.gz (all of build, in memory: seconds of CPU) and requires
+                byte equality with train_q.jsonl and train_q.manifest.json in --out_dir. The script runs it before any training or
+                scoring, so the panel on disk is never trusted through a step marker or its manifest alone (a train_q.jsonl
+                replaced by the real labels with its manifest re-tagged is refused). Exit 1 on any difference.
 recipe          the trainer flags of the real adapters s0-s2 (ML-1M: Gate-FT's, outputs/confrec/gateft/adapters): every key of their
                 train_config.json that records an argument, except --train, --out and --seed (one token per line; an unset
                 optional flag is left out, which is the trainer's default again). s0, s1 and s2 must agree on every argument, on the
@@ -89,7 +100,7 @@ EFFECTIVE_BATCH = 32                        # micro-batch x accumulation (Amendm
 # the question `like`, no swap prior, no user cap, the scorer's default seed and chunk_items
 SCORE_REGISTERED = {"questions": ["like"], "swap_k": 0, "seed": 0, "dtype": "float16", "topk_logprobs": 50,
                     "max_model_len": 4096, "chunk_users": 100, "chunk_items": 1000, "readout": "yesno", "n_users": None}
-COMMANDS = ("build", "recipe", "scoring", "verify_adapter", "verify_scores", "link", "record", "info")
+COMMANDS = ("build", "verify_teacher", "recipe", "scoring", "verify_adapter", "verify_scores", "link", "record", "info")
 
 
 class FtqError(Exception):
@@ -155,7 +166,8 @@ def teacher_order(q_hat, tie) -> list:
 
 def teacher_labels(q_hat, tie, k: int) -> list:
     """The teacher: label 1 for the first k examples in teacher order, 0 for the others. It sees the q-hat and the tie key of
-    every example and nothing else (no label, no user, no time): a pure function of (q_hat, tie, k)."""
+    every example and nothing else: no label of the example, no user preference information (the q-hat leaves the example's
+    own user out of the global prior; the tie key is a random hash of the ids) and no time. A pure function of (q_hat, tie, k)."""
     n = len(q_hat)
     if len(tie) != n:
         raise FtqError(f"{len(tie)} tie keys for {n} q-hat values")
@@ -245,14 +257,14 @@ def aligned_qhat(train_path, qhat_path, qmanifest_path, ex: dict) -> list:
     return out
 
 
-def build(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
-    """train_q.jsonl and train_q.manifest.json under out_dir; the manifest."""
+def compute_teacher(train, qhat, qmanifest, *, domain: str, split=None) -> tuple:
+    """(the lines of train_q.jsonl, the manifest), recomputed from the registered train.jsonl and the nested slot's stage-1 files
+    with every input check and every assertion of the teacher; nothing is written (build writes, verify_teacher compares)."""
     import random
-    from src.confrec import build_rated_panels as brp
     from src.confrec import ftgrid_data as fd
     from src.confrec import ftprune
     from src.confrec.stats import strict_json
-    train, qhat, qmanifest, out = Path(train), Path(qhat), Path(qmanifest), Path(out_dir)
+    train, qhat, qmanifest = Path(train), Path(qhat), Path(qmanifest)
     for p, hint in ((train, "run_ftgrid.sh stage 0 writes panels/<d>/train.jsonl"),
                     (qhat, "run_ftmethod.sh <d> with STAGES=1 writes the nested slot's stage-1 files"),
                     (qmanifest, "run_ftmethod.sh <d> with STAGES=1 writes the nested slot's stage-1 files")):
@@ -331,7 +343,10 @@ def build(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
                     "q_hat": "train_qhat.csv.gz column q_hat of the nested slot's stage 1 (forensics.prior_means "
                              "mean_prior_shrunk, k = 5, other users' first ratings strictly before the example's time)",
                     "tie_seed": TIE_SEED, "tie_key": f"sha1('tie:{TIE_SEED}:<user_id>::<item_id>')",
-                    "order": "ftprune.removal_mask's order for one class: finite q-hat descending, then the tie key ascending"},
+                    "order": "ftprune.removal_mask's order for one class: finite q-hat descending, then the tie key ascending",
+                    "information": "no label of the example and no user preference information: the q-hat is an item statistic "
+                                   "whose global prior leaves the example's own user out, the tie key is a seed-0 hash of the "
+                                   "ids; only k = round(beta n) comes from the real TRAIN labels, as registered"},
         "beta": beta, "n": n, "k": k, "n_real_positives": positives, "n_teacher_positives": int(sum(labels)),
         "n_qhat_nonfinite": n_nonfinite,
         "agreement_with_real_labels": {
@@ -351,6 +366,14 @@ def build(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
         "split": split_info,
         "code_sha1": {"ftq_panel.py": file_sha1(__file__), "ftprune.py": file_sha1(ftprune.__file__),
                       "train_lora_offset.py": file_sha1(_tlo().__file__), "ftgrid_data.py": file_sha1(fd.__file__)}})
+    return teacher_lines, manifest
+
+
+def build(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
+    """train_q.jsonl and train_q.manifest.json under out_dir; the manifest."""
+    from src.confrec import build_rated_panels as brp
+    teacher_lines, manifest = compute_teacher(train, qhat, qmanifest, domain=domain, split=split)
+    teacher_sha1, out = manifest["train_q"]["sha1"], Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     staged = {TEACHER_NAME: out / (TEACHER_NAME + ".tmp"), MANIFEST_NAME: out / (MANIFEST_NAME + ".tmp")}
     try:
@@ -363,6 +386,24 @@ def build(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
             tmp.unlink(missing_ok=True)
     if file_sha1(out / TEACHER_NAME) != teacher_sha1:
         raise FtqError(f"{out / TEACHER_NAME} is not the file that was verified")
+    return manifest
+
+
+def verify_teacher(train, qhat, qmanifest, out_dir, *, domain: str, split=None) -> dict:
+    """The panel on disk is the teacher: recompute it from train.jsonl and the stage-1 files and require byte equality with
+    train_q.jsonl and with train_q.manifest.json in out_dir (a step marker or a manifest alone is no proof: a train_q.jsonl swapped
+    for another file with its manifest re-tagged is refused). Returns the manifest."""
+    teacher_lines, manifest = compute_teacher(train, qhat, qmanifest, domain=domain, split=split)
+    out = Path(out_dir)
+    for name, want in ((TEACHER_NAME, b"".join(teacher_lines)), (MANIFEST_NAME, json_bytes(manifest))):
+        path = out / name
+        if not path.is_file():
+            raise FtqError(f"{path}: missing (stage 1 writes the teacher panel and its manifest)")
+        got = path.read_bytes()
+        if got != want:
+            raise FtqError(f"{path} is not the teacher recomputed from {train} and {qhat}: it has {len(got)} bytes (sha1 "
+                           f"{sha1_bytes(got)}), the recomputation {len(want)} bytes (sha1 {sha1_bytes(want)}). The teacher "
+                           f"panel was changed after stage 1 or was built by other code: move {out} aside and rerun stage 1")
     return manifest
 
 
@@ -541,10 +582,35 @@ def check_provenance(adapter_dir, *, p_seed: int, train_q_sha1: str) -> None:
 
 
 # ---------------------------------------------------------------- the control root's links to the real scores
+def resolved(path) -> str:
+    """The physical path (links resolved), case-normalised where the platform folds case."""
+    return os.path.normcase(os.path.realpath(path))
+
+
+def is_link(path) -> bool:
+    """A symlink, or an NTFS junction (the symlink of a Windows box without the privilege)."""
+    return os.path.islink(path) or bool(getattr(os.path, "isjunction", lambda p: False)(path))
+
+
+def inside(path: str, root: str) -> bool:
+    """True iff the resolved path is the resolved root or lies below it."""
+    return path == root or path.startswith(root.rstrip(os.sep) + os.sep)
+
+
 def link_models(real_scores, q_scores, models, allow_copy: bool = False) -> list:
     """Make q_scores/<model> a relative symlink to real_scores/<model> for every model; returns one note per model. Never a
-    copy unless allow_copy (DRY_RUN on a platform without symlinks); never an existing link that points elsewhere."""
+    copy unless allow_copy (DRY_RUN on a platform without symlinks); never an existing link that points elsewhere. The FT-Q
+    scores directory is a directory of its own: it is not itself a link, and it is not the real scores directory nor below or
+    above it (a q_scores that resolves into the registered grid would make the links point at themselves or at their own
+    siblings, and could replace a registered score directory); every link made is asserted to resolve to its target."""
     real, q = Path(real_scores), Path(q_scores)
+    real_r, q_r = resolved(real), resolved(q)
+    if inside(q_r, real_r) or inside(real_r, q_r):
+        raise FtqError(f"{q} resolves to {q_r}, the real scores directory {real_r} or a directory below or above it: the FT-Q "
+                       "root is a root of its own and never the registered grid")
+    if is_link(q):
+        raise FtqError(f"{q} is itself a link (to {q_r}): the FT-Q scores directory is a real directory, only the model "
+                       "directories inside it are links")
     notes = []
     for m in models:
         target = real / m
@@ -568,6 +634,10 @@ def link_models(real_scores, q_scores, models, allow_copy: bool = False) -> list
             raise FtqError(f"{link} exists and is not a link to {target}: the real scores are linked, never copied")
         try:
             os.symlink(os.path.relpath(target, start=q), link, target_is_directory=True)
+            if resolved(link) != resolved(target):                       # asserted, not assumed
+                if os.path.islink(link):
+                    os.unlink(link)
+                raise FtqError(f"{link} was made but resolves to {resolved(link)}, not to {resolved(target)}")
             notes.append(f"[link] {link} -> {os.path.relpath(target, start=q)}")
         except (OSError, NotImplementedError) as e:
             if not allow_copy:
@@ -763,6 +833,13 @@ def main(argv=None) -> int:
             print(f"ftq_panel build: {a.domain}: the teacher labels {man['k']} of {man['n']} TRAIN examples 1 (beta = "
                   f"{man['beta']:.4f}) and agrees with the real label on "
                   f"{man['agreement_with_real_labels']['share_teacher_equals_real_label']:.1%}", file=sys.stderr)
+        elif a.command == "verify_teacher":
+            need(a, "domain", "train", "qhat", "qmanifest", "out_dir")
+            if a.domain not in DOMAINS:
+                raise FtqError(f"--domain {a.domain!r}: FT-Q runs on {', '.join(DOMAINS)}", 2)
+            man = verify_teacher(a.train, a.qhat, a.qmanifest, a.out_dir, domain=a.domain, split=a.split)
+            print(f"ftq_panel verify_teacher: {a.domain}: {Path(a.out_dir) / TEACHER_NAME} (sha1 {man['train_q']['sha1']}) and its "
+                  "manifest are byte for byte the teacher recomputed from train.jsonl and the stage-1 q-hat file")
         elif a.command == "recipe":
             print("\n".join(cmd_recipe(a)))
         elif a.command == "scoring":

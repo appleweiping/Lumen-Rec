@@ -1,5 +1,25 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Code record: the extra-analysis module (addendum 6 items 2-8, FT-Q reading of addendum 8); recorded before any non-ML-1M statistic was computed
+
+- `src/confrec/ftgrid_extra.py` = 8d0e5d86158b5f61c274d953d75ca63c169d44e5
+- `scripts/sigir/run_ftextra.sh` = b2d3826ec2d539672b0011d64f6e8477a8eef3a4
+- `tests/test_confrec_ftgrid_extra.py` = 4b99e214992318ea51b207427ee5b5630872ac6f
+
+Written by an implementer agent, reviewed twice by an independent same-family reviewer (two rounds, no blocker; three major and eight minor findings fixed,
+each replayed as a unit test; the reviewer recomputed 61 ML-1M statistics with its own code, all within 1e-15). Tests: 58 pass on the server
+(CPU, with the report's 26). The module reuses the bound report code read-only and reproduces its registered numbers exactly (`registered_pooled`).
+ML-1M run (exploratory, server CPU): `outputs/confrec/ftgrid/extra/ml1m.json` sha1 dfb7fc476750e52faef0cd76744d99bf830b5f68 (G_wu zero-shot +0.0001,
+LoRA +0.0091; G_{LLM|CF} LoRA +0.0035 [-0.0016, +0.0092]; item share of the LoRA confidence 0.902; dUAUC(L - q-hat) LoRA -0.0161 [-0.0291, -0.0026]; deployable
+top-k error rate 0.401 / 0.318 against the oracle 0.339 / 0.250 for zero-shot / LoRA). Notes for the record: (1) the module was extended after addendum 8
+was written (FT-Q: the q-hat companion, the control-root scoping, `ft_wording`, `summarize --ftc/--ftq`), so addendum 8's "used as they are" holds for the
+bound code only; (2) the module's readings R1-R19 (docstring, copied into every output) include choices stricter than the registered text (R13) and the
+cut rule `FTEXTRA_NOT_RUN <dataset>` for a panel whose fine-tuned runs are cut at a section-10 checkpoint; (3) until this commit the server checkout held
+earlier versions of the module and runner (f5fe320a, 56b0aad9), which refuse nothing relevant but have the old dry-run guard; the reviewed files are the
+ones recorded here. At the time of recording the Toys fine-tuned job (`32_ft_toys`) had finished on the server (report written 2026-10-05 10:29 +0800); no
+Toys, Video_Games or Sports report, score table, knockout analysis or extra-analysis output has been opened or pulled by anyone, and the server's Toys
+files were only listed by name and size.
+
 ## 2026-10-05 · Wording rules record, update after editor pass 1 (recorded before any further result file was pulled)
 
 `scripts/sigir/fill_paper.py` sha1 = eb85eb91ef799ebb26e8f3b7723fd710f099eae4 and `docs/sigir/PAPER_DATA_MAP.md` sha1 = 08354e11225cfbe5a7c7d745a98704067d6eb0be (the previous record of 2026-10-04 was b2702b7f69b8cfcb72668d860b9a821a9b32e1e9

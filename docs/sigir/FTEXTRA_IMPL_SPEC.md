@@ -87,6 +87,9 @@ that keeps all / none of the gain); seed aggregation incomplete -> `complete: fa
 determinism (two runs byte-identical); no NaN in the JSON.
 
 ## X2: `scripts/sigir/run_ftc.sh` and `src/confrec/ftc_panel.py` (FT-C on Toys, A3-6 item 8)
+**Superseded on 2026-10-05 by addendum 8** (idea-stage/PREREG_AMENDMENT_3_ADDENDUM_8.md): the Toys permutation run is withdrawn (the permutation moves 5.1% of
+the Toys TRAIN labels); the files named below were replaced by `scripts/sigir/run_ftq.sh`, `src/confrec/ftq_panel.py` and `tests/test_confrec_ftq.py` (FT-Q, an
+item-only teacher control run in `outputs/confrec/ftgrid_q/`). The text of this section is kept as the history of the interface that was first specified.
 No bound file changes. `ftc_panel.py` builds `outputs/confrec/ftgrid/ftc/toys/train_perm.jsonl` from
 `outputs/confrec/ftgrid/panels/toys/train.jsonl` with `ftgrid_data.permute_within_item(rows, 0)` (import, never copy), asserts what
 `ftgrid_data` asserts for ML-1M (every item's label sum and rating multiset preserved, nothing else changes), and writes a manifest

@@ -48,6 +48,21 @@ foreach ($d in "ml1m", "toys") {
   Add-F "grid" "outputs/confrec/ftgrid_llama/report/${d}_tables.csv"      "grid/llama/${d}_tables.csv"
   Add-F "grid" "outputs/confrec/ftgrid_llama/panels/$d/ftgrid_split.json" "grid/llama/${d}_split.json"
 }
+# alias ext: the extra analyses of Amendment 3 addendum 6 (src/confrec/ftgrid_extra.py, scripts/sigir/run_ftextra.sh): per
+# domain (Qwen root), Llama root, the FT-Q teacher root (addendum 8) and the cross-domain summary with the Holm families
+foreach ($d in "ml1m", "toys", "games", "sports") {
+  Add-F "ext" "outputs/confrec/ftgrid/extra/$d.json"         "extra/$d.json"
+  Add-F "ext" "outputs/confrec/ftgrid/extra/${d}_tables.csv" "extra/${d}_tables.csv"
+}
+Add-F "ext" "outputs/confrec/ftgrid/extra/summary.json" "extra/summary.json"
+foreach ($d in "ml1m", "toys") {
+  Add-F "ext" "outputs/confrec/ftgrid_llama/extra/$d.json"         "extra/llama/$d.json"
+  Add-F "ext" "outputs/confrec/ftgrid_llama/extra/${d}_tables.csv" "extra/llama/${d}_tables.csv"
+}
+foreach ($d in "ml1m", "toys", "games", "sports") {
+  Add-F "ext" "outputs/confrec/ftgrid_q/extra/$d.json"         "extra/ftq/$d.json"
+  Add-F "ext" "outputs/confrec/ftgrid_q/extra/${d}_tables.csv" "extra/ftq/${d}_tables.csv"
+}
 Add-F "prn"  "outputs/confrec/ftprune/pruning_ml1m.json" "prn/pruning_ml1m.json"
 Add-F "prn"  "outputs/confrec/ftprune/pruning_ml1m.csv"  "prn/pruning_ml1m.csv"
 Add-F "slot" "outputs/confrec/ftmethod/slot.json"        "slot/slot.json"

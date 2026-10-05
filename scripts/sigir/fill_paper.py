@@ -51,10 +51,8 @@ ROOT = Path(__file__).resolve().parents[2]
 SECTION_FILES = ("abstract", "introduction", "related_work", "preliminaries", "observation", "method", "experiments",
                  "conclusion", "appendix")
 ALIASES = ("sel", "gate", "gft", "aud", "aud2q", "aud2l", "grid", "cpu", "ko", "prn", "slot", "corr", "mir", "ext")
-# ext: the addendum-6 analysis (A3-6 items 2-8; docs/sigir/FTEXTRA_IMPL_SPEC.md), per domain and backbone plus its cross-domain
-# summary. Its specs below are placeholders that keep every ext slot red (result_file_missing) until the file exists and the specs
-# are completed against its real schema (editor pass 2).
-EXT_DETAIL = "extra-analysis file not produced yet"
+# ext: the addendum-6 analysis (src/confrec/ftgrid_extra.py, A3-6 items 2-8, addendum 8 for FT-Q): extra/<d>.json (Qwen main root),
+# extra/llama/<d>.json, extra/ftq/<d>.json (the FT-Q teacher root) and extra/summary.json (section "alias ext" below).
 MIN_N = 150                                   # A3 section 1: fewer users = descriptive
 RATED = ("ml1m", "toys", "games", "sports")   # rated panels, registered order
 RATED_NAME = {"ml1m": "ML-1M", "toys": "Toys", "games": "Video Games", "sports": "Sports"}
@@ -824,13 +822,13 @@ def rel_rows(bb: str, p1_label: str) -> dict:
     def g_cf_span(R, c, k, s):
         """'G_CF: E-D / E-W': the registered G_CF of E-D (k = 0; no LLM feature, one value per panel, read from the zero-shot
         regime's rows and from the fine-tuned regime's when the zero-shot block is unavailable) and the within-user G_CF,wu of
-        the addendum-6 analysis (k = 1; ext, pending)."""
+        the addendum-6 analysis (k = 1, alias ext, the same rows rule)."""
         d, reg = c
         if reg != "span":
             raise SpecError("a spanning row has a per-regime cell")
         if k == 1:
             expect(s, "ext:E_W.G_CF_wu")
-            raise Missing("result_file_missing", EXT_DETAIL)
+            return ext_g_cf_wu(R, ext_rel(bb, d))
         if k != 0:
             raise SpecError(f"no third slot expected in the G_CF cell ({k})")
         expect(s, "grid:G_CF")
@@ -850,35 +848,27 @@ def rel_rows(bb: str, p1_label: str) -> dict:
             return first
         raise first
 
-    def item_shares(R, c, k, s):
-        """'Item share: MF (b_i) / label (m)' of E-G (ext, pending; one value per panel)."""
-        d, reg = c
-        if reg != "span":
-            raise SpecError("a spanning row has a per-regime cell")
-        expect(s, ("ext:E_G.item_share_mf", "ext:E_G.item_share_label")[min(k, 1)])
-        raise Missing("result_file_missing", EXT_DETAIL)
-
     rows = {
         # ---- tab:tracks block A (and tab:app-llama, which uses the same labels)
         r"UAUC of $\ell$": stat("grid:UAUC", "E_A", ("UAUC_TEST",)),
         r"LoRA $-$ ZS (E-B)": span(e_b),
         r"item mean $m$ (ref.)": span(ref("q_hat", "cpu:UAUC_item_mean_prior")),
-        r"matched mean $m_T$ (ref.)$^\dagger$": ext_pending("ext:E_J.UAUC_q_hat_T"),
+        r"matched mean $m_T$ (ref.)$^\dagger$": ext_span_q_hat_T(bb),
         r"temporal MF (ref.)": span(ref("mf", "cpu:UAUC_mf_temporal")),
-        r"$\Delta$UAUC($\ell-m$), E-J$^\dagger$": ext_pending("ext:E_J.dUAUC_L_minus_q_hat"),
-        r"$\Delta$UAUC($\ell-$MF), warm$^\dagger$": ext_pending("ext:E_J.dUAUC_L_minus_mf"),
+        r"$\Delta$UAUC($\ell-m$), E-J$^\dagger$": ext_stat(bb, "ext:E_J.dUAUC_L_minus_q_hat", "E_J", ("dUAUC_L_minus_q_hat",)),
+        r"$\Delta$UAUC($\ell-$MF), warm$^\dagger$": ext_stat(bb, "ext:E_J.dUAUC_L_minus_mf", "E_J", ("dUAUC_L_minus_MF_warm",)),
         r"Users: TEST / $S_d$": users,
         # ---- block B
         r"Reliability $r_8$ of $\hat\pi$": stat("grid:r8c", "E_D", ("shares",), "r8c"),
         r"Item-prior share $\rho^2/r_8$": stat("grid:item_prior_share", "E_D", ("shares",), "item_prior_share",
                                                special="shares"),
-        r"e-share$^\dagger$": ext_pending("ext:E_G.e_share"),
-        r"Item share of MF / label$^\dagger$": item_shares,
+        r"e-share$^\dagger$": ext_stat(bb, "ext:E_G.e_share", "E_G", ("e_share",), leaf="e_share"),
+        r"Item share of MF / label$^\dagger$": ext_item_shares(bb),
         # G and the star permutation keep their seed mean under their own keys (G_mean_over_seeds,
         # dUAUC_mean_over_seeds; ftgrid_report.stacker_block / starperm_block)
         r"$\mathcal G=\Delta$UAUC(M2$-$M1), E-D": mean_keyed(bb, "grid:G", ("information_gain",), "G",
                                                              "G_mean_over_seeds"),
-        r"$\mathcal G_{\rm wu}$ (E-W)$^\dagger$": ext_pending("ext:E_W.G_wu"),
+        r"$\mathcal G_{\rm wu}$ (E-W)$^\dagger$": ext_stat(bb, "ext:E_W.G_wu", "E_W", ("G_wu",)),
         r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$": g_cf_span,
         r"MF personal residual (ref.)": span(ref("mf_personal_residual_warm", "cpu:UAUC_mf_personal_residual")),
         r"Star permutation $\Delta$UAUC": mean_keyed(bb, "grid:starperm_dUAUC", ("star_permutation",),
@@ -886,7 +876,7 @@ def rel_rows(bb: str, p1_label: str) -> dict:
         r"Popularity link of $\hat\pi$": stat("grid:partial_rho_pi_logpop", "E_E", ("partial_spearman", "pi_item")),
         r"Popularity link of $\ell$": stat("grid:partial_rho_L_logpop", "E_E", ("partial_spearman", "L_item")),
         p1_label: span(p1),
-        r"P1$_{\rm wu}$$^\dagger$": ext_pending("ext:E_W.P1_wu"),
+        r"P1$_{\rm wu}$$^\dagger$": ext_p1_wu(bb),
         # ---- block C (oracle rows: E-C of the grid report; deployable rows: E-C' of the addendum-6 analysis). The UAUC of pi-hat
         # alone, the Platt slope and the AURC stay in the released files (editor pass 2026-10-05, page budget).
         r"ECE (after Platt)": stat("grid:ece10_platt", "E_C", (), "ECE"),
@@ -895,8 +885,7 @@ def rel_rows(bb: str, p1_label: str) -> dict:
         r"Errors in top tertile, oracle": stat("grid:share_errors_top_tertile", "E_C", (), "share_errors_top"),
         r"Margin AUROC, oracle": stat("grid:auroc_margin_correct", "E_C", (), "AUROC_margin_correct"),
         # the three deployable rows share their label; the slot text names the statistic
-        r"deployable$^\dagger$": ext_pending("ext:E_Cprime.share_correct_bottom", "ext:E_Cprime.share_errors_top",
-                                             "ext:E_Cprime.AUROC_margin"),
+        r"deployable$^\dagger$": ext_deployable(bb),
         # ---- tab:app-llama: the Llama Toys knockout (alias ko of the Llama grid report)
         r"Knockout: head $-$ tail drop of $\ell$": ko_handler(r"Head $-$ tail drop of $\ell$", bb),
         r"Knockout: registered label": ko_handler(r"Registered label (per seed)", bb),
@@ -904,12 +893,218 @@ def rel_rows(bb: str, p1_label: str) -> dict:
     return rows
 
 
-def ext_pending(*slot_texts):
-    """A table cell of the addendum-6 analysis (alias ext): checks the slot text and stays red until the result file exists and
-    the spec is completed against its schema (editor pass 2)."""
+# ================================================================================================ alias ext
+# The addendum-6 analysis (src/confrec/ftgrid_extra.py; A3-6 items 2-8, addendum 8 for FT-Q) at the local paths of
+# scripts/sigir/pull_results.ps1: extra/<d>.json (Qwen main root), extra/llama/<d>.json (Llama root), extra/ftq/<d>.json (the FT-Q
+# teacher root) and extra/summary.json (the A3-6 Holm families E-F, E-H, E-J, the robust readings, the addendum-8 wording). Editor
+# pass 2 (2026-10-05): written against the module's real schema (its readings R1-R19, `summarize`, the tests of
+# tests/test_confrec_ftgrid_extra.py) and the real ML-1M file. A block the file marks unavailable stays red with its own reason.
+EXT_SUM = "extra/summary.json"
+
+
+def ext_rel(bb: str, d: str) -> str:
+    """The domain file of a backbone's root: the Qwen main root extra/<d>.json, the Llama root extra/llama/<d>.json."""
+    return f"extra/{d}.json" if bb == "qwen" else f"extra/{bb}/{d}.json"
+
+
+def ftq_rel(d: str) -> str:
+    """The FT-Q teacher root's domain file (addendum 8; its FT_C_reading block is the FT-Q reading R_Q)."""
+    return f"extra/ftq/{d}.json"
+
+
+def ext_mark(R, rel: str, text: str) -> str:
+    """A3-6 Consequence (ftgrid_extra R1): items 2-7 are exploratory on ML-1M (either backbone) and registered, outcome-free on every
+    other panel. An exploratory value is set in italics; the status is read from the file (status.items_2_to_7), never from the
+    column."""
+    st = R.get(rel, "status", "items_2_to_7")
+    if st == "exploratory":
+        return r"\textit{" + text + "}"
+    if st != "registered_outcome_free":
+        raise Missing("field_not_produced", f"{rel}: status.items_2_to_7 is {st!r} (exploratory or registered_outcome_free)")
+    return text
+
+
+def ext_zs_failed(R, rel: str) -> bool:
+    """True when the extra file excluded the zero-shot model's like or swap arm for E1 (the cell reads FAILED_INTEGRITY)."""
+    try:
+        runs = R.get(rel, "runs", "zeroshot")
+    except Missing:
+        return False
+    return any((runs.get(a) or {}).get("status") == "FAILED_INTEGRITY" for a in ("like", "swap"))
+
+
+def ext_regime_val(R, rel: str, block: str, reg: str, sub: tuple = (), leaf: str | None = None,
+                   mean_leaf: str | None = None) -> Val:
+    """A per-regime statistic of an extra file: <block>.<reg>.<sub...> holds per-model records (per_model; per_seed in E-J) and
+    their mean_over_seeds (ftgrid_extra's seed summaries). ZS: the zeroshot record (at its leaf); FT: the seed mean with its
+    interval and the s.d. (ddof 1) of the three seed estimates; fewer than the registered seeds -> incomplete_regime (never
+    replaced, as the grid cells)."""
+    if reg == "FT":
+        require_ft(R)
+    try:
+        node = R.get(rel, block, reg)
+        if reg == "FT" and node.get("complete") is False:
+            raise Missing("incomplete_regime", f"{rel}: {block}.FT has models {node.get('models')}, missing or excluded "
+                                               f"{node.get('missing_or_excluded')} (never replaced)")
+        blk = R.get(rel, block, reg, *sub)
+        per_key = "per_model" if isinstance(blk, dict) and "per_model" in blk else "per_seed"
+        lf = (leaf,) if leaf else ()
+        if reg == "ZS":
+            return val(R.get(rel, block, reg, *sub, per_key, "zeroshot", *lf))
+        have = R.get(rel, block, reg, *sub, per_key)
+        if any(m not in have for m in FT_MODELS):
+            raise Missing("incomplete_regime", f"{rel}: {'.'.join((block, reg) + tuple(sub))} has seeds {sorted(have)} "
+                                               "(s0-s2 registered; a missing seed is never replaced)")
+        per = [R.get(rel, block, reg, *sub, per_key, m, *lf, "est") for m in FT_MODELS]
+        ml = (mean_leaf,) if mean_leaf else ()
+        return val(R.get(rel, block, reg, *sub, "mean_over_seeds", *ml), sd=stdev(per))
+    except Missing as e:
+        if reg == "ZS" and e.reason in ("result_not_in_report", "field_not_produced") and ext_zs_failed(R, rel):
+            return Val(text=r"FAILED\_INTEGRITY")
+        raise
+
+
+def _ext_cell(R, c, bb: str, block: str, sub: tuple, leaf: str | None = None, mean_leaf: str | None = None) -> str:
+    d, reg = c
+    if reg == "span":
+        raise SpecError("a per-regime row has a spanning cell")
+    rel = ext_rel(bb, d)
+    v = ext_regime_val(R, rel, block, reg, sub, leaf, mean_leaf)
+    return v.text if v.text is not None else ext_mark(R, rel, fmt(v))
+
+
+def ext_stat(bb: str, slot_text: str, block: str, sub: tuple = (), leaf: str | None = None, mean_leaf: str | None = None):
+    """A per-regime row of tab:tracks, tab:teaches or tab:app-llama read from the extra file of the backbone's root."""
     def h(R, c, k, s):
-        expect(s, *slot_texts)
-        raise Missing("result_file_missing", EXT_DETAIL)
+        expect(s, slot_text)
+        return _ext_cell(R, c, bb, block, sub, leaf, mean_leaf)
+    return h
+
+
+EXT_DEPLOYABLE = {"ext:E_Cprime.share_correct_bottom": "share_correct_bottom",
+                  "ext:E_Cprime.share_errors_top": "share_errors_top",
+                  "ext:E_Cprime.AUROC_margin": "AUROC_margin_correct"}
+
+
+def ext_deployable(bb: str):
+    """The three deployable rows of E-C' (A3-6 item 7) share one row label: the slot text names the statistic of
+    E_Cprime.<reg>.deployable."""
+    def h(R, c, k, s):
+        key = EXT_DEPLOYABLE[expect(s, *EXT_DEPLOYABLE)]
+        return _ext_cell(R, c, bb, "E_Cprime", ("deployable",), key, key)
+    return h
+
+
+def ext_span_q_hat_T(bb: str):
+    """'matched mean m_T (ref.)': the UAUC of q-hat_T on E-A's TEST rows, i.e. UAUC_b of E-J's dUAUC(L - q-hat_T) record (an
+    estimate: the file holds no interval for it); one value per panel, from the zero-shot rows, else the fine-tuned rows."""
+    def h(R, c, k, s):
+        expect(s, "ext:E_J.UAUC_q_hat_T")
+        d, reg = c
+        if reg != "span":
+            raise SpecError("a spanning row has a per-regime cell")
+        rel, first = ext_rel(bb, d), None
+        for reg_, m in (("ZS", "zeroshot"), ("FT", "s0")):
+            try:
+                x = R.get(rel, "E_J", reg_, "dUAUC_L_minus_q_hat_T", "per_seed", m, "UAUC_b")
+            except Missing as e:
+                if e.reason == "result_file_missing":
+                    raise
+                first = first or e
+                continue
+            return ext_mark(R, rel, fmt(val(x)))
+        raise first
+    return h
+
+
+def ext_item_shares(bb: str):
+    """'Item share of MF / label' (E-G ii and iii; once per panel): the MF score with its item bias (k = 0) and the label with
+    q-hat (k = 1), E_G.<MF_score_item_bias | label_q_hat>.item_share."""
+    def h(R, c, k, s):
+        d, reg = c
+        if reg != "span":
+            raise SpecError("a spanning row has a per-regime cell")
+        if k > 1:
+            raise SpecError(f"no third slot expected in the item-share cell ({k})")
+        name, blk = (("ext:E_G.item_share_mf", "MF_score_item_bias"), ("ext:E_G.item_share_label", "label_q_hat"))[k]
+        expect(s, name)
+        rel = ext_rel(bb, d)
+        return ext_mark(R, rel, fmt(val(R.get(rel, "E_G", blk, "item_share"))))
+    return h
+
+
+def ext_g_cf_wu(R, rel: str) -> str:
+    """G_CF,wu = dUAUC(M3 - M0) of E-W (no LLM feature: one value per panel), from the zero-shot rows, else the fine-tuned rows."""
+    first = None
+    for reg in ("ZS", "FT"):
+        try:
+            return ext_mark(R, rel, fmt(val(R.get(rel, "E_W", reg, "G_CF_wu"))))
+        except Missing as e:
+            if e.reason == "result_file_missing":
+                raise
+            first = first or e
+    raise first
+
+
+def ext_p1_wu(bb: str):
+    """P1_wu (A3-6 item 2): P1's quantity with the within-user estimator, an ML-1M cell as P1's: the three seed contrasts, their
+    mean with its interval and p (a sensitivity estimate; P1 itself is the grid row above)."""
+    def h(R, c, k, s):
+        expect(s, "ext:E_W.P1_wu")
+        d, reg = c
+        if reg != "span" or d != "ml1m":
+            raise SpecError("P1_wu is an ML-1M spanning cell")
+        require_ft(R)
+        rel = ext_rel(bb, d)
+        R.get(rel, "E_W", "P1_wu")                    # available false -> result_not_in_report with its reason
+        per = [R.get(rel, "E_W", "P1_wu", "per_seed", m, "est") for m in FT_MODELS]
+        rec = R.get(rel, "E_W", "P1_wu", "mean_over_seeds")
+        p = rec.get("p")
+        ptxt = ("$p$ " + pval(p)) if _fin(p) else "no $p$ (descriptive)"
+        return ext_mark(R, rel, " / ".join(num(x) for x in per) + "; " + fmt(val(rec)) + ", " + ptxt)
+    return h
+
+
+def ext_reading_cell(R, rel: str, control: str, kind: str) -> str:
+    """A cell of an FT-C / FT-Q reading (A3-6 item 8; addendum 8): the FT_C_reading block of the file, which must be the control
+    the row names; an unavailable block stays red with the file's own reason. kind R: the retention with its interval, or 'not
+    defined' when the file records that R is not defined (R13; its label then reads NOT_DEFINED); label: the label verbatim; UAUC:
+    addendum 8's descriptive companion, the UAUC of the two control adapters and of q-hat on the same rows (estimates)."""
+    require_ft(R)
+    b = R.get(rel, "FT_C_reading")
+    if b.get("control") != control:
+        raise Missing("field_not_produced", f"{rel}: FT_C_reading is the {b.get('control')!r} control, not {control}")
+    if kind == "label":
+        return tex(R.get(rel, "FT_C_reading", "label"))
+    if kind == "UAUC":
+        return " / ".join([num(R.get(rel, "FT_C_reading", "UAUC", m, "est")) for m in ("p0", "p1")]
+                          + [num(R.get(rel, "FT_C_reading", "UAUC_q_hat", "est"))])
+    defined = R.get(rel, "FT_C_reading", "defined")
+    if defined is False:
+        return "not defined"
+    if defined is not True:
+        raise Missing("field_null", f"{rel}: FT_C_reading.defined is {defined!r}")
+    return fmt(val(R.get(rel, "FT_C_reading", "R")))
+
+
+def ext_ftc(R, c, k, s):
+    """'FT-C (permuted): R / reading': the ML-1M LoRA cell only (addendum 8 withdrew the Toys run): R (k = 0), label (k = 1)."""
+    d, reg = c
+    if (d, reg) != ("ml1m", "FT") or k > 1:
+        raise SpecError("FT-C is the ML-1M LoRA cell (R / label)")
+    kind = ("R", "label")[k]
+    expect(s, f"ext:FT_C_reading.{kind}")
+    return ext_reading_cell(R, ext_rel("qwen", "ml1m"), "FT-C", kind)
+
+
+def ext_ftq(kind: str):
+    """The FT-Q rows (addendum 8): the LoRA cell of each dataset, read from the teacher root's file."""
+    def h(R, c, k, s):
+        d, reg = c
+        if reg != "FT":
+            raise SpecError("FT-Q is a LoRA cell")
+        expect(s, f"ext:FT_Q_reading.{kind}")
+        return ext_reading_cell(R, ftq_rel(d), "FT-Q", kind)
     return h
 
 
@@ -1358,17 +1553,19 @@ def z2_handler(label):
     return h
 
 
-# ---- tab:teaches (editor pass 2026-10-05): E-F, E-H and the FT-C reading of the addendum-6 analysis (alias ext, pending) and the
-# Qwen knockout rows of the former tab:popularity (alias ko); columns as tab:tracks (ML-1M has no store field: no knockout cell).
+# ---- tab:teaches (editor pass 2026-10-05; pass 2): E-F, E-H, the FT-C reading (ML-1M only, addendum 8) and the FT-Q readings of the
+# addendum-6 analysis (alias ext) and the Qwen knockout rows of the former tab:popularity (alias ko); columns as tab:tracks (ML-1M
+# has no store field: no knockout cell).
 TEACH_ROWS = {
-    r"$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3)": ext_pending("ext:E_F.G_LLM_given_CF"),
-    r"$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2)": ext_pending("ext:E_F.G_CF_given_LLM"),
-    r"Sparse rows ($m$ from $<5$ ratings)": ext_pending("ext:E_H.sparse.G_prior"),
-    r"Dense rows": ext_pending("ext:E_H.dense.G_prior"),
-    r"Unseen items (no TRAIN example)": ext_pending("ext:E_H.unseen.G_prior"),
-    r"Seen items": ext_pending("ext:E_H.seen.G_prior"),
-    r"Retention $R$$^\dagger$": ext_pending("ext:FT_C_reading.R"),
-    r"Reading$^\dagger$": ext_pending("ext:FT_C_reading.label"),
+    r"$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3)": ext_stat("qwen", "ext:E_F.G_LLM_given_CF", "E_F", ("G_LLM_given_CF",)),
+    r"$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2)": ext_stat("qwen", "ext:E_F.G_CF_given_LLM", "E_F", ("G_CF_given_LLM",)),
+    **{label: ext_stat("qwen", f"ext:E_H.{st}.G_prior", "E_H", ("strata", st, "G_prior"))
+       for label, st in ((r"Sparse rows ($m$ from $<5$ ratings)", "sparse"), (r"Dense rows", "dense"),
+                         (r"Unseen items (no TRAIN example)", "unseen"), (r"Seen items", "seen"))},
+    r"FT-C (permuted): $R$ / reading": ext_ftc,
+    r"FT-Q (teacher): $R_Q$": ext_ftq("R"),
+    r"reading": ext_ftq("label"),
+    r"UAUC of $q_0$ / $q_1$ / $m$": ext_ftq("UAUC"),
     r"Head $-$ tail drop of $\ell$": ko_handler(r"Head $-$ tail drop of $\ell$"),
     r"Placebo drop": ko_handler(r"Placebo drop (real-brand swap)"),
     r"Tail $\Delta$UAUC": ko_handler(r"Tail $\Delta$UAUC"),
@@ -1963,16 +2160,150 @@ def p_mir_decision(R, s):
     return tex(R.get(MIR, "decision"))
 
 
+# ---- alias ext, prose (editor pass 2, 2026-10-05). The A3-6 families are summarize's (extra/summary.json): their members,
+# confirmations (R14: Holm p < 0.05, the sigma_seed rule for FT members, the hypothesised sign for H-F and H-S) and the outside
+# members are printed as counts (the count rule of A3-6 item 9.2), never as one word for a mixed outcome; E-J is two-sided and the
+# sign of a confirmed member is reported as found. Nothing here confirms anything that summarize did not confirm.
+AMAZON = ("toys", "games", "sports")
+
+
+def _names(ds) -> str:
+    names = [RATED_NAME[d] for d in ds]
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def _ext_family(R, fam: str) -> tuple:
+    """(members, outside) of an A3-6 family of the summary (ftgrid_extra.holm_family)."""
+    f = R.get(EXT_SUM, "families", fam)
+    return f.get("members") or {}, f.get("outside_family") or {}
+
+
+def _not_run_note(R) -> str:
+    """The panels whose fine-tuned runs are a registered cut recorded in the summary (not members of the FT families)."""
+    cut = [d for d in AMAZON if d in (R.get(EXT_SUM, "not_run") or {})]
+    return f" ({_names(cut)}: fine-tuning not run)" if cut else ""
+
+
+def c_ext_ef(R, s):
+    """H-F (A3-6 item 3): the E-F members confirmed by summarize out of the family's members (Qwen Amazon panels, FT)."""
+    require_ft(R)
+    mem, _ = _ext_family(R, "E_F")
+    k = sum(1 for v in mem.values() if v.get("confirmed") is True)
+    return f"{k} of {len(mem)} Qwen Amazon panels" + _not_run_note(R)
+
+
+def c_ext_eh(reg: str):
+    """H-S (A3-6 item 5): the E-H members of a regime (panel runs with at least 150 users on sparse rows) confirmed by summarize,
+    out of the regime's members; the panel runs outside the family by the minimum-n rule are named."""
+    word = {"ZS": "zero-shot", "FT": "fine-tuned"}[reg]
+
+    def h(R, s):
+        if reg == "FT":
+            require_ft(R)
+        mem, out = _ext_family(R, "E_H")
+        mem = {k: v for k, v in mem.items() if k.endswith(":" + reg)}
+        out = [k.split(":")[0] for k in out if k.endswith(":" + reg)]
+        below = f" ({_names([d for d in AMAZON if d in out])} below 150 users)" if out else ""
+        if not mem:
+            if not out:
+                raise Missing("not_decided", f"{EXT_SUM}: the E-H family has no {word} panel run")
+            return f"none of the {word} panel runs{below}"
+        k = sum(1 for v in mem.values() if v.get("confirmed") is True)
+        return f"{k} of {len(mem)} {word} panel runs{below}"
+    return h
+
+
+def c_ext_ej(R, s):
+    """H-J (A3-6 item 6, two-sided): the E-J members confirmed by summarize out of the family's members, with the sign of each
+    confirmed member as found (below or above the item mean)."""
+    require_ft(R)
+    mem, _ = _ext_family(R, "E_J")
+    conf = [d for d in AMAZON if (mem.get(d) or {}).get("confirmed") is True]
+    if any(d not in AMAZON for d in mem):
+        raise Missing("field_not_produced", f"{EXT_SUM}: E-J members {sorted(mem)} (the Qwen Amazon panels)")
+    below = [d for d in conf if (mem[d].get("sign") or 0) < 0]
+    above = [d for d in conf if (mem[d].get("sign") or 0) > 0]
+    if len(below) + len(above) != len(conf):
+        raise Missing("field_null", f"{EXT_SUM}: a confirmed E-J member has no sign")
+    parts = ([f"below it on {_names(below)}"] if below else []) + ([f"above it on {_names(above)}"] if above else [])
+    return (f"{len(conf)} of {len(mem)} Qwen Amazon panels" + (f" ({'; '.join(parts)})" if parts else "")
+            + _not_run_note(R))
+
+
+ROBUST_WORDS = {"robust": "robust", "estimator_dependent": "estimator-dependent",
+                "seed_sign_disagreement": "seed-sign dependent", "both_intervals_include_0": "both intervals include 0",
+                "descriptive_min_n": "descriptive (fewer than 150 users)"}
+
+
+def c_ext_robust(R, s):
+    """A3-6 item 2 reading rule (R6, R17) on the Qwen Amazon panels (registered, outcome-free), per regime: how many panels read
+    'robust' among those with a reading; the estimator-dependent ones are named (the paper calls them so)."""
+    require_ft(R)
+    rr = R.get(EXT_SUM, "robust_readings")
+    n, k, dep = {"ZS": 0, "FT": 0}, {"ZS": 0, "FT": 0}, []
+    for reg in ("ZS", "FT"):
+        for d in AMAZON:
+            reading = ((rr.get(f"{d}:{reg}") or {}).get("G") or {}).get("reading")
+            if reading is None or reading == "not_available":
+                continue
+            if reading not in ROBUST_WORDS:
+                raise Missing("field_not_produced", f"{EXT_SUM}: robust_readings.{d}:{reg}.G.reading = {reading!r}")
+            n[reg] += 1
+            k[reg] += reading == "robust"
+            if reading == "estimator_dependent":
+                dep.append(f"{RATED_NAME[d]} ({'zero-shot' if reg == 'ZS' else 'fine-tuned'})")
+    if not (n["ZS"] or n["FT"]):
+        raise Missing("not_decided", f"{EXT_SUM}: no Qwen Amazon panel has a reading of G")
+    out = (f"robust on {k['ZS']} of {n['ZS']} zero-shot and {k['FT']} of {n['FT']} fine-tuned Qwen Amazon panels")
+    return out + (f"; estimator-dependent on {', '.join(dep)}" if dep else "")
+
+
+def p_ext_p1_reading(R, s):
+    """The A3-6 item 2 reading of P1 (ML-1M, Qwen3-8B): the registered P1 against its within-user estimate (E_W.P1_wu.reading_P1),
+    labelled exploratory when the file says so (A3-6 Consequence)."""
+    require_ft(R)
+    rel = ext_rel("qwen", "ml1m")
+    reading = R.get(rel, "E_W", "P1_wu", "reading_P1", "reading")
+    if reading not in ROBUST_WORDS:
+        raise Missing("field_not_produced", f"{rel}: E_W.P1_wu.reading_P1.reading = {reading!r}")
+    expl = R.get(rel, "status", "items_2_to_7") == "exploratory"
+    return ROBUST_WORDS[reading] + (" (exploratory)" if expl else "")
+
+
+def c_ext_ft_wording(R, s):
+    """Addendum 8 section 2 (ftgrid_extra R18, summarize's ft_wording): 'fine-tuning mostly teaches the item' only if FT-C reads
+    ITEM_DRIVEN on ML-1M and FT-Q on every dataset run; a USER_DRIVEN or MIXED label: the evidence is mixed, with the labels per
+    control and dataset; never decided on partial input."""
+    require_ft(R)
+    w = R.get(EXT_SUM, "ft_wording")              # not requested: available false -> result_not_in_report
+    if w.get("complete") is not True:
+        raise Missing("not_decided", f"{EXT_SUM}: ft_wording is incomplete ({w.get('reason')}); never decided on partial "
+                                     "input (R18)")
+    labs = w.get("labels") or {}
+    ftc, ftq = labs.get("FT-C") or {}, labs.get("FT-Q") or {}
+    if "ml1m" not in ftc or not ftq:
+        raise Missing("field_not_produced", f"{EXT_SUM}: ft_wording.labels lacks FT-C ml1m or FT-Q")
+    order = [d for d in ("ml1m",) + AMAZON if d in ftq]
+    lab = (f"FT-C on ML-1M {tex(ftc['ml1m'])}; FT-Q on " + ", ".join(f"{RATED_NAME[d]} {tex(ftq[d])}" for d in order))
+    yes, mixed = w.get("fine_tuning_mostly_teaches_the_item"), w.get("evidence_mixed")
+    if yes is True:
+        txt = "fine-tuning mostly teaches the item"
+        if w.get("item_quality_from_item_text") is True:
+            txt += ", and the adapter learns item quality from item text"
+        return f"{txt} ({lab})"
+    if yes is not False:
+        raise Missing("field_null", f"{EXT_SUM}: ft_wording.fine_tuning_mostly_teaches_the_item is {yes!r}")
+    if mixed is True:
+        return f"the evidence is mixed ({lab})"
+    return f"the labels do not support saying that fine-tuning mostly teaches the item ({lab})"
+
+
 @dataclass
 class ProseSpec:
     before: str           # the normalized text right before the slot ends with this
     handler: object
 
 
-# Placeholder for the prose slots of the addendum-6 analysis (alias ext): red until the file exists; editor pass 2 writes their
-# handlers (counts of the E-F, E-H and E-J Holm families of the cross-domain summary, the E-W robustness reading, P1_wu's verdict,
-# and the FT-C wording rule: "fine-tuning mostly teaches the item" only if the reading is ITEM_DRIVEN on every dataset run).
-EXT_PROSE = unfillable("result_file_missing", EXT_DETAIL)
 PROSE_SPECS = {
     # The gate branches that occurred (GATE_PASS, GATE_FT_PASS) were resolved in the skeleton by the main session on 2026-10-04;
     # their numbers still come from gate.json / gate_ft.json (and the handlers refuse any other decision). The introduction's
@@ -1988,21 +2319,20 @@ PROSE_SPECS = {
     # ---- Findings 6.1, what the confidence tracks (numbers are in tab:tracks; the prose carries the registered words and counts)
     ("experiments", "raises / leaves / lowers", 0): ProseSpec("Fine-tuning", c_rq4_ft),
     ("experiments", "grid:E_B confirmed, k of 4", 0): ProseSpec("(E-B, confirmed on", c_eb_count),
-    ("experiments", "ext:E_J.H_J_count", 0): ProseSpec(
-        "the item mean (H-J) on", EXT_PROSE),
+    ("experiments", "ext:summary.families.E_J count", 0): ProseSpec("the item mean (H-J) on", c_ext_ej),
     ("experiments", "grid:G confirmed, k of 4 zero-shot", 0): ProseSpec("is confirmed (E-D) on", c_g_count("ZS")),
     ("experiments", "grid:G confirmed, k of 4 LoRA", 0): ProseSpec("zero-shot and", c_g_count("FT")),
-    ("experiments", "ext:E_W.robust_count", 0): ProseSpec(
-        "the within-user estimator finds it", EXT_PROSE),
+    ("experiments", "ext:summary.robust_readings count", 0): ProseSpec("the within-user estimator finds it", c_ext_robust),
     ("experiments", "holds / does not hold", 0): ProseSpec("[S]. P1", c_p1_holds),
     ("experiments", "grid:P1", 0): ProseSpec(r"(mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$", p_p1),
     ("experiments", "n of 3", 0): ProseSpec(r"\mathcal G_{\rm ZS}$ [S];", c_p1_n),
-    ("experiments", "ext:E_W.P1_wu_verdict", 0): ProseSpec(r"P1$_{\rm wu}$", EXT_PROSE),
+    ("experiments", "ext:E_W.P1_wu.reading_P1", 0): ProseSpec("seeds positive; within-user reading", p_ext_p1_reading),
     # ---- Findings 6.2, what fine-tuning teaches
-    ("experiments", "ext:FT_C_reading.wording", 0): ProseSpec("by its reading rule", EXT_PROSE),
-    ("experiments", "ext:E_F.H_F_count", 0): ProseSpec("H-F) on", EXT_PROSE),
-    ("experiments", "ext:E_H.H_S_count_ZS", 0): ProseSpec("H-S) in", EXT_PROSE),
-    ("experiments", "ext:E_H.H_S_count_FT", 0): ProseSpec("[S] zero-shot and", EXT_PROSE),
+    ("experiments", "ext:summary.ft_wording (the wording it allows, with the labels per control and dataset)", 0): ProseSpec(
+        "By the wording rule of addendum 8,", c_ext_ft_wording),
+    ("experiments", "ext:summary.families.E_F count", 0): ProseSpec("H-F) on", c_ext_ef),
+    ("experiments", "ext:summary.families.E_H count ZS", 0): ProseSpec("H-S) in", c_ext_eh("ZS")),
+    ("experiments", "ext:summary.families.E_H count FT", 0): ProseSpec("[S] and", c_ext_eh("FT")),
     ("experiments", "POSITIVE / NEGATIVE / NULL / INDETERMINATE", 0): ProseSpec("the Qwen3-8B knockout is labelled",
                                                                                  c_ko_label),
     # ---- Findings 6.3, which uses survive a matched control

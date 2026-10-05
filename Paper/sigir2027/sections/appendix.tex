@@ -35,7 +35,7 @@ Toys and then by simplicity; all $7\times2$ development UAUCs are released, and 
 A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
 \label{tab:deviations}
 \centering\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.88}
-% ROWS: the 18 rows of the deviations record, in its order, condensed (what happened with its evidence | effect on claims). Row 7
+% ROWS: the 20 rows of the deviations record, in its order, condensed (what happened with its evidence | effect on claims). Row 7
 % carries three result slots (alias sel: the DEV UAUC of V* on ML-1M; gate: the CONFIRM UAUC; grid: the ML-1M zero-shot UAUC on TEST
 % rows), printed as estimates.
 \begin{tabular}{@{}r>{\raggedright\arraybackslash}p{0.645\columnwidth}>{\raggedright\arraybackslash}p{0.285\columnwidth}@{}}
@@ -60,6 +60,8 @@ A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
 16 & $m$ may use ratings in $[T_d,t)$, which the LLMs never see (A3-1 item 2; A3-6 \S6). & $m_T$ is printed beside it.\\
 17 & E-C's top-$k_u$ decision takes $k_u$ from the TEST likes, an oracle (A3-6 \S7). & Only deployable rows describe a system.\\
 18 & Gate-FT's file holds a second scoring of the ML-1M zero-shot prompts (vLLM batching). & None: the grid scoring is printed.\\
+19 & A3-6 added Toys to FT-C, but only 5.1\% of its TRAIN labels can move; A3-8 withdrew it before any control adapter existed and added FT-Q, an item-only teacher. & FT-C informs on ML-1M only; ``teaches the item'' needs FT-C and FT-Q.\\
+20 & The extra-analysis code reads gaps strictly: $R$ needs a complete E-B and 150 users; an unavailable family member keeps $p=1$; deployable $k_u$ rounds half up; E-W keeps users with an AUC in all 20 splits. & Conservative; no threshold or family changes.\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -212,8 +214,9 @@ Mean $p$, head $-$ tail & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l
 conventions. Amendment 2, after the pilot gates: the remedy round, Gate-FT, the next-item audit, an interpretive diagnosis battery
 (readings released) and the forking-path rules. Amendment 3, before any adapter existed: the fine-tuned programme, conditional on a
 Gate-FT pass except its zero-shot panels, with five implementation addenda, addendum 6 (after two internal reviews of a draft; the
-endpoints marked $^\dagger$, Toys FT-C, and the admission and wording rules) and addendum 7 (S6 wording, composition diagnostics and a
-conditional item-stratified arm, before any S6 arm existed); Table~\ref{tab:deviations} lists every deviation.
+endpoints marked $^\dagger$ and the admission and wording rules), addendum 7 (S6 wording, composition diagnostics and a conditional
+item-stratified arm, before any S6 arm existed) and addendum 8 (FT-C stays ML-1M only; the FT-Q teacher control, before any control
+adapter existed); Table~\ref{tab:deviations} lists every deviation.
 
 \paragraph{Store-name knockout.}
 Store strings in history and candidate text are replaced in one case-insensitive whole-word pass (generic stores and strings
@@ -228,7 +231,7 @@ registered seen/unseen-item split is not run.
 \emph{Scoring:} vLLM prefill, at most 4,096 tokens (3,072 next-item), 100-user chunks. \emph{Fine-tuning:} LoRA~\citep{hu2022lora} on
 the query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05, learning rate $10^{-4}$, cosine decay, 3\%
 warm-up, one epoch, bf16, effective batch 32; at most 24,000 training examples per domain; prompts above 1,024 tokens skipped and
-counted; permutation control: seeds 0 and 1. \emph{Data and hashes:} pilot ML-1M panel 985494c7, pilot Toys panel 69252b48,
+counted; FT-C and FT-Q controls: seeds 0 and 1. \emph{Data and hashes:} pilot ML-1M panel 985494c7, pilot Toys panel 69252b48,
 registered V0 prompts on the pilot ML-1M panel 12e83c4f (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s,
 rendered prompt-bank sha1, user-id list sha1s and the time split $T_d$ of every domain from the freeze record and the split files}.
 \emph{Software, compute, artefact:} \DATANEEDED{package versions and GPU model from each report; total GPU hours}. Prompts, panel

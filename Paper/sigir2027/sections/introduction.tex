@@ -74,8 +74,8 @@ main object and the zero-shot regime its contrast.
 \item[C1] \emph{What the confidence encodes.} A decomposition of the yes/no log-odds into user offset, item prior and pair-specific
   residual, with the information gain over the prior-only item mean as the measure of personal information, benchmarked against an
   item mean and matrix factorisation on the same pairs; a within-user estimator and the complementarity to collaborative filtering;
-  and two controls for what fine-tuning teaches, a within-item label permutation and a store-name pseudonym knockout with a
-  real-brand placebo.
+  and three controls for what fine-tuning teaches: a within-item label permutation, an item-only teacher, and a store-name
+  pseudonym knockout with a real-brand placebo.
 \item[C2] \emph{Which uses of the confidence survive a control.} The invariance lemma and a controlled test of each route it
   leaves open: item-dependent corrections (including a two-view contrast~\citep{burns2023ccs} that we evaluate, not propose)
   against a paraphrase placebo and an ensemble null; selective serving~\citep{geifman2017selective} against random coverage;
@@ -96,8 +96,8 @@ post-hoc stacking, CI and datasets; else omit}
 \DATANEEDED{(i) What the confidence tracks (Section 6.1, Table tab:tracks): zero-shot and LoRA UAUC beside the item mean, the
 information-matched item mean and MF on the same rows, item-prior share and e-share, G and G_wu against G_CF, P1; counts per regime;
 direction-free unless admitted}
-\DATANEEDED{(ii) What fine-tuning teaches (Section 6.2, Table tab:teaches): within-item permutation retention and its label,
-complementarity to CF (H-F), the sparse and unseen strata (H-S), the store-name knockout label and the wording it allows}
+\DATANEEDED{(ii) What fine-tuning teaches (Section 6.2, Table tab:teaches): FT-C (ML-1M) and FT-Q retention, their labels and the
+wording of addendum 8, complementarity to CF (H-F), the sparse and unseen strata (H-S), the store-name knockout label and its wording}
 \DATANEEDED{(iii) Which uses survive a matched control (Section 6.3): error anatomy (oracle and deployable top-k), corrections against
 placebo and ensemble null, selective serving against random, static exposure against the pool and the published recommenders,
 uncertainty-selected against class-matched random pruning}

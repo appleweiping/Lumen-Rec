@@ -630,6 +630,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     ap.add_argument("--files", nargs="+", default=None, help="record: repo-relative files whose sha1 the log must hold")
     ap.add_argument("--root", default=None, help="record: the repo root (default: this checkout)")
     ap.add_argument("--print", dest="do_print", action="store_true", help="record: print the lines for the pilot log")
+    ap.add_argument("--append", action="store_true", help="record: DRY_RUN only, append the missing lines to the (temporary) pilot "
+                                                          "log, the human step of the rehearsal")
     return ap.parse_args(argv)
 
 
@@ -725,6 +727,13 @@ def cmd_record(a) -> int:
         print("\n".join(record_lines(a.files, a.root)))
         return 0
     missing = record_missing(a.pilot_log, a.files, a.root)
+    if missing and a.append:
+        log = Path(a.pilot_log)
+        lead = b"" if not log.stat().st_size or log.read_bytes().endswith(b"\n") else b"\n"
+        with open(log, "ab") as f:
+            f.write(lead + ("\n".join(record_lines(missing, a.root)) + "\n").encode("utf-8"))
+        print(f"[dry] recorded {', '.join(missing)} in {log} (the human step, on the temporary pilot log)")
+        missing = record_missing(a.pilot_log, a.files, a.root)
     if missing:
         raise FtqError(f"FT-Q record (Amendment 3 addendum 8 section 4): the sha1 of these files is not in {a.pilot_log}: "
                        f"{missing}; run `python -m src.confrec.ftq_panel record --pilot_log {a.pilot_log} --files "

@@ -47,9 +47,10 @@
 %   aud2q, aud2l  the same audit on TEST events 1,001-3,000 (Z2): Qwen3-8B restricted, and Llama-3.1-8B-Instruct.
 %   grid  rated-grid report per domain and backbone (E-A..E-E, P1, FT_C, knockout); cpu, ko and corr are fields of it (the
 %         non-LLM references, the knockout block, the invariance checks and corrections).
-%   ext   the addendum-6 analysis per domain and backbone (registered_pooled, E_W, E_F, E_G, E_H, E_J, E_Cprime, FT_C_reading) and
-%         its cross-domain summary (Holm families E-F, E-H, E-J). Every ext slot is red until that file exists; pass 2 of the
-%         editing specifies it against the file's schema.
+%   ext   the addendum-6 analysis (src/confrec/ftgrid_extra.py): per domain extra/<d>.json (Qwen main root; blocks registered_pooled,
+%         E_W, E_F, E_G, E_H, E_J, E_Cprime, FT_C_reading = FT-C on ML-1M), extra/llama/<d>.json (Llama root), extra/ftq/<d>.json
+%         (the FT-Q teacher root of addendum 8: FT_C_reading = FT-Q) and extra/summary.json (Holm families E-F, E-H, E-J, the robust
+%         readings, the addendum-8 wording ft_wording). ML-1M values of items 2-7 are exploratory (status.items_2_to_7; set in italics).
 %   prn   pruning analysis (arms P0-P3, seeds 0-4, contrasts, claim label); slot  method-slot reports; mir  stage-3 decision.
 % =====================================================================================================================
 \section{Findings}
@@ -59,9 +60,9 @@
 % take the top of the next page and none is still deferred when the appendix floats are defined.
 \begin{table*}[tp]
 \caption{What the confidence tracks: rated panels, Qwen3-8B (Llama: Table~\ref{tab:app-llama}); ZS: zero-shot; LoRA: seed mean
-(s.d.); $m$: item mean, $m_T$: information-matched item mean; $^\dagger$: addendum 6 (ML-1M exploratory, Amazon registered
-outcome-free). Popularity link: partial Spearman with log popularity given $m$. P1: LoRA minus zero-shot $\mathcal G$ (seeds 0 / 1 / 2;
-mean, $p$). Estimators: Section~\ref{sec:tools}.}
+(s.d.); $m$: item mean, $m_T$: information-matched item mean; $^\dagger$: addendum 6 (Amazon: registered outcome-free; ML-1M, in
+italics: exploratory). Popularity link: partial Spearman with log popularity given $m$. P1: LoRA minus zero-shot $\mathcal G$ (seeds
+0 / 1 / 2; mean, $p$). Estimators: Section~\ref{sec:tools}.}
 \label{tab:tracks}
 \centering\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{0.9}
 % COLUMNS: ML-1M, Toys, Video Games, Sports x {ZS, LoRA}; EVAL users of each panel, TEST rows (block B: S_d, here all TEST users
@@ -123,13 +124,13 @@ where a registered test decides it, and registered outputs that no table shows a
 \subsection{What the confidence tracks}\label{sec:exp-tracks}\label{sec:exp-rq4}
 Table~\ref{tab:tracks}A sets every LLM UAUC beside the item mean, the information-matched item mean and MF on the same rows.
 Fine-tuning \DATANEEDED{raises / leaves / lowers} UAUC (E-B, confirmed on \DATANEEDED{grid:E\_B confirmed, k of 4} Qwen panels), and
-in the fine-tuned regime the UAUC of $\ell$ differs from that of the item mean (H-J) on \DATANEEDED{ext:E\_J.H\_J\_count}.
+in the fine-tuned regime the UAUC of $\ell$ differs from that of the item mean (H-J) on \DATANEEDED{ext:summary.families.E\_J count}.
 Table~\ref{tab:tracks}B gives the share of the within-user variance of the confidence that the item prior explains (the non-prior
 share is its complement), beside the e-share and the item shares of MF and of the labels. The personal information gain
 $\mathcal G$ is confirmed (E-D) on \DATANEEDED{grid:G confirmed, k of 4 zero-shot} zero-shot and \DATANEEDED{grid:G confirmed, k of 4
 LoRA} fine-tuned panels, beside the CF reference gain $\mathcal G_{\rm CF}$, and the within-user estimator finds it
-\DATANEEDED{ext:E\_W.robust\_count}. P1 \DATANEEDED{holds / does not hold} (mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$
-\DATANEEDED{grid:P1}; \DATANEEDED{n of 3} seeds positive; within-user P1$_{\rm wu}$ \DATANEEDED{ext:E\_W.P1\_wu\_verdict}), so
+\DATANEEDED{ext:summary.robust\_readings count}. P1 \DATANEEDED{holds / does not hold} (mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$
+\DATANEEDED{grid:P1}; \DATANEEDED{n of 3} seeds positive; within-user reading \DATANEEDED{ext:E\_W.P1\_wu.reading\_P1}), so
 \DATANEEDED{branch: supervision raises the personal information gain / there is no evidence that supervision adds personal evidence}.
 The wording flags apply: shares are uninterpretable if $r_8<0.7$, $\mathcal G/\mathcal G_{\rm CF}$ is reported only if the interval of
 $\mathcal G_{\rm CF}$ excludes 0, and an MF personal-residual UAUC of at most 0.55 makes ``no personal signal'' a property of
@@ -138,12 +139,15 @@ consumed-item panels.
 % BRANCH-GATEFT-BEGIN (tab:teaches: E-F, E-H, FT-C and the knockout belong to the fine-tuned programme, recorded GATE_FT_PASS)
 \begin{table*}[tp]
 \caption{What fine-tuning teaches: rated panels, Qwen3-8B; ZS: zero-shot; LoRA: seed mean (s.d.; knockout labels: seeds 0 / 1 / 2);
-$^\dagger$ as in Table~\ref{tab:tracks}; ML-1M has no store field (no knockout).}
+$^\dagger$ as in Table~\ref{tab:tracks}. C: retention of the LoRA gain by adapters trained without user--item evidence (FT-C: labels
+permuted within items, ML-1M only; FT-Q: labels of an item-only teacher; registered, outcome-free). ML-1M has no store field.}
 \label{tab:teaches}
 \centering\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{0.9}
 % COLUMNS as tab:tracks. Block A (alias ext, E_F with E-W's within-user stackers): G_LLM_given_CF = dUAUC(M4 - M3), G_CF_given_LLM =
 % dUAUC(M4 - M2). Block B (ext, E_H): G_prior = dUAUC(M1 - M0) on the sparse / dense / unseen / seen TEST rows (minimum-n rule per
-% stratum). Block C (ext, FT_C_reading): retention R with its interval and the reading label, LoRA columns of ML-1M and Toys only.
+% stratum). Block C: FT-C (ext, extra/ml1m.json FT_C_reading, control FT-C; ML-1M only: addendum 8 withdrew the Toys run) and FT-Q
+% (ext, extra/ftq/<d>.json FT_C_reading, control FT-Q; addendum 8): retention R / R_Q with its interval, the reading label, and the
+% UAUC of the teacher adapters q_0, q_1 beside the item mean on the same rows (addendum 8's descriptive companion); LoRA columns only.
 % Block D (alias ko, the knockout block of the grid report; the former tab:popularity): head-minus-tail drop of l (pseudonym),
 % placebo drop, tail dUAUC, registered label of decide() verbatim (AMBIGUOUS written INDETERMINATE, UNDETERMINED written
 % INCOMPLETE); LoRA cells: mean of the three seeds with their s.d. (no interval for that mean), label "s0 / s1 / s2".
@@ -164,9 +168,11 @@ Dense rows & \DATANEEDED{ext:E\_H.dense.G\_prior} & \DATANEEDED{ext:E\_H.dense.G
 Unseen items (no TRAIN example) & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior} & \DATANEEDED{ext:E\_H.unseen.G\_prior}\\
 Seen items & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior} & \DATANEEDED{ext:E\_H.seen.G\_prior}\\
 \midrule
-\multicolumn{9}{@{}l}{\emph{C. Within-item label permutation (FT-C): retention of the regime gain by permuted adapters}}\\
-Retention $R$$^\dagger$ & -- & \DATANEEDED{ext:FT\_C\_reading.R} & -- & \DATANEEDED{ext:FT\_C\_reading.R} & -- & -- & -- & --\\
-Reading$^\dagger$ & -- & \DATANEEDED{ext:FT\_C\_reading.label} & -- & \DATANEEDED{ext:FT\_C\_reading.label} & -- & -- & -- & --\\
+\multicolumn{9}{@{}l}{\emph{C. Retention of the LoRA gain without user--item evidence}}\\
+FT-C (permuted): $R$ / reading & -- & \DATANEEDED{ext:FT\_C\_reading.R} / \DATANEEDED{ext:FT\_C\_reading.label} & -- & -- & -- & -- & -- & --\\
+FT-Q (teacher): $R_Q$ & -- & \DATANEEDED{ext:FT\_Q\_reading.R} & -- & \DATANEEDED{ext:FT\_Q\_reading.R} & -- & \DATANEEDED{ext:FT\_Q\_reading.R} & -- & \DATANEEDED{ext:FT\_Q\_reading.R}\\
+\quad reading & -- & \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.label} & -- & \DATANEEDED{ext:FT\_Q\_reading.label}\\
+\quad UAUC of $q_0$ / $q_1$ / $m$ & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC} & -- & \DATANEEDED{ext:FT\_Q\_reading.UAUC}\\
 \midrule
 \multicolumn{9}{@{}l}{\emph{D. Store-name knockout (pseudonym arm; placebo: real-store swap)}}\\
 Head $-$ tail drop of $\ell$ & -- & -- & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta}\\
@@ -180,12 +186,14 @@ Registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:label} & \DA
 
 % ---------------------------------------------------------------------------------------------------------------------
 \subsection{What fine-tuning teaches}\label{sec:exp-teach}\label{sec:exp-rq5}
-Table~\ref{tab:teaches} separates what LoRA adds. The within-item label permutation (FT-C) keeps every item's label rate and
-destroys the user--item evidence; by its reading rule \DATANEEDED{ext:FT\_C\_reading.wording}. Beside collaborative filtering, the
-fine-tuned LLM's prior and residual add to an MF stacker ($\mathcal G_{\rm LLM|CF}>0$, H-F) on \DATANEEDED{ext:E\_F.H\_F\_count} Qwen
-Amazon panels, and on sparse rows the item prior adds to the item mean ($\mathcal G_{\rm prior}>0$, H-S) in
-\DATANEEDED{ext:E\_H.H\_S\_count\_ZS} zero-shot and \DATANEEDED{ext:E\_H.H\_S\_count\_FT} fine-tuned panel runs; the other strata
-are descriptive. For store names, the Qwen3-8B knockout is labelled \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} on Toys
+Table~\ref{tab:teaches} separates what LoRA adds. Two controls remove the user--item evidence and keep what is known about the item:
+adapters trained on labels permuted within each item (FT-C; ML-1M only, where 97.7\% of the TRAIN examples sit in items with several
+examples) and adapters trained on the labels of an item-only teacher, the TRAIN examples with the highest item mean (FT-Q). By the
+wording rule of addendum 8, \DATANEEDED{ext:summary.ft\_wording (the wording it allows, with the labels per control and dataset)}.
+Beside collaborative filtering, the fine-tuned LLM's prior and residual add to an MF stacker ($\mathcal G_{\rm LLM|CF}>0$, H-F) on
+\DATANEEDED{ext:summary.families.E\_F count} Qwen Amazon panels, and on sparse rows the item prior adds to the item mean
+($\mathcal G_{\rm prior}>0$, H-S) in \DATANEEDED{ext:summary.families.E\_H count ZS} and \DATANEEDED{ext:summary.families.E\_H count FT};
+the other strata are descriptive. For store names, the Qwen3-8B knockout is labelled \DATANEEDED{POSITIVE / NEGATIVE / NULL / INDETERMINATE} on Toys
 and Video Games in every model, so the confidence is called
 \DATANEEDED{branch: familiarity-linked / popularity-linked}; the knockout replaces store names only, and the Llama Toys knockout is in
 Table~\ref{tab:app-llama}. The popularity links (Table~\ref{tab:tracks}B) and the next-item popularity rows (Table~\ref{tab:anatomy}B)

@@ -1,5 +1,38 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Wording rules record, update after editor pass 1 (recorded before any further result file was pulled)
+
+`scripts/sigir/fill_paper.py` sha1 = eb85eb91ef799ebb26e8f3b7723fd710f099eae4 and `docs/sigir/PAPER_DATA_MAP.md` sha1 = 08354e11225cfbe5a7c7d745a98704067d6eb0be (the previous record of 2026-10-04 was b2702b7f69b8cfcb72668d860b9a821a9b32e1e9
+and 01a72d00c197fea350788d13d3529436dd6a3ecb; the former version is the public commit 807cfb9). Changes: specs for the restructured tables (tab:tracks,
+tab:teaches, tab:exposure summary rows, tab:deviations, the gate table), the alias `ext` (the extra-analysis files of addendum 6; every `ext:` slot reads red until
+its file exists), the rename of the verbalised reranker's row label, and three new decision functions: `c_eb_count` and `c_g_count` implement the count rule of
+addendum 6 item 9.2 (how many panels confirm E-B and G per regime, never one word for a mixed outcome) and `p_mir_decision` prints the registered stage-3 label
+verbatim. A mechanical comparison of the 175 top-level definitions of the previous version with the current one finds no existing decision function changed (the
+differences are the spec tables, the table builders, the alias list and the removed cell handlers of dropped table rows). The count functions read the ML-1M grid
+report, which had already been read; the rule they implement was registered before they were written. No Toys, Video_Games, Sports, Llama, Z2, S6 or slot result
+has been pulled.
+
+## 2026-10-05 · Amendment 3 addendum 8 (the Toys permutation control withdrawn; item-only teacher control FT-Q; recorded before any control adapter existed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_8.md` sha1 = 85b22ba8262e5eb3a5a76ef47fb553288bfde483. The implementer of addendum 6 item 8 reported, and a CPU count on the registered TRAIN
+panels (inputs only) confirmed, that a within-item permutation cannot change items that occur once: the share of TRAIN examples in items with at
+least two examples is 97.7% (ML-1M), 23.8% (Toys), 64.6% (Video_Games), 21.3% (Sports), and on Toys the permutation moves 768 of 15,010 labels
+(5.1%), so a high retention would be nearly mechanical. The Toys permutation run is therefore withdrawn (never run; its draft script is not
+used); FT-C stays ML-1M only. FT-Q registers an item-only teacher (labels = the top round(beta n) examples by the method slot's TRAIN q-hat,
+seed-0 tie key; same prompts; two adapters per dataset in the root `outputs/confrec/ftgrid_q/`; retention R_Q and labels as addendum 6 item 8) on
+ML-1M and Toys (required) and Video_Games and Sports (run unless cut on 2026-10-29), with a wording rule that needs FT-C ITEM_DRIVEN on ML-1M and
+FT-Q ITEM_DRIVEN on every dataset run. Recorded before any FT-C or FT-Q adapter existed or was scored and before any Toys, Video_Games or Sports
+fine-tuned report, extra-analysis file or knockout analysis was read (the Toys job `32_ft_toys` was scoring its knockout arms; stage 6 had not run).
+
+## 2026-10-05 · Amendment 3 addendum 7 (S6 wording, composition diagnostics, conditional item-stratified arm; recorded before any S6 arm was built)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_7.md` sha1 = 832c04957ec18b40d3a5bf3f884b8e513c574713. Recorded before stages A and B of `run_ftprune.sh` ran (queue job `47_prune_AB` is
+pending behind the fine-tuned grid), before any pruned adapter and before any S6 outcome. RQ6 is re-worded (no "noisy examples"; P2 =
+uncertainty-selected pruning; P1 matches class counts only); composition diagnostics (items left without examples, item label-rate
+distortion, TEST-item coverage, head-tercile share) are computed from the prune manifest by a new file, `ftprune_compose.py`, whose sha1 is
+recorded before the `prune` record; the item-stratified random arm P1s is run only if P2 - P1 reads BEATS, and is defined completely in the
+addendum so that no choice is left afterwards. No bound file changes.
+
 ## 2026-10-04 · Wording rules record (Amendment 3 addendum 6 section 9.3; recorded before any further result file was pulled)
 
 `scripts/sigir/fill_paper.py` sha1 = b2702b7f69b8cfcb72668d860b9a821a9b32e1e9 and `docs/sigir/PAPER_DATA_MAP.md` sha1 = 01a72d00c197fea350788d13d3529436dd6a3ecb.
@@ -11,8 +44,8 @@ those files are pulled; a change to an existing decision function after results 
 
 ## 2026-10-04 · Amendment 3 addendum 6 (reviewer-driven additions; recorded before any non-ML-1M outcome of its items was read)
 
-`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_6.md` sha1 = 868f87b6819fddd03717f44a9baac63ea4db4cf3. Recorded 2026-10-05 about 04:40 server time
-(2026-10-04 about 20:40 UTC). At that time the Toys fine-tuned job (`32_ft_toys`, queue) was in stage 4 (decomposition arms; the like passes of the
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_6.md` sha1 = 868f87b6819fddd03717f44a9baac63ea4db4cf3. Recorded (pushed to GitHub and pulled by the server) 2026-10-05
+about 04:30 server time (2026-10-04 about 20:30 UTC). At that time the Toys fine-tuned job (`32_ft_toys`, queue) was in stage 4 (decomposition arms; the like passes of the
 zero-shot model and of s0-s2 were finished) and no Toys, Video_Games or Sports report, no knockout arm, no FT-C adapter and no Llama, S6, Z2 or
 method-slot result existed; the files of the running job were not opened. The addendum adds: two corrections (the non-prior share is withdrawn as
 "an upper bound on the personal share"; direction words follow registered tests only), E-W (a within-user stacker estimator with repeated

@@ -1,8 +1,78 @@
+# Integration notes
+
+## 0. Editor pass 1 (2026-10-05; brief `docs/sigir/PAPER_REVISION_BRIEF.md`)
+
+Scope: the revision brief (story: what the confidence tracks; what fine-tuning teaches; which uses survive a matched control; the
+registered protocol and its deviations), the page budget, the anonymity and wording rules, the merge of the verified citations, and
+the specs and tests of `scripts/sigir/fill_paper.py`. No number was typed: every result is a slot; the new endpoints of addendum 6
+are `ext:` slots that stay red until `ftgrid_extra.py`'s files exist (editor pass 2 specifies them).
+
+**Pages before the references** (`scripts/sigir/page_budget.py` on the synthetic result set; SIGIR rule 9 pages, appendix included):
+9.24 before the pass, 8.90 after it (8.91 on a "typical" variant of the synthetic set with the minimum-n flags cleared, because
+the synthetic Toys world has 140 users and flags every Toys cell "(descriptive)", which widens the rated tables). The measuring tool
+had two bugs, fixed in this pass and reported: it measured the end of the text only, so floats still deferred at that point (flushed
+by its own `\clearpage`) were not counted (at one stage the text ended on page 9 while the guide and every appendix table sat on
+page 10); and its count of undefined references matched all warnings as one. It now records where every float ends and measures to
+the later of the text end and the last float end. Latexmk needs Perl: run the tool with Git's `usr\bin` on PATH.
+
+**What moved or changed** (section by section):
+- Abstract: claims kept; the pruning route named "uncertainty-selected pruning" (addendum 7).
+- Introduction: claims of the 2026-10-04 rewrite kept; the output-level citations corrected after verification (PerRecBench under
+  "pointwise rating prompts"; Kang et al. only for "zero-shot LLMs trail CF, fine-tuned ones approach it"); RQ6 worded as in
+  addendum 7; the guide named outside the contributions; the findings-in-brief slots follow the three-part story; the gate sentence
+  says the bar is a point estimate. PROSE_SPECS anchors updated to this text (two slots read `skeleton_changed` at the start of the
+  pass, four tests failed).
+- Related work: about 0.5 page; three paragraphs (pointwise scoring; confidence, calibration and answer priors; popularity,
+  exposure, pruning and serving) with the verified works listed below.
+
+**Citations merged from the verification pass (2026-10-05).** Into `references.bib`, unchanged: `tan2025perrecbench`,
+`zhang2024cft`, `kim2025lostinsequence` (introduction), `dipalma2025memorize` (related work, limitations), `qin2024prp`,
+`wang2026llm4dsr`, `fayyazi2025facter`, `bellogin2011predicting`, `park2026echotrace` (related work); `anon2026benchmark` (`@misc`,
+author "Anonymous", title "Omitted for double-blind review") added by hand. Already present and now cited: `hou2024llmrank`,
+`zhuang2024beyond`, `lichtenberg2024popularity` (as finding less popularity bias), `ni2026popular` (entity QA), `wang2021tce`. Not
+merged or not cited: `zhang2025shapley` (not LLM-based), `yang2026recloop` (Semantic-ID recommenders), `zou2026uncertainty` (non-LLM,
+dropped for space), `cronentownsend2002predicting` (optional), `mozafari2026pretraining` (kept uncited). No discrepancy was left: the
+verifier's notes required no field correction; the wording follows its notes (ReLLa's score is the two-way Yes/No softmax; FACTER
+thresholds a fairness score; LLM4DSR thresholds a generation probability to clean histories).
+- Setting: lemma and proposition shrunk to one display each, proofs inlined; decomposition paragraph unchanged in substance.
+- Protocol: the gate paragraph of the protocol and the gate subsection of the findings merged into one paragraph plus the small
+  tab:gate-outcomes (moved here; "Rule" column folded into the row labels; the pilot rows dropped, their values stay in the text);
+  repeated constants dropped (the bars stay); new: the families E-F, E-H, E-J, the robustness rule of E-W, the count rule and the
+  replication rule (interval, not sign); tab:rq compacted, RQ4/RQ5 cells gain the new endpoints, RQ6 says the arms are matched per
+  class only and points to addendum 7.
+- Tools: paragraphs on the deployable top-k decision (E-C'), the item-prior share, the e-share and the item shares of MF and labels
+  (E-G), the within-user estimator (E-W), M4 (E-F), the strata (E-H), the matched item mean (E-J) and the FT-C reading rule; the
+  other paragraphs shortened; the method slot is a run-in paragraph.
+- Findings: 6.1 "What the confidence tracks" (tab:tracks, the former tab:reliability: same-row references including m_T, the E-J
+  contrasts, item-prior share, e-share, item shares, G and G_wu beside G_CF, P1 and P1_wu, ECE and the oracle and deployable error
+  anatomy); 6.2 "What fine-tuning teaches" (new tab:teaches: E-F, E-H, the FT-C reading, the knockout rows of the former
+  tab:popularity, shortened); 6.3 "Which uses survive a matched control" (S1/S2, S3 with tab:anatomy and the shrunk tab:exposure,
+  corrections, S6 with addendum-7 wording, the method slot); the guide subsection became the caption of tab:guide. Prose lists that
+  repeated table cells were dropped; the prose keeps the registered words and adds count slots. The full-width tables are defined
+  ahead of the text so that none is deferred past the appendix.
+- Conclusion: "two statements do not depend on the data" replaced (an accounting identity); e is the pair-specific residual;
+  limitations paragraph as listed in the brief.
+- Appendix: the variant-bank and sensitivity tables became two sentences and a pointer (tab:app-sens spec kept dormant);
+  tab:deviations added (18 rows, condensed; row 7 carries three slots); tab:app-llama follows tab:tracks and carries the Llama Toys
+  knockout; tab:app-z2 keeps four rows; amendments paragraph lists addenda 6 and 7.
+- Anonymity: "C-CRP" became "a verbalised reranker" in the text, the tables and `REF_METHODS`; the benchmark protocol is
+  `\citep{anon2026benchmark}`; repository and path names, the project name and a research-group name were removed from TeX and bib
+  comments.
+
+**Open for the main session.** (1) The sha1 of the edited `fill_paper.py` must be recorded in PILOT_LOG before any further result file
+is pulled (A3-6 section 9.3): this pass added specs (tables tab:tracks, tab:teaches, tab:deviations, the exposure summary rows, the
+item-prior share row) and three new decision functions (`c_eb_count`, `c_g_count` and `p_mir_decision`; the count rule of A3-6 item
+9.2 and the verbatim stage-3 label); no existing decision function changed. (2) `pull_results.ps1` must pull the ext files to the
+paths of the data map (alias `ext`). (3) `CITATION_MAP.md` (not part of the paper sources) still names the project and a research group
+in two headers: strip them before any source upload. (4) The title is three lines long; "... Item Priors, Personal Evidence and
+Actionable Uncertainty" would fit two (the authors' decision).
+
 # Integration notes (text integrator, 2026-10-04)
 
 Scope: alignment with the binding texts, page budget, consistency audit, citations, compile check. No result slot was filled and
 no number was invented. All compiling was done in a private copy; only the nine section files, `references.bib` and
-`CITATION_MAP.md` were written to this directory (main.tex untouched).
+`CITATION_MAP.md` were written to this directory (main.tex untouched). Sections 1-9 below describe that pass; where they differ from
+section 0, section 0 is current (for example the page counts of section 1 and the gate table of section 3).
 
 ## 1. Page counts (pre-reference part, appendix included; SIGIR 2025 rule: at most 9 pages)
 

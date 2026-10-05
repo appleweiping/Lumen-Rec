@@ -1,23 +1,18 @@
 % =====================================================================================================================
-% Introduction (owner: intro; integrated 2026-10-04). Pre-results draft.
-%  * Every result is a \DATANEEDED slot. The only empirical facts stated are the registered gate outcomes of the pilot that
-%    motivated the registered remedy (ML-1M zero-shot UAUC 0.587 < 0.60; sports next-item NDCG@10 0.2093 >= 0.1863;
-%    KuaiRec zero-shot UAUC 0.469 < 0.58). Nothing else from the pilot is stated.
-%  * Branches (remedy outcome, fine-tuning gate outcome, nested method slot) are separate \DATANEEDED{branch: ...} sentences:
-%    keep the one that occurred and delete the other.
-%  * Findings written into slots must satisfy the registered claim-admission rule (confirmed on untouched users, same sign on at
-%    least one fresh Amazon domain and on the second backbone); otherwise the sentence stays direction-free.
-%  * Design statements (Qwen3-8B zero-shot and LoRA on four rated panels, Llama-3.1-8B-Instruct as replication backbone,
-%    zero-shot only on the four next-item panels, the three actionability routes, five-seed pruning) describe the registered
-%    grid (Amendments 2 and 3): re-verify them against what was actually run (cut rules) before submission.
-%  * Wording rule (Amendment 3, section 5): do not attribute the item prior to name recognition unless the pseudonym knockout is
-%    POSITIVE in both domains and both regimes; until then write "popularity-linked".
-%  * Integration (2026-10-04): "registered before any confirmatory result was analysed" is exact (the next-item scoring started
-%    before its analysis specification was written; the specification was frozen before any audit score was analysed; Section
-%    sec:protocol says so). Holm families and the two single tests follow Amendment 3 section 11. The reported decomposition
-%    statistic is the non-prior share, an upper bound on the personal share. The RQ list was folded into one paragraph and the
-%    gap paragraph shortened for the page budget (Table tab:rq carries the endpoints).
-%  * Cross-references used: sec:prelim, sec:protocol; tab:rq (audit protocol); sec:exp-gates, tab:guide (findings section).
+% Introduction. Every result is a \DATANEEDED slot. The only empirical facts stated as text are the registered gate outcomes of
+% the pilot that motivated the registered remedy (ML-1M zero-shot UAUC 0.587 < 0.60; Sports next-item NDCG@10 0.2093 >= 0.1863;
+% KuaiRec zero-shot UAUC 0.469 < 0.58); the gate branches that occurred (GATE_PASS, GATE_FT_PASS) are resolved as text with their
+% numbers in slots.
+%  * Findings written into the slots must satisfy the registered claim-admission rule (Amendment 3 addendum 6 section 9: confirmed
+%    on untouched users; for a statement beyond one panel the same sign with its own interval excluding 0 on a fresh Amazon domain
+%    and on the second backbone); mixed outcomes are counts per regime; otherwise the sentence stays direction-free.
+%  * Wording: "familiarity" only under the knockout rule (otherwise "popularity-linked"); e is the pair-specific residual; the
+%    non-prior share is the share of within-user variance the item prior does not explain linearly (never an upper bound); the
+%    knockout replaces store-name strings only.
+%  * Editor pass 2026-10-05: claims of the 2026-10-04 rewrite kept; citations of the output-level studies corrected after their
+%    verification (each claim carries its own citation); RQ6 worded as in addendum 7; the guide is named outside the contributions.
+%  * Cross-references used: sec:prelim, sec:protocol, sec:exp-tracks, sec:exp-teach, sec:exp-uses, tab:rq, tab:guide,
+%    app:deviations.
 % =====================================================================================================================
 \providecommand{\method}{\textsc{Mirror}}
 \providecommand{\py}{P(\texttt{Yes})}
@@ -34,55 +29,63 @@ The same number is read as a \emph{confidence}: a system may abstain or truncate
 low~\citep{fan2026ugr,kweon2024perk}, what is shown feeds back into what is learnt, a loop known to amplify popularity
 bias~\citep{chaney2018feedback,mansoury2020feedback}, and fine-tuning data can be pruned by uncertainty~\citep{wu2025unit} or
 coreset scores~\citep{lin2024dealrec,mei2025goracs}. Whether the confidence deserves this reading is largely untested for the
-yes/no family, evaluated by discrimination (AUC, or per-user AUC, UAUC) and, to our knowledge, not by calibration; uncertainty
-work on LLM recommenders addresses list-wise rankings~\citep{kweon2025uqrec,yan2026evirank}, generative
-recommenders~\citep{fan2026ugr} or verbalised confidence~\citep{ravikumar2026hallucinating}. Missing are labels that match the
-question, disaggregation (a ranking depends on the order within one user's candidates, a serving decision on the order across
-users) and non-LLM reference points on the same pairs~\citep{ferraridacrema2019progress}.
+yes/no family, which is evaluated by discrimination (AUC, per-user AUC, UAUC) and log loss~\citep{lin2024rella} rather than by
+reliability (calibration error, selective risk); uncertainty work on LLM recommenders addresses list-wise
+rankings~\citep{kweon2025uqrec,yan2026evirank}, generative recommenders~\citep{fan2026ugr} or verbalised
+confidence~\citep{ravikumar2026hallucinating}. Output-level studies find that, under pointwise rating prompts, LLM recommenders
+follow item quality and user rating bias more than personal preference~\citep{tan2025perrecbench}, that zero-shot LLMs trail
+collaborative filtering in rating prediction while fine-tuned ones approach it~\citep{kang2023llmrating}, and that LLM recommenders
+under-use the user's history~\citep{kim2025lostinsequence,zhang2024cft}; none has measured what the token confidence itself encodes,
+how fine-tuning changes it, or which uses of it survive a matched control, on labels that match the question and against a
+leakage-free item mean and a collaborative-filtering reference on the same pairs~\citep{ferraridacrema2019progress}.
 
 Above all, it is open how much of $\py$ is a prior about the item and how much is evidence about this user. Write the log-odds
 of \emph{Yes} as $\ell(u,i)=b_u+\pi(i)+e(u,i)$: a user offset, an item prior that the model brings to the item whoever asks
-(possibly popularity-linked), and personal evidence. Only $e$ personalises the ranking, and the prior is what per-user
-calibration cannot touch: by an invariance lemma (Section~\ref{sec:prelim}) any strictly increasing per-user map, such as
-temperature or Platt scaling~\citep{guo2017calibration}, leaves per-user AUC and within-user NDCG unchanged; outcomes change only
-through item-dependent corrections, cross-user decisions and training.
+(possibly popularity-linked), and a pair-specific residual that carries whatever personal evidence there is. Only $\pi+e$ orders
+a user's candidates, and the user offset is what per-user calibration cannot use: by an invariance lemma
+(Section~\ref{sec:prelim}) any strictly increasing per-user map, such as temperature or Platt
+scaling~\citep{guo2017calibration}, leaves per-user AUC and within-user NDCG unchanged, so outcomes change only through
+item-dependent corrections, cross-user decisions and training. We measure personal information by prediction: the UAUC that the
+residual adds to the prior and an item mean, beside what matrix factorisation adds.
 
-We therefore audit the confidence of yes/no recommenders through six practitioner questions, S1--S6, posed as research questions
-with registered endpoints (Table~\ref{tab:rq}): is the model sure when it is right (RQ1) and unsure when it is wrong (RQ2); does
+We audit the confidence of yes/no recommenders through six practitioner questions, S1--S6, posed as research questions with
+registered endpoints (Table~\ref{tab:rq}): is the model sure when it is right (RQ1) and unsure when it is wrong (RQ2); does
 serving the most confident items over-expose head items (RQ3, static); how well does confidence track labels that match the
 question, and how much of it is item prior (RQ4); is it higher for popular items, and is that warranted once quality is
-controlled (RQ5); and can uncertainty flag noisy training examples better than matched random pruning (RQ6)?
+controlled (RQ5); and does pruning the training examples that the zero-shot model is most uncertain about help more than matched
+random pruning (RQ6)?
 
 \paragraph{A registered audit.}
 Panels, endpoints, thresholds and a claim-admission rule were registered before any confirmatory result was analysed
-(Section~\ref{sec:protocol}): a finding enters the abstract only if it is confirmed on untouched users and has the same sign on
-at least one fresh Amazon domain and on a second backbone; until then its wording stays direction-free. Not every gate was met:
-under the registered zero-shot prompt a pilot on 1,500 ML-1M users reached UAUC 0.587 against a bar of 0.60 while the next-item
-component was met (NDCG@10 0.2093 against 0.1863), and on the fully observed KuaiRec matrix~\citep{gao2022kuairec} the zero-shot
-UAUC was 0.469 against 0.58, so exposure is analysed statically. These registered negative results (Section~\ref{sec:exp-gates})
-motivated one registered prompt-remedy round. It selected, on development users, the label-aligned prompt that asks whether the
-user would rate the item 4 stars or higher and, on 1,683 untouched ML-1M users, that prompt reached UAUC
-0.603 (95\% CI 0.594--0.612) against 0.576 for the registered prompt on the same users, so the bar was
-met.
-As TALLRec-style recommenders are fine-tuned~\citep{bao2023tallrec}, the LoRA regime was to carry the main results if it met its own
-registered gate, a mean UAUC of at least 0.65 over three seeds. It did (mean 0.742;
-seeds 0.740, 0.745, 0.743), so the fine-tuned regime is the main object and the zero-shot regime its contrast.
+(Section~\ref{sec:protocol}): a statement beyond one panel needs confirmation on untouched users and the same sign, with its own
+interval excluding zero, on a fresh Amazon domain and on a second backbone. Not every gate was met: under the registered zero-shot
+prompt a pilot on 1,500 ML-1M users reached UAUC 0.587 against a bar of 0.60 (the next-item component was met: NDCG@10 0.2093
+against 0.1863), and on the fully observed KuaiRec matrix~\citep{gao2022kuairec} the zero-shot UAUC was 0.469 against 0.58, so
+exposure is analysed statically. One registered prompt-remedy round (Section~\ref{sec:protocol}) selected, on development users,
+the label-aligned prompt that asks whether the user would rate the item 4 stars or higher; on 1,683
+untouched ML-1M users it reached UAUC 0.603 (95\% CI 0.594--0.612) against 0.576 for the registered
+prompt, so the bar (a point estimate) was met. As TALLRec-style recommenders are fine-tuned~\citep{bao2023tallrec}, the LoRA regime
+was to carry the main results if it met its own registered gate, a mean UAUC of at least 0.65 over three seeds. It did (mean
+0.742; seeds 0.740, 0.745, 0.743), so the fine-tuned regime is the
+main object and the zero-shot regime its contrast.
 
 \paragraph{Contributions.}
 \begin{list}{}{\introlistsetup}
-\item[C1] \emph{Protocol.} A pre-registered audit of Qwen3-8B, zero-shot and with LoRA (three seeds), replicated with
+\item[C1] \emph{What the confidence encodes.} A decomposition of the yes/no log-odds into user offset, item prior and pair-specific
+  residual, with the information gain over the prior-only item mean as the measure of personal information, benchmarked against an
+  item mean and matrix factorisation on the same pairs; a within-user estimator and the complementarity to collaborative filtering;
+  and two controls for what fine-tuning teaches, a within-item label permutation and a store-name pseudonym knockout with a
+  real-brand placebo.
+\item[C2] \emph{Which uses of the confidence survive a control.} The invariance lemma and a controlled test of each route it
+  leaves open: item-dependent corrections (including a two-view contrast~\citep{burns2023ccs} that we evaluate, not propose)
+  against a paraphrase placebo and an ensemble null; selective serving~\citep{geifman2017selective} against random coverage;
+  static exposure against the pool and eight published recommenders; uncertainty-selected pruning against class-matched random
+  pruning over five seeds.
+\item[C3] \emph{A pre-registered, hash-chained protocol.} Qwen3-8B, zero-shot and with LoRA (three seeds), replicated with
   Llama-3.1-8B-Instruct, on rated panels with matched labels (ML-1M; Amazon Toys, Video Games, Sports) and, zero-shot, on
-  next-item panels of an existing benchmark protocol (four domains $\times$ 10k users $\times$ 101 candidates), with non-LLM
-  references, user-clustered intervals, Holm correction within registered endpoint families (the primary fine-tuning hypothesis
-  and the pruning contrast are single tests) and fresh-user confirmation.
-\item[C2] \emph{Decomposition.} A reliability-corrected non-prior share (an upper bound on the personal share), the information
-  gain over the prior-only item mean, a star-permutation contrast, a two-axis popularity analysis~\citep{xiong2023procal}
-  partialled on item quality and, in the fine-tuned programme, a pseudonym knockout with a real-brand placebo.
-\item[C3] \emph{Actionability.} The lemma and a controlled test of each route it leaves open: item-dependent corrections (including
-  a two-view contrast~\citep{burns2023ccs} that we evaluate, not propose) against a paraphrase placebo and an ensemble null;
-  selective serving~\citep{geifman2017selective} against random coverage; exposure against the pool and eight published
-  recommenders; pruning against matched random pruning over five seeds.
-\item[C4] \emph{A guide.} A one-table answer to S1--S6 (Table~\ref{tab:guide}), each tied to its registered endpoint.
+  same-candidate next-item panels of an earlier benchmark protocol~\citep{anon2026benchmark} (four domains $\times$ 10k users
+  $\times$ 101 candidates), with non-LLM references, user-clustered intervals, Holm correction within registered families, fresh-user
+  confirmation and a table of deviations (Appendix~\ref{app:deviations}).
 \end{list}
 % METHOD-SLOT-BEGIN (introduction): delete this sentence if the nested method slot is retired at its kill date
 \DATANEEDED{branch: only if the nested method slot (prior-offset LoRA) survives its kill rule -- one sentence with its gain over
@@ -90,9 +93,12 @@ post-hoc stacking, CI and datasets; else omit}
 % METHOD-SLOT-END (introduction)
 
 \paragraph{Findings in brief.}
-\DATANEEDED{RQ1, RQ2, RQ4: zero-shot versus LoRA confidence--label relation (UAUC, calibration, error-detection AUROC) beside the
-reference rows; both backbones; confirmation users; 95\% CI; source: main reliability table; direction-free unless admitted}
-\DATANEEDED{RQ4, RQ5: non-prior share (an upper bound on the personal share), information gain over the prior-only item mean,
-quality-partialled popularity link, knockout contrast against the placebo; source: decomposition and knockout tables}
-\DATANEEDED{RQ3, RQ6, C3: corrections against placebo and ensemble null; selective serving against random; head-share excess over
-the pool and against the published recommenders; pruning against matched random; source: actionability tables}
+\DATANEEDED{(i) What the confidence tracks (Section 6.1, Table tab:tracks): zero-shot and LoRA UAUC beside the item mean, the
+information-matched item mean and MF on the same rows, item-prior share and e-share, G and G_wu against G_CF, P1; counts per regime;
+direction-free unless admitted}
+\DATANEEDED{(ii) What fine-tuning teaches (Section 6.2, Table tab:teaches): within-item permutation retention and its label,
+complementarity to CF (H-F), the sparse and unseen strata (H-S), the store-name knockout label and the wording it allows}
+\DATANEEDED{(iii) Which uses survive a matched control (Section 6.3): error anatomy (oracle and deployable top-k), corrections against
+placebo and ensemble null, selective serving against random, static exposure against the pool and the published recommenders,
+uncertainty-selected against class-matched random pruning}
+Table~\ref{tab:guide} condenses the answers to S1--S6.

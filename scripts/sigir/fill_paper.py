@@ -50,7 +50,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SECTION_FILES = ("abstract", "introduction", "related_work", "preliminaries", "observation", "method", "experiments",
                  "conclusion", "appendix")
-ALIASES = ("sel", "gate", "gft", "aud", "aud2q", "aud2l", "grid", "cpu", "ko", "prn", "slot", "corr", "mir")
+ALIASES = ("sel", "gate", "gft", "aud", "aud2q", "aud2l", "grid", "cpu", "ko", "prn", "slot", "corr", "mir", "ext")
+# ext: the addendum-6 analysis (A3-6 items 2-8; docs/sigir/FTEXTRA_IMPL_SPEC.md), per domain and backbone plus its cross-domain
+# summary. Its specs below are placeholders that keep every ext slot red (result_file_missing) until the file exists and the specs
+# are completed against its real schema (editor pass 2).
+EXT_DETAIL = "extra-analysis file not produced yet"
 MIN_N = 150                                   # A3 section 1: fewer users = descriptive
 RATED = ("ml1m", "toys", "games", "sports")   # rated panels, registered order
 RATED_NAME = {"ml1m": "ML-1M", "toys": "Toys", "games": "Video Games", "sports": "Sports"}
@@ -60,8 +64,9 @@ FAMILY_UNITS = (("S10k", "sports", "events_1001_10000"), ("Toys", "toys", "all")
 ANATOMY_UNITS = {"S1k": ("sports", "events_1_1000"), "S10k": ("sports", "events_1001_10000"), "Toys": ("toys", "all"),
                  "Home": ("home", "all"), "Tools": ("tools", "all")}
 FT_MODELS = ("s0", "s1", "s2")
-REF_METHODS = {  # tab:exposure row label -> reference method of docs/sigir/ref_exposure
-    r"C-CRP (verbalised)": "ccrp_v3", r"ELMRec~\citep{wang2024elmrec}": "elmrec_graph",
+REF_METHODS = {  # tab:exposure row label -> reference method of docs/sigir/ref_exposure (all nine: c_rq3_baselines reads them)
+    # The verbalised reranker of the earlier benchmark protocol is anonymised in the paper (double-blind); its method key stays.
+    r"Verbalised reranker": "ccrp_v3", r"ELMRec~\citep{wang2024elmrec}": "elmrec_graph",
     r"IRLLRec~\citep{wang2025irllrec}": "irllrec_intent", r"LLM2Rec~\citep{he2025llm2rec}": "llm2rec_sasrec",
     r"LLMEmb~\citep{liu2025llmemb}": "llmemb", r"LLM-ESR~\citep{liu2024llmesr}": "llmesr_sasrec",
     r"ProEx~\citep{zhang2026proex}": "proex_profile", r"ProMax~\citep{zhang2026promax}": "promax_profile",
@@ -644,13 +649,15 @@ def go_seeds(R, c, k, s):
     return " / ".join(num(x) for x in per)
 
 
-# Main-session decision (2026-10-04): the ML-1M zero-shot UAUC and the paired delta (LoRA - zero-shot) of tab:gate-outcomes
-# are the grid values of tab:reliability (E_A zero-shot, E_B), so the two tables print the same numbers; gate_ft.json's
-# own zero_shot_context is a second scoring of the same prompts and is not printed (it is recorded in FILLED.json notes).
+# Main-session decision (2026-10-04): the ML-1M zero-shot UAUC and the paired delta (LoRA - zero-shot) on the Gate-FT rows are
+# the grid values (E_A zero-shot, E_B); gate_ft.json's own zero_shot_context is a second scoring of the same prompts and is not
+# printed (it is recorded in FILLED.json notes). Editor pass 2026-10-05: tab:gate-outcomes (now in the protocol) no longer
+# repeats them; they, and the item-mean and MF references on these rows, are printed once, in the ML-1M cells of tab:tracks A.
 # The per-seed LoRA UAUCs, their mean with its interval and the G9 decision stay gate_ft.json's (the registered output).
 GATE_ZS_NOTE = ("gate_ft.json zero_shot_context (UAUC_post_T, dUAUC_finetuned_minus_zeroshot_post_T) is a second scoring "
-                "of the same V1 prompts on the same users (vLLM batching; |dUAUC| about 1e-4): not printed; "
-                "tab:gate-outcomes prints the grid values of tab:reliability (main-session decision 2026-10-04)")
+                "of the same V1 prompts on the same users (vLLM batching; |dUAUC| about 1e-4): not printed; the zero-shot "
+                "UAUC and the paired gain on these rows are printed once, from the grid report, in tab:tracks "
+                "(main-session decision 2026-10-04; editor pass 2026-10-05)")
 
 
 def go_mean(R, c, k, s):
@@ -667,16 +674,6 @@ def go_mean(R, c, k, s):
         expect(s, "gft:decision")
         return tex(R.get(GFT, "decision"))
     raise SpecError(f"no slot expected in column {c}")
-
-
-def go_delta(R, c, k, s):
-    expect(s, "gft:dUAUC_finetuned_minus_zeroshot_post_T", "grid:dUAUC_ft_minus_zs")
-    return eb_cell(R, "qwen", "ml1m", need_ft=False)        # the Gate-FT table exists in every branch
-
-
-def go_refs(R, c, k, s):
-    expect(s, "cpu:UAUC_item_mean_prior, UAUC_mf_temporal")
-    return " / ".join(fmt(ref_val(R, "qwen", "ml1m", r, prefer=("FT", "ZS"))) for r in ("q_hat", "mf"))
 
 
 def go_caption(R, s):
@@ -813,43 +810,107 @@ def rel_rows(bb: str, p1_label: str) -> dict:
         d, reg = c
         return " / ".join(fmt(regime_val(R, bb, d, reg, "E_C", (), key)) for key in ("AUROC_margin_correct", "AURC"))
 
+    def users(R, c, k, s):
+        """'Users: TEST / S_d': the users with both classes among TEST candidates (k = 0) and the users of S_d (k = 1)."""
+        d, reg = c
+        if reg != "span":
+            raise SpecError("a spanning row has a per-regime cell")
+        if k == 0:
+            return n_users(R, d, s)
+        if k == 1:
+            return n_sd(R, d, s)
+        raise SpecError(f"no third slot expected in the users cell ({k})")
+
+    def g_cf_span(R, c, k, s):
+        """'G_CF: E-D / E-W': the registered G_CF of E-D (k = 0; no LLM feature, one value per panel, read from the zero-shot
+        regime's rows and from the fine-tuned regime's when the zero-shot block is unavailable) and the within-user G_CF,wu of
+        the addendum-6 analysis (k = 1; ext, pending)."""
+        d, reg = c
+        if reg != "span":
+            raise SpecError("a spanning row has a per-regime cell")
+        if k == 1:
+            expect(s, "ext:E_W.G_CF_wu")
+            raise Missing("result_file_missing", EXT_DETAIL)
+        if k != 0:
+            raise SpecError(f"no third slot expected in the G_CF cell ({k})")
+        expect(s, "grid:G_CF")
+        h, first = g_cf_handler(bb), None
+        for reg_ in ("ZS", "FT"):
+            try:
+                out = h(R, (d, reg_), 0, s)
+            except Missing as e:
+                if e.reason == "result_file_missing":
+                    raise
+                first = first or e
+                continue
+            if out != r"FAILED\_INTEGRITY":
+                return out
+            first = first or out
+        if isinstance(first, str):
+            return first
+        raise first
+
+    def item_shares(R, c, k, s):
+        """'Item share: MF (b_i) / label (m)' of E-G (ext, pending; one value per panel)."""
+        d, reg = c
+        if reg != "span":
+            raise SpecError("a spanning row has a per-regime cell")
+        expect(s, ("ext:E_G.item_share_mf", "ext:E_G.item_share_label")[min(k, 1)])
+        raise Missing("result_file_missing", EXT_DETAIL)
+
     rows = {
+        # ---- tab:tracks block A (and tab:app-llama, which uses the same labels)
         r"UAUC of $\ell$": stat("grid:UAUC", "E_A", ("UAUC_TEST",)),
-        r"LoRA $-$ ZS (paired)": span(e_b),
-        r"prior-only item mean (ref.)": span(ref("q_hat", "cpu:UAUC_item_mean_prior")),
-        r"popularity (ref.)": span(ref("popularity", "cpu:UAUC_popularity")),
-        r"temporal biased MF (ref.)": span(ref("mf", "cpu:UAUC_mf_temporal")),
-        r"ECE (after Platt)": stat("grid:ece10_platt", "E_C", (), "ECE"),
-        r"Platt slope": stat("grid:platt_slope", "E_C", (), "platt_slope"),
-        r"Correct decisions in bottom tertile": stat("grid:share_correct_bottom_tertile", "E_C", (),
-                                                     "share_correct_bottom"),
-        r"Errors in top tertile": stat("grid:share_errors_top_tertile", "E_C", (), "share_errors_top"),
-        r"Margin AUROC / AURC": margin,
-        r"Users ($n$)": span(n_users),
-        r"UAUC of $\ell$ on $S_d$": stat("grid:uauc_L_Sd", "E_D", ("UAUC", "L")),
-        r"UAUC of $\hat\pi$ alone": stat("grid:uauc_pi", "E_D", ("UAUC", "pi")),
-        r"UAUC of $\hat e$": stat("grid:uauc_evidence", "E_D", ("UAUC", "e_hat")),
+        r"LoRA $-$ ZS (E-B)": span(e_b),
+        r"item mean $m$ (ref.)": span(ref("q_hat", "cpu:UAUC_item_mean_prior")),
+        r"matched mean $m_T$ (ref.)$^\dagger$": ext_pending("ext:E_J.UAUC_q_hat_T"),
+        r"temporal MF (ref.)": span(ref("mf", "cpu:UAUC_mf_temporal")),
+        r"$\Delta$UAUC($\ell-m$), E-J$^\dagger$": ext_pending("ext:E_J.dUAUC_L_minus_q_hat"),
+        r"$\Delta$UAUC($\ell-$MF), warm$^\dagger$": ext_pending("ext:E_J.dUAUC_L_minus_mf"),
+        r"Users: TEST / $S_d$": users,
+        # ---- block B
         r"Reliability $r_8$ of $\hat\pi$": stat("grid:r8c", "E_D", ("shares",), "r8c"),
-        r"Non-prior share $1-\rho^2/r_8$": stat("grid:non_prior_share", "E_D", ("shares",), "non_prior_share",
-                                                special="shares"),
+        r"Item-prior share $\rho^2/r_8$": stat("grid:item_prior_share", "E_D", ("shares",), "item_prior_share",
+                                               special="shares"),
+        r"e-share$^\dagger$": ext_pending("ext:E_G.e_share"),
+        r"Item share of MF / label$^\dagger$": item_shares,
         # G and the star permutation keep their seed mean under their own keys (G_mean_over_seeds,
         # dUAUC_mean_over_seeds; ftgrid_report.stacker_block / starperm_block)
-        r"$\mathcal G=\Delta$UAUC(M2$-$M1)": mean_keyed(bb, "grid:G", ("information_gain",), "G",
-                                                         "G_mean_over_seeds"),
-        r"$\mathcal G_{\rm CF}=\Delta$UAUC(M3$-$M0)": g_cf_handler(bb),
+        r"$\mathcal G=\Delta$UAUC(M2$-$M1), E-D": mean_keyed(bb, "grid:G", ("information_gain",), "G",
+                                                             "G_mean_over_seeds"),
+        r"$\mathcal G_{\rm wu}$ (E-W)$^\dagger$": ext_pending("ext:E_W.G_wu"),
+        r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$": g_cf_span,
+        r"MF personal residual (ref.)": span(ref("mf_personal_residual_warm", "cpu:UAUC_mf_personal_residual")),
         r"Star permutation $\Delta$UAUC": mean_keyed(bb, "grid:starperm_dUAUC", ("star_permutation",),
                                                      "dUAUC_L_minus_perm", "dUAUC_mean_over_seeds"),
-        r"Popularity link of $\hat\pi$ (partial Spearman)": stat("grid:partial_rho_pi_logpop", "E_E",
-                                                                 ("partial_spearman", "pi_item")),
-        r"Popularity link of $\ell$ (partial Spearman)": stat("grid:partial_rho_L_logpop", "E_E",
-                                                              ("partial_spearman", "L_item")),
+        r"Popularity link of $\hat\pi$": stat("grid:partial_rho_pi_logpop", "E_E", ("partial_spearman", "pi_item")),
+        r"Popularity link of $\ell$": stat("grid:partial_rho_L_logpop", "E_E", ("partial_spearman", "L_item")),
         p1_label: span(p1),
-        r"Users in $S_d$ ($n$)": span(n_sd),
-        r"UAUC, prior-only item mean (ref.)": span(ref("q_hat", "cpu:UAUC_item_mean_prior")),
-        r"UAUC, popularity (ref.)": span(ref("popularity", "cpu:UAUC_popularity")),
-        r"UAUC, MF personal residual (ref.)": span(ref("mf_personal_residual_warm", "cpu:UAUC_mf_personal_residual")),
+        r"P1$_{\rm wu}$$^\dagger$": ext_pending("ext:E_W.P1_wu"),
+        # ---- block C (oracle rows: E-C of the grid report; deployable rows: E-C' of the addendum-6 analysis). The UAUC of pi-hat
+        # alone, the Platt slope and the AURC stay in the released files (editor pass 2026-10-05, page budget).
+        r"ECE (after Platt)": stat("grid:ece10_platt", "E_C", (), "ECE"),
+        r"Correct in bottom tertile, oracle": stat("grid:share_correct_bottom_tertile", "E_C", (),
+                                                   "share_correct_bottom"),
+        r"Errors in top tertile, oracle": stat("grid:share_errors_top_tertile", "E_C", (), "share_errors_top"),
+        r"Margin AUROC, oracle": stat("grid:auroc_margin_correct", "E_C", (), "AUROC_margin_correct"),
+        # the three deployable rows share their label; the slot text names the statistic
+        r"deployable$^\dagger$": ext_pending("ext:E_Cprime.share_correct_bottom", "ext:E_Cprime.share_errors_top",
+                                             "ext:E_Cprime.AUROC_margin"),
+        # ---- tab:app-llama: the Llama Toys knockout (alias ko of the Llama grid report)
+        r"Knockout: head $-$ tail drop of $\ell$": ko_handler(r"Head $-$ tail drop of $\ell$", bb),
+        r"Knockout: registered label": ko_handler(r"Registered label (per seed)", bb),
     }
     return rows
+
+
+def ext_pending(*slot_texts):
+    """A table cell of the addendum-6 analysis (alias ext): checks the slot text and stays red until the result file exists and
+    the spec is completed against its schema (editor pass 2)."""
+    def h(R, c, k, s):
+        expect(s, *slot_texts)
+        raise Missing("result_file_missing", EXT_DETAIL)
+    return h
 
 
 def mean_keyed(bb, slot_text, sub, per_key_leaf, mean_leaf):
@@ -939,7 +1000,38 @@ def exposure_handler(label):
     return h
 
 
-# ---- tab:popularity (knockout, Qwen)
+# Editor pass 2026-10-05 (page budget): the eight published recommenders of tab:exposure are summarised per cell by the minimum,
+# median and maximum of their estimates (context, estimates only); their per-method values stay in the released files, and the
+# verbalised reranker keeps its own row. c_rq3_baselines still reads all nine reference methods.
+PUBLISHED = tuple(m for lab, m in REF_METHODS.items() if lab != r"Verbalised reranker")
+assert len(PUBLISHED) == 8, PUBLISHED
+EXPOSURE_SUMMARY = {r"Published, min": "min", r"Published, median": "median", r"Published, max": "max"}
+
+
+def exposure_summary_handler(label):
+    stat = EXPOSURE_SUMMARY[label]
+
+    def h(R, c, k, s):
+        blk, unit = c
+        d, seg = ANATOMY_UNITS[unit]
+        rel = f"aud/{d}.json"
+        st, key = {"dh": ("aud:B.delta_head", "delta_head"), "gini": ("aud:B.gini_exposure", "gini_exposure"),
+                   "aplt": ("aud:B.tail_share_top10", "tail_share_top10")}[blk]
+        expect(s, f"{st}, {stat} of 8")
+        ests = []
+        for m in PUBLISHED:
+            rec = R.get(rel, "segments", seg, "reference", m, "B_exposure", key)
+            est = rec.get("est") if isinstance(rec, dict) else rec
+            if not _fin(est):
+                raise Missing("field_null", f"{rel}: {seg}.reference.{m}.B_exposure.{key} has no estimate")
+            ests.append(float(est))
+        xs = sorted(ests)
+        value = {"min": xs[0], "max": xs[-1], "median": (xs[3] + xs[4]) / 2}[stat]
+        return num(value, src=f"{rel}:segments.{seg}.reference.(8 published).B_exposure.{key}.est ({stat})")
+    return h
+
+
+# ---- knockout rows (tab:teaches block D, Qwen; tab:app-llama, Llama Toys; the former tab:popularity)
 KO_ROWS = {r"Head $-$ tail drop of $\ell$": ("ko:head_minus_tail.delta", ("delta", "pseudo", "head_minus_tail")),
            r"Placebo drop (real-brand swap)": ("ko:placebo.delta", ("delta", "placebo", "head_minus_tail")),
            r"Tail $\Delta$UAUC": ("ko:tail_dUAUC", ("dUAUC", "real_minus_pseudo", "tail")),
@@ -979,8 +1071,8 @@ def ko_handler(label, bb="qwen"):
 
 # ---- tab:pruning
 PRN = "prn/pruning_ml1m.json"
-PRUNE_ROWS = {r"P0 full data": "P0", r"P1 random 25\%": "P1", r"P2 most uncertain 25\%": "P2",
-              r"P3 most prior-congruent 25\%": "P3"}
+PRUNE_ROWS = {r"P0 full data": "P0", r"P1 random (class-matched)": "P1", r"P2 uncertainty-selected": "P2",
+              r"P3 prior-congruent": "P3"}       # names of addendum 7 (2026-10-05)
 
 
 def _prn_arm(R, arm):
@@ -1054,7 +1146,8 @@ def prune_refs(R, c, k, s):
     return " / ".join(fmt(ref_val(R, "qwen", "ml1m", r, prefer=("FT", "ZS"))) for r in ("q_hat", "popularity", "mf"))
 
 
-# ---- tab:app-sens
+# ---- tab:app-sens (dormant since the editor pass of 2026-10-05: the variant-bank and sensitivity tables were cut to two sentences
+# and a pointer to the artefact; the spec is kept so that the table can be restored, or rendered for the artefact, unchanged)
 SENS_COLS = {1: "ml1m", 2: "toys", 3: "E1", 4: "E2", 5: "eligible", 6: "tied"}
 
 
@@ -1265,6 +1358,42 @@ def z2_handler(label):
     return h
 
 
+# ---- tab:teaches (editor pass 2026-10-05): E-F, E-H and the FT-C reading of the addendum-6 analysis (alias ext, pending) and the
+# Qwen knockout rows of the former tab:popularity (alias ko); columns as tab:tracks (ML-1M has no store field: no knockout cell).
+TEACH_ROWS = {
+    r"$\mathcal G_{\rm LLM|CF}=\Delta$UAUC(M4$-$M3)": ext_pending("ext:E_F.G_LLM_given_CF"),
+    r"$\mathcal G_{\rm CF|LLM}=\Delta$UAUC(M4$-$M2)": ext_pending("ext:E_F.G_CF_given_LLM"),
+    r"Sparse rows ($m$ from $<5$ ratings)": ext_pending("ext:E_H.sparse.G_prior"),
+    r"Dense rows": ext_pending("ext:E_H.dense.G_prior"),
+    r"Unseen items (no TRAIN example)": ext_pending("ext:E_H.unseen.G_prior"),
+    r"Seen items": ext_pending("ext:E_H.seen.G_prior"),
+    r"Retention $R$$^\dagger$": ext_pending("ext:FT_C_reading.R"),
+    r"Reading$^\dagger$": ext_pending("ext:FT_C_reading.label"),
+    r"Head $-$ tail drop of $\ell$": ko_handler(r"Head $-$ tail drop of $\ell$"),
+    r"Placebo drop": ko_handler(r"Placebo drop (real-brand swap)"),
+    r"Tail $\Delta$UAUC": ko_handler(r"Tail $\Delta$UAUC"),
+    r"Registered label": ko_handler(r"Registered label (per seed)"),
+}
+
+
+# ---- tab:deviations (editor pass 2026-10-05): the deviations record condensed; row 7 carries three estimates
+def deviation_row7(R, c, k, s):
+    if c != "what":
+        raise SpecError(f"no slot expected in column {c} of deviation row 7")
+    if k == 0:
+        expect(s, "sel:UAUC of v_star")                        # the DEV UAUC of V* on ML-1M (G5)
+        return _sel_uauc(R, "v_star", "ml1m")
+    if k == 1:
+        expect(s, "gate:UAUC")                                 # the CONFIRM UAUC (G6), estimate only
+        return num(R.get(GATE, "UAUC"))
+    if k == 2:
+        expect(s, "grid:UAUC")                                 # the ML-1M zero-shot UAUC on TEST rows (E-A), estimate only
+        v = regime_val(R, "qwen", "ml1m", "ZS", "E_A", ("UAUC_TEST",))
+        v.est_only = True
+        return fmt(v)
+    raise SpecError(f"no fourth slot expected in deviation row 7 ({k})")
+
+
 # ---- registry
 @dataclass
 class TableSpec:
@@ -1294,26 +1423,30 @@ def _rel_cols(domains):
 
 def build_table_specs() -> dict:
     specs = {}
+    # editor pass 2026-10-05: the gate table moved to the protocol, its "Rule" column folded into the row labels; the zero-shot
+    # UAUC, the paired gain and the references on the Gate-FT rows are printed once, in tab:tracks
     specs["tab:gate-outcomes"] = TableSpec(
-        "tab:gate-outcomes", 5, _cols({1: "c1", 2: "c2", 3: "c3", 4: "c4"}, {(1, 2): "c12"}),
-        {r"G5 dev: ML-1M UAUC": go_g5_ml1m, r"G5 dev: Toys UAUC": go_g5_toys, r"G6 confirm: ML-1M UAUC": go_g6,
-         r"LoRA seeds 0 / 1 / 2": go_seeds, r"mean over seeds": go_mean,
-         r"paired $\Delta$ (LoRA $-$ zero-shot)": go_delta, r"item mean, MF (same rows)": go_refs},
+        "tab:gate-outcomes", 4, _cols({1: "c1", 2: "c2", 3: "c4"}),
+        {r"G5 DEV: ML-1M UAUC (bound $>0$)": go_g5_ml1m, r"G5 DEV: Toys UAUC (E2)": go_g5_toys,
+         r"G6 CONFIRM: ML-1M UAUC ($\ge0.60$)": go_g6, r"G9 Gate-FT: seeds 0 / 1 / 2": go_seeds,
+         r"G9 Gate-FT: mean ($\ge0.65$)": go_mean},
         caption=go_caption)
     specs["tab:anatomy"] = TableSpec(
         "tab:anatomy", 6, _cols({1: "S1k", 2: "S10k", 3: "Toys", 4: "Home", 5: "Tools"}),
         {lab: anatomy_handler(lab) for lab in ANATOMY_ROWS})
-    specs["tab:reliability"] = TableSpec("tab:reliability", 9, _rel_cols(RATED),
-                                         rel_rows("qwen", r"P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ (ML-1M)"))
+    # tab:tracks is the former tab:reliability (editor pass 2026-10-05: same-row references, E-J, shares, G and G_wu, oracle and
+    # deployable top-k); tab:app-llama follows it for the second backbone
+    specs["tab:tracks"] = TableSpec("tab:tracks", 9, _rel_cols(RATED),
+                                    rel_rows("qwen", r"P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$"))
     llama_rows = rel_rows("llama", r"P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$")
     specs["tab:app-llama"] = TableSpec("tab:app-llama", 5, _rel_cols(("ml1m", "toys")), llama_rows)
+    specs["tab:teaches"] = TableSpec("tab:teaches", 9, _rel_cols(RATED), dict(TEACH_ROWS))
     specs["tab:exposure"] = TableSpec(
         "tab:exposure", 18, exposure_col,
-        {lab: exposure_handler(lab) for lab in [r"Pool (level)", r"Target head share (level)", r"LLM, \textsf{next}",
-                                                r"LLM, \textsf{like}", *REF_METHODS]})
-    specs["tab:popularity"] = TableSpec(
-        "tab:popularity", 5, _cols({1: ("toys", "ZS"), 2: ("toys", "FT"), 3: ("games", "ZS"), 4: ("games", "FT")}),
-        {lab: ko_handler(lab) for lab in KO_ROWS})
+        {**{lab: exposure_handler(lab) for lab in [r"Pool (level)", r"Target head share (level)", r"LLM, \textsf{next}",
+                                                   r"LLM, \textsf{like}", *REF_METHODS]},
+         **{lab: exposure_summary_handler(lab) for lab in EXPOSURE_SUMMARY}})
+    specs["tab:deviations"] = TableSpec("tab:deviations", 3, _cols({1: "what", 2: "effect"}), {"7": deviation_row7})
     specs["tab:pruning"] = TableSpec(
         "tab:pruning", 5, _cols({1: "UAUC", 2: "dP1", 3: "npos", 4: "dP0"}, {(1, 4): "ref"}),
         {**{lab: prune_handler(lab) for lab in PRUNE_ROWS}, r"Item mean, popularity, MF (ref.)": prune_refs})
@@ -1786,28 +1919,94 @@ def unfillable(reason, detail):
     return h
 
 
+# ---- count rule (addendum 6 item 9.2; editor pass 2026-10-05): a registered family with mixed outcomes is reported as counts
+# per regime, never with one direction word. These functions only count confirmed members (the existing decision functions
+# above are unchanged and still decide the unanimous words).
+def c_eb_count(R, s):
+    """E-B: on how many of the four Qwen domains the regime contrast is confirmed (eb_family: Holm over the four domains and the
+    sigma_seed rule); confirmed members of both signs are not decided (a written sentence)."""
+    fam = eb_family(R)
+    conf = [v for v in fam.values() if v["confirmed"]]
+    if any(v["est"] > 0 for v in conf) and any(v["est"] < 0 for v in conf):
+        raise Missing("not_decided", "E-B is confirmed with both signs: a mixed outcome needs a written sentence")
+    return f"{len(conf)} of 4"
+
+
+def c_g_count(reg):
+    """E-D: on how many of the four Qwen domains G is confirmed in regime reg (the report's E-D Holm family; for FT also the
+    sigma_seed rule, as the report's 'confirmed' flag encodes); confirmed members of both signs are not decided, and a member on
+    fewer than 150 users (descriptive) stops the count, as in c_rq4_g."""
+    def h(R, s):
+        if reg == "FT":
+            require_ft(R)
+        pos = neg = 0
+        for d in RATED:
+            rel = grid_rel("qwen", d)
+            regime_ok(R, rel, "E_D", reg)
+            fam = R.get(rel, "E_D", reg, "holm_family_E_D")
+            g = (R.get(rel, "E_D", reg, "information_gain", "per_model", "zeroshot", "G") if reg == "ZS"
+                 else R.get(rel, "E_D", reg, "information_gain", "G_mean_over_seeds"))
+            if g.get("descriptive_min_n"):
+                raise Missing("below_min_n", f"{rel}: G ({reg}) on {g.get('n_users')} users (< {MIN_N})")
+            if fam["confirmed"].get("G") is True:
+                pos += g["est"] > 0
+                neg += g["est"] < 0
+        if pos and neg:
+            raise Missing("not_decided", f"G is confirmed with both signs in the {reg} regime")
+        return f"{pos + neg} of 4"
+    return h
+
+
+def p_mir_decision(R, s):
+    """The registered stage-3 label of the two-view contrast (pilot1_gate --stage3_gate), verbatim; after GATE_PASS only."""
+    require_gatepass(R)
+    return tex(R.get(MIR, "decision"))
+
+
 @dataclass
 class ProseSpec:
     before: str           # the normalized text right before the slot ends with this
     handler: object
 
 
-P_AMB = "the sentence does not say which regime (zero-shot or LoRA) the value belongs to"
+# Placeholder for the prose slots of the addendum-6 analysis (alias ext): red until the file exists; editor pass 2 writes their
+# handlers (counts of the E-F, E-H and E-J Holm families of the cross-domain summary, the E-W robustness reading, P1_wu's verdict,
+# and the FT-C wording rule: "fine-tuning mostly teaches the item" only if the reading is ITEM_DRIVEN on every dataset run).
+EXT_PROSE = unfillable("result_file_missing", EXT_DETAIL)
 PROSE_SPECS = {
-    ("experiments", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("(mean post-$T_d$ UAUC", p_gft_mean),
-    # The gate branches that occurred (GATE_PASS, GATE_FT_PASS) were resolved in the skeleton by the main session on
-    # 2026-10-04; their numbers still come from gate.json / gate_ft.json (and the handlers refuse any other decision).
-    ("abstract", "gate:UAUC", 0): ProseSpec("a registered remedy then reached UAUC", p_gate_est),
-    ("abstract", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("and LoRA tuning reached", p_gft_mean_est),
-    ("introduction", "gate:n_users", 0): ProseSpec("or higher and, on", p_gate_n),
-    ("introduction", "gate:UAUC, ci95", 0): ProseSpec("that prompt reached UAUC", p_gate_range),
+    # The gate branches that occurred (GATE_PASS, GATE_FT_PASS) were resolved in the skeleton by the main session on 2026-10-04;
+    # their numbers still come from gate.json / gate_ft.json (and the handlers refuse any other decision). The introduction's
+    # anchors follow its 2026-10-04 rewrite (editor pass 2026-10-05); the protocol's gate paragraph prints no number (the gate
+    # table does).
+    ("introduction", "gate:n_users", 0): ProseSpec("4 stars or higher; on", p_gate_n),
+    ("introduction", "gate:UAUC, ci95", 0): ProseSpec("untouched ML-1M users it reached UAUC", p_gate_range),
     ("introduction", "gate:v0_context.UAUC", 0): ProseSpec("against", p_gate_v0),
     ("introduction", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("It did (mean", p_gft_mean_est),
     ("introduction", "gft:UAUC_post_T_per_seed", 0): ProseSpec("[S]; seeds", p_gft_seeds),
-    ("experiments", "gate:UAUC, ci95", 0): ProseSpec(r"GATE\_PASS (UAUC", p_gate_ci),
     ("conclusion", "gate:UAUC", 0): ProseSpec("the remedied zero-shot prompt reached UAUC", p_gate_est),
     ("conclusion", "gft:UAUC_post_T_mean_over_seeds", 0): ProseSpec("and LoRA tuning reached", p_gft_mean_est),
-    ("experiments", "k of 4", 0): ProseSpec(r"\emph{Reading template (RQ1).} On", c_rq1_k),
+    # ---- Findings 6.1, what the confidence tracks (numbers are in tab:tracks; the prose carries the registered words and counts)
+    ("experiments", "raises / leaves / lowers", 0): ProseSpec("Fine-tuning", c_rq4_ft),
+    ("experiments", "grid:E_B confirmed, k of 4", 0): ProseSpec("(E-B, confirmed on", c_eb_count),
+    ("experiments", "ext:E_J.H_J_count", 0): ProseSpec(
+        "the item mean (H-J) on", EXT_PROSE),
+    ("experiments", "grid:G confirmed, k of 4 zero-shot", 0): ProseSpec("is confirmed (E-D) on", c_g_count("ZS")),
+    ("experiments", "grid:G confirmed, k of 4 LoRA", 0): ProseSpec("zero-shot and", c_g_count("FT")),
+    ("experiments", "ext:E_W.robust_count", 0): ProseSpec(
+        "the within-user estimator finds it", EXT_PROSE),
+    ("experiments", "holds / does not hold", 0): ProseSpec("[S]. P1", c_p1_holds),
+    ("experiments", "grid:P1", 0): ProseSpec(r"(mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$", p_p1),
+    ("experiments", "n of 3", 0): ProseSpec(r"\mathcal G_{\rm ZS}$ [S];", c_p1_n),
+    ("experiments", "ext:E_W.P1_wu_verdict", 0): ProseSpec(r"P1$_{\rm wu}$", EXT_PROSE),
+    # ---- Findings 6.2, what fine-tuning teaches
+    ("experiments", "ext:FT_C_reading.wording", 0): ProseSpec("by its reading rule", EXT_PROSE),
+    ("experiments", "ext:E_F.H_F_count", 0): ProseSpec("H-F) on", EXT_PROSE),
+    ("experiments", "ext:E_H.H_S_count_ZS", 0): ProseSpec("H-S) in", EXT_PROSE),
+    ("experiments", "ext:E_H.H_S_count_FT", 0): ProseSpec("[S] zero-shot and", EXT_PROSE),
+    ("experiments", "POSITIVE / NEGATIVE / NULL / INDETERMINATE", 0): ProseSpec("the Qwen3-8B knockout is labelled",
+                                                                                 c_ko_label),
+    # ---- Findings 6.3, which uses survive a matched control
+    ("experiments", "k of 4", 0): ProseSpec(r"unsure when wrong (S1, S2).} On", c_rq1_k),
     ("experiments", "above / indistinguishable from / below", 0): ProseSpec(r"domains $\mathrm{acc}_{\rm high}$ is",
                                                                              c_rq1_dir),
     ("experiments", "aud:C.acc_top_minus_bottom_tertile", 0): ProseSpec(
@@ -1815,106 +2014,26 @@ PROSE_SPECS = {
                                                         "acc_top_minus_bottom_tertile"))),
     ("experiments", "concentrated in the high tertile / spread evenly / concentrated in the low tertile", 0): ProseSpec(
         "so correct top-1 decisions are", c_rq1_cons),
-    ("experiments", "grid:share_correct_bottom_tertile", 0): ProseSpec(
-        "share of correct decisions in the bottom margin tertile is", p_grid_ec("ZS", "share_correct_bottom")),
-    ("experiments", "grid:share_correct_bottom_tertile", 1): ProseSpec("[S] (zero-shot) and",
-                                                                       p_grid_ec("FT", "share_correct_bottom")),
     ("experiments", "more often than / as often as / less often than", 0): ProseSpec(
-        "Top-1 errors fall in the high tertile", c_rq2),
+        "top-1 errors fall in the high tertile", c_rq2),
     ("experiments", "aud:C.share_errors_in_top_tertile", 0): ProseSpec(
         "one third of the time (share", p_aud(("C_calibration", "error_anatomy", "share_errors_in_top_tertile"))),
-    ("experiments", "grid:share_errors_top_tertile", 0): ProseSpec(
-        "the share of errors in the top margin tertile is", unfillable("ambiguous_slot", P_AMB)),
-    ("experiments", "detects / does not detect", 0): ProseSpec(
-        "and the margin", unfillable("ambiguous_slot", P_AMB + "; the margin AUROC is descriptive per panel")),
-    ("experiments", "grid:auroc_margin_correct", 0): ProseSpec("errors (AUROC", unfillable("ambiguous_slot", P_AMB)),
-    ("experiments", "mostly low-confidence / no more often low- than high-confidence / mostly high-confidence", 0):
-        ProseSpec("so wrong answers are", unfillable("interpretive", "a synthesis of the RQ2 endpoints")),
     ("experiments", "above / indistinguishable from / below", 1): ProseSpec(r"scores $\Delta_{\rm head}$ is",
                                                                              c_rq3_dir),
     ("experiments", "k of 4", 1): ProseSpec("[S] 0 on", c_rq3_k),
     ("experiments", "aud:B.delta_head", 0): ProseSpec("0 on [S] domains (", p_aud(("B_exposure", "llm", "delta_head"))),
-    ("experiments", "the same / the opposite / no", 0): ProseSpec("summary.json S3.admission), with", c_rq3_backbone),
+    ("experiments", "the same / the opposite / no", 0): ProseSpec("domains ([S]), with", c_rq3_backbone),
     ("experiments", "aud2l:B.delta_head", 0): ProseSpec(
         "sign on the second backbone (", lambda R, s: _z2_list(R, "aud2l", ("B_exposure", "llm", "delta_head"))),
     ("experiments", "larger / similar / smaller", 0): ProseSpec("on the second backbone ([S]), and", c_rq3_baselines),
-    ("experiments", "aud:B.head_share_top10_llm_minus_ref", 0): ProseSpec(
-        "than for the baselines (paired difference",
-        unfillable("ambiguous_slot", "one slot for 36 paired differences (9 baselines x 4 domains): the sentence fixes "
-                                     "no baseline or domain")),
-    ("experiments", "aud:D.gain_at_50_vs_full", 0): ProseSpec(
-        "serving the confident half changes NDCG@10 by",
-        unfillable("ambiguous_slot", "'relative to the random signal' names no field: the p_max gain, the random gain "
-                                     "or their difference (not produced)")),
-    ("experiments", "aud:D.niche_minus_mainstream_served_share", 0): ProseSpec(
-        "niche-minus-mainstream served share by",
-        unfillable("ambiguous_slot", "'relative to the random signal' names no field: the p_max share, the random share "
-                                     "or their difference (not produced)")),
-    ("experiments", "aud:C.pointwise.uauc", 0): ProseSpec(r"the per-event AUC of $\ell$ is",
-                                                           p_aud(("C_calibration", "pointwise", "uauc"))),
-    ("experiments", "above / indistinguishable from / below", 2): ProseSpec(
-        r"zero-shot regime $\mathrm{UAUC}(\ell)$ is",
-        unfillable("to_be_removed", f"{REMOVAL_DECISION} (RQ4: the paired difference UAUC(l) - UAUC(item mean) with "
-                                    "its interval is written by no script; this direction word depends on it)")),
-    ("experiments", "k of 4", 2): ProseSpec("the prior-only item mean on", unfillable(
-        "to_be_removed", f"{REMOVAL_DECISION} (RQ4: depends on the paired difference UAUC(l) - UAUC(item mean))")),
-    ("experiments", "above / indistinguishable from / below", 3): ProseSpec("panels and after LoRA", unfillable(
-        "to_be_removed", f"{REMOVAL_DECISION} (RQ4: depends on the paired difference UAUC(l) - UAUC(item mean))")),
-    ("experiments", "grid:UAUC minus cpu:UAUC_item_mean_prior", 0): ProseSpec("it (paired difference", unfillable(
-        "to_be_removed", f"{REMOVAL_DECISION} (RQ4: the paired difference UAUC(l) - UAUC(item mean) with its "
-                         "user-bootstrap interval is written by no script)")),
-    # RQ4 as rewritten by the main session (2026-10-04): three estimates with their own intervals, no direction word
-    ("experiments", "grid:UAUC", 0): ProseSpec(r"the zero-shot $\mathrm{UAUC}(\ell)$ is", p_grid_uauc("ZS")),
-    ("experiments", "cpu:UAUC_item_mean_prior", 0): ProseSpec(r"$\mathrm{UAUC}(\ell)$ is [S] against",
-                                                              p_grid_ref("q_hat")),
-    ("experiments", "grid:UAUC", 1): ProseSpec("on the same rows, and after LoRA", p_grid_uauc("FT")),
-    ("experiments", "grid:non_prior_share", 0): ProseSpec("the non-prior share is", p_nonprior("ZS")),
-    ("experiments", "grid:non_prior_share", 1): ProseSpec("[S] (zero-shot) and", p_nonprior("FT")),
-    ("experiments", "above / not distinguishable from", 0): ProseSpec(r"the information gain $\mathcal G$ is", c_rq4_g),
-    ("experiments", "grid:G", 0): ProseSpec("[S] 0 (", unfillable("ambiguous_slot", P_AMB)),
-    ("experiments", "grid:G_CF", 0): ProseSpec(r"against a reference gain $\mathcal G_{\rm CF}$ of", p_gcf),
-    ("experiments", "raises / leaves / lowers", 0): ProseSpec("fine-tuning", c_rq4_ft),
-    ("experiments", "grid:dUAUC_ft_minus_zs", 0): ProseSpec("UAUC (paired difference", p_eb),
-    ("experiments", "holds / does not hold", 0): ProseSpec("and P1", c_p1_holds),
-    ("experiments", "grid:P1", 0): ProseSpec(r"(mean $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$", p_p1),
-    ("experiments", "n of 3", 0): ProseSpec(r"\mathcal G_{\rm ZS}$ [S];", c_p1_n),
-    ("experiments", "the same / opposite / unrelated", 0): ProseSpec(
-        "Level and gap point in", unfillable("interpretive", "relation of the level and gap contrasts")),
-    ("experiments", "aud:E.head_minus_tail_mean_p", 0): ProseSpec("directions (",
-                                                                   p_aud(("E_popularity", "head_minus_tail_mean_p"))),
-    ("experiments", "aud:E.bias_index.head_minus_tail", 0): ProseSpec(
-        "directions ([S],", p_aud(("E_popularity", "bias_index", "head_minus_tail"))),
-    ("experiments", "above / indistinguishable from / below", 4): ProseSpec(
-        r"popularity link of $\hat\pi$ is", unfillable("ambiguous_slot", P_AMB)),
-    ("experiments", "grid:partial_rho_pi_logpop", 0): ProseSpec("[S] 0 (", unfillable("ambiguous_slot", P_AMB)),
-    ("experiments", "POSITIVE / NEGATIVE / NULL / INDETERMINATE", 0): ProseSpec("the Qwen3-8B knockout is labelled",
-                                                                                 c_ko_label),
-    ("experiments", "ko:head_minus_tail.delta", 0): ProseSpec(
-        "(drop", unfillable("ambiguous_slot", "the sentence fixes neither the domain (Toys, Video Games) nor the regime")),
-    ("experiments", "ko:placebo.delta", 0): ProseSpec(
-        "placebo", unfillable("ambiguous_slot", "the sentence fixes neither the domain nor the regime")),
-    ("experiments", "ko:label, drop with the same / the opposite sign", 0): ProseSpec(
-        "Llama on Toys", unfillable("ambiguous_slot", "the Llama Toys knockout has a label per model (zero-shot, seeds "
-                                                      "0-2); the sign comparison is interpretive")),
-    ("experiments", "ko:label or not run", 0): ProseSpec(
-        "Sports", unfillable("ambiguous_slot", "the Sports knockout has a label per model; 'not run' needs the recorded "
-                                               "cut (KNOCKOUT_SPORTS=0, PILOT_LOG)")),
+    ("experiments", "corr:max_abs_dAUC_user", 0): ProseSpec("change per-user AUC by at most", p_corr_max),
+    ("experiments", "mir:decision", 0): ProseSpec("two-view contrast is labelled", p_mir_decision),
     ("experiments", "prn:d_vs_P1", 0): ProseSpec("The contrast P2 $-$ P1 is", p_prn("est")),
     ("experiments", "prn:ci_P2_minus_P1", 0): ProseSpec("(interval", p_prn("ci")),
     ("experiments", "prn:p_P2_minus_P1", 0): ProseSpec("$p$", p_prn("p")),
     ("experiments", "prn:n_pos_of_5", 0): ProseSpec(") with", p_prn("npos")),
     ("experiments", "better than / worse than / about equal to / inconclusive against", 0): ProseSpec(
-        "most uncertain examples is", c_prn),
-    ("experiments", "corr:max_abs_dAUC_user", 0): ProseSpec("change per-user AUC by at most", p_corr_max),
-    ("experiments", "above / indistinguishable from / below", 5): ProseSpec(
-        "each item-dependent correction is",
-        unfillable("ambiguous_slot", "'each item-dependent correction' covers several corrections and panels; the "
-                                     "registered stage-3 outcome is the label of mir/decision.json")),
-    ("experiments", "mir:dUAUC_mirror_minus_placebo", 0): ProseSpec("its control in UAUC (",
-                                                                     p_mir("dUAUC_mirror_minus_placebo")),
-    ("experiments", "mir:dUAUC_mirror_minus_ensemble_null", 0): ProseSpec(
-        "[S],", p_mir("dUAUC_mirror_minus_ensemble_null")),
-    ("experiments", "mir:dNDCG10_mirror_minus_raw", 0): ProseSpec("moves next-item NDCG@10 by", p_mir_ndcg),
+        "so uncertainty-selected pruning is", c_prn),
     ("experiments", "above / indistinguishable from / below", 6): ProseSpec("Prior-offset LoRA is", c_slot_dir),
     ("experiments", "k of 4", 3): ProseSpec("post-hoc stacking on", c_slot_k),
     ("experiments", "slot:d_offset_minus_stack", 0): ProseSpec("datasets (gain", p_slot_list),

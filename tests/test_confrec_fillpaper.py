@@ -382,40 +382,42 @@ def test_the_unfilled_report_lists_exactly_the_red_slots(real):
 
 # ================================================================================================ real files
 def test_real_gate_files_fill_the_gate_table(real):
+    """tab:gate-outcomes (in the protocol since the editor pass of 2026-10-05): the bars sit in the row labels, the G5/G6 rows
+    read the selection and confirmation files, the Gate-FT rows gate_ft.json; the zero-shot UAUC, the paired gain and the
+    references on the Gate-FT rows are printed once, in tab:tracks, so this table has no grid cell."""
     sel, gate, gft = real.j["sel/selection.json"], real.j["gate/gate.json"], real.j["gft/gate_ft.json"]
-    text = read(real.out, "sections/experiments.tex")
+    text = read(real.out, "sections/observation.tex")
     t = table_text(text, "tab:gate-outcomes")
     vs = sel["v_star"]
-    assert row_cells(t, "G5 dev: ML-1M UAUC") == [n3(sel["table"]["V0"]["ml1m"]["UAUC"]),
-                                                  n3(sel["table"][vs]["ml1m"]["UAUC"]), "lower bound $>0$",
-                                                  sel["decision"].replace("_", "\\_")]
-    assert row_cells(t, "G5 dev: Toys UAUC")[1:] == [n3(sel["table"][vs]["toys"]["UAUC"]), "E2",
-                                                     "yes" if sel["table"][vs]["E2"] else "no"]
+    assert row_cells(t, r"G5 DEV: ML-1M UAUC (bound $>0$)") == [n3(sel["table"]["V0"]["ml1m"]["UAUC"]),
+                                                                n3(sel["table"][vs]["ml1m"]["UAUC"]),
+                                                                sel["decision"].replace("_", "\\_")]
+    assert row_cells(t, "G5 DEV: Toys UAUC (E2)") == [n3(sel["table"]["V0"]["toys"]["UAUC"]),
+                                                      n3(sel["table"][vs]["toys"]["UAUC"]),
+                                                      "yes" if sel["table"][vs]["E2"] else "no"]
     ci = gate["ci95"]
     v0 = gate["v0_context"]
-    assert row_cells(t, "G6 confirm: ML-1M UAUC") == [cell(v0["UAUC"], v0["ci95"]["lo"], v0["ci95"]["hi"]),
-                                                      cell(gate["UAUC"], ci["lo"], ci["hi"]), r"$\ge0.60$, E1",
-                                                      gate["decision"].replace("_", "\\_")]
-    assert row_cells(t, "LoRA seeds 0 / 1 / 2")[1] == " / ".join(n3(x) for x in gft["UAUC_post_T_per_seed"])
+    assert row_cells(t, r"G6 CONFIRM: ML-1M UAUC ($\ge0.60$)") == [cell(v0["UAUC"], v0["ci95"]["lo"], v0["ci95"]["hi"]),
+                                                                   cell(gate["UAUC"], ci["lo"], ci["hi"]),
+                                                                   gate["decision"].replace("_", "\\_")]
+    assert row_cells(t, "G9 Gate-FT: seeds 0 / 1 / 2") == ["--", " / ".join(n3(x) for x in gft["UAUC_post_T_per_seed"]), ""]
     m = gft["UAUC_post_T_seed_averaged_ci95"]
-    mean_row = row_cells(t, "mean over seeds")
-    assert mean_row[1:] == [cell(gft["UAUC_post_T_mean_over_seeds"], m["lo"], m["hi"], sd1(gft["UAUC_post_T_per_seed"])),
-                            r"$\ge0.65$", gft["decision"].replace("_", "\\_")]
-    # main-session decision: the zero-shot UAUC and the paired delta are the grid values of tab:reliability, so without
-    # the grid report they stay red; gate_ft.json's own zero_shot_context is never printed
-    assert mean_row[0].startswith("\\DATANEEDED{")
-    assert row_cells(t, r"paired $\Delta$ (LoRA $-$ zero-shot)")[1].startswith("\\DATANEEDED{")
+    assert row_cells(t, r"G9 Gate-FT: mean ($\ge0.65$)") == [
+        "--", cell(gft["UAUC_post_T_mean_over_seeds"], m["lo"], m["hi"], sd1(gft["UAUC_post_T_per_seed"])),
+        gft["decision"].replace("_", "\\_")]
+    # gate_ft.json's own zero_shot_context is never printed (a second scoring of the same prompts; FILLED.json notes)
     assert n3(gft["zero_shot_context"]["UAUC_post_T"]) not in t
-    assert f"fresh ML-1M users:\n{gate['n_users']:,}" in text
-    u = unfilled_of(real.doc, table="tab:gate-outcomes")
-    assert len(u) == 3 and {(x["reason"], x["detail"]) for x in u} == {("result_file_missing", "grid/qwen/ml1m.json")}
+    assert f"CONFIRM: {gate['n_users']:,} fresh ML-1M" in text.replace("\n", " ")
+    assert unfilled_of(real.doc, table="tab:gate-outcomes") == []
     note = json.loads(read(real.out, "FILLED.json"))["notes"][0]
     assert note["not_printed"] == {"gft/gate_ft.json:zero_shot_context.UAUC_post_T": gft["zero_shot_context"]["UAUC_post_T"],
                                    "gft/gate_ft.json:zero_shot_context.dUAUC_finetuned_minus_zeroshot_post_T.est":
                                        gft["zero_shot_context"]["dUAUC_finetuned_minus_zeroshot_post_T"]["est"]}
-    assert len(note["slots"]) == 2 and "second scoring" in note["note"]
-    assert f"(mean post-$T_d$ UAUC {n3(gft['UAUC_post_T_mean_over_seeds'])}$\\pm${s3((m['hi'] - m['lo']) / 2)} " \
-           "against 0.65)" in text.replace("\n", " ")
+    assert note["slots"] == [] and "second scoring" in note["note"] and "tab:tracks" in note["note"]
+    # the protocol states the gate outcomes in words and prints no gate number of its own
+    flat = " ".join(text.split())
+    assert "found a fix (FIX\\_FOUND)" in flat and "passed (GATE\\_FT\\_PASS)" in flat
+    assert n3(gate["UAUC"]) not in flat.split(r"\begin{table}")[0]
 
 
 def test_resolved_gate_branches_are_filled_from_the_gate_files_and_refused_for_any_other_decision(real, tmp_path):
@@ -426,13 +428,12 @@ def test_resolved_gate_branches_are_filled_from_the_gate_files_and_refused_for_a
 
     def flat(out, f):
         return " ".join(read(out, f"sections/{f}.tex").split())
-    assert f"a registered remedy then reached UAUC {est} on untouched ML-1M users" in flat(real.out, "abstract")
-    assert f"and LoRA tuning reached {mean} (bar 0.65)" in flat(real.out, "abstract")
     intro = flat(real.out, "introduction")
-    assert (f"on {gate['n_users']:,} untouched ML-1M users, that prompt reached UAUC {est} "
-            f"(95\\% CI {n3(ci['lo'])}--{n3(ci['hi'])}) against {v0} for the registered prompt") in intro
+    # the introduction as rewritten on 2026-10-04 (anchors of PROSE_SPECS updated by the editor pass of 2026-10-05)
+    assert (f"4 stars or higher; on {gate['n_users']:,} untouched ML-1M users it reached UAUC {est} "
+            f"(95\\% CI {n3(ci['lo'])}--{n3(ci['hi'])}) against {v0} for the registered prompt, so the bar (a point "
+            "estimate) was met") in intro
     assert f"It did (mean {mean}; seeds {seeds})" in intro
-    assert f"GATE\\_PASS (UAUC {est}$\\pm${s3((ci['hi'] - ci['lo']) / 2)})" in flat(real.out, "experiments")
     assert (f"the remedied zero-shot prompt reached UAUC {est} on untouched users (bar 0.60) and LoRA tuning reached "
             f"{mean} (bar 0.65)") in flat(real.out, "conclusion")
     # any other registered decision leaves them red as branch_not_taken (the branch that occurred is not the one written)
@@ -448,21 +449,45 @@ def test_resolved_gate_branches_are_filled_from_the_gate_files_and_refused_for_a
     wanted = {"gate:UAUC", "gate:UAUC, ci95", "gate:n_users", "gate:v0_context.UAUC", "gft:UAUC_post_T_mean_over_seeds",
               "gft:UAUC_post_T_per_seed"}
     reds = [u for u in doc["unfilled"] if fill.norm(u["slot"]) in wanted and u["kind"] == "prose"
-            and u["file"] in ("sections/abstract.tex", "sections/introduction.tex", "sections/conclusion.tex")]
-    assert len(reds) == 2 + 5 + 2 and all(u["reason"] == "branch_not_taken" for u in reds)
+            and u["file"] in ("sections/introduction.tex", "sections/conclusion.tex")]
+    assert len(reds) == 5 + 2 and all(u["reason"] == "branch_not_taken" for u in reds)
 
 
-def test_real_selection_fills_the_sensitivity_table(real):
+SENS_TEX = r"""
+\begin{table}[!htbp]
+\caption{Prompt sensitivity (G5).}
+\label{tab:app-sens}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Variant & ML-1M & Toys & E1 & E2 & Eligible & Tied\\
+\midrule
+""" + "".join(rf"{v} & \DATANEEDED{{sel:UAUC}} & \DATANEEDED{{sel:UAUC}} & \DATANEEDED{{sel:E1}} & \DATANEEDED{{sel:E2}} & "
+              rf"\DATANEEDED{{sel:eligible}} & \DATANEEDED{{sel:tied\_with\_max}}\\" + "\n"
+              for v in ("V0", "V1", "V2", "V3", "V4", "V5", "V7")) + r"""\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+
+def test_real_selection_fills_the_sensitivity_table_when_it_is_restored(real, tmp_path):
+    """The variant-bank and sensitivity tables were cut to two sentences (editor pass 2026-10-05); the tab:app-sens spec is
+    kept dormant so that the table can be restored, or rendered for the artefact, unchanged."""
+    assert "tab:app-sens" not in (PAPER / "sections" / "appendix.tex").read_text(encoding="utf-8")
+    assert "tab:app-sens" in fill.TABLE_SPECS
+    paper = copy_skeleton(tmp_path / "paper")
+    p = paper / "sections" / "appendix.tex"
+    p.write_text(p.read_text(encoding="utf-8") + SENS_TEX, encoding="utf-8")
+    fill.run(paper, real.res, tmp_path / "filled")
     sel = real.j["sel/selection.json"]
-    t = table_text(read(real.out, "sections/appendix.tex"), "tab:app-sens")
+    t = table_text(read(tmp_path / "filled", "sections/appendix.tex"), "tab:app-sens")
     for v in ("V0", "V1", "V2", "V3", "V4", "V5", "V7"):
         row = sel["table"][v]
         yn = {True: "yes", False: "no"}
         assert row_cells(t, v) == [n3(row["ml1m"]["UAUC"]), n3(row["toys"]["UAUC"]),
                                    yn[row["ml1m"]["E1"] and row["toys"]["E1"]], yn[row["E2"]], yn[row["eligible"]],
                                    yn[row["tied_with_max"]]]
-    # the DEV item-mean reference row is dropped from the skeleton (main session); while present it reads to_be_removed
-    assert {x["reason"] for x in unfilled_of(real.doc, table="tab:app-sens")} <= {"to_be_removed"}
+    doc = json.loads(read(tmp_path / "filled", "UNFILLED.json"))
+    assert unfilled_of(doc, table="tab:app-sens") == []
 
 
 def test_real_sports_audit_fills_its_columns_and_leaves_the_other_domains_red(real):
@@ -492,6 +517,32 @@ def test_real_sports_audit_fills_its_columns_and_leaves_the_other_domains_red(re
     assert ex[0:2] == [cell(x["delta_head"]["est"], x["delta_head"]["lo"], x["delta_head"]["hi"]) for x in b]
     assert ex[6:8] == [n3(x["gini_exposure"]["est"]) for x in b]          # Gini block: estimates only
     assert ex[12:14] == [n3(x["tail_share_top10"]["est"]) for x in b]     # APLT block: estimates only
+
+
+def test_exposure_table_summarises_the_eight_published_recommenders(real):
+    """tab:exposure (editor pass 2026-10-05): the verbalised reranker keeps its own row; the eight published recommenders are
+    summarised per cell by the minimum, median and maximum of their estimates (estimates only, a source recorded for each)."""
+    aud = real.j["aud/sports.json"]
+    assert len(fill.PUBLISHED) == 8 and "ccrp_v3" not in fill.PUBLISHED
+    assert set(fill.PUBLISHED) | {"ccrp_v3"} == set(fill.REF_METHODS.values())
+    assert fill.REF_METHODS[r"Verbalised reranker"] == "ccrp_v3"
+    text = read(real.out, "sections/experiments.tex")
+    t = table_text(text, "tab:exposure")
+    assert "C-CRP" not in text and "C-CRP" not in t
+    segs = [aud["segments"][s] for s in ("events_1_1000", "events_1001_10000")]
+    for blk, key, off in (("dh", "delta_head", 0), ("gini", "gini_exposure", 6), ("aplt", "tail_share_top10", 12)):
+        rr = row_cells(t, "Verbalised reranker")
+        ref = [seg["reference"]["ccrp_v3"]["B_exposure"][key] for seg in segs]
+        assert rr[off:off + 2] == ([cell(r["est"], r["lo"], r["hi"]) for r in ref] if blk == "dh"
+                                   else [n3(r["est"]) for r in ref]), blk
+        for label, fn in (("Published, min", np.min), ("Published, median", np.median), ("Published, max", np.max)):
+            want = [n3(float(fn([seg["reference"][m]["B_exposure"][key]["est"] for m in fill.PUBLISHED]))) for seg in segs]
+            assert row_cells(t, label)[off:off + 2] == want, (label, blk)
+    ceq = json.loads(read(real.out, "CHECK_EQUAL.json"))
+    assert ceq["summary"]["numbers_without_a_source"] == 0
+    # the other domains wait for their audit files
+    red = [u for u in unfilled_of(real.doc, table="tab:exposure") if u["row"].startswith("Published")]
+    assert red and {u["reason"] for u in red} == {"result_file_missing"}
     red = unfilled_of(real.doc, table="tab:anatomy")
     assert len(red) == 17 * 3 and {(u["reason"], u["detail"]) for u in red} == {
         ("result_file_missing", "aud/toys.json"), ("result_file_missing", "aud/home.json"),
@@ -510,43 +561,51 @@ def real_grid(real, tmp_path_factory):
     out = base / "filled"
     fill.run(PAPER, res, out)
     return SimpleNamespace(out=out, doc=json.loads(read(out, "UNFILLED.json")),
-                           rep=json.loads((res / "grid/qwen/ml1m.json").read_text(encoding="utf-8")), gft=real.j["gft/gate_ft.json"])
+                           rep=json.loads((res / "grid/qwen/ml1m.json").read_text(encoding="utf-8")), gft=real.j["gft/gate_ft.json"],
+                           sel=real.j["sel/selection.json"], gate=real.j["gate/gate.json"])
 
 
 def test_real_ml1m_grid_report_fills_its_columns_and_passes_the_checks(real_grid):
     rep, gft = real_grid.rep, real_grid.gft
     text = read(real_grid.out, "sections/experiments.tex")
-    t = table_text(text, "tab:reliability")
+    t = table_text(text, "tab:tracks")
     seeds = ("s0", "s1", "s2")
     if rep["E_A"]["ZS"].get("available", True):
-        assert row_cells(t, r"UAUC of $\ell$")[0] == rec_cell(rep["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"])
+        zs = rep["E_A"]["ZS"]["UAUC_TEST"]
+        assert row_cells(t, r"UAUC of $\ell$")[0] == rec_cell(zs["per_model"]["zeroshot"])
+        # the references of the Gate-FT rows are the ML-1M cells of tab:tracks A (printed once, zero-shot rows)
+        assert row_cells(t, r"\quad item mean $m$ (ref.)")[0] == rec_cell(zs["references"]["q_hat"])
+        assert row_cells(t, r"\quad temporal MF (ref.)")[0] == rec_cell(zs["references"]["mf"])
+        # deviation row 7 prints the DEV, CONFIRM and TEST zero-shot UAUCs as estimates
+        sel, gate = real_grid.sel, real_grid.gate
+        dev = table_text(read(real_grid.out, "sections/appendix.tex"), "tab:deviations")
+        row7 = row_cells(dev, "7")[0]
+        assert (f"DEV {n3(sel['table'][sel['v_star']]['ml1m']['UAUC'])}, CONFIRM {n3(gate['UAUC'])}, zero-shot on TEST rows "
+                f"{n3(zs['per_model']['zeroshot']['est'])}") in " ".join(row7.split())
     if rep["E_A"]["FT"].get("available", True) and rep["E_A"]["FT"].get("complete"):
         ft = rep["E_A"]["FT"]["UAUC_TEST"]
         assert row_cells(t, r"UAUC of $\ell$")[1] == rec_cell(ft["mean_over_seeds"],
                                                              sd=sd1([ft["per_model"][s]["est"] for s in seeds]))
         app = table_text(read(real_grid.out, "sections/appendix.tex"), "tab:app-seeds")
         assert row_cells(app, "ML-1M")[0] == " / ".join(n3(ft["per_model"][s]["est"]) for s in seeds)
-        g = row_cells(table_text(text, "tab:gate-outcomes"), "item mean, MF (same rows)")[0]
-        assert g == " / ".join(rec_cell(ft["references"][r]) for r in ("q_hat", "mf"))
     for c in real_grid.doc["checks"]:
         if c["check"].startswith("grid ml1m"):
             assert c["ok"] is (n3(c["a"]) == n3(c["b"])), c          # identical when printed, or flagged
-    # decision (1): the Gate-FT table prints the zero-shot UAUC and the paired delta of tab:reliability, identically
-    g = table_text(text, "tab:gate-outcomes")
+    # decision (1): the zero-shot UAUC and E-B of the Gate-FT rows are the grid values; since the editor pass they are printed
+    # in tab:tracks only (the gate table prints gate_ft.json's LoRA values), and the second scoring is recorded, not printed
+    g = table_text(read(real_grid.out, "sections/observation.tex"), "tab:gate-outcomes")
+    assert row_cells(g, r"G9 Gate-FT: mean ($\ge0.65$)")[0] == "--"
     if rep["E_A"]["ZS"].get("available", True) and rep["E_B"].get("complete"):
-        assert row_cells(g, "mean over seeds")[0] == row_cells(t, r"UAUC of $\ell$")[0]
-        assert row_cells(g, r"paired $\Delta$ (LoRA $-$ zero-shot)")[1] == row_cells(t, r"\quad LoRA $-$ ZS (paired)")[0]
         note = json.loads(read(real_grid.out, "FILLED.json"))["notes"][0]
-        zs = rep["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"]["est"]
-        assert note["printed_instead"]["grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot.est"] == zs
-        assert note["abs_difference"]["UAUC_zero_shot"] == abs(gft["zero_shot_context"]["UAUC_post_T"] - zs)
-    # --check_equal: every quantity printed in two places agrees on its estimate (the zero-shot and E-B duplicates
-    # included); the Gate-FT seeds duplicate the grid seeds of tab:app-seeds
+        zs_est = rep["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"]["est"]
+        assert note["printed_instead"]["grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot.est"] == zs_est
+        assert note["abs_difference"]["UAUC_zero_shot"] == abs(gft["zero_shot_context"]["UAUC_post_T"] - zs_est)
+    # --check_equal: every quantity printed in two places agrees on its estimate; the Gate-FT seeds duplicate the grid seeds
+    # of tab:app-seeds, and the zero-shot UAUC appears in tab:tracks, tab:corrections and tab:deviations
     ceq = json.loads(read(real_grid.out, "CHECK_EQUAL.json"))
     assert ceq["summary"]["estimates_differ"] == 0 and ceq["summary"]["numbers_without_a_source"] == 0
     groups = {grp["quantity"]: grp for grp in ceq["groups"]}
-    for q, tabs in (("grid/qwen/ml1m.json:E_B.mean_over_seeds", {"tab:gate-outcomes", "tab:reliability"}),
-                    ("grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot", {"tab:gate-outcomes", "tab:reliability"}),
+    for q, tabs in (("grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot", {"tab:tracks", "tab:deviations"}),
                     ("grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0", {"tab:gate-outcomes", "tab:app-seeds"})):
         if q in groups:
             assert tabs <= set(groups[q]["tables"]) and groups[q]["estimates_equal"], q
@@ -555,22 +614,24 @@ def test_real_ml1m_grid_report_fills_its_columns_and_passes_the_checks(real_grid
         word = {"P1_HOLDS": "holds", "NO_EVIDENCE": "does not hold"}[p1["decision"]["verdict"]]
         npos = sum(1 for s in seeds if p1["per_seed"][s]["est"] > 0)
         flat = text.replace("\n", " ")
-        assert f"and P1 {word} (mean" in flat and f"{npos} of 3 seeds positive" in flat
-    # cross-domain sentences wait for the other three panels
-    u = [x for x in real_grid.doc["unfilled"] if x["slot"].startswith("raises / leaves")]
-    assert u and u[0]["reason"] == "result_file_missing"
+        assert f"P1 {word} (mean" in flat and f"{npos} of 3 seeds positive" in flat
+    # cross-domain sentences and counts wait for the other three panels
+    for prefix in ("raises / leaves", "grid:E\\_B confirmed", "grid:G confirmed"):
+        u = [x for x in real_grid.doc["unfilled"] if x["slot"].startswith(prefix)]
+        assert u and {x["reason"] for x in u} == {"result_file_missing"}, prefix
 
 
 def test_split_files_fill_the_user_counts(real):
-    t = table_text(read(real.out, "sections/experiments.tex"), "tab:reliability")
+    t = table_text(read(real.out, "sections/experiments.tex"), "tab:tracks")
     sp = {d: real.j[f"grid/qwen/{d}_split.json"] for d in fill.RATED}
-    assert row_cells(t, r"Users ($n$)") == [f"{sp[d]['eval']['users_both_classes_test']:,}" for d in fill.RATED]
-    assert row_cells(t, r"Users in $S_d$ ($n$)") == [f"{sp[d]['sd']['users']:,}" for d in fill.RATED]
+    assert row_cells(t, r"Users: TEST / $S_d$") == [f"{sp[d]['eval']['users_both_classes_test']:,} / {sp[d]['sd']['users']:,}"
+                                                    for d in fill.RATED]
 
 
 # ================================================================================================ synthetic, real schemas
-def test_reliability_cells_regimes_lora_sd_descriptive_and_uninterpretable(synth):
-    t = table_text(read(synth.out, "sections/experiments.tex"), "tab:reliability")
+def test_tracks_cells_regimes_lora_sd_descriptive_and_uninterpretable(synth):
+    """tab:tracks (the former tab:reliability, editor pass 2026-10-05)."""
+    t = table_text(read(synth.out, "sections/experiments.tex"), "tab:tracks")
     m = synth.ml1m
     zs = m["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"]
     ft = m["E_A"]["FT"]["UAUC_TEST"]
@@ -581,32 +642,38 @@ def test_reliability_cells_regimes_lora_sd_descriptive_and_uninterpretable(synth
     assert toys_zs["n_users"] < 150 and uauc[2] == rec_cell(toys_zs) and uauc[2].endswith(r"{\scriptsize\,(descriptive)}")
     assert uauc[5].startswith("\\DATANEEDED{")                          # games: seed s2 failed E1
     eb = m["E_B"]
-    assert row_cells(t, r"\quad LoRA $-$ ZS (paired)")[0] == rec_cell(
+    assert row_cells(t, r"\quad LoRA $-$ ZS (E-B)")[0] == rec_cell(
         eb["mean_over_seeds"], sd=sd1([eb["per_seed"][s]["est"] for s in ("s0", "s1", "s2")]))
     ref = m["E_A"]["ZS"]["UAUC_TEST"]["references"]
-    assert row_cells(t, r"\quad prior-only item mean (ref.)")[0] == rec_cell(ref["q_hat"])
-    assert row_cells(t, r"\quad temporal biased MF (ref.)")[0] == rec_cell(ref["mf"])
+    assert row_cells(t, r"\quad item mean $m$ (ref.)")[0] == rec_cell(ref["q_hat"])
+    assert row_cells(t, r"\quad temporal MF (ref.)")[0] == rec_cell(ref["mf"])
     ec = m["E_C"]["FT"]
-    assert row_cells(t, "Platt slope")[1] == rec_cell(ec["mean_over_seeds"]["platt_slope"], sd=sd1(
-        [ec["per_model"][s]["platt_slope"]["est"] for s in ("s0", "s1", "s2")]))
+    assert row_cells(t, "ECE (after Platt)")[1] == rec_cell(ec["mean_over_seeds"]["ECE"], sd=sd1(
+        [ec["per_model"][s]["ECE"]["est"] for s in ("s0", "s1", "s2")]))
+    assert row_cells(t, "Margin AUROC, oracle")[0] == rec_cell(m["E_C"]["ZS"]["per_model"]["zeroshot"]["AUROC_margin_correct"])
     for k, reg in ((0, "ZS"), (1, "FT")):
         sh = m["E_D"][reg]["shares"]
         rec = sh["per_model"]["zeroshot"] if reg == "ZS" else sh["mean_over_seeds"]
         want = ("uninterpretable" if rec["shares_reading"] == "uninterpretable" else
-                rec_cell(rec["non_prior_share"], sd=None if reg == "ZS" else sd1(
-                    [sh["per_model"][s]["non_prior_share"]["est"] for s in ("s0", "s1", "s2")])))
-        assert row_cells(t, r"Non-prior share $1-\rho^2/r_8$")[k] == want, reg
+                rec_cell(rec["item_prior_share"], sd=None if reg == "ZS" else sd1(
+                    [sh["per_model"][s]["item_prior_share"]["est"] for s in ("s0", "s1", "s2")])))
+        assert row_cells(t, r"Item-prior share $\rho^2/r_8$")[k] == want, reg
     ig = m["E_D"]["FT"]["information_gain"]
-    assert row_cells(t, r"$\mathcal G=\Delta$UAUC(M2$-$M1)")[1] == rec_cell(
+    assert row_cells(t, r"$\mathcal G=\Delta$UAUC(M2$-$M1), E-D")[1] == rec_cell(
         ig["G_mean_over_seeds"], sd=sd1([ig["per_model"][s]["G"]["est"] for s in ("s0", "s1", "s2")]))
-    assert row_cells(t, r"$\mathcal G_{\rm CF}=\Delta$UAUC(M3$-$M0)")[0] == rec_cell(
-        m["E_D"]["ZS"]["information_gain"]["G_CF"])
+    # G_CF: one value per panel (no LLM feature; zero-shot rows), beside the pending within-user value of addendum 6
+    assert row_cells(t, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[0] == (
+        rec_cell(m["E_D"]["ZS"]["information_gain"]["G_CF"]) + r" / \DATANEEDED{ext:E\_W.G\_CF\_wu}")
     p1 = m["P1"]
-    assert row_cells(t, r"P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ (ML-1M)")[0] == (
+    assert row_cells(t, r"P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$")[0] == (
         " / ".join(n3(p1["per_seed"][s]["est"]) for s in ("s0", "s1", "s2")) + "; "
         + rec_cell(p1["mean_over_seeds"]) + ", $p$ " + f"{p1['mean_over_seeds']['p']:.3f}")
-    games = [u for u in unfilled_of(synth.doc, table="tab:reliability") if u["column"] == 6]
+    games = [u for u in unfilled_of(synth.doc, table="tab:tracks") if u["column"] == 6 and not u["slot"].startswith("ext:")]
     assert games and {u["reason"] for u in games} == {"incomplete_regime"}
+    # the Llama table follows tab:tracks with the same row specs (the synthetic Llama ML-1M report is the ML-1M world)
+    la = table_text(read(synth.out, "sections/appendix.tex"), "tab:app-llama")
+    assert row_cells(la, r"UAUC of $\ell$")[0] == rec_cell(zs)
+    assert row_cells(la, r"Item-prior share $\rho^2/r_8$")[:2] == row_cells(t, r"Item-prior share $\rho^2/r_8$")[:2]
 
 
 def test_seed_table_failed_integrity_and_the_permutation_control(synth):
@@ -632,11 +699,11 @@ def test_pruning_table_mean_sd_negated_contrast_and_a_registered_cut(synth):
     assert row_cells(t, "P0 full data") == [cell(a0["UAUC_seed_averaged"], sd=a0["sd_seed"]),
                                             cell(-c10["est"], -c10["hi"], -c10["lo"]),
                                             str(sum(1 for x in c10["per_seed"].values() if x < 0)), "--"]
-    assert row_cells(t, r"P1 random 25\%")[3] == cell(c10["est"], c10["lo"], c10["hi"])
-    assert row_cells(t, r"P2 most uncertain 25\%")[1:] == [cell(c21["est"], c21["lo"], c21["hi"]),
+    assert row_cells(t, r"P1 random (class-matched)")[3] == cell(c10["est"], c10["lo"], c10["hi"])
+    assert row_cells(t, r"P2 uncertainty-selected")[1:] == [cell(c21["est"], c21["lo"], c21["hi"]),
                                                           str(sum(1 for x in c21["per_seed"].values() if x > 0)),
                                                           cell(c20["est"], c20["lo"], c20["hi"])]
-    assert row_cells(t, r"P3 most prior-congruent 25\%") == ["not run"] * 4
+    assert row_cells(t, r"P3 prior-congruent") == ["not run"] * 4
 
 
 def test_slot_table_kill_rule_reads_not_run(synth):
@@ -651,21 +718,29 @@ def test_slot_table_kill_rule_reads_not_run(synth):
     assert row_cells(t, r"Offset $-$ stacking")[0] == want[:-1] + rf"\,({s3(min(per))} to {s3(max(per))})" + "}"
 
 
-def test_knockout_table_labels_seed_means_and_the_minimum_n_rule(synth):
-    t = table_text(read(synth.out, "sections/experiments.tex"), "tab:popularity")
+def test_knockout_rows_labels_seed_means_and_the_minimum_n_rule(synth):
+    """The knockout rows of tab:teaches (block D; the former tab:popularity) and of tab:app-llama (Llama Toys)."""
+    t = table_text(read(synth.out, "sections/experiments.tex"), "tab:teaches")
     ko = synth.toys["knockout"]
     an = ko["analyses"]
     hmt = an["zeroshot"]["delta"]["pseudo"]["head_minus_tail"]
     assert hmt["n_clusters"] < 150
     cells = row_cells(t, r"Head $-$ tail drop of $\ell$")
-    assert cells[0] == cell(hmt["est"], hmt["lo"], hmt["hi"], desc=True)
+    assert cells[:2] == ["--", "--"]                                    # ML-1M has no store field
+    assert cells[2] == cell(hmt["est"], hmt["lo"], hmt["hi"], desc=True)
     ests = [an[s]["delta"]["pseudo"]["head_minus_tail"]["est"] for s in ("s0", "s1", "s2")]
-    assert cells[1] == cell(sum(ests) / 3, sd=sd1(ests), desc=True)
-    assert row_cells(t, "Registered label (per seed)")[:2] == [
+    assert cells[3] == cell(sum(ests) / 3, sd=sd1(ests), desc=True)
+    plc = an["zeroshot"]["delta"]["placebo"]["head_minus_tail"]
+    assert row_cells(t, "Placebo drop")[2] == cell(plc["est"], plc["lo"], plc["hi"], desc=True)
+    assert row_cells(t, "Registered label")[2:4] == [
         ko["labels"]["zeroshot"]["label"], " / ".join(ko["labels"][s]["label"] for s in ("s0", "s1", "s2"))]
-    # the games report has no knockout arms: its cells stay red with the report's own reason
-    red = [u for u in unfilled_of(synth.doc, table="tab:popularity") if u["column"] in (3, 4)]
+    # the games and sports reports have no knockout arms: their cells stay red with the report's own reason
+    red = [u for u in unfilled_of(synth.doc, table="tab:teaches") if u["column"] in (5, 6, 7, 8) and u["slot"].startswith("ko:")]
     assert red and all(u["reason"] == "result_not_in_report" and "knockout is not available" in u["detail"] for u in red)
+    # Llama Toys knockout in tab:app-llama (the synthetic Llama Toys report is the Toys world)
+    la = table_text(read(synth.out, "sections/appendix.tex"), "tab:app-llama")
+    assert row_cells(la, r"Knockout: head $-$ tail drop of $\ell$")[2:4] == cells[2:4]
+    assert row_cells(la, "Knockout: registered label")[2:4] == row_cells(t, "Registered label")[2:4]
 
 
 def test_stage3_corrections_and_second_backbone_tables(synth):
@@ -690,19 +765,23 @@ def test_direction_words_follow_the_registered_tests(synth):
     text = read(synth.out, "sections/experiments.tex").replace("\n", " ")
     s1 = synth.summary["S1"]["acc_top_minus_bottom_tertile"]["next"]["holm"]
     assert all(s1["reject_holm"].values()) and set(s1["sign"].values()) == {1}
-    assert r"On 4 of 4 domains $\mathrm{acc}_{\rm high}$ is above $\mathrm{acc}_{\rm low}$" in text
-    assert "so correct top-1 decisions are concentrated in the high tertile;" in text
+    assert r"On 4 of 4 next-item domains $\mathrm{acc}_{\rm high}$ is above $\mathrm{acc}_{\rm low}$" in text
+    assert "so correct top-1 decisions are concentrated in the high tertile, and top-1 errors" in text
     s2 = synth.summary["S2"]["share_errors_in_top_minus_third"]["next"]["holm"]
     word = {1: "more often than", -1: "less often than"}[next(iter(set(s2["sign"].values())))]
     assert all(s2["reject_holm"].values()) and f"fall in the high tertile {word} one third" in text
     adm = synth.summary["S3"]["admission"]["llm_next"]
     assert adm["effect_claimed"] and r"$\Delta_{\rm head}$ is above 0 on 4 of 4 domains" in text
     assert "with the same sign on the second backbone" in text
-    assert "is better than random pruning" in text and synth.prn["claim"]["label"] == "BEATS_RANDOM"
+    # addendum 7 wording: P2 is uncertainty-selected pruning, P1 class-matched random pruning
+    assert "so uncertainty-selected pruning is better than class-matched random pruning" in text
+    assert synth.prn["claim"]["label"] == "BEATS_RANDOM" and "noisy" not in text
     p1 = synth.ml1m["P1"]
     word = {"P1_HOLDS": "holds", "NO_EVIDENCE": "does not hold"}[p1["decision"]["verdict"]]
     npos = sum(1 for s in ("s0", "s1", "s2") if p1["per_seed"][s]["est"] > 0)
-    assert f"and P1 {word} (mean" in text and f"{npos} of 3 seeds positive" in text
+    assert f"P1 {word} (mean" in text and f"{npos} of 3 seeds positive" in text
+    # the registered stage-3 label of the two-view contrast, verbatim (after GATE_PASS)
+    assert f"two-view contrast is labelled {fill.tex(synth.mir['decision'])} (rows 5--7)" in text
     labels = {synth.toys["knockout"]["labels"][m]["label"] for m in ("zeroshot", "s0", "s1", "s2")}
     # Video Games has no knockout: the Qwen label is not written (it would need both domains)
     assert unfilled_of(synth.doc, slot="POSITIVE / NEGATIVE / NULL / INDETERMINATE")[0]["reason"] == "result_not_in_report"
@@ -733,9 +812,11 @@ def test_mixed_holm_signs_leave_the_direction_red(synth, tmp_path):
         docs = [json.loads((res / f"aud/{d}.json").read_text(encoding="utf-8")) for d in ("sports", "toys", "home", "tools")]
         (res / "aud/summary.json").write_text(json.dumps(synth.na.summarize(docs)), encoding="utf-8")
     v = _variant(synth, tmp_path, edit)
-    for slot in ("k of 4", "above / indistinguishable from /\nbelow",
-                 "concentrated in the high tertile / spread evenly / concentrated in the low tertile"):
-        u = [x for x in v.doc["unfilled"] if x["slot"] == slot and x["line"] < 150]
+    for slot, anchor in (("k of 4", r"unsure when wrong (S1, S2).} On"),
+                         ("above / indistinguishable from / below", r"domains $\mathrm{acc}_{\rm high}$ is"),
+                         ("concentrated in the high tertile / spread evenly / concentrated in the low tertile",
+                          "so correct top-1 decisions are")):
+        u = [x for x in v.doc["unfilled"] if fill.norm(x["slot"]) == slot and x.get("anchor") == anchor]
         assert u and u[0]["reason"] == "not_decided", slot
 
 
@@ -747,13 +828,17 @@ def test_a_zero_shot_run_failing_integrity_reads_failed_integrity(synth, tmp_pat
         rep["runs"]["zeroshot"]["like"]["status"] = "FAILED_INTEGRITY"
         (res / "grid/qwen/ml1m.json").write_text(json.dumps(rep), encoding="utf-8")
     _variant(synth, tmp_path, edit)
-    t = table_text(read(tmp_path / "filled", "sections/experiments.tex"), "tab:reliability")
-    for label in (r"UAUC of $\ell$", "ECE (after Platt)", r"UAUC of $\ell$ on $S_d$", r"$\mathcal G=\Delta$UAUC(M2$-$M1)"):
+    t = table_text(read(tmp_path / "filled", "sections/experiments.tex"), "tab:tracks")
+    for label in (r"UAUC of $\ell$", "ECE (after Platt)", r"Item-prior share $\rho^2/r_8$",
+                  r"$\mathcal G=\Delta$UAUC(M2$-$M1), E-D"):
         assert row_cells(t, label)[0] == r"FAILED\_INTEGRITY", label
     ft = synth.ml1m["E_A"]["FT"]["UAUC_TEST"]
     assert row_cells(t, r"UAUC of $\ell$")[1] == rec_cell(ft["mean_over_seeds"], sd=sd1(
         [ft["per_model"][s]["est"] for s in ("s0", "s1", "s2")]))          # the LoRA column is unaffected
-    assert row_cells(t, r"\quad prior-only item mean (ref.)")[0] == rec_cell(ft["references"]["q_hat"])   # FT rows
+    assert row_cells(t, r"\quad item mean $m$ (ref.)")[0] == rec_cell(ft["references"]["q_hat"])   # FT rows
+    # G_CF (one value per panel) falls back to the fine-tuned regime's rows when the zero-shot block is unavailable
+    gcf = synth.ml1m["E_D"]["FT"]["information_gain"]["G_CF"]
+    assert row_cells(t, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[0].startswith(rec_cell(gcf) + " / ")
 
 
 @pytest.mark.parametrize("p, rule, word", [(0.001, True, "raises"), (0.4, True, "leaves"), (0.001, False, "leaves")])
@@ -765,8 +850,87 @@ def test_regime_contrast_word_needs_holm_and_the_sigma_seed_rule(synth, tmp_path
         for d in fill.RATED:
             (res / f"grid/qwen/{d}.json").write_text(json.dumps(rep), encoding="utf-8")
     v = _variant(synth, tmp_path, edit)
-    assert f"fine-tuning {word} UAUC (paired difference" in v.text
+    # the unanimous word (c_rq4_ft) and the count of confirmed members (count rule, addendum 6 item 9.2)
+    k = 4 if word == "raises" else 0
+    assert f"Fine-tuning {word} UAUC (E-B, confirmed on {k} of 4 Qwen panels)" in v.text
     assert synth.ml1m["E_B"]["mean_over_seeds"]["est"] > 0
+
+
+def _count_world(synth, conf_zs, conf_ft, g_first_sign=1.0, eb_p=0.001, eb_rule=True):
+    """Four Qwen grid reports built from the synthetic ML-1M report, with planted E-D confirmations of G per regime, the sign
+    of the first domain's G, and planted E-B raw p-values and sigma_seed rule."""
+    def edit(res):
+        for j, d in enumerate(fill.RATED):
+            rep = copy.deepcopy(synth.ml1m)
+            for reg, conf in (("ZS", conf_zs), ("FT", conf_ft)):
+                rep["E_D"][reg]["holm_family_E_D"]["confirmed"]["G"] = bool(conf[j])
+                g = (rep["E_D"][reg]["information_gain"]["per_model"]["zeroshot"]["G"] if reg == "ZS"
+                     else rep["E_D"][reg]["information_gain"]["G_mean_over_seeds"])
+                g["est"] = (abs(g["est"]) or 0.01) * (g_first_sign if j == 0 else 1.0)
+                g["descriptive_min_n"] = False
+            rep["E_B"]["mean_over_seeds"]["p"] = eb_p[j] if isinstance(eb_p, list) else eb_p
+            rep["E_B"]["seeds"]["sigma_seed_rule"] = eb_rule
+            (res / f"grid/qwen/{d}.json").write_text(json.dumps(rep), encoding="utf-8")
+    return edit
+
+
+def test_count_rule_reports_confirmed_members_per_regime(synth, tmp_path):
+    """Addendum 6 item 9.2 (count slots added by the editor pass of 2026-10-05): G confirmed (E-D Holm family) in k of the four
+    Qwen panels per regime, and the regime contrast E-B confirmed (Holm over the domains and the sigma_seed rule) in k of 4;
+    confirmed members of both signs are not decided; the unanimous words of the existing decision functions are unchanged."""
+    v = _variant(synth, tmp_path / "a", _count_world(synth, [1, 0, 0, 0], [1, 1, 1, 1]))
+    assert ("$\\mathcal G$ is confirmed (E-D) on 1 of 4 zero-shot and 4 of 4 fine-tuned panels" in v.text)
+    assert "Fine-tuning raises UAUC (E-B, confirmed on 4 of 4 Qwen panels)" in v.text
+    v = _variant(synth, tmp_path / "b", _count_world(synth, [0, 0, 0, 0], [1, 1, 1, 1], g_first_sign=-1.0,
+                                                     eb_p=[0.001, 0.4, 0.4, 0.4]))
+    assert "is confirmed (E-D) on 0 of 4 zero-shot and" in v.text
+    u = [x for x in v.doc["unfilled"] if fill.norm(x["slot"]) == "grid:G confirmed, k of 4 LoRA"]
+    assert u and u[0]["reason"] == "not_decided"                        # a confirmed G of each sign: a written sentence
+    assert "(E-B, confirmed on 1 of 4 Qwen panels)" in v.text            # Holm: only the domain with p = 0.001
+    u = [x for x in v.doc["unfilled"] if x["slot"] == "raises / leaves / lowers"]
+    assert u and u[0]["reason"] == "not_decided"                        # mixed: no single word
+
+
+EXT_TABLE_SLOTS = {   # alias ext (A3-6; editor pass 2026-10-05): table -> the slot texts that pass 2 specifies against the schema
+    "tab:tracks": {"ext:E_J.UAUC_q_hat_T", "ext:E_J.dUAUC_L_minus_q_hat", "ext:E_J.dUAUC_L_minus_mf", "ext:E_G.e_share",
+                   "ext:E_G.item_share_mf", "ext:E_G.item_share_label", "ext:E_W.G_wu", "ext:E_W.G_CF_wu", "ext:E_W.P1_wu",
+                   "ext:E_Cprime.share_correct_bottom", "ext:E_Cprime.share_errors_top", "ext:E_Cprime.AUROC_margin"},
+    "tab:teaches": {"ext:E_F.G_LLM_given_CF", "ext:E_F.G_CF_given_LLM", "ext:E_H.sparse.G_prior", "ext:E_H.dense.G_prior",
+                    "ext:E_H.unseen.G_prior", "ext:E_H.seen.G_prior", "ext:FT_C_reading.R", "ext:FT_C_reading.label"},
+    "tab:app-llama": {"ext:E_J.dUAUC_L_minus_q_hat", "ext:E_G.e_share", "ext:E_W.G_wu", "ext:E_W.G_CF_wu", "ext:E_W.P1_wu"},
+}
+EXT_PROSE_SLOTS = {"ext:E_J.H_J_count", "ext:E_W.robust_count", "ext:E_W.P1_wu_verdict", "ext:FT_C_reading.wording",
+                   "ext:E_F.H_F_count", "ext:E_H.H_S_count_ZS", "ext:E_H.H_S_count_FT"}
+
+
+def test_ext_slots_stay_red_until_the_extra_analysis_exists(synth):
+    """Every slot of the addendum-6 analysis (alias ext) has a spec that checks its slot text and keeps it red with
+    result_file_missing until the file exists; nothing else is affected (the other cells of their rows are filled)."""
+    ext = [u for u in synth.doc["unfilled"] if fill.norm(u["slot"]).startswith("ext:")]
+    assert ext and {u["reason"] for u in ext} == {"result_file_missing"} and {u["detail"] for u in ext} == {fill.EXT_DETAIL}
+    by_table: dict = {}
+    for u in ext:
+        if u["kind"] == "table":
+            by_table.setdefault(u["table"], set()).add(fill.norm(u["slot"]))
+    assert by_table == EXT_TABLE_SLOTS
+    assert {fill.norm(u["slot"]) for u in ext if u["kind"] == "prose"} == EXT_PROSE_SLOTS
+    assert len(ext) == 147 and fill.ALIASES[-1] == "ext"
+    assert synth.doc["summary"]["unfilled_by_alias"]["ext"] == len(ext)
+    t = table_text(read(synth.out, "sections/experiments.tex"), "tab:tracks")
+    assert row_cells(t, r"$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$")[0].endswith(r" / \DATANEEDED{ext:E\_W.G\_CF\_wu}")
+    assert not unfilled_of(synth.doc, reason="skeleton_changed")
+
+
+def test_the_deviations_table_keeps_every_row_of_the_record():
+    """tab:deviations condenses the 18 rows of the deviations record (none dropped); the introduction points to it."""
+    text = (PAPER / "sections" / "appendix.tex").read_text(encoding="utf-8")
+    body = table_text(text, "tab:deviations")
+    nums = [int(m) for m in re.findall(r"(?m)^(\d+) & ", body)]
+    assert nums == list(range(1, 19))
+    record = (ROOT / "docs" / "sigir" / "DEVIATIONS.md").read_text(encoding="utf-8")
+    assert len(re.findall(r"(?m)^\| (\d+) \|", record)) == 18
+    assert r"\label{app:deviations}" in text
+    assert r"Appendix~\ref{app:deviations}" in (PAPER / "sections" / "introduction.tex").read_text(encoding="utf-8")
 
 
 def test_pruning_p3_minus_p0_is_filled_when_p3_runs(synth, tmp_path):
@@ -775,7 +939,7 @@ def test_pruning_p3_minus_p0_is_filled_when_p3_runs(synth, tmp_path):
     v = _variant(synth, tmp_path, lambda res: _put(res, "prn/pruning_ml1m.json", prn))
     t = table_text(read(tmp_path / "filled", "sections/experiments.tex"), "tab:pruning")
     a3, c31, c30 = prn["arms"]["P3"], prn["contrasts"]["P3-P1"], prn["contrasts"]["P3-P0"]
-    assert row_cells(t, r"P3 most prior-congruent 25\%") == [
+    assert row_cells(t, r"P3 prior-congruent") == [
         cell(a3["UAUC_seed_averaged"], sd=a3["sd_seed"]), cell(c31["est"], c31["lo"], c31["hi"]),
         str(sum(1 for x in c31["per_seed"].values() if x > 0)), cell(c30["est"], c30["lo"], c30["hi"])]
     assert unfilled_of(v.doc, table="tab:pruning") == []
@@ -783,22 +947,23 @@ def test_pruning_p3_minus_p0_is_filled_when_p3_runs(synth, tmp_path):
 
 def test_check_equal_flags_a_quantity_printed_with_different_estimates(synth, tmp_path, capsys):
     # synthetic grid ML-1M report beside the real gate_ft.json: the LoRA seed mean (and the seeds) differ between
-    # tab:gate-outcomes (gate_ft.json) and tab:reliability / tab:app-seeds (grid): exactly what --check_equal is for
+    # tab:gate-outcomes (gate_ft.json) and tab:tracks / tab:app-seeds (grid): exactly what --check_equal is for
     res = fill.main(["--paper", str(PAPER), "--results", str(synth.res), "--out", str(tmp_path / "f"), "--check_equal"])
     ceq = res["check_equal"]
     groups = {g["quantity"]: g for g in ceq["groups"]}
     g = groups["grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds"]
-    assert not g["estimates_equal"] and {"tab:gate-outcomes", "tab:reliability"} <= set(g["tables"])
+    assert not g["estimates_equal"] and {"tab:gate-outcomes", "tab:tracks"} <= set(g["tables"])
     assert {o["source"] for o in g["occurrences"]} >= {"gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
                                                        "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds"}
     assert ceq["summary"]["estimates_differ"] >= 1
     out = capsys.readouterr().out
     assert "[DIFFERENT ESTIMATES] grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds" in out and "CHECK_EQUAL:" in out
     assert json.loads(read(tmp_path / "f", "CHECK_EQUAL.json")) == json.loads(json.dumps(ceq))
-    # the zero-shot UAUC and E-B are one quantity in both tables (decision 1): never a difference
-    for q in ("grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot", "grid/qwen/ml1m.json:E_B.mean_over_seeds"):
-        assert groups[q]["estimates_equal"] and "tab:gate-outcomes" in groups[q]["tables"]
-        assert len({o["printed"] for o in groups[q]["occurrences"] if o["table"]}) == 1      # identical table cells
+    # the zero-shot UAUC is one quantity wherever it is printed (decision 1; since the editor pass: tab:tracks, the
+    # corrections table and deviation row 7, which prints the estimate only): never a difference of estimates
+    q = "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+    assert groups[q]["estimates_equal"] and {"tab:tracks", "tab:corrections", "tab:deviations"} <= set(groups[q]["tables"])
+    assert "tab:gate-outcomes" not in groups[q]["tables"]
 
 
 def test_dropped_slots_read_to_be_removed_until_the_skeleton_drops_them(real, tmp_path):
@@ -828,7 +993,7 @@ def test_prose_matching_survives_a_removed_slot_with_the_same_text(real, tmp_pat
     doc = json.loads(read(tmp_path / "filled", "UNFILLED.json"))
     assert unfilled_of(doc, reason="skeleton_changed") == []
     left = [u for u in doc["unfilled"] if u["slot"] == "k of 4"]
-    assert len(left) == n - 1 and r"\emph{Reading template (RQ1).} On" not in {u["anchor"] for u in left}
+    assert len(left) == n - 1 and r"unsure when wrong (S1, S2).} On" not in {u["anchor"] for u in left}
     assert all(u["anchor"] for u in left)
 
 
@@ -867,7 +1032,7 @@ def test_one_table_with_every_kind_of_cell(synth, tmp_path, monkeypatch):
         "Estimate": lambda R, c, k, s: fill.fmt(fill.regime_val(R, "qwen", "ml1m", "ZS", "E_A", ("UAUC_TEST",))),
         "LoRA mean": lambda R, c, k, s: fill.fmt(fill.regime_val(R, "qwen", "ml1m", "FT", "E_A", ("UAUC_TEST",))),
         "Mean (s.d.)": lambda R, c, k, s: fill.prune_handler("P0 full data")(R, "UAUC", k, s),
-        "Cut": lambda R, c, k, s: fill.prune_handler(r"P3 most prior-congruent 25\%")(R, "UAUC", k, s),
+        "Cut": lambda R, c, k, s: fill.prune_handler(r"P3 prior-congruent")(R, "UAUC", k, s),
         "Descriptive": lambda R, c, k, s: fill.fmt(fill.regime_val(R, "qwen", "toys", "ZS", "E_A", ("UAUC_TEST",))),
         "Direction word": lambda R, c, k, s: fill.c_prn(R, s),
         "Registered label": lambda R, c, k, s: fill.ko_handler("Registered label (per seed)")(R, ("toys", "ZS"), k,

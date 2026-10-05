@@ -79,7 +79,7 @@
   note = {AgentSearch 2026 Workshop, co-located with SIGIR 2026, per arXiv comments}
 }
 
-% ==================== Hooi group (calibration / confidence) ====================
+% ==================== Confidence and calibration of LLMs ====================
 
 @inproceedings{xiong2024llmuncertainty,
   author = {Xiong, Miao and Hu, Zhiyuan and Lu, Xinyang and Li, Yifei and Fu, Jie and He, Junxian and Hooi, Bryan},
@@ -697,7 +697,7 @@
   url = {https://doi.org/10.1145/3626772.3657844}
 }
 
-% ==================== Baselines (Lumen main table) ====================
+% ==================== Baselines of the next-item panels ====================
 
 @inproceedings{wang2024elmrec,
   author = {Wang, Xinfeng and Cui, Jin and Fukumoto, Fumiyo and Suzuki, Yoshimi},
@@ -1047,8 +1047,8 @@
   url = {https://doi.org/10.1111/j.2044-8295.1910.tb00207.x}
 }
 
-% ---- Verified on 2026-10-04 but NOT cited in the current draft (no room within the 9-page budget); kept so that a later
-% ---- revision can cite them without re-verification (see CITATION_MAP.md, 'Added 2026-10-04').
+% ---- Verified on 2026-10-04; entries below this line that no section cites are kept so that a later revision can cite them
+% ---- without re-verification (see CITATION_MAP.md, 'Added 2026-10-04').
 @inproceedings{tian2023justask,
   author = {Tian, Katherine and Mitchell, Eric and Zhou, Allan and Sharma, Archit and Rafailov, Rafael and Yao, Huaxiu and Finn, Chelsea and Manning, Christopher},
   title = {Just Ask for Calibration: Strategies for Eliciting Calibrated Confidence Scores from Language Models Fine-Tuned with Human Feedback},
@@ -1147,4 +1147,126 @@
   publisher = {Radiological Society of North America (RSNA)},
   doi = {10.1148/radiology.143.1.7063747},
   url = {https://doi.org/10.1148/radiology.143.1.7063747}
+}
+
+% ==================== Added 2026-10-05 (editor pass) ====================
+% Verified on 2026-10-05 against Crossref, ACL Anthology, PMLR or arXiv by the citation-verification pass (its notes give the URL
+% checked for each entry); merged unchanged. Keys tan2025perrecbench, zhang2024cft and kim2025lostinsequence are the keys the
+% introduction cites. PerRecBench and the counterfactual fine-tuning paper are arXiv preprints (no peer-reviewed version found).
+
+% The earlier same-candidate benchmark protocol whose next-item panels are reused (anonymised for double-blind review).
+@misc{anon2026benchmark,
+  author = {Anonymous},
+  title = {Omitted for double-blind review},
+  year = {2026}
+}
+
+@misc{tan2025perrecbench,
+  author = {Zhaoxuan Tan and Zinan Zeng and Qingkai Zeng and Zhenyu Wu and Zheyuan Liu and Fengran Mo and Meng Jiang},
+  title = {Can Large Language Models Understand Preferences in Personalized Recommendation?},
+  year = {2025},
+  url = {https://arxiv.org/abs/2501.13391},
+  eprint = {2501.13391},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CL}
+}
+
+@misc{zhang2024cft,
+  author = {Yang Zhang and Juntao You and Yimeng Bai and Jizhi Zhang and Keqin Bao and Wenjie Wang and Tat-Seng Chua},
+  title = {Causality-Enhanced Behavior Sequence Modeling in {LLMs} for Personalized Recommendation},
+  year = {2024},
+  url = {https://arxiv.org/abs/2410.22809},
+  eprint = {2410.22809},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.IR}
+}
+
+@inproceedings{kim2025lostinsequence,
+  author = {Kim, Sein and Kang, Hongseok and Kim, Kibum and Kim, Jiwan and Kim, Donghyun and Yang, Minchul and Oh, Kwangjin and McAuley, Julian and Park, Chanyoung},
+  title = {Lost in Sequence: Do Large Language Models Understand Sequential Recommendation?},
+  booktitle = {Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  series = {KDD '25},
+  pages = {1160--1171},
+  year = {2025},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3711896.3737035},
+  url = {https://doi.org/10.1145/3711896.3737035}
+}
+
+@inproceedings{dipalma2025memorize,
+  author = {Di Palma, Dario and Merra, Felice Antonio and Sfilio, Maurizio and Anelli, Vito Walter and Narducci, Fedelucio and Di Noia, Tommaso},
+  title = {Do {LLMs} Memorize Recommendation Datasets? {A} Preliminary Study on {MovieLens-1M}},
+  booktitle = {Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  series = {SIGIR '25},
+  pages = {2582--2586},
+  year = {2025},
+  month = jul,
+  publisher = {ACM},
+  doi = {10.1145/3726302.3730178},
+  url = {https://doi.org/10.1145/3726302.3730178}
+}
+
+@inproceedings{qin2024prp,
+  author = {Qin, Zhen and Jagerman, Rolf and Hui, Kai and Zhuang, Honglei and Wu, Junru and Yan, Le and Shen, Jiaming and Liu, Tianqi and Liu, Jialu and Metzler, Donald and Wang, Xuanhui and Bendersky, Michael},
+  title = {Large Language Models are Effective Text Rankers with Pairwise Ranking Prompting},
+  booktitle = {Findings of the Association for Computational Linguistics: NAACL 2024},
+  pages = {1504--1518},
+  year = {2024},
+  month = jun,
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.findings-naacl.97},
+  url = {https://doi.org/10.18653/v1/2024.findings-naacl.97}
+}
+
+@article{wang2026llm4dsr,
+  author = {Wang, Bohao and Liu, Feng and Zhang, Changwang and Chen, Jiawei and Wu, Yudi and Zhou, Sheng and Lou, Xingyu and Wang, Jun and Feng, Yan and Chen, Chun and Wang, Can},
+  title = {{LLM4DSR:} Leveraging Large Language Model for Denoising Sequential Recommendation},
+  journal = {ACM Transactions on Information Systems},
+  volume = {44},
+  number = {1},
+  pages = {1--32},
+  year = {2026},
+  month = jan,
+  publisher = {Association for Computing Machinery (ACM)},
+  doi = {10.1145/3762182},
+  url = {https://doi.org/10.1145/3762182}
+}
+
+@inproceedings{fayyazi2025facter,
+  author = {Fayyazi, Arya and Kamal, Mehdi and Pedram, Massoud},
+  title = {{FACTER:} Fairness-Aware Conformal Thresholding and Prompt Engineering for Enabling Fair {LLM-Based} Recommender Systems},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {267},
+  pages = {16407--16422},
+  year = {2025},
+  month = jul,
+  publisher = {PMLR},
+  url = {https://proceedings.mlr.press/v267/fayyazi25a.html}
+}
+
+@inproceedings{bellogin2011predicting,
+  author = {Bellog{\'\i}n, Alejandro and Castells, Pablo and Cantador, Iv{\'a}n},
+  title = {Predicting the Performance of Recommender Systems: An Information Theoretic Approach},
+  booktitle = {Advances in Information Retrieval Theory: Third International Conference on the Theory of Information Retrieval, {ICTIR} 2011},
+  series = {Lecture Notes in Computer Science},
+  volume = {6931},
+  editor = {Amati, Giambattista and Crestani, Fabio},
+  pages = {27--39},
+  year = {2011},
+  publisher = {Springer Berlin Heidelberg},
+  doi = {10.1007/978-3-642-23318-0_5},
+  url = {https://doi.org/10.1007/978-3-642-23318-0_5}
+}
+
+@misc{park2026echotrace,
+  author = {Donguk Park and Dongwon Lee and Yeon-Chang Lee},
+  title = {{EchoTrace:} Diagnosing Recursive Risks in {LLM-Powered} Recommender Systems},
+  year = {2026},
+  url = {https://arxiv.org/abs/2602.07442},
+  eprint = {2602.07442},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.HC},
+  note = {Accepted at CIKM 2026, per arXiv comments}
 }

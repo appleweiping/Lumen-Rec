@@ -1,38 +1,38 @@
-% Conclusion (owner: intro; integrated 2026-10-04). Pre-results draft: the only unconditional statements are the two
-% data-independent ones (decomposition and invariance lemma); everything empirical is a \DATANEEDED slot and must come from
-% committed result files and satisfy the registered claim-admission rule (otherwise direction-free wording). The first sentence
-% and "the audit tests each against its own control" describe the registered grid: re-verify them against what was actually run
-% (cut rules) before submission. "Registered before any confirmatory result was analysed" is exact (see sec:protocol).
-% Cross-references: sec:prelim, tab:guide (one-table guide).
+% Conclusion. Every empirical statement is a \DATANEEDED slot written from the filled tables under the claim-admission rule
+% (otherwise direction-free; mixed outcomes as counts per regime). The gate sentence is the resolved GATE_PASS / GATE_FT_PASS branch
+% with its numbers in slots. Editor pass 2026-10-05: "two statements do not depend on the data" replaced (the decomposition is an
+% accounting identity); e is the pair-specific residual; the limitations paragraph follows the revision brief (recipe and
+% backbones, pointwise and sampled scope, static exposure, store-name knockout and its unit-dependent thresholds, the item mean's
+% information advantage, exploratory ML-1M items of addendum 6, self-hosted registration, internal reviews).
+% Cross-references: sec:prelim, tab:guide, tab:tracks, tab:teaches.
 \section{Conclusion}
 \label{sec:conclusion}
 
-We audited what the token confidence of yes/no LLM recommenders knows, with matched labels and a protocol registered before
-any confirmatory result was analysed. Two statements do not depend on the data: the confidence
-decomposes into a user offset, an item prior and personal evidence, and no strictly increasing per-user map of the scores can
-change per-user AUC or within-user NDCG (Section~\ref{sec:prelim}).
-\DATANEEDED{2--3 sentences from the decomposition tables only: non-prior share (an upper bound on the personal share) and
-information gain over the prior-only item mean by regime and backbone, and the quality-partialled popularity link of the prior,
-each with its confirmation-user CI; direction-free unless the claim-admission rule is met}
-The audit tests each route that the lemma leaves open against its own control.
-\DATANEEDED{1--2 sentences from the actionability tables only: which of item-dependent corrections, cross-user selective serving,
-static exposure and pruning beat their placebo, ensemble null, random or matched-random control, with effect size and CI, or
-that none did}
+We audited what the token confidence of yes/no LLM recommenders encodes, with matched labels, non-LLM references on the same pairs
+and a protocol registered before any confirmatory result was analysed. Splitting the confidence into a user offset, an item prior
+and a pair-specific residual is an accounting identity, and the invariance lemma is a property of within-user metrics; what they
+leave open was measured.
+\DATANEEDED{2--3 sentences from Tables tab:tracks and tab:teaches only: the LLM beside the item mean, the matched item mean and MF,
+the item-prior share and e-share, G and G_wu against G_CF by regime (counts per regime), the FT-C reading, H-F and H-S; direction-free
+unless the claim-admission rule is met}
+Each route that the lemma leaves open was tested against its own control.
+\DATANEEDED{1--2 sentences from the tables of Section 6.3 only: which of item-dependent corrections, selective serving, static exposure
+and uncertainty-selected pruning beat their placebo, ensemble null, random or class-matched random control, with effect size and
+interval, or that none did}
 % METHOD-SLOT-BEGIN (conclusion): delete this sentence if the nested method slot is retired at its kill date
 \DATANEEDED{branch: only if the nested method slot (prior-offset LoRA) survives its kill rule -- one sentence on its gain over
 post-hoc stacking; else omit}
 % METHOD-SLOT-END (conclusion)
 Both registered gates were met on ML-1M: the remedied zero-shot prompt reached UAUC \DATANEEDED{gate:UAUC} on untouched users
-(bar 0.60) and LoRA tuning reached \DATANEEDED{gft:UAUC\_post\_T\_mean\_over\_seeds} (bar 0.65), so the fine-tuned regime carries the main
-results and the zero-shot regime is the contrast.
-Table~\ref{tab:guide} condenses the answers to the six questions.
+(bar 0.60) and LoRA tuning reached \DATANEEDED{gft:UAUC\_post\_T\_mean\_over\_seeds} (bar 0.65), so the fine-tuned regime carries the
+main results and the zero-shot regime is the contrast. Table~\ref{tab:guide} condenses the answers to the six questions.
 \DATANEEDED{one sentence of practitioner guidance drawn only from the admitted rows of that table}
 
 \paragraph{Limitations.}
-Every claim is scoped to same-candidate evaluation with popularity-sampled negatives, which can order systems differently from
-full-catalogue ranking~\citep{krichene2020sampled}. Rated labels need explicit feedback, and the untouched users available for
-confirmation are limited by the data (\DATANEEDED{confirmation users per rated panel, from the split file}). Zero-shot confidence
-depends on the prompt; we report the registered prompt and one remedy round, not a prompt search. Exposure is analysed statically
-(the fully observed validity check failed), so no echo-chamber dynamics are claimed. Item text may have been seen in pre-training.
-Only two 8B backbones (the second on \DATANEEDED{panels run}) and one LoRA configuration are covered, and the registration is a
-dated document written by the team that ran the experiments, not a public-registry entry.
+One LoRA recipe (rank 16, one epoch) on two 8B backbones is audited, and no sampling-based or verbalised uncertainty estimator.
+Scores are pointwise, the next-item panels hold sampled candidates under same-candidate scope~\citep{krichene2020sampled}, and exposure
+is static. The knockout replaces store names only, and its registered thresholds are on the logit scale, hence unit-dependent. The
+item mean may use ratings in $[T_d,t)$ that the LLMs never see ($m_T$ stands beside it). The ML-1M values of the addendum-6 endpoints
+are exploratory, and item text, ML-1M included, may have been seen in pre-training~\citep{dipalma2025memorize}. The registration is a
+set of dated, hash-chained project documents rather than a public-registry entry, and the two reviews behind addenda 6 and 7 were
+internal, not independent.

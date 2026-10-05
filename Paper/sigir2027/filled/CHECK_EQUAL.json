@@ -1,11 +1,11 @@
 {
  "schema": "fill_paper_check_equal_v1",
  "summary": {
-  "quantities_printed_more_than_once": 19,
-  "printed_in_more_than_one_table": 17,
+  "quantities_printed_more_than_once": 13,
+  "printed_in_more_than_one_table": 12,
   "estimates_differ": 0,
-  "format_or_interval_differs": 4,
-  "numbers_without_a_source": 2
+  "format_or_interval_differs": 5,
+  "numbers_without_a_source": 0
  },
  "rule": "a quantity is a result field (gate_ft.json fields that duplicate grid ML-1M fields, and references taken from either regime's identical rows, count as one quantity); estimates_equal = false is an inconsistency to resolve, printed_equal = false a format or interval difference",
  "groups": [
@@ -21,7 +21,7 @@
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 184,
+     "line": 277,
      "table": "tab:anatomy",
      "row": "Temperature $T$",
      "column": 1,
@@ -31,7 +31,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 184,
+     "line": 277,
      "table": "tab:anatomy",
      "row": "Temperature $T$",
      "column": 2,
@@ -43,31 +43,20 @@
   },
   {
    "quantity": "gate/gate.json:UAUC",
-   "n_printed": 5,
-   "n_tables": 5,
+   "n_printed": 4,
+   "n_tables": 4,
    "tables": [
-    "prose:sections/abstract.tex",
     "prose:sections/conclusion.tex",
-    "prose:sections/experiments.tex",
     "prose:sections/introduction.tex",
+    "tab:deviations",
     "tab:gate-outcomes"
    ],
    "estimates_equal": true,
    "printed_equal": false,
    "occurrences": [
     {
-     "file": "sections/abstract.tex",
-     "line": 23,
-     "table": null,
-     "row": null,
-     "column": null,
-     "source": "gate/gate.json:UAUC",
-     "estimate": "0.603",
-     "printed": "0.603"
-    },
-    {
      "file": "sections/introduction.tex",
-     "line": 65,
+     "line": 66,
      "table": null,
      "row": null,
      "column": null,
@@ -76,20 +65,10 @@
      "printed": "0.603"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 106,
-     "table": null,
-     "row": null,
-     "column": null,
-     "source": "gate/gate.json:UAUC",
-     "estimate": "0.603",
-     "printed": "0.603$\\pm$.009"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 128,
+     "file": "sections/observation.tex",
+     "line": 68,
      "table": "tab:gate-outcomes",
-     "row": "G6 confirm: ML-1M UAUC",
+     "row": "G6 CONFIRM: ML-1M UAUC ($\\ge0.60$)",
      "column": 2,
      "source": "gate/gate.json:UAUC",
      "estimate": "0.603",
@@ -97,10 +76,20 @@
     },
     {
      "file": "sections/conclusion.tex",
-     "line": 25,
+     "line": 26,
      "table": null,
      "row": null,
      "column": null,
+     "source": "gate/gate.json:UAUC",
+     "estimate": "0.603",
+     "printed": "0.603"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 51,
+     "table": "tab:deviations",
+     "row": "7",
+     "column": 1,
      "source": "gate/gate.json:UAUC",
      "estimate": "0.603",
      "printed": "0.603"
@@ -120,7 +109,7 @@
    "occurrences": [
     {
      "file": "sections/introduction.tex",
-     "line": 64,
+     "line": 65,
      "table": null,
      "row": null,
      "column": null,
@@ -129,8 +118,8 @@
      "printed": "1,683"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 112,
+     "file": "sections/observation.tex",
+     "line": 54,
      "table": "tab:gate-outcomes",
      "row": null,
      "column": null,
@@ -153,7 +142,7 @@
    "occurrences": [
     {
      "file": "sections/introduction.tex",
-     "line": 65,
+     "line": 66,
      "table": null,
      "row": null,
      "column": null,
@@ -162,10 +151,10 @@
      "printed": "0.576"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 128,
+     "file": "sections/observation.tex",
+     "line": 68,
      "table": "tab:gate-outcomes",
-     "row": "G6 confirm: ML-1M UAUC",
+     "row": "G6 CONFIRM: ML-1M UAUC ($\\ge0.60$)",
      "column": 1,
      "source": "gate/gate.json:v0_context.UAUC",
      "estimate": "0.576",
@@ -175,33 +164,22 @@
   },
   {
    "quantity": "grid/qwen/ml1m.json:E_A.*.UAUC_TEST.references.mf",
-   "n_printed": 5,
-   "n_tables": 5,
+   "n_printed": 4,
+   "n_tables": 4,
    "tables": [
     "tab:corrections",
-    "tab:gate-outcomes",
     "tab:pruning",
-    "tab:reliability",
-    "tab:slot"
+    "tab:slot",
+    "tab:tracks"
    ],
    "estimates_equal": true,
    "printed_equal": true,
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 135,
-     "table": "tab:gate-outcomes",
-     "row": "item mean, MF (same rows)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.mf",
-     "estimate": "0.791",
-     "printed": "0.791{\\scriptsize$\\pm$.018}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 275,
-     "table": "tab:reliability",
-     "row": "temporal biased MF (ref.)",
+     "line": 86,
+     "table": "tab:tracks",
+     "row": "temporal MF (ref.)",
      "column": 1,
      "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.mf",
      "estimate": "0.791",
@@ -209,7 +187,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 442,
+     "line": 342,
      "table": "tab:pruning",
      "row": "Item mean, popularity, MF (ref.)",
      "column": 1,
@@ -219,7 +197,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 102,
+     "line": 86,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -229,89 +207,35 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 135,
+     "line": 117,
      "table": "tab:slot",
      "row": "Item mean / MF (ref.)",
      "column": 1,
      "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.mf",
      "estimate": "0.791",
      "printed": "0.791{\\scriptsize$\\pm$.018}"
-    }
-   ]
-  },
-  {
-   "quantity": "grid/qwen/ml1m.json:E_A.*.UAUC_TEST.references.popularity",
-   "n_printed": 3,
-   "n_tables": 2,
-   "tables": [
-    "tab:pruning",
-    "tab:reliability"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 274,
-     "table": "tab:reliability",
-     "row": "popularity (ref.)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.popularity",
-     "estimate": "0.616",
-     "printed": "0.616{\\scriptsize$\\pm$.020}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 298,
-     "table": "tab:reliability",
-     "row": "UAUC, popularity (ref.)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.popularity",
-     "estimate": "0.616",
-     "printed": "0.616{\\scriptsize$\\pm$.020}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 442,
-     "table": "tab:pruning",
-     "row": "Item mean, popularity, MF (ref.)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.popularity",
-     "estimate": "0.616",
-     "printed": "0.616{\\scriptsize$\\pm$.020}"
     }
    ]
   },
   {
    "quantity": "grid/qwen/ml1m.json:E_A.*.UAUC_TEST.references.q_hat",
-   "n_printed": 7,
-   "n_tables": 6,
+   "n_printed": 5,
+   "n_tables": 5,
    "tables": [
     "tab:app-seeds",
     "tab:corrections",
-    "tab:gate-outcomes",
     "tab:pruning",
-    "tab:reliability",
-    "tab:slot"
+    "tab:slot",
+    "tab:tracks"
    ],
    "estimates_equal": true,
    "printed_equal": true,
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 135,
-     "table": "tab:gate-outcomes",
-     "row": "item mean, MF (same rows)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.references.q_hat",
-     "estimate": "0.759",
-     "printed": "0.759{\\scriptsize$\\pm$.021}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 273,
-     "table": "tab:reliability",
-     "row": "prior-only item mean (ref.)",
+     "line": 84,
+     "table": "tab:tracks",
+     "row": "item mean $m$ (ref.)",
      "column": 1,
      "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat",
      "estimate": "0.759",
@@ -319,17 +243,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 297,
-     "table": "tab:reliability",
-     "row": "UAUC, prior-only item mean (ref.)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat",
-     "estimate": "0.759",
-     "printed": "0.759{\\scriptsize$\\pm$.021}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 442,
+     "line": 342,
      "table": "tab:pruning",
      "row": "Item mean, popularity, MF (ref.)",
      "column": 1,
@@ -339,7 +253,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 102,
+     "line": 86,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -349,7 +263,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 135,
+     "line": 117,
      "table": "tab:slot",
      "row": "Item mean / MF (ref.)",
      "column": 1,
@@ -359,7 +273,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 190,
+     "line": 175,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 3,
@@ -371,33 +285,21 @@
   },
   {
    "quantity": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds",
-   "n_printed": 7,
-   "n_tables": 7,
+   "n_printed": 5,
+   "n_tables": 5,
    "tables": [
-    "prose:sections/abstract.tex",
     "prose:sections/conclusion.tex",
-    "prose:sections/experiments.tex",
     "prose:sections/introduction.tex",
     "tab:gate-outcomes",
-    "tab:reliability",
-    "tab:slot"
+    "tab:slot",
+    "tab:tracks"
    ],
    "estimates_equal": true,
    "printed_equal": false,
    "occurrences": [
     {
-     "file": "sections/abstract.tex",
-     "line": 24,
-     "table": null,
-     "row": null,
-     "column": null,
-     "source": "gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
-     "estimate": "0.742",
-     "printed": "0.742"
-    },
-    {
      "file": "sections/introduction.tex",
-     "line": 68,
+     "line": 69,
      "table": null,
      "row": null,
      "column": null,
@@ -406,20 +308,10 @@
      "printed": "0.742"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 108,
-     "table": null,
-     "row": null,
-     "column": null,
-     "source": "gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
-     "estimate": "0.742",
-     "printed": "0.742$\\pm$.019"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 133,
+     "file": "sections/observation.tex",
+     "line": 70,
      "table": "tab:gate-outcomes",
-     "row": "mean over seeds",
+     "row": "G9 Gate-FT: mean ($\\ge0.65$)",
      "column": 2,
      "source": "gft/gate_ft.json:UAUC_post_T_mean_over_seeds",
      "estimate": "0.742",
@@ -427,8 +319,8 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 271,
-     "table": "tab:reliability",
+     "line": 82,
+     "table": "tab:tracks",
      "row": "UAUC of $\\ell$",
      "column": 2,
      "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds",
@@ -437,7 +329,7 @@
     },
     {
      "file": "sections/conclusion.tex",
-     "line": 26,
+     "line": 27,
      "table": null,
      "row": null,
      "column": null,
@@ -447,7 +339,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 130,
+     "line": 112,
      "table": "tab:slot",
      "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
      "column": 1,
@@ -480,10 +372,10 @@
      "printed": "0.740"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 132,
+     "file": "sections/observation.tex",
+     "line": 69,
      "table": "tab:gate-outcomes",
-     "row": "LoRA seeds 0 / 1 / 2",
+     "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
      "source": "gft/gate_ft.json:UAUC_post_T_per_seed.0",
      "estimate": "0.740",
@@ -491,7 +383,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 190,
+     "line": 175,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -524,10 +416,10 @@
      "printed": "0.745"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 132,
+     "file": "sections/observation.tex",
+     "line": 69,
      "table": "tab:gate-outcomes",
-     "row": "LoRA seeds 0 / 1 / 2",
+     "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
      "source": "gft/gate_ft.json:UAUC_post_T_per_seed.1",
      "estimate": "0.745",
@@ -535,7 +427,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 190,
+     "line": 175,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -568,10 +460,10 @@
      "printed": "0.743"
     },
     {
-     "file": "sections/experiments.tex",
-     "line": 132,
+     "file": "sections/observation.tex",
+     "line": 69,
      "table": "tab:gate-outcomes",
-     "row": "LoRA seeds 0 / 1 / 2",
+     "row": "G9 Gate-FT: seeds 0 / 1 / 2",
      "column": 2,
      "source": "gft/gate_ft.json:UAUC_post_T_per_seed.2",
      "estimate": "0.743",
@@ -579,7 +471,7 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 190,
+     "line": 175,
      "table": "tab:app-seeds",
      "row": "ML-1M",
      "column": 1,
@@ -595,26 +487,16 @@
    "n_tables": 3,
    "tables": [
     "tab:corrections",
-    "tab:gate-outcomes",
-    "tab:reliability"
+    "tab:deviations",
+    "tab:tracks"
    ],
    "estimates_equal": true,
-   "printed_equal": true,
+   "printed_equal": false,
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 133,
-     "table": "tab:gate-outcomes",
-     "row": "mean over seeds",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
-     "estimate": "0.596",
-     "printed": "0.596{\\scriptsize$\\pm$.022}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 271,
-     "table": "tab:reliability",
+     "line": 82,
+     "table": "tab:tracks",
      "row": "UAUC of $\\ell$",
      "column": 1,
      "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
@@ -623,7 +505,17 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 102,
+     "line": 51,
+     "table": "tab:deviations",
+     "row": "7",
+     "column": 1,
+     "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+     "estimate": "0.596",
+     "printed": "0.596"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 86,
      "table": "tab:corrections",
      "row": "0",
      "column": 2,
@@ -634,86 +526,21 @@
    ]
   },
   {
-   "quantity": "grid/qwen/ml1m.json:E_B.mean_over_seeds",
-   "n_printed": 2,
-   "n_tables": 2,
-   "tables": [
-    "tab:gate-outcomes",
-    "tab:reliability"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 134,
-     "table": "tab:gate-outcomes",
-     "row": "paired $\\Delta$ (LoRA $-$ zero-shot)",
-     "column": 2,
-     "source": "grid/qwen/ml1m.json:E_B.mean_over_seeds",
-     "estimate": "0.147",
-     "printed": "0.147{\\scriptsize$\\pm$.022\\,(.002)}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 272,
-     "table": "tab:reliability",
-     "row": "LoRA $-$ ZS (paired)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_B.mean_over_seeds",
-     "estimate": "0.147",
-     "printed": "0.147{\\scriptsize$\\pm$.022\\,(.002)}"
-    }
-   ]
-  },
-  {
-   "quantity": "grid/qwen/ml1m.json:E_D.*.information_gain.G_CF",
-   "n_printed": 2,
-   "n_tables": 1,
-   "tables": [
-    "tab:reliability"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 290,
-     "table": "tab:reliability",
-     "row": "$\\mathcal G_{\\rm CF}=\\Delta$UAUC(M3$-$M0)",
-     "column": 1,
-     "source": "grid/qwen/ml1m.json:E_D.ZS.information_gain.G_CF",
-     "estimate": "0.036",
-     "printed": "0.036{\\scriptsize$\\pm$.013}"
-    },
-    {
-     "file": "sections/experiments.tex",
-     "line": 290,
-     "table": "tab:reliability",
-     "row": "$\\mathcal G_{\\rm CF}=\\Delta$UAUC(M3$-$M0)",
-     "column": 2,
-     "source": "grid/qwen/ml1m.json:E_D.FT.information_gain.G_CF",
-     "estimate": "0.036",
-     "printed": "0.036{\\scriptsize$\\pm$.013}"
-    }
-   ]
-  },
-  {
    "quantity": "grid/qwen/ml1m.json:P1.mean_over_seeds",
    "n_printed": 2,
    "n_tables": 2,
    "tables": [
     "prose:sections/experiments.tex",
-    "tab:reliability"
+    "tab:tracks"
    ],
    "estimates_equal": true,
    "printed_equal": false,
    "occurrences": [
     {
      "file": "sections/experiments.tex",
-     "line": 294,
-     "table": "tab:reliability",
-     "row": "P1: $\\mathcal G_{\\rm FT}-\\mathcal G_{\\rm ZS}$ (ML-1M)",
+     "line": 103,
+     "table": "tab:tracks",
+     "row": "P1: $\\mathcal G_{\\rm FT}-\\mathcal G_{\\rm ZS}$",
      "column": 1,
      "source": "grid/qwen/ml1m.json:P1.mean_over_seeds",
      "estimate": "0.011",
@@ -721,7 +548,7 @@
     },
     {
      "file": "sections/experiments.tex",
-     "line": 369,
+     "line": 132,
      "table": null,
      "row": null,
      "column": null,
@@ -732,87 +559,21 @@
    ]
   },
   {
-   "quantity": "sel/selection.json:table.V0.ml1m.UAUC",
-   "n_printed": 2,
-   "n_tables": 2,
-   "tables": [
-    "tab:app-sens",
-    "tab:gate-outcomes"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 126,
-     "table": "tab:gate-outcomes",
-     "row": "G5 dev: ML-1M UAUC",
-     "column": 1,
-     "source": "sel/selection.json:table.V0.ml1m.UAUC",
-     "estimate": "0.588",
-     "printed": "0.588"
-    },
-    {
-     "file": "sections/appendix.tex",
-     "line": 71,
-     "table": "tab:app-sens",
-     "row": "V0",
-     "column": 1,
-     "source": "sel/selection.json:table.V0.ml1m.UAUC",
-     "estimate": "0.588",
-     "printed": "0.588"
-    }
-   ]
-  },
-  {
-   "quantity": "sel/selection.json:table.V0.toys.UAUC",
-   "n_printed": 2,
-   "n_tables": 2,
-   "tables": [
-    "tab:app-sens",
-    "tab:gate-outcomes"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 127,
-     "table": "tab:gate-outcomes",
-     "row": "G5 dev: Toys UAUC",
-     "column": 1,
-     "source": "sel/selection.json:table.V0.toys.UAUC",
-     "estimate": "0.540",
-     "printed": "0.540"
-    },
-    {
-     "file": "sections/appendix.tex",
-     "line": 71,
-     "table": "tab:app-sens",
-     "row": "V0",
-     "column": 2,
-     "source": "sel/selection.json:table.V0.toys.UAUC",
-     "estimate": "0.540",
-     "printed": "0.540"
-    }
-   ]
-  },
-  {
    "quantity": "sel/selection.json:table.V1.ml1m.UAUC",
    "n_printed": 2,
    "n_tables": 2,
    "tables": [
-    "tab:app-sens",
+    "tab:deviations",
     "tab:gate-outcomes"
    ],
    "estimates_equal": true,
    "printed_equal": true,
    "occurrences": [
     {
-     "file": "sections/experiments.tex",
-     "line": 126,
+     "file": "sections/observation.tex",
+     "line": 66,
      "table": "tab:gate-outcomes",
-     "row": "G5 dev: ML-1M UAUC",
+     "row": "G5 DEV: ML-1M UAUC (bound $>0$)",
      "column": 2,
      "source": "sel/selection.json:table.V1.ml1m.UAUC",
      "estimate": "0.612",
@@ -820,46 +581,13 @@
     },
     {
      "file": "sections/appendix.tex",
-     "line": 72,
-     "table": "tab:app-sens",
-     "row": "V1",
+     "line": 51,
+     "table": "tab:deviations",
+     "row": "7",
      "column": 1,
      "source": "sel/selection.json:table.V1.ml1m.UAUC",
      "estimate": "0.612",
      "printed": "0.612"
-    }
-   ]
-  },
-  {
-   "quantity": "sel/selection.json:table.V1.toys.UAUC",
-   "n_printed": 2,
-   "n_tables": 2,
-   "tables": [
-    "tab:app-sens",
-    "tab:gate-outcomes"
-   ],
-   "estimates_equal": true,
-   "printed_equal": true,
-   "occurrences": [
-    {
-     "file": "sections/experiments.tex",
-     "line": 127,
-     "table": "tab:gate-outcomes",
-     "row": "G5 dev: Toys UAUC",
-     "column": 2,
-     "source": "sel/selection.json:table.V1.toys.UAUC",
-     "estimate": "0.544",
-     "printed": "0.544"
-    },
-    {
-     "file": "sections/appendix.tex",
-     "line": 72,
-     "table": "tab:app-sens",
-     "row": "V1",
-     "column": 2,
-     "source": "sel/selection.json:table.V1.toys.UAUC",
-     "estimate": "0.544",
-     "printed": "0.544"
     }
    ]
   }

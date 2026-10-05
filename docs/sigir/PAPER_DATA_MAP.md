@@ -12,7 +12,8 @@ that day). The live state is always `Paper/sigir2027/filled/UNFILLED.json`.
 | pull | `powershell -NoProfile -File scripts\sigir\pull_results.ps1 [-ListOnly]` | `docs/sigir/results/<alias>/...`, `docs/sigir/results/MANIFEST.json` (path, size, sha1, server mtime; missing files listed) |
 | fill | `python scripts\sigir\fill_paper.py [--check_equal]` | `Paper/sigir2027/filled/{main.tex, references.bib, sections/*.tex, UNFILLED.json, FILLED.json, CHECK_EQUAL.json}` |
 | compile | in `Paper/sigir2027/filled/`: pdflatex, bibtex, pdflatex x2 | `filled/main.pdf` (unfilled slots stay red) |
-| test | `python -m pytest tests\test_confrec_fillpaper.py -q` | 30 tests, CPU, about 1 minute |
+| test | `python -m pytest tests\test_confrec_fillpaper.py -q -p no:cacheprovider` | 35 tests, CPU, about 2 minutes |
+| page budget | `python scripts\sigir\page_budget.py --results <dir> --out <dir>` (Git's `usr\bin` on PATH for latexmk's perl) | the pages used before the references with typical fillers; since 2026-10-05 it measures to the later of the text end and the last float end |
 
 - The pull is read-only on the server: one `stat` listing through `scripts\sigir\remote.ps1 -ScriptFile`, then one `scp` per
   file over the `lumen-gpu` key (BatchMode). No credential is written anywhere.
@@ -80,6 +81,12 @@ Cell formats (FILL RULE 2):
 | prn | `src.confrec.ftprune analyze` (run_ftprune.sh stage E) | `outputs/confrec/ftprune/pruning_ml1m.json` (+ `.csv`) | `prn/pruning_ml1m.json` |
 | slot | `src.confrec.ftmethod_report dataset` / `slot` (run_ftmethod.sh stage 5) | `outputs/confrec/ftmethod/<d>/report.json`, `outputs/confrec/ftmethod/slot.json` | `slot/<d>.json`, `slot/slot.json` |
 | mir | `scripts/sigir/pilot1_gate.py --stage3_gate` (run_gatefix_stage3.sh) | `outputs/confrec/gatefix/stage3/decision.json` | `mir/decision.json` |
+| ext | `src.confrec.ftgrid_extra build` / `summarize` (run_ftextra.sh; A3-6 items 2-8; interface: `docs/sigir/FTEXTRA_IMPL_SPEC.md`) | `outputs/confrec/ftgrid/extra/<d>.json`, `extra/summary.json`; Llama `outputs/confrec/ftgrid_llama/extra/<d>.json` | PROPOSED `extra/<d>.json`, `extra/summary.json`, `extra/llama/<d>.json` (fixed when `pull_results.ps1` is extended) |
+
+The `ext` specs written by the editor pass of 2026-10-05 are placeholders: every `ext:` slot checks its slot text and stays red with
+`result_file_missing` ("extra-analysis file not produced yet") until the file exists; editor pass 2 replaces them with handlers
+written against the real schema of `ftgrid_extra.py`. The list of `ext:` slots is in section 4b below and in
+`tests/test_confrec_fillpaper.py` (`EXT_TABLE_SLOTS`, `EXT_PROSE_SLOTS`).
 
 Where the skeleton's PROPOSED path differs from the script, the alias follows the script (FILL RULE: "the alias follows the
 script"):
@@ -96,28 +103,68 @@ together.
 
 Columns: `ZS` = regime zero-shot (model `zeroshot`), `LoRA` = regime FT (seeds s0-s2). `S1k` = sports segment
 `events_1_1000`, `S10k` = `events_1001_10000`. Toys, Home and Tools use segment `all`. Next-item cells use question `next`
-unless the row says `like`.
+unless the row says `like`. Editor pass 1 (2026-10-05) restructured the tables (`Paper/sigir2027/INTEGRATION_NOTES.md` section 0 lists what moved); a `$^\dagger$` in a
+row label marks an endpoint of addendum 6 (alias `ext`, red until its file exists).
 
-**tab:gate-outcomes**
+**tab:gate-outcomes** (protocol, `observation.tex`; the "Rule" column is folded into the row labels; the pilot outcomes are text)
 
-| row | V0 / zero-shot | V* / LoRA | Outcome |
+| row | V0 | V* / LoRA | Outcome |
 |---|---|---|---|
-| G5 dev ML-1M | `sel.table.V0.ml1m.UAUC` | `sel.table[v_star].ml1m.UAUC` | `sel.decision` |
-| G5 dev Toys | `sel.table.V0.toys.UAUC` | `sel.table[v_star].toys.UAUC` | `sel.table[v_star].E2` |
-| G6 confirm | `gate.v0_context.{UAUC,ci95}` | `gate.{UAUC,ci95}` | `gate.decision` |
-| LoRA seeds | | `gft.UAUC_post_T_per_seed` | |
-| mean over seeds | grid ml1m `E_A.ZS.UAUC_TEST.per_model.zeroshot` (decision 1) | `gft.UAUC_post_T_mean_over_seeds`, `UAUC_post_T_seed_averaged_ci95`, `UAUC_post_T_sd_over_seeds` | `gft.decision` |
-| paired delta | | grid ml1m `E_B.mean_over_seeds` with the seed s.d. (decision 1) | |
-| item mean, MF | spans both columns: grid ml1m `E_A.FT` (else ZS) `references.q_hat / .mf` | | |
+| G5 DEV: ML-1M UAUC (bound > 0) | `sel.table.V0.ml1m.UAUC` | `sel.table[v_star].ml1m.UAUC` | `sel.decision` |
+| G5 DEV: Toys UAUC (E2) | `sel.table.V0.toys.UAUC` | `sel.table[v_star].toys.UAUC` | `sel.table[v_star].E2` |
+| G6 CONFIRM: ML-1M UAUC (>= 0.60) | `gate.v0_context.{UAUC,ci95}` | `gate.{UAUC,ci95}` | `gate.decision` |
+| G9 Gate-FT: seeds 0 / 1 / 2 | -- | `gft.UAUC_post_T_per_seed` | |
+| G9 Gate-FT: mean (>= 0.65) | -- | `gft.UAUC_post_T_mean_over_seeds`, `UAUC_post_T_seed_averaged_ci95`, `UAUC_post_T_sd_over_seeds` | `gft.decision` |
 
-The caption slot is `gate.n_users`.
+The caption slot is `gate.n_users`. Decision 1 (main session, 2026-10-04) stands: the zero-shot UAUC and the paired gain on the
+Gate-FT rows are the grid values; since the editor pass they, and the item-mean and MF references of these rows, are printed once,
+in the ML-1M cells of tab:tracks A, and the gate table prints no grid cell. gate_ft.json's own `zero_shot_context` (a second scoring
+of the same prompts) is never printed; FILLED.json "notes" records both values with their absolute differences.
 
-Decision 1 (main session, 2026-10-04): the zero-shot UAUC and the paired delta print the grid values of tab:reliability, so
-both tables print 0.596 and 0.147. The slot texts `gft:...` and `grid:UAUC` / `grid:dUAUC_ft_minus_zs` are both accepted.
-gate_ft.json's own `zero_shot_context` (0.595996, delta 0.14647) is a second scoring of the same prompts and is not printed.
-FILLED.json "notes" records both values, read from the files, with their absolute differences.
+**tab:tracks** (the former tab:reliability; findings 6.1) and **tab:app-llama** (Llama, ML-1M and Toys, the same row specs). File
+`grid/<bb>/<d>.json` unless the alias says `cpu` or `ext`. A ZS cell is `per_model.zeroshot`; a LoRA cell is the seed mean plus the
+s.d. of the three `per_model.s0-s2` estimates; a span cell holds one value per panel.
 
-**tab:anatomy.** Columns S1k, S10k, Toys, Home and Tools all read `aud/<d>.json` `segments.<seg>.questions.next`:
+| row | field |
+|---|---|
+| UAUC of l | `E_A.<reg>.UAUC_TEST` |
+| LoRA - ZS (E-B; span) | `E_B.mean_over_seeds` (s.d. of `E_B.per_seed`) |
+| item mean m / temporal MF (ref.; span) | cpu: `E_A.ZS.UAUC_TEST.references.{q_hat, mf}` (FT rows when the ZS block is unavailable) |
+| matched mean m_T (ref.; span) | ext `E_J.UAUC_q_hat_T` (pending) |
+| dUAUC(l - m), E-J; dUAUC(l - MF), warm | ext `E_J.dUAUC_L_minus_q_hat`, `E_J.dUAUC_L_minus_mf` (pending; per regime) |
+| Users: TEST / S_d (span) | `ftgrid_split.eval.users_both_classes_test` / `ftgrid_split.sd.users` (two slots in one cell) |
+| Reliability r8 | `E_D.<reg>.shares.r8c` |
+| Item-prior share rho^2/r8 | `E_D.<reg>.shares.item_prior_share` (new grid spec; "uninterpretable" when `shares_reading` says so; the non-prior share is its complement) |
+| e-share; item share of MF / label (span) | ext `E_G.e_share`; `E_G.item_share_mf` / `E_G.item_share_label` (pending) |
+| G, E-D | `E_D.<reg>.information_gain.per_model.<m>.G`, `G_mean_over_seeds` |
+| G_wu (E-W) | ext `E_W.G_wu` (pending) |
+| G_CF: E-D / E-W (span) | `E_D.ZS.information_gain.G_CF` (FT rows when the ZS block is unavailable) / ext `E_W.G_CF_wu` (pending) |
+| MF personal residual (ref.; span) | cpu: `E_A.ZS.mf_personal_residual_warm_pairs_only` |
+| star permutation | `E_D.<reg>.star_permutation.per_model.<m>.dUAUC_L_minus_perm`, `dUAUC_mean_over_seeds` |
+| popularity link of pi / l | `E_E.<reg>.partial_spearman.{pi_item, L_item}` |
+| P1 (span, ML-1M) | `P1.per_seed.s0-s2`, `P1.mean_over_seeds` (est, CI, p) |
+| P1_wu (span, ML-1M) | ext `E_W.P1_wu` (pending) |
+| ECE (after Platt) | `E_C.<reg>.ECE` |
+| correct in bottom / errors in top / margin AUROC, oracle | `E_C.<reg>.{share_correct_bottom, share_errors_top, AUROC_margin_correct}` |
+| deployable (three rows, one label; the slot text names the statistic) | ext `E_Cprime.{share_correct_bottom, share_errors_top, AUROC_margin}` (pending) |
+| tab:app-llama only: knockout head - tail drop, registered label (Toys) | `knockout.analyses.<m>.delta.pseudo.head_minus_tail`, `knockout.labels.<m>.label` |
+
+Kept in the released files since the editor pass (page budget): the UAUC of pi-hat and e-hat alone (the latter is also row 4 of
+tab:corrections), the Platt slope, the AURC, popularity as a rated reference.
+
+**tab:teaches** (new; findings 6.2). Columns as tab:tracks.
+
+| row | field |
+|---|---|
+| G_LLM\|CF = dUAUC(M4 - M3), G_CF\|LLM = dUAUC(M4 - M2) | ext `E_F.G_LLM_given_CF`, `E_F.G_CF_given_LLM` (pending) |
+| G_prior on sparse / dense / unseen / seen rows | ext `E_H.<stratum>.G_prior` (pending; minimum-n rule per stratum) |
+| retention R, reading (LoRA columns of ML-1M and Toys) | ext `FT_C_reading.R`, `FT_C_reading.label` (pending) |
+| knockout: head - tail drop, placebo drop, tail dUAUC, registered label (Toys, Video Games, Sports) | ko: `knockout.analyses.<m>.{delta.pseudo.head_minus_tail, delta.placebo.head_minus_tail, dUAUC.real_minus_pseudo.tail}`, `knockout.labels.<m>.label` |
+
+A LoRA knockout cell is the mean of the three seed estimates with their s.d. (no interval exists for that mean). ML-1M has no store
+field ("--"). The overall dUAUC of the former tab:popularity stays in the released files.
+
+**tab:anatomy.** Unchanged. Columns S1k, S10k, Toys, Home and Tools all read `aud/<d>.json` `segments.<seg>.questions.next`:
 
 | row | field |
 |---|---|
@@ -139,47 +186,16 @@ FILLED.json "notes" records both values, read from the files, with their absolut
 | row | field |
 |---|---|
 | Pool | `B_exposure.llm.pool_head_share` (Delta_head block), `pool_tail_share` (APLT block) |
-| Target | `B_exposure.llm.target_head_share` |
 | LLM next / like | `questions.{next,like}.B_exposure.llm.{delta_head, gini_exposure, tail_share_top10}` |
-| baselines | `segments.<seg>.reference.<method>.B_exposure.*` |
+| Verbalised reranker | `segments.<seg>.reference.ccrp_v3.B_exposure.*` (the paper names it only "a verbalised reranker") |
+| Published, min / median / max | the minimum, median and maximum over the eight published recommenders of `segments.<seg>.reference.<method>.B_exposure.<field>.est` (estimates only; source recorded per cell) |
 
-Baseline methods: ccrp_v3, elmrec_graph, irllrec_intent, llm2rec_sasrec, llmemb, llmesr_sasrec, proex_profile,
-promax_profile, rlmrec_graphcl.
+Published methods (`fill_paper.PUBLISHED`): elmrec_graph, irllrec_intent, llm2rec_sasrec, llmemb, llmesr_sasrec, proex_profile,
+promax_profile, rlmrec_graphcl. The per-method values and the target head share stay in the released files; the RQ3 comparison word
+(`c_rq3_baselines`) still reads all nine reference methods.
 
-**tab:reliability (Qwen) and tab:app-llama (Llama).** File `grid/<bb>/<d>.json`. A ZS cell is `per_model.zeroshot`. A LoRA
-cell is the seed mean plus the s.d. of the three `per_model.s0-s2` estimates.
-
-| row | field |
-|---|---|
-| UAUC | `E_A.<reg>.UAUC_TEST` |
-| LoRA - ZS (span) | `E_B.mean_over_seeds` (s.d. of `E_B.per_seed`) |
-| item mean / popularity / MF (span) | `E_A.ZS.UAUC_TEST.references.{q_hat,popularity,mf}` |
-| ECE / Platt slope | `E_C.<reg>.{ECE, platt_slope}` |
-| correct in bottom / errors in top | `E_C.<reg>.{share_correct_bottom, share_errors_top}` |
-| margin AUROC / AURC | `E_C.<reg>.{AUROC_margin_correct, AURC}` |
-| Users (span) | `ftgrid_split.eval.users_both_classes_test` |
-| UAUC of l / pi / e on S_d | `E_D.<reg>.UAUC.{L,pi,e_hat}` |
-| r8 / non-prior share | `E_D.<reg>.shares.{r8c,non_prior_share}`; "uninterpretable" when `shares_reading` says so |
-| G | `E_D.<reg>.information_gain.per_model.<m>.G`, `G_mean_over_seeds` |
-| G_CF | `E_D.<reg>.information_gain.G_CF` (no seed s.d.) |
-| star permutation | `E_D.<reg>.star_permutation.per_model.<m>.dUAUC_L_minus_perm`, `dUAUC_mean_over_seeds` |
-| popularity link of pi / l | `E_E.<reg>.partial_spearman.{pi_item, L_item}` |
-| P1 (span, ML-1M) | `P1.per_seed.s0-s2`, `P1.mean_over_seeds` (est, CI, p) |
-| Users in S_d (span) | `ftgrid_split.sd.users` |
-| bottom reference rows | `E_A.ZS...references.{q_hat,popularity}`, `E_A.ZS.mf_personal_residual_warm_pairs_only` |
-
-**tab:popularity.** File `grid/qwen/{toys,games}.json`:
-
-| row | field |
-|---|---|
-| head-tail drop | `knockout.analyses.<m>.delta.pseudo.head_minus_tail` |
-| placebo | `knockout.analyses.<m>.delta.placebo.head_minus_tail` |
-| tail / overall dUAUC | `knockout.analyses.<m>.dUAUC.real_minus_pseudo.{tail,all}` |
-| label | `knockout.labels.<m>.label` (LoRA cell: "s0 / s1 / s2") |
-
-A LoRA cell is the mean of the three seed estimates with their s.d. No interval exists for that mean.
-
-**tab:pruning.** File `prn/pruning_ml1m.json`:
+**tab:pruning.** File `prn/pruning_ml1m.json`; rows named as in addendum 7 (P0 full data, P1 random (class-matched), P2
+uncertainty-selected, P3 prior-congruent):
 
 | column | field |
 |---|---|
@@ -191,18 +207,16 @@ A LoRA cell is the mean of the three seed estimates with their s.d. No interval 
 
 `arms.P3.status = NOT_RUN` makes the P3 row read "not run".
 
-**tab:app-sens.** Each variant row reads `sel.table[V]`:
+**tab:deviations** (new; appendix). The 18 rows of `docs/sigir/DEVIATIONS.md`, condensed (what happened with its evidence, effect on
+claims). Row 7 carries three estimates: `sel.table[v_star].ml1m.UAUC` (DEV), `gate.UAUC` (CONFIRM), grid ml1m
+`E_A.ZS.UAUC_TEST.per_model.zeroshot` (TEST, zero-shot).
 
-| column | field |
-|---|---|
-| ML-1M, Toys | `ml1m.UAUC`, `toys.UAUC` |
-| E1 | `ml1m.E1 and toys.E1` |
-| E2, Eligible, Tied | `E2`, `eligible`, `tied_with_max` |
+**tab:app-sens** (dormant). The table was cut to two sentences and a pointer to the artefact; its spec is kept, so the table can be
+restored or rendered for the artefact unchanged (each variant row reads `sel.table[V]`: ML-1M and Toys UAUC, E1 of both panels, E2,
+eligible, tied_with_max).
 
-The DEV-user item-mean reference row was dropped from the skeleton (no script produces it).
-
-**tab:corrections.** Caption and the 2nd-rated column use the domain directory of `mir.inputs.toys`. The ML-1M and 2nd-rated
-columns read the grid zero-shot report:
+**tab:corrections.** Unchanged. Caption and the 2nd-rated column use the domain directory of `mir.inputs.toys`; the ML-1M and
+2nd-rated columns read the grid zero-shot report:
 
 | row | field |
 |---|---|
@@ -212,7 +226,7 @@ columns read the grid zero-shot report:
 | 5-6 | `mir.criteria.{ml1m,toys}.{dUAUC_mirror_minus_placebo, dUAUC_mirror_minus_ensemble_null}` |
 | 7 | `mir.next_item_no_loss["dNDCG@10_mirror_minus_raw"].tie_exact` |
 
-**tab:slot**
+**tab:slot.** Unchanged.
 
 | row | field |
 |---|---|
@@ -223,7 +237,7 @@ columns read the grid zero-shot report:
 
 "not run" applies when `slot.json` is `KILLED` and the dataset was never run.
 
-**tab:app-seeds.** File grid qwen:
+**tab:app-seeds.** Unchanged. File grid qwen:
 
 | row | field |
 |---|---|
@@ -232,32 +246,48 @@ columns read the grid zero-shot report:
 
 A seed excluded for E1 reads FAILED_INTEGRITY.
 
-**tab:app-z2.** Each cell is "aud2q / aud2l": the single segment of each file, question `next`. Rows use the same fields as
-tab:anatomy and tab:exposure.
+**tab:app-z2.** Each cell is "aud2q / aud2l": the single segment of each file, question `next`. Four rows since the editor pass (the
+endpoints the second-backbone clause of claim admission uses): acc_high - acc_low and top-1 errors in the top tertile (C), delta_head
+(B), mean p head - tail (E); `Z2_ROWS` keeps the specs of the other four rows.
 
 **tab:guide** is free text throughout: clauses and the admission verdicts.
 
-## 4. Prose slots (experiments.tex, `PROSE_SPECS`)
+## 4. Prose slots (`PROSE_SPECS`)
 
-Cross-domain sentences get per-domain lists in the registered order: next-item S10k, Toys, Home, Tools (the four family
-units); rated ML-1M, Toys, Video Games, Sports. Direction words are filled only by the registered test.
+Since the editor pass the prose carries the registered words and counts and points to the tables for the numbers (per-panel lists
+that repeated table cells were dropped). Direction words are filled only by the registered test.
 
 | slot | rule |
 |---|---|
-| RQ1 `k of 4`, direction, consequence | `aud/summary.json` `S1.acc_top_minus_bottom_tertile.next.holm` (Holm over the four domains). The consequence is written only when all four agree |
-| RQ2 more/as/less often | `S2.share_errors_in_top_minus_third.next.holm`, all four agreeing |
-| RQ3 direction, `k of 4` | `S3.admission.llm_next` (effect_claimed and sign, or no domain excluding 0) |
-| RQ3 second backbone | sign of aud2q vs aud2l `delta_head`, the same or opposite in at least 3 of 4 domains |
-| RQ3 vs baselines | larger, smaller or similar only when all 9 x 4 Holm contrasts agree |
-| RQ4 zero-shot UAUC, item mean, LoRA UAUC (as rewritten 2026-10-04) | per-panel lists of `E_A.ZS`, the `q_hat` reference on the same rows, and `E_A.FT`, each with its own interval; no direction word, because no paired test is registered |
-| RQ4 G above / not distinguishable | `E_D.<reg>.holm_family_E_D.confirmed.G` in every domain and both regimes |
-| RQ4 raises / leaves / lowers | E-B Holm over the four Qwen domains, computed from the per-domain raw p, plus `E_B.seeds.sigma_seed_rule` |
-| RQ4 P1 holds / n of 3 | `P1.decision.verdict` and the per-seed signs |
-| RQ5 knockout label | written only if all Qwen labels (Toys, Video Games x zeroshot, s0-s2) are identical |
-| RQ6 | `prn.claim.label`: BEATS_RANDOM, WORSE_THAN_RANDOM, ABOUT_EQUAL, INCONCLUSIVE |
-| slot | `slot.json holm.confirmed` and the sign of dUAUC |
+| S1 `k of 4`, direction, consequence | `aud/summary.json` `S1.acc_top_minus_bottom_tertile.next.holm` (Holm over the four domains); the consequence only when all four agree; the per-domain differences as a list |
+| S2 more/as/less often | `S2.share_errors_in_top_minus_third.next.holm`, all four agreeing; the per-domain shares as a list |
+| S3 direction, `k of 4` | `S3.admission.llm_next` (effect_claimed and sign, or no domain excluding 0); the per-domain delta_head as a list |
+| S3 second backbone | sign of aud2q vs aud2l `delta_head`, the same or opposite in at least 3 of 4 domains; the Llama values as a list |
+| S3 vs the reference systems | larger, smaller or similar only when all 9 x 4 Holm contrasts agree |
+| 6.1 raises / leaves / lowers | E-B Holm over the four Qwen domains, computed from the per-domain raw p, plus `E_B.seeds.sigma_seed_rule` (unchanged) |
+| 6.1 `grid:E_B confirmed, k of 4` (new) | count rule (A3-6 item 9.2): the number of the four Qwen domains confirmed by `eb_family`; confirmed members of both signs: `not_decided` |
+| 6.1 `grid:G confirmed, k of 4 zero-shot` / `... LoRA` (new) | count rule: the number of the four Qwen domains whose `E_D.<reg>.holm_family_E_D.confirmed.G` is true (positive G); both signs: `not_decided`; a descriptive member: `below_min_n` |
+| 6.1 P1 holds / n of 3, P1 cell | `P1.decision.verdict`, the per-seed signs, `P1.mean_over_seeds` (unchanged) |
+| 6.2 knockout label | written only if all Qwen labels (Toys, Video Games x zeroshot, s0-s2) are identical (unchanged) |
+| corrections: per-user maps | the largest `max_abs_dAUC_user` over the four rated panels (unchanged) |
+| corrections: `mir:decision` (new) | the registered stage-3 label of `mir/decision.json`, verbatim, after GATE_PASS |
+| S6 | `prn.claim.label`: BEATS_RANDOM, WORSE_THAN_RANDOM, ABOUT_EQUAL, INCONCLUSIVE, worded against "class-matched random pruning" (addendum 7); contrast, interval, p and the count of positive seeds |
+| method slot | `slot.json holm.confirmed` and the sign of dUAUC; the per-dataset gains as a list |
+| introduction and conclusion gate sentences | gate.json / gate_ft.json after GATE_PASS / GATE_FT_PASS (anchors follow the introduction as rewritten on 2026-10-04) |
+
+**4b. ext prose slots (pending; editor pass 2 writes their handlers).** `ext:E_J.H_J_count` (family E-J: k of 3 Amazon panels and
+the sign of each confirmed member), `ext:E_W.robust_count` (the reading rule of E-W per regime: robust or estimator-dependent),
+`ext:E_W.P1_wu_verdict` (P1 on the within-user values), `ext:FT_C_reading.wording` ("fine-tuning mostly teaches the item" only if the
+reading is ITEM_DRIVEN on every dataset run), `ext:E_F.H_F_count` (family E-F: k of 3), `ext:E_H.H_S_count_ZS` and
+`ext:E_H.H_S_count_FT` (family E-H per regime: k of the members with at least 150 users).
 
 ## 5. State at the last pull (2026-10-04, about 17:00 UTC) and what is still needed
+
+**Update (editor pass 1, 2026-10-05; same result files).** The restructured skeleton has **704 slots**: 151 filled (sel 7, gate 9,
+gft 6, aud 74, grid 43, cpu 6, corr 4, free 2) and 553 unfilled (esult_file_missing 510, of which 147 are ext: slots of addendum
+6; esult_not_in_report 8, the ML-1M FT-C rows; ree_text 29; ranch_slot 6). mbiguous_slot and interpretive are 0: the
+prose no longer carries number slots whose panel or regime it does not fix (the tables carry the numbers). skeleton_changed 0;
+CHECK_EQUAL: 13 quantities printed more than once, estimates differ for 0. The counts below are those of 2026-10-04.
 
 Pulled:
 

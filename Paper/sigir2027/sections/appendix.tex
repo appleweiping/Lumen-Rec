@@ -1,21 +1,15 @@
 % =====================================================================================================================
-% Appendix (owner: results; integrated 2026-10-04). Compact skeleton. Same fill rules and file aliases as sections/experiments.tex
-% (sel, gate, gft, cpu, grid, aud, aud2q, aud2l, ko, prn, corr, mir, slot). No URLs; no number is typed by hand: every slot is filled
-% from a committed result file.
-% Sections: app:prompts (= app:sensitivity), the per-panel tables (no heading; former app:tables, unreferenced), app:prereg
-% (= app:pseudonym = app:repro).
-% Every float is single-column with the specifier p (!tbp): a float with only t/b that is still queued at the end of the document is
-% lost, and so is a single-column float queued behind a deferred table*.
-% Integration cuts (page budget, see INTEGRATION_NOTES.md): the diagnosis-battery section app:battery and its table tab:app-battery
-% (interpretive only, alias diag = outputs/confrec/diag/diag.json; 6 slots) were removed and are mentioned in one clause of the
-% Findings and of app:prereg; the "baselines' own margin" rows of tab:serving were removed because that comparison is not run
-% (tab:serving itself was then merged into tab:anatomy, block C, in experiments.tex)
-% (Amendment 3 section 11). Remaining cut order if a filled draft exceeds 9 pages: tab:app-seeds (keep the FT-C rows), the share and
-% ECE rows of tab:app-llama, tab:app-z2 only if the second-backbone clause of claim admission is dropped from the paper.
-% Fine-tuned items (LoRA columns, per-seed table, FT-C rows) exist only after a recorded GATE_FT_PASS (Amendment 3 section 0); blocks
-% between "% BRANCH-GATEFT-BEGIN" and "% BRANCH-GATEFT-END" are deleted otherwise.
+% Appendix. Same fill rules and aliases as sections/experiments.tex (sel, gate, gft, cpu, grid, ext, aud, aud2q, aud2l, ko, prn,
+% corr, mir, slot). No URLs; no number is typed by hand: every result is a slot filled from a committed result file.
+% Sections: app:prompts (= app:sensitivity), app:deviations (with tab:deviations), the per-panel tables, app:prereg
+% (= app:pseudonym = app:repro). Every float is single-column with the specifier p (FILL RULE 6).
+% Editor pass 2026-10-05 (page budget): the variant-bank and prompt-sensitivity tables became two sentences and a pointer to the
+% artefact (the selection file holds all 7 x 2 development UAUCs; tab:gate-outcomes keeps V0 and V*); the deviations table was
+% added (all 18 rows of the deviations record, condensed); tab:app-llama follows tab:tracks and holds the Llama Toys knockout;
+% tab:app-z2 keeps the four rows that the second-backbone clause of claim admission uses.
+% Fine-tuned items (LoRA columns, per-seed table, FT-C rows) exist because GATE_FT_PASS was recorded (Amendment 3 section 0).
 % =====================================================================================================================
-\section{Prompts, Registration and Reproducibility}\label{app:prompts}\label{app:sensitivity}
+\section{Prompts, Registration and Reproducibility}\label{app:prompts}\label{app:sensitivity}\label{app:deviations}
 All prompts are single-turn chat messages (thinking disabled). \textbf{V0}, the registered prompt of the rated panels (user
 message, no system message):
 \begin{quote}\ttfamily\scriptsize\raggedright
@@ -28,72 +22,62 @@ Description: \{first 200 characters, if present\}\\[1pt]
 Would this user like the candidate item? Answer with only Yes or No.
 \end{quote}
 Next-item panels use plain history lines (last 5 events) and the question \textsf{next} (``Will this user purchase the candidate
-item next?'') or \textsf{like}, frozen at V0. V1 and V7 (Table~\ref{tab:app-bank}) ask ``Will this user rate the candidate item 4 stars or higher (on a 1-5
-scale)?''; every variant's dislike and paraphrase strings were fixed in advance and are scored only after the zero-shot gate. Table~\ref{tab:app-sens} publishes all $7\times2$ development UAUCs of the remedy round: a
-variant is eligible if E1 holds on both panels and E2 holds, and $V^\ast$ is the eligible variant with the highest ML-1M UAUC,
-ties within 0.005 broken by the Toys UAUC and then by the simplicity order V0, V1, V5, V3, V4, V2, V7.
+item next?'') or \textsf{like}, frozen at V0. The remedy round scored V0 and six variants fixed in advance (no collaborative or
+popularity statistic, user mean rating, few-shot example or verbalised readout): V1 asks ``Will this user rate the candidate item 4
+stars or higher (on a 1-5 scale)?''~\citep{kang2023llmrating}; V2 splits the history into liked and disliked
+lists~\citep{bao2023tallrec}; V3 shows 20 events~\citep{lin2024rella}; V4 adds genres or categories; V5 a system message with the
+rating scale~\citep{kang2023llmrating}; V7 combines V1, V3, V4 and V5 (V6 was dropped before scoring). $V^\ast$ is the variant with the
+highest ML-1M UAUC among those meeting E1 on both panels and E2 (Toys UAUC at least V0's minus 0.010), ties within 0.005 broken by
+Toys and then by simplicity; all $7\times2$ development UAUCs are released, and Table~\ref{tab:gate-outcomes} gives V0 and $V^\ast$.
 
 \begin{table}[!htbp]
-\caption{Registered variant bank (no variant uses CF or popularity statistics, the user's mean rating, few-shot examples,
-thinking, or a verbalised or digit readout; V6 dropped before scoring).}
-\label{tab:app-bank}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}llcl@{}}
+\caption{Deviations, post-hoc degrees of freedom and disclosures, each checkable in the dated pilot log (log), the amendments (A$k$;
+A3-$k$: addendum $k$ of Amendment 3) or the commit history.}
+\label{tab:deviations}
+\centering\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.88}
+% ROWS: the 18 rows of the deviations record, in its order, condensed (what happened with its evidence | effect on claims). Row 7
+% carries three result slots (alias sel: the DEV UAUC of V* on ML-1M; gate: the CONFIRM UAUC; grid: the ML-1M zero-shot UAUC on TEST
+% rows), printed as estimates.
+\begin{tabular}{@{}r>{\raggedright\arraybackslash}p{0.645\columnwidth}>{\raggedright\arraybackslash}p{0.285\columnwidth}@{}}
 \toprule
-Id & Change relative to V0 & History & Basis\\
+ & What happened (evidence) & Effect on claims\\
 \midrule
-V0 & none (registered control) & 10 & --\\
-V1 & threshold question family & 10 & registered label; \citep{kang2023llmrating}\\
-V2 & same 10 events as liked ($>3$) and disliked ($\le3$) lists & 10 & TALLRec~\citep{bao2023tallrec}\\
-V3 & longer history & 20 & ReLLa~\citep{lin2024rella}\\
-V4 & history lines annotated with genres (ML-1M) or categories (Amazon, 80 characters) & 10 & rating prediction~\citep{kang2023llmrating}\\
-V5 & system message with role and the 1--5 scale; no persona line & 10 & rating prediction~\citep{kang2023llmrating}\\
-V7 & V1 + V3 + V4 + V5 & 20 & combined\\
+1 & A method paper (\method{}) became an audit after the Pilot-1 gate failed (0.587 $<$ 0.60); A2 closed a hole of its decision table after that result (A2 \S3.1). & The audit design postdates the first data.\\
+2 & P1 and E-D were written after exploratory forensics on the burned pilot users (log 10-04). & Only P1's fine-tuned side is confirmatory.\\
+3 & The stage-3 ensemble null is the code's binormal prediction, not A2 G7's literal z-sum (logged before stage 3). & \method{}'s null follows the code.\\
+4 & The wording rules were written after the ML-1M results, hashed before any later file was pulled (A3-6 \S9.3). & The ML-1M wording was set with its numbers known.\\
+5 & A comment rule allowed direction words on unadjusted intervals; never implemented (A3-6 \S1.2). & None.\\
+6 & The Gate-FT bar is anchored to published ML-1M UAUCs with 3-star negatives (A2 G9). & A pass licenses the programme, not competence.\\
+7 & V1 was selected on burned DEV users (also TRAIN users): DEV \DATANEEDED{sel:UAUC of v\_star}, CONFIRM \DATANEEDED{gate:UAUC}, zero-shot on TEST rows \DATANEEDED{grid:UAUC}, against the 0.60 bar applied to CONFIRM users. & Gate met on the point estimate; zero-shot rated results are scoped to V1.\\
+8 & Which arm a GPU-hour cut drops is chosen with ML-1M results in view (A3 \S10). & Each cut is logged before the affected result is read.\\
+9 & An INCOMPLETE method-slot dataset needs a dated addendum (A3-5). & Method slot only.\\
+10 & The niche and mainstream bins were redefined after the Sports analysis, before any other niche value (spec G). & Not a quintile contrast; group sizes differ by domain.\\
+11 & The next-item specification was written while scoring ran and frozen before any analysis (log 10-03/04). & None known.\\
+12 & Amendment 1's hash was logged retroactively, from commit and pull times (log 10-04). & A1's timing rests on those times.\\
+13 & The non-prior share was called an upper bound on the personal share (A3); withdrawn (A3-6 \S1.1). & $\mathcal G$ measures personal information.\\
+14 & E-D's stackers are pooled and uncentred; E-W was added after a review (A3-6 \S2). & Disagreement: estimator-dependent.\\
+15 & Addendum 6 was written after the ML-1M report and two internal reviews (log 10-04). & Its ML-1M values ($^\dagger$) are exploratory.\\
+16 & $m$ may use ratings in $[T_d,t)$, which the LLMs never see (A3-1 item 2; A3-6 \S6). & $m_T$ is printed beside it.\\
+17 & E-C's top-$k_u$ decision takes $k_u$ from the TEST likes, an oracle (A3-6 \S7). & Only deployable rows describe a system.\\
+18 & Gate-FT's file holds a second scoring of the ML-1M zero-shot prompts (vLLM batching). & None: the grid scoring is printed.\\
 \bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{table}[!htbp]
-\caption{Prompt sensitivity (G5): \textsf{like} UAUC on the development panels (1,500 burned users each). E2: Toys UAUC $\ge$
-V0 $-0.010$; Tied: within 0.005 of the best eligible ML-1M UAUC.}
-\label{tab:app-sens}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% ROWS: V0, V1, V2, V3, V4, V5, V7. COLUMNS (alias sel; table[V][panel]): UAUC (ml1m), UAUC (toys), E1 (both panels: yes/no),
-% E2, eligible, tied_with_max. Cell format: UAUC with three decimals (the user-cluster interval is in selection.json). No reference
-% row: no registered script computes the non-LLM references on the burned users (Pilot-1 diagnostics are exploratory). V* = sel:v_star; a fix needs V* != V0 and a positive one-sided lower bound
-% (level 1 - 0.05/6) on ML-1M (sel:bootstrap.lower_bound).
-\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
-Variant & ML-1M & Toys & E1 & E2 & Eligible & Tied\\
-\midrule
-V0 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V1 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V2 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V3 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V4 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V5 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-V7 & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:UAUC} & \DATANEEDED{sel:E1} & \DATANEEDED{sel:E2} & \DATANEEDED{sel:eligible} & \DATANEEDED{sel:tied\_with\_max}\\
-\bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 % ---------------------------------------------------------------------------------------------------------------------
-% Full per-panel tables (integration: the section heading and its one-line lead-in were removed for the page budget).
+% Per-panel tables.
 
 \begin{table}[!htbp]
 \caption{Corrections against controls: references (0), invariance checks (1--2), priors on $S_d$ (3--4), two-view contrast after
-GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sports: VALID events 1--1000.}
+GATE\_PASS (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sports: VALID events 1--1000.}
 \label{tab:corrections}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% ROWS and sources. 0: one cell "raw / item mean / MF" = grid:UAUC; cpu:UAUC_item_mean_prior; cpu:UAUC_mf_temporal (zero-shot,
-% same rows). 1: corr:max_abs_dAUC_user (rated: max over users of |AUC after per-user Platt scaling minus before|);
-% (the Sports cell is "--": the list-softmax invariance of NDCG is the lemma itself and no script reports it). 2: corr:dAUC_pooled_offset_removal
-% (change of pooled AUC when each user's mean logit is removed; rated columns only). 3-4 (alias corr, on S_d): dUAUC_nohist_minus_raw
-% = UAUC(L - L_nohist) - UAUC(L); dUAUC_evidence_minus_raw = UAUC(e-hat) - UAUC(L). Rows 5-7 are inside the GATEPASS branch markers: mir:
-% dUAUC_mirror_minus_placebo, dUAUC_mirror_minus_ensemble_null (rated columns), dNDCG10_mirror_minus_raw (sports VALID events 1-1000
-% only). Under F0/F1 delete rows 5-7 and write one sentence: "not run (registered: stage 3 only after GATE_PASS)".
+% ROWS and sources. 0: "raw / item mean / MF" = grid:UAUC; cpu:UAUC_item_mean_prior; cpu:UAUC_mf_temporal (zero-shot, same rows).
+% 1: corr:max_abs_dAUC_user (rated: max over users of |AUC after per-user Platt scaling minus before|; the Sports cell is "--": the
+% list-softmax invariance of NDCG is the lemma itself). 2: corr:dAUC_pooled_offset_removal (change of pooled AUC when each user's
+% mean logit is removed). 3-4 (on S_d): dUAUC_nohist_minus_raw = UAUC(L - L_nohist) - UAUC(L); dUAUC_evidence_minus_raw = UAUC(e-hat)
+% - UAUC(L). Rows 5-7 (inside the GATEPASS markers; alias mir): dUAUC_mirror_minus_placebo, dUAUC_mirror_minus_ensemble_null (rated
+% columns), dNDCG10_mirror_minus_raw (Sports VALID events 1-1000).
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -103,7 +87,7 @@ GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sport
 1 & Per-user Platt scaling: max $|\Delta|$ & \DATANEEDED{corr:max\_abs\_dAUC\_user} & \DATANEEDED{corr:max\_abs\_dAUC\_user} & --\\
 2 & Per-user offset removal: $\Delta$ pooled AUC & \DATANEEDED{corr:dAUC\_pooled\_offset\_removal} & \DATANEEDED{corr:dAUC\_pooled\_offset\_removal} & --\\
 3 & No-history prior subtracted (raw) & \DATANEEDED{corr:dUAUC\_nohist\_minus\_raw} & \DATANEEDED{corr:dUAUC\_nohist\_minus\_raw} & --\\
-4 & Swap-prior evidence $\hat e$ (raw) & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & --\\
+4 & Swap-prior residual $\hat e$ (raw) & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & \DATANEEDED{corr:dUAUC\_evidence\_minus\_raw} & --\\
 % BRANCH-GATEPASS-BEGIN
 5 & \method{} (paraphrase placebo) & \DATANEEDED{mir:dUAUC\_mirror\_minus\_placebo} & \DATANEEDED{mir:dUAUC\_mirror\_minus\_placebo} & --\\
 6 & \method{} (ensemble null) & \DATANEEDED{mir:dUAUC\_mirror\_minus\_ensemble\_null} & \DATANEEDED{mir:dUAUC\_mirror\_minus\_ensemble\_null} & --\\
@@ -115,13 +99,11 @@ GATE\_PASS only (5--7). 2nd rated: \DATANEEDED{mir:second\_rated\_domain}; Sport
 
 % METHOD-SLOT-BEGIN (appendix)
 \begin{table}[!htbp]
-\caption{Nested method slot: TEST UAUC (seed mean, s.d.) and the paired difference offset minus stacking.}
+\caption{Nested method slot: TEST UAUC (seed mean, s.d.) and the paired difference offset minus stacking (seed range).}
 \label{tab:slot}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% ROWS: SFT with b = 0 (the main-grid adapters; context), post-hoc stacking, prior-offset LoRA, difference, references.
-% COLUMNS: four rated datasets (ML-1M, Toys, Video Games, Sports; a cell reads "not run" after the kill rule fires, in the order
-% ML-1M, Toys, Video Games, Sports). Alias slot: UAUC_mean_sd; d_offset_minus_stack (mean, seed range, interval). SFT row: grid:UAUC.
-% References: cpu.
+% ROWS: SFT with b = 0 (the main-grid adapters; context), post-hoc stacking, prior-offset LoRA, difference, references. COLUMNS: the
+% four rated datasets; a cell reads "not run" after the kill rule fires (order ML-1M, Toys, Video Games, Sports). Alias slot.
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -139,15 +121,14 @@ Item mean / MF (ref.) & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_tempo
 % METHOD-SLOT-END (appendix)
 
 \begin{table}[!htbp]
-\caption{Second backbone, Llama-3.1-8B-Instruct: key rows of Table~\ref{tab:reliability} (``not run'' only under a registered
-cut rule).}
+\caption{Second backbone, Llama-3.1-8B-Instruct: key rows of Tables~\ref{tab:tracks} and \ref{tab:teaches} (``not run'' only under a
+registered cut rule; $^\dagger$: addendum 6).}
 \label{tab:app-llama}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% COLUMNS and ROW sources exactly as tab:reliability (blocks A and B; block B is the former tab:decomp) (alias grid, cpu), backbone = Llama-3.1-8B-Instruct, report root
-% outputs/confrec/ftgrid_llama/report (Amendment 3 sections 4 and 8); columns ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA. The zero-shot
-% columns exist in every Gate-FT branch (Z1), the LoRA columns and P1 only after GATE_FT_PASS. The reference rows repeat the
-% non-LLM values of the same panel and rows. Cut rule: Llama Toys fine-tuning may be cut on 2026-10-22. Platt slope, Brier skill and the
-% Llama knockout (Toys) stay in the released files; the knockout is read in the RQ5 reading template.
+% COLUMNS: ML-1M ZS, ML-1M LoRA, Toys ZS, Toys LoRA (the Llama report root; Amendment 3 sections 4, 5 and 8). Row sources exactly as
+% tab:tracks and tab:teaches, backbone Llama-3.1-8B-Instruct (aliases grid, cpu, ext, ko). The zero-shot columns exist in every
+% Gate-FT branch, the LoRA columns, P1 and the knockout after GATE_FT_PASS (recorded). Cut rule: Llama Toys fine-tuning and its
+% knockout may be cut on 2026-10-22.
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -156,32 +137,36 @@ cut rule).}
  & ZS & LoRA & ZS & LoRA\\
 \midrule
 UAUC of $\ell$ & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
-\quad LoRA $-$ ZS (paired) & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
-\quad prior-only item mean (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
-\quad popularity (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_popularity}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_popularity}}\\
-\quad temporal biased MF (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
+\quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
+\quad item mean $m$ (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
+\quad temporal MF (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
+$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
 ECE (after Platt) & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
-Correct decisions in bottom tertile & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
-Errors in top tertile & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
-Non-prior share $1-\rho^2/r_8$ & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share} & \DATANEEDED{grid:non\_prior\_share}\\
-$\mathcal G=\Delta$UAUC(M2$-$M1) & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
-Star permutation $\Delta$UAUC & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC} & \DATANEEDED{grid:starperm\_dUAUC}\\
-Popularity link of $\hat\pi$ (partial Spearman) & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+Correct in bottom tertile, oracle & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
+Errors in top tertile, oracle & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
+Item-prior share $\rho^2/r_8$ & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share}\\
+e-share$^\dagger$ & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
+$\mathcal G=\Delta$UAUC(M2$-$M1), E-D & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
+$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
+$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
+Popularity link of $\hat\pi$ & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
 P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--}\\
+P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{ext:E\_W.P1\_wu}} & \multicolumn{2}{c}{--}\\
+Knockout: head $-$ tail drop of $\ell$ & -- & -- & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta}\\
+Knockout: registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:label}\\
 \bottomrule
 \end{tabular}}
 \end{table}
+
 % BRANCH-GATEFT-BEGIN
 \begin{table}[!htbp]
-\caption{Every LoRA seed (Qwen3-8B; all rows: CAL $\cup$ TEST) and the within-item label-permutation control (ML-1M).}
+\caption{Every LoRA seed (Qwen3-8B; all rows: CAL $\cup$ TEST) and the ML-1M within-item label-permutation adapters.}
 \label{tab:app-seeds}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% ROWS: the four rated domains and three FT-C rows. COLUMNS (alias grid): UAUC and UAUC_all_rows per seed (E-A and its secondary (i); one cell
-% "seed 0 / seed 1 / seed 2", values only), item mean (ref.; cpu:UAUC_item_mean_prior). The Gate-FT seeds of ML-1M must equal
-% gft:UAUC_post_T_per_seed. FT-C rows (A3 section 9; adapters trained on labels permuted within each item, ML-1M TRAIN examples, permutation
-% seed 0): permuted UAUC (ftc_UAUC, ftc_UAUC_all_rows) for seeds 0 and 1, and the contrast real minus permuted at the same seed with its
-% user-bootstrap interval (ftc_dUAUC_real_minus_perm on TEST rows, ftc_dUAUC_all_rows on all rows); descriptive, in no Holm family. ECE and
-% slope per seed stay in the released files (seed means: tab:reliability).
+% ROWS: the four rated domains and two FT-C rows. COLUMNS (alias grid): UAUC and UAUC_all_rows per seed (E-A and its secondary (i); one
+% cell "seed 0 / seed 1 / seed 2"), item mean (ref.). The Gate-FT seeds of ML-1M must equal gft:UAUC_post_T_per_seed. FT-C rows
+% (Amendment 3 section 9; ML-1M TRAIN examples, permutation seed 0): permuted UAUC for seeds 0 and 1 and the contrast real minus
+% permuted at the same seed with its user-bootstrap interval; descriptive, in no Holm family (the reading rule R: tab:teaches C).
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -200,16 +185,14 @@ ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minu
 % BRANCH-GATEFT-END
 
 \begin{table}[!htbp]
-\caption{Second backbone, next-item (RQ1--RQ3, RQ5): Qwen3-8B / Llama-3.1-8B-Instruct on events 1,001--3,000 of each domain,
+\caption{Second backbone, next-item (S1--S3, S5): Qwen3-8B / Llama-3.1-8B-Instruct on events 1,001--3,000 of each domain,
 \textsf{next}, V0.}
 \label{tab:app-z2}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.9}
-% ROWS: key endpoints of sections B, C, D, E of the next-item audit (Amendment 3 section 4, Z2, as revised 2026-10-04: sections A-E,
-% Llama temperature fitted on the first 500 VALID events of each domain, Qwen on its 2,000). COLUMNS: Sports, Toys, Home, Tools. Cell:
-% the value for Qwen3-8B (alias aud2q) / for Llama-3.1-8B-Instruct (alias aud2l); the paired comparison is the pair of values on identical
-% events (same field paths as aud). An S3 or S5 finding meets the second-backbone clause of claim admission only if the sign of
-% delta_head (resp. of the head-minus-tail contrasts) agrees on at least 3 of 4 domains; an S1 or S2 finding that rests on the next-item
-% panels needs the C rows (integration addition, 2026-10-04: two rows, 8 slots, field paths as in tab:anatomy).
+% ROWS: the four Z2 endpoints that the second-backbone clause of claim admission uses (Amendment 3 section 4): S1 and S2 rest on the
+% C rows, S3 on delta_head and S5 on the head-minus-tail level (an S3 or S5 finding meets the clause only if the signs agree on at
+% least 3 of 4 domains). The other Z2 endpoints (Gini, selective serving, Bias Index) stay in the released files. COLUMNS: Sports,
+% Toys, Home, Tools. Cell: Qwen3-8B (alias aud2q) / Llama-3.1-8B-Instruct (alias aud2l) on identical events (field paths as aud).
 \resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -218,41 +201,36 @@ ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minu
 $\mathrm{acc}_{\rm high}-\mathrm{acc}_{\rm low}$ ($p_{\max}$ tertiles) & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile} & \DATANEEDED{aud2q:C.acc\_top\_minus\_bottom\_tertile / aud2l:C.acc\_top\_minus\_bottom\_tertile}\\
 Top-1 errors in the top tertile & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile} & \DATANEEDED{aud2q:C.share\_errors\_in\_top\_tertile / aud2l:C.share\_errors\_in\_top\_tertile}\\
 $\Delta_{\rm head}$, \textsf{next} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head} & \DATANEEDED{aud2q:B.delta\_head / aud2l:B.delta\_head}\\
-Gini of exposure, \textsf{next} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure} & \DATANEEDED{aud2q:B.gini\_exposure / aud2l:B.gini\_exposure}\\
-NDCG@10 gain, confident half ($p_{\max}$) & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full} & \DATANEEDED{aud2q:D.gain\_at\_50\_vs\_full / aud2l:D.gain\_at\_50\_vs\_full}\\
-Niche $-$ mainstream served share ($p_{\max}$) & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share} & \DATANEEDED{aud2q:D.niche\_minus\_mainstream\_served\_share / aud2l:D.niche\_minus\_mainstream\_served\_share}\\
 Mean $p$, head $-$ tail & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p} & \DATANEEDED{aud2q:E.head\_minus\_tail\_mean\_p / aud2l:E.head\_minus\_tail\_mean\_p}\\
-Bias Index, head $-$ tail & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail} & \DATANEEDED{aud2q:E.bias\_index.head\_minus\_tail / aud2l:E.bias\_index.head\_minus\_tail}\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
 % ---------------------------------------------------------------------------------------------------------------------
 \paragraph{Registered amendments}\label{app:prereg}\label{app:pseudonym}\label{app:repro}
-(timestamped project documents, not public-registry entries). Amendment 1, before any pilot data: scoring, resampling, tie and
-split conventions. Amendment 2, after the pilot gates: the remedy round, Gate-FT, the next-item audit, an interpretive diagnosis
-battery and the forking-path rules. Amendment 3, before any adapter existed: the fine-tuned programme (with two implementation addenda), all but its zero-shot
-panels conditional on a Gate-FT pass.
+(dated project documents, not public-registry entries). Amendment 1, before any pilot data: scoring, resampling, tie and split
+conventions. Amendment 2, after the pilot gates: the remedy round, Gate-FT, the next-item audit, an interpretive diagnosis battery
+(readings released) and the forking-path rules. Amendment 3, before any adapter existed: the fine-tuned programme, conditional on a
+Gate-FT pass except its zero-shot panels, with five implementation addenda, addendum 6 (after two internal reviews of a draft; the
+endpoints marked $^\dagger$, Toys FT-C, and the admission and wording rules) and addendum 7 (S6 wording, composition diagnostics and a
+conditional item-stratified arm, before any S6 arm existed); Table~\ref{tab:deviations} lists every deviation.
 
-\paragraph{Pseudonym knockout.}
-Every store string in history and candidate text is replaced in one case-insensitive pass over whole words; a stop-list
-excludes generic or placeholder stores and strings shorter than four characters or made of digits; pseudonyms are injective
-within a panel and never equal a real store string. The placebo maps every brand the pseudonym arm maps, history-only brands included,
-to another real brand of the same tercile of category-wide brand review counts. Treated candidates are those whose store string occurs
-as a whole word in their own title (share reported); brand tokens beyond the store field are not substituted. UAUC is computed over all
-candidates (primary) and over treated candidates; the registered seen/unseen-item split is not run. A model is NULL iff UAUC falls by more than 0.02 (real minus pseudonym) overall and in
-the tail (pseudonymisation destroys evidence); POSITIVE under the thresholds of Table~\ref{tab:rq}; NEGATIVE iff the interval of the
-pseudonym slope contains 0 and the head-minus-tail contrasts of pseudonym and placebo differ by at most 0.05; INDETERMINATE
-otherwise; INCOMPLETE if an input is missing.
+\paragraph{Store-name knockout.}
+Store strings in history and candidate text are replaced in one case-insensitive whole-word pass (generic stores and strings
+shorter than four characters or made of digits excepted), by injective pseudonyms that never equal a real store or, in the placebo arm,
+by a real store of the same tercile of category-wide review counts (history-only stores included). A model is NULL iff UAUC falls by
+more than 0.02 (real minus pseudonym) overall and in the tail; POSITIVE under the thresholds of Table~\ref{tab:rq}; NEGATIVE iff the
+interval of the pseudonym slope contains 0 and the head-minus-tail contrasts of pseudonym and placebo differ by at most 0.05;
+INDETERMINATE otherwise; INCOMPLETE if an input is missing. The thresholds are on the logit scale, hence unit-dependent; the
+registered seen/unseen-item split is not run.
 
 \paragraph{Reproducibility checklist.}
-\emph{Scoring:} vLLM prefill, at most 4,096 tokens (3,072 next-item), 100-user chunks. \emph{Fine-tuning:} LoRA~\citep{hu2022lora} on the
-query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05, learning rate $10^{-4}$, cosine decay, 3\% warm-up,
-one epoch, bf16, effective batch 32 ($8\times4$); at most 24,000 training examples per domain; prompts above 1,024 tokens skipped and
-counted (a domain with more than 2\% such prompts trains with the 99.5th-percentile length rounded up to 256); permutation control:
-seeds 0 and 1.
-\emph{Data and hashes:} pilot ML-1M panel 985494c7, pilot Toys panel 69252b48, registered V0 prompts on the pilot ML-1M panel 12e83c4f
-(first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s, rendered prompt-bank sha1, user-id list
-  sha1s and the time split $T_d$ of every domain from the freeze record and ftgrid\_split.json}. \emph{Software, compute, artefact:}
-\DATANEEDED{package versions and GPU model from each report.json; total GPU hours}. Prompts, panel builders, scorers, analysis scripts
-and every result file are released with the anonymous artefact; every number in the paper is read from a committed result file.
+\emph{Scoring:} vLLM prefill, at most 4,096 tokens (3,072 next-item), 100-user chunks. \emph{Fine-tuning:} LoRA~\citep{hu2022lora} on
+the query, key, value and output projections, $r{=}16$, $\alpha{=}32$, dropout 0.05, learning rate $10^{-4}$, cosine decay, 3\%
+warm-up, one epoch, bf16, effective batch 32; at most 24,000 training examples per domain; prompts above 1,024 tokens skipped and
+counted; permutation control: seeds 0 and 1. \emph{Data and hashes:} pilot ML-1M panel 985494c7, pilot Toys panel 69252b48,
+registered V0 prompts on the pilot ML-1M panel 12e83c4f (first eight hexadecimal digits of the sha1); \DATANEEDED{amendment sha1s,
+rendered prompt-bank sha1, user-id list sha1s and the time split $T_d$ of every domain from the freeze record and the split files}.
+\emph{Software, compute, artefact:} \DATANEEDED{package versions and GPU model from each report; total GPU hours}. Prompts, panel
+builders, scorers, analysis scripts and every result file are released with the anonymous artefact; every number in the paper is read
+from a committed result file.

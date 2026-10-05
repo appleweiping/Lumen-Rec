@@ -1,25 +1,31 @@
-% Abstract (owner: intro; integrated 2026-10-04). Budget: <= 200 words once the slots are filled (the fixed text is about 150
-% words; each slot is to be replaced by one sentence of about 15-20 words). No unconfirmed claim appears: every result is a slot,
-% and a finding may be written into a slot only if it meets the registered claim-admission rule (confirmed on fresh users, same
-% sign on at least one fresh Amazon domain and on the second backbone); otherwise the sentence stays direction-free.
-% The design statements (Qwen3-8B zero-shot and LoRA on rated panels with Llama-3.1-8B-Instruct as replication backbone,
-% zero-shot only on the four next-item panels, the three routes) describe the registered grid (Amendments 2 and 3): re-verify
-% them against what was actually run (schedule cut rules) before submission.
-% The reported decomposition statistic is the non-prior share 1 - rho^2/r_8, an upper bound on the personal share (Amendment 3).
-% If the nested method slot survives its kill rule, add one clause after the lemma sentence (it is not rendered while omitted):
+% Abstract (rewritten 2026-10-04 after two internal reviews: findings first, same-row references, no gate numbers; editor pass
+% 2026-10-05: the pruning route is named as in addendum 7).
+% Budget: <= 200 words once the slots are filled (the fixed text is about 135 words; each slot is to be replaced by one sentence of about
+% 20 words). No unconfirmed claim appears: every result is a slot, and a finding may be written into a slot only if it meets the
+% registered claim-admission rule (Amendment 3 addendum 6 section 9: confirmed on untouched users and, for a statement beyond one panel,
+% the same sign with its own interval excluding 0 on at least one fresh Amazon domain and on the second backbone); otherwise the sentence
+% stays scoped to the panel ("on ML-1M") or direction-free.
+% The design statements (Qwen3-8B zero-shot and LoRA on rated panels with Llama-3.1-8B-Instruct as replication backbone, zero-shot
+% only on the four next-item panels) describe the registered grid (Amendments 2 and 3): re-verify them against what was actually run
+% (schedule cut rules) before submission.
+% The reported decomposition statistics are the non-prior share 1 - rho^2/r_8 (the share of within-user variance the item prior does
+% not explain linearly; NOT an upper bound on the personal share, addendum 6 item 1), the e-share, and the information gain G.
+% If the nested method slot survives its kill rule, add one clause after the routes sentence (it is not rendered while omitted):
 % METHOD-SLOT-BEGIN (abstract)
-%   ... "and a prior-offset LoRA that models personal evidence on top of a fixed item prior" + one DATANEEDED clause with its gain over post-hoc stacking.
+%   ... "and a prior-offset LoRA that models what a fixed item prior does not" + one DATANEEDED clause with its gain over post-hoc stacking.
 % METHOD-SLOT-END (abstract)
 Pointwise LLM recommenders ask a yes/no question about a user--item pair and use the probability of \emph{Yes} both to rank
-candidates and as a confidence for abstaining, exposure control and data pruning. What does that confidence know? We report a
-pre-registered audit of an 8B backbone, zero-shot and LoRA-tuned (plus a replication backbone), on rated panels whose labels
-match the question and, zero-shot, on same-candidate next-item panels (four domains, 10k users, 101 candidates), with non-LLM
-references and confirmation on untouched users. We decompose the confidence into a user offset, an item prior and personal
-evidence, show that no strictly increasing per-user calibration map can change per-user AUC or within-user NDCG, and test the
-remaining routes (item-dependent corrections, cross-user serving and exposure, data pruning) against their own controls.
-\DATANEEDED{one sentence: non-prior share of the within-user confidence (an upper bound on the share of personal evidence rather
-than item prior) and information gain over the prior-only item mean, zero-shot versus LoRA, with CI}
-\DATANEEDED{one sentence: which routes beat their control, with effect size and CI, or that none did}
-The registered zero-shot prompt missed its bar; a registered remedy then reached UAUC \DATANEEDED{gate:UAUC} on untouched ML-1M users
-(bar 0.60), and LoRA tuning reached \DATANEEDED{gft:UAUC\_post\_T\_mean\_over\_seeds} (bar 0.65).
-A one-table guide answers six practitioner questions. All claims are scoped to same-candidate evaluation.
+candidates and as a confidence for abstaining, exposure control and data pruning. What does that confidence know? We audit it
+for Qwen3-8B, zero-shot and LoRA-tuned (Llama-3.1-8B-Instruct as a replication backbone), on rated panels whose labels match the
+question and, zero-shot, on four same-candidate next-item panels (10k users, 101 candidates), in a pre-registered protocol with
+non-LLM references on the same pairs and confirmation on untouched users. We split the log-odds into a user offset, an item prior
+(the model's mean answer for the item under other users' histories) and a pair-specific residual, and measure how much the
+residual adds, as a predictor of the label, to an item mean and to matrix factorisation.
+\DATANEEDED{one sentence: the rated-panel result beside the references on the same rows (UAUC of zero-shot and LoRA, the item mean
+and matrix factorisation, with CI), the share of within-user confidence variance the item prior explains, and the personal
+information gain over the item mean, zero-shot versus LoRA}
+\DATANEEDED{one sentence: what the within-item label-permutation control and the complementarity to collaborative filtering show}
+\DATANEEDED{one sentence: which routes (item-dependent corrections, cross-user selective serving and exposure, uncertainty-selected
+pruning) beat their control, with effect size and CI, or that none did}
+Because per-user recalibration cannot change within-user rankings, we test only the routes that can. All claims are scoped to
+same-candidate evaluation.

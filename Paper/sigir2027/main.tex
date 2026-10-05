@@ -3,6 +3,7 @@
 \documentclass[sigconf,natbib=true,anonymous=true]{acmart}
 
 \usepackage{booktabs}
+\usepackage{array}    % >{...} column prefixes (tab:deviations)
 \usepackage{amsmath}  % acmart already loads newtxmath; amssymb would clash (\Bbbk)
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -10,6 +11,7 @@
 \usepackage{subcaption}
 
 \newcommand{\DATANEEDED}[1]{\textcolor{red}{\textbf{[DATA NEEDED: #1]}}}
+\setlength{\emergencystretch}{1.5em}   % lets TeX break lines with long numeric tokens (estimates with intervals) without overfull boxes
 \newcommand{\method}{\textsc{Mirror}}
 \newcommand{\py}{P(\texttt{Yes})}
 
@@ -20,7 +22,7 @@
 \begin{document}
 
 \title{What Does a Yes/No LLM Recommender's Confidence Know?\\
-Item Priors versus Personal Evidence, and When Uncertainty Is Actionable}
+Item Priors, Personal Evidence and Actionable Uncertainty}
 
 \author{Anonymous Author(s)}
 \affiliation{\institution{Anonymous Institution}\country{Anonymous}}

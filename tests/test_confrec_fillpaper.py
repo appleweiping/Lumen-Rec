@@ -880,15 +880,17 @@ def _count_world(synth, conf_zs, conf_ft, g_first_sign=1.0, eb_p=0.001, eb_rule=
 def test_count_rule_reports_confirmed_members_per_regime(synth, tmp_path):
     """Addendum 6 item 9.2 (count slots added by the editor pass of 2026-10-05): G confirmed (E-D Holm family) in k of the four
     Qwen panels per regime, and the regime contrast E-B confirmed (Holm over the domains and the sigma_seed rule) in k of 4;
-    confirmed members of both signs are not decided; the unanimous words of the existing decision functions are unchanged."""
+    since 2026-10-06 the count carries the sign of the confirmed members (E-D is two-sided: a confirmed negative G is the
+    residual lowering the UAUC, not personal evidence); the unanimous words of the existing decision functions are unchanged."""
     v = _variant(synth, tmp_path / "a", _count_world(synth, [1, 0, 0, 0], [1, 1, 1, 1]))
-    assert ("$\\mathcal G$ is confirmed (E-D) on 1 of 4 zero-shot and 4 of 4 fine-tuned panels" in v.text)
+    assert ("$\\mathcal G$ is confirmed (E-D) on 1 of 4 (positive: ML-1M) zero-shot and 4 of 4 (all positive) fine-tuned panels"
+            in v.text)
     assert "Fine-tuning raises UAUC (E-B, confirmed on 4 of 4 Qwen panels)" in v.text
     v = _variant(synth, tmp_path / "b", _count_world(synth, [0, 0, 0, 0], [1, 1, 1, 1], g_first_sign=-1.0,
                                                      eb_p=[0.001, 0.4, 0.4, 0.4]))
     assert "is confirmed (E-D) on 0 of 4 zero-shot and" in v.text
-    u = [x for x in v.doc["unfilled"] if fill.norm(x["slot"]) == "grid:G confirmed, k of 4 LoRA"]
-    assert u and u[0]["reason"] == "not_decided"                        # a confirmed G of each sign: a written sentence
+    # a confirmed G of each sign is a count with both signs stated, not a missing sentence
+    assert "4 of 4 (positive: Toys, Video Games and Sports; negative: ML-1M) fine-tuned panels" in v.text
     assert "(E-B, confirmed on 1 of 4 Qwen panels)" in v.text            # Holm: only the domain with p = 0.001
     u = [x for x in v.doc["unfilled"] if x["slot"] == "raises / leaves / lowers"]
     assert u and u[0]["reason"] == "not_decided"                        # mixed: no single word

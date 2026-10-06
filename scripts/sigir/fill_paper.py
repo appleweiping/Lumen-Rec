@@ -2131,12 +2131,13 @@ def c_eb_count(R, s):
 
 def c_g_count(reg):
     """E-D: on how many of the four Qwen domains G is confirmed in regime reg (the report's E-D Holm family; for FT also the
-    sigma_seed rule, as the report's 'confirmed' flag encodes); confirmed members of both signs are not decided, and a member on
-    fewer than 150 users (descriptive) stops the count, as in c_rq4_g."""
+    sigma_seed rule, as the report's 'confirmed' flag encodes), with the sign of the confirmed members (the test is two-sided: a
+    confirmed negative G lowers the UAUC and is not personal evidence; updated 2026-10-06, sign added); a member on fewer than
+    150 users (descriptive) stops the count, as in c_rq4_g."""
     def h(R, s):
         if reg == "FT":
             require_ft(R)
-        pos = neg = 0
+        pos, neg = [], []
         for d in RATED:
             rel = grid_rel("qwen", d)
             regime_ok(R, rel, "E_D", reg)
@@ -2146,11 +2147,19 @@ def c_g_count(reg):
             if g.get("descriptive_min_n"):
                 raise Missing("below_min_n", f"{rel}: G ({reg}) on {g.get('n_users')} users (< {MIN_N})")
             if fam["confirmed"].get("G") is True:
-                pos += g["est"] > 0
-                neg += g["est"] < 0
-        if pos and neg:
-            raise Missing("not_decided", f"G is confirmed with both signs in the {reg} regime")
-        return f"{pos + neg} of 4"
+                if g["est"] > 0:
+                    pos.append(d)
+                elif g["est"] < 0:
+                    neg.append(d)
+        # the E-D test is two-sided: a confirmed G of either sign is counted, and the sign is stated (a confirmed negative G
+        # means that adding the residual to the prior lowers the UAUC, not that it carries personal evidence)
+        k = len(pos) + len(neg)
+        if not k:
+            return "0 of 4"
+        if len(pos) == 4 or len(neg) == 4:
+            return "4 of 4 (all " + ("positive" if pos else "negative") + ")"
+        parts = ([f"positive: {_names(pos)}"] if pos else []) + ([f"negative: {_names(neg)}"] if neg else [])
+        return f"{k} of 4 ({'; '.join(parts)})"
     return h
 
 

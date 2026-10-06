@@ -1,19 +1,19 @@
 {
  "schema": "fill_paper_filled_v1",
  "summary": {
-  "slots_total": 714,
-  "filled": 490,
-  "unfilled": 224,
+  "slots_total": 709,
+  "filled": 526,
+  "unfilled": 183,
   "unfilled_by_reason": {
    "branch_slot": 6,
-   "free_text": 29,
-   "result_file_missing": 189
+   "free_text": 24,
+   "result_file_missing": 153
   },
   "filled_by_alias": {
    "aud": 111,
    "corr": 5,
    "cpu": 25,
-   "ext": 115,
+   "ext": 151,
    "free": 4,
    "gate": 9,
    "gft": 6,
@@ -27,8 +27,8 @@
    "aud2q": 16,
    "branch": 6,
    "corr": 4,
-   "ext": 42,
-   "free": 40,
+   "ext": 6,
+   "free": 35,
    "grid": 1,
    "mir": 7,
    "prn": 17,
@@ -63,6 +63,8 @@
   "extra/llama/ml1m.json": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
   "extra/llama/toys.json": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
   "extra/ml1m.json": "b2918d95aa59f4693ede10953ff253b99b85f733",
+  "extra/sports.json": "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+  "extra/summary.json": "30507a2e57b7f38e68595a2c8b031c7766af9360",
   "extra/toys.json": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
@@ -670,6 +672,21 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 85,
+   "slot": "ext:E\\_J.UAUC\\_q\\_hat\\_T",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "matched mean $m_T$ (ref.)$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.615",
+   "from": [
+    "extra/sports.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 86,
    "slot": "cpu:UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -843,6 +860,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "$-$0.131{\\scriptsize$\\pm$.031}",
+   "from": [
+    "extra/sports.json:E_J.ZS",
+    "extra/sports.json:E_J.ZS.dUAUC_L_minus_q_hat",
+    "extra/sports.json:E_J.ZS.dUAUC_L_minus_q_hat.per_seed.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "$-$0.090{\\scriptsize$\\pm$.029\\,(.005)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_J.FT",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s0.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s1.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s2.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_q_hat.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 88,
    "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
    "kind": "table",
@@ -956,6 +1012,45 @@
     "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s2.est",
     "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.mean_over_seeds",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "$-$0.047{\\scriptsize$\\pm$.037}",
+   "from": [
+    "extra/sports.json:E_J.ZS",
+    "extra/sports.json:E_J.ZS.dUAUC_L_minus_MF_warm",
+    "extra/sports.json:E_J.ZS.dUAUC_L_minus_MF_warm.per_seed.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "$-$0.019{\\scriptsize$\\pm$.034\\,(.006)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_J.FT",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s0.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s1.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s2.est",
+    "extra/sports.json:E_J.FT.dUAUC_L_minus_MF_warm.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -1477,6 +1572,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.702{\\scriptsize$\\pm$.060}",
+   "from": [
+    "extra/sports.json:E_G.ZS",
+    "extra/sports.json:E_G.ZS.e_share",
+    "extra/sports.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.260{\\scriptsize$\\pm$.025\\,(.033)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_G.FT",
+    "extra/sports.json:E_G.FT.e_share",
+    "extra/sports.json:E_G.FT.e_share.per_model",
+    "extra/sports.json:E_G.FT.e_share.per_model.s0.e_share.est",
+    "extra/sports.json:E_G.FT.e_share.per_model.s1.e_share.est",
+    "extra/sports.json:E_G.FT.e_share.per_model.s2.e_share.est",
+    "extra/sports.json:E_G.FT.e_share.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 95,
    "slot": "ext:E\\_G.item\\_share\\_mf",
    "kind": "table",
@@ -1563,6 +1697,36 @@
    "from": [
     "extra/games.json:E_G.label_q_hat.item_share",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.130{\\scriptsize$\\pm$.028}",
+   "from": [
+    "extra/sports.json:E_G.MF_score_item_bias.item_share",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_label",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.059{\\scriptsize$\\pm$.013}",
+   "from": [
+    "extra/sports.json:E_G.label_q_hat.item_share",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -1824,6 +1988,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.003}",
+   "from": [
+    "extra/sports.json:E_W.ZS",
+    "extra/sports.json:E_W.ZS.G_wu",
+    "extra/sports.json:E_W.ZS.G_wu.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.001{\\scriptsize$\\pm$.009\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_W.FT",
+    "extra/sports.json:E_W.FT.G_wu",
+    "extra/sports.json:E_W.FT.G_wu.per_model",
+    "extra/sports.json:E_W.FT.G_wu.per_model.s0.est",
+    "extra/sports.json:E_W.FT.G_wu.per_model.s1.est",
+    "extra/sports.json:E_W.FT.G_wu.per_model.s2.est",
+    "extra/sports.json:E_W.FT.G_wu.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 98,
    "slot": "grid:G\\_CF",
    "kind": "table",
@@ -1925,6 +2128,21 @@
    "from": [
     "grid/qwen/sports.json:E_D.ZS",
     "grid/qwen/sports.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 98,
+   "slot": "ext:E\\_W.G\\_CF\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.004}",
+   "from": [
+    "extra/sports.json:E_W.ZS.G_CF_wu",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -2842,6 +3060,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.314{\\scriptsize$\\pm$.011}",
+   "from": [
+    "extra/sports.json:E_Cprime.ZS",
+    "extra/sports.json:E_Cprime.ZS.deployable",
+    "extra/sports.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_correct_bottom",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.292{\\scriptsize$\\pm$.008\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_Cprime.FT",
+    "extra/sports.json:E_Cprime.FT.deployable",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s0.share_correct_bottom.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s1.share_correct_bottom.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s2.share_correct_bottom.est",
+    "extra/sports.json:E_Cprime.FT.deployable.mean_over_seeds.share_correct_bottom",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 110,
    "slot": "grid:share\\_errors\\_top\\_tertile",
    "kind": "table",
@@ -3095,6 +3352,45 @@
     "extra/games.json:E_Cprime.FT.deployable.per_model.s2.share_errors_top.est",
     "extra/games.json:E_Cprime.FT.deployable.mean_over_seeds.share_errors_top",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.303{\\scriptsize$\\pm$.014}",
+   "from": [
+    "extra/sports.json:E_Cprime.ZS",
+    "extra/sports.json:E_Cprime.ZS.deployable",
+    "extra/sports.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_errors_top",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.266{\\scriptsize$\\pm$.013\\,(.007)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_Cprime.FT",
+    "extra/sports.json:E_Cprime.FT.deployable",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s0.share_errors_top.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s1.share_errors_top.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s2.share_errors_top.est",
+    "extra/sports.json:E_Cprime.FT.deployable.mean_over_seeds.share_errors_top",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -3356,6 +3652,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.535{\\scriptsize$\\pm$.015}",
+   "from": [
+    "extra/sports.json:E_Cprime.ZS",
+    "extra/sports.json:E_Cprime.ZS.deployable",
+    "extra/sports.json:E_Cprime.ZS.deployable.per_model.zeroshot.AUROC_margin_correct",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.584{\\scriptsize$\\pm$.013\\,(.008)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_Cprime.FT",
+    "extra/sports.json:E_Cprime.FT.deployable",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s0.AUROC_margin_correct.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s1.AUROC_margin_correct.est",
+    "extra/sports.json:E_Cprime.FT.deployable.per_model.s2.AUROC_margin_correct.est",
+    "extra/sports.json:E_Cprime.FT.deployable.mean_over_seeds.AUROC_margin_correct",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 125,
    "slot": "raises / leaves / lowers",
    "kind": "prose",
@@ -3418,6 +3753,23 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 126,
+   "slot": "ext:summary.families.E\\_J count",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "the item mean (H-J) on",
+   "text": "3 of 3 Qwen Amazon panels (below it on Toys, Video Games and Sports)",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/summary.json:families.E_J",
+    "extra/summary.json:not_run"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 129,
    "slot": "grid:G confirmed, k of 4 zero-shot",
    "kind": "prose",
@@ -3426,7 +3778,7 @@
    "column": null,
    "blocks": [],
    "anchor": "is confirmed (E-D) on",
-   "text": "1 of 4",
+   "text": "1 of 4 (negative: Sports)",
    "from": [
     "grid/qwen/ml1m.json:E_D.ZS",
     "grid/qwen/ml1m.json:E_D.ZS.holm_family_E_D",
@@ -3452,7 +3804,7 @@
    "column": null,
    "blocks": [],
    "anchor": "zero-shot and",
-   "text": "1 of 4",
+   "text": "1 of 4 (positive: ML-1M)",
    "from": [
     "gft/gate_ft.json:decision",
     "grid/qwen/ml1m.json:E_D.FT",
@@ -3467,6 +3819,23 @@
     "grid/qwen/sports.json:E_D.FT",
     "grid/qwen/sports.json:E_D.FT.holm_family_E_D",
     "grid/qwen/sports.json:E_D.FT.information_gain.G_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 131,
+   "slot": "ext:summary.robust\\_readings count",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "the within-user estimator finds it",
+   "text": "robust on 0 of 3 zero-shot and 0 of 3 fine-tuned Qwen Amazon panels; estimator-dependent on Video Games (zero-shot), Sports (zero-shot), Video Games (fine-tuned)",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/summary.json:robust_readings",
+    "extra/summary.json:not_run"
    ]
   },
   {
@@ -3673,6 +4042,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.000{\\scriptsize$\\pm$.006}",
+   "from": [
+    "extra/sports.json:E_F.ZS",
+    "extra/sports.json:E_F.ZS.G_LLM_given_CF",
+    "extra/sports.json:E_F.ZS.G_LLM_given_CF.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.005{\\scriptsize$\\pm$.012\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_F.FT",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF.per_model",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF.per_model.s0.est",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF.per_model.s1.est",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF.per_model.s2.est",
+    "extra/sports.json:E_F.FT.G_LLM_given_CF.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 162,
    "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
    "kind": "table",
@@ -3798,6 +4210,49 @@
     "extra/games.json:E_F.FT.G_CF_given_LLM.per_model.s2.est",
     "extra/games.json:E_F.FT.G_CF_given_LLM.mean_over_seeds",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.001{\\scriptsize$\\pm$.002}",
+   "from": [
+    "extra/sports.json:E_F.ZS",
+    "extra/sports.json:E_F.ZS.G_CF_given_LLM",
+    "extra/sports.json:E_F.ZS.G_CF_given_LLM.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.001{\\scriptsize$\\pm$.002\\,(.000)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_F.FT",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM.per_model",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM.per_model.s0.est",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM.per_model.s1.est",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM.per_model.s2.est",
+    "extra/sports.json:E_F.FT.G_CF_given_LLM.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -3931,6 +4386,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.013{\\scriptsize$\\pm$.022}",
+   "from": [
+    "extra/sports.json:E_H.ZS",
+    "extra/sports.json:E_H.ZS.strata.sparse.G_prior",
+    "extra/sports.json:E_H.ZS.strata.sparse.G_prior.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.025{\\scriptsize$\\pm$.032\\,(.009)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_H.FT",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior.per_model",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior.per_model.s0.est",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior.per_model.s1.est",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior.per_model.s2.est",
+    "extra/sports.json:E_H.FT.strata.sparse.G_prior.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 166,
    "slot": "ext:E\\_H.dense.G\\_prior",
    "kind": "table",
@@ -4056,6 +4554,49 @@
     "extra/games.json:E_H.FT.strata.dense.G_prior.per_model.s2.est",
     "extra/games.json:E_H.FT.strata.dense.G_prior.mean_over_seeds",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.001{\\scriptsize$\\pm$.005}",
+   "from": [
+    "extra/sports.json:E_H.ZS",
+    "extra/sports.json:E_H.ZS.strata.dense.G_prior",
+    "extra/sports.json:E_H.ZS.strata.dense.G_prior.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.001{\\scriptsize$\\pm$.010\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_H.FT",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior.per_model",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior.per_model.s0.est",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior.per_model.s1.est",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior.per_model.s2.est",
+    "extra/sports.json:E_H.FT.strata.dense.G_prior.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -4189,6 +4730,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.003{\\scriptsize$\\pm$.007}",
+   "from": [
+    "extra/sports.json:E_H.ZS",
+    "extra/sports.json:E_H.ZS.strata.unseen.G_prior",
+    "extra/sports.json:E_H.ZS.strata.unseen.G_prior.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.012{\\scriptsize$\\pm$.011\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_H.FT",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior.per_model",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior.per_model.s0.est",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior.per_model.s1.est",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior.per_model.s2.est",
+    "extra/sports.json:E_H.FT.strata.unseen.G_prior.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 168,
    "slot": "ext:E\\_H.seen.G\\_prior",
    "kind": "table",
@@ -4314,6 +4898,49 @@
     "extra/games.json:E_H.FT.strata.seen.G_prior.per_model.s2.est",
     "extra/games.json:E_H.FT.strata.seen.G_prior.mean_over_seeds",
     "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.006{\\scriptsize$\\pm$.016}{\\scriptsize\\,(descriptive)}",
+   "from": [
+    "extra/sports.json:E_H.ZS",
+    "extra/sports.json:E_H.ZS.strata.seen.G_prior",
+    "extra/sports.json:E_H.ZS.strata.seen.G_prior.per_model.zeroshot",
+    "extra/sports.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.011{\\scriptsize$\\pm$.037\\,(.003)}{\\scriptsize\\,(descriptive)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/sports.json:E_H.FT",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior.per_model",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior.per_model.s0.est",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior.per_model.s1.est",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior.per_model.s2.est",
+    "extra/sports.json:E_H.FT.strata.seen.G_prior.mean_over_seeds",
+    "extra/sports.json:status.items_2_to_7"
    ]
   },
   {
@@ -4921,6 +5548,71 @@
     "grid/qwen/sports.json:knockout.labels.s0.label",
     "grid/qwen/sports.json:knockout.labels.s1.label",
     "grid/qwen/sports.json:knockout.labels.s2.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 188,
+   "slot": "ext:summary.ft\\_wording (the wording it allows, with the labels per control and dataset)",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "By the wording rule of addendum 8,",
+   "text": "fine-tuning mostly teaches the item, and the adapter learns item quality from item text (FT-C on ML-1M ITEM\\_DRIVEN; FT-Q on ML-1M ITEM\\_DRIVEN, Toys ITEM\\_DRIVEN)",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/summary.json:ft_wording"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 190,
+   "slot": "ext:summary.families.E\\_F count",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "H-F) on",
+   "text": "0 of 3 Qwen Amazon panels",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/summary.json:families.E_F",
+    "extra/summary.json:not_run"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 191,
+   "slot": "ext:summary.families.E\\_H count ZS",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "H-S) in",
+   "text": "0 of 2 zero-shot panel runs (Video Games below 150 users)",
+   "from": [
+    "extra/summary.json:families.E_H"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 191,
+   "slot": "ext:summary.families.E\\_H count FT",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "[S] and",
+   "text": "0 of 2 fine-tuned panel runs (Video Games below 150 users)",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/summary.json:families.E_H",
+    "extra/summary.json:not_run"
    ]
   },
   {
@@ -6732,7 +7424,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 28,
+   "line": 30,
    "slot": "gate:UAUC",
    "kind": "prose",
    "table": null,
@@ -6748,7 +7440,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 29,
+   "line": 31,
    "slot": "gft:UAUC\\_post\\_T\\_mean\\_over\\_seeds",
    "kind": "prose",
    "table": null,

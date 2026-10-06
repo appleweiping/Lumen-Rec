@@ -93,12 +93,23 @@ post-hoc stacking, CI and datasets; else omit}
 % METHOD-SLOT-END (introduction)
 
 \paragraph{Findings in brief.}
-\DATANEEDED{(i) What the confidence tracks (Section 6.1, Table tab:tracks): zero-shot and LoRA UAUC beside the item mean, the
-information-matched item mean and MF on the same rows, item-prior share and e-share, G and G_wu against G_CF, P1; counts per regime;
-direction-free unless admitted}
-\DATANEEDED{(ii) What fine-tuning teaches (Section 6.2, Table tab:teaches): FT-C (ML-1M) and FT-Q retention, their labels and the
-wording of addendum 8, complementarity to CF (H-F), the sparse and unseen strata (H-S), the store-name knockout label and its wording}
-\DATANEEDED{(iii) Which uses survive a matched control (Section 6.3): error anatomy (oracle and deployable top-k), corrections against
-placebo and ensemble null, selective serving against random, static exposure against the pool and the published recommenders,
-uncertainty-selected against class-matched random pruning}
+\emph{(i) What the confidence tracks (Section~\ref{sec:exp-tracks}).} On the four rated panels (ML-1M, Toys, Video Games, Sports) the
+fine-tuned Qwen3-8B reaches UAUC 0.742, 0.558, 0.580 and 0.534, against 0.759, 0.684, 0.662 and 0.624 for the item mean on the same
+rows and 0.791, 0.539, 0.532 and 0.534 for matrix factorisation. It is below the item mean on all four panels, and Holm-confirmed
+below on the three Amazon panels ($-0.126$, $-0.082$, $-0.090$); on ML-1M the gap is $-0.016$ (exploratory), and Llama-3.1-8B
+matches the item mean there (0.760) and stays $0.123$ below it on Toys. The item prior explains 0.90, 0.66, 0.72 and 0.74 of the
+within-user variance of the fine-tuned confidence (zero-shot: 0.39 on ML-1M and 0.33 on Sports; the other two panels fall below the
+reliability bar). The pair-specific residual adds at most $+0.010$ UAUC to the prior and the item mean (ML-1M, interval
+$[0.003,0.017]$; at most $+0.002$ on the other panels, where the zero-shot Sports value, $-0.009$, is confirmed negative), against
+$+0.036$ for the MF residual on ML-1M; that supervision raises this gain (P1) holds on ML-1M ($+0.011$, $p=0.004$, three of
+three seeds) and finds no evidence on Llama-3.1-8B ($+0.004$, $p=0.38$).
+\emph{(ii) What fine-tuning teaches (Section~\ref{sec:exp-teach}).} An adapter trained on labels permuted within each item keeps
+$R=0.92$ of the gain from real labels on ML-1M, and one trained on pseudo-labels from the item mean alone keeps $0.85$ on ML-1M
+and, with a wide interval, $1.3$ on Toys (both read ITEM\_DRIVEN under the registered rule; the teacher adapters reach UAUC 0.720
+and 0.564--0.571 against 0.742 and 0.558 for the real-label adapters). The fine-tuned LLM adds nothing detectable to matrix
+factorisation ($\mathcal G_{\rm LLM|CF}\le0.005$, confirmed on none of the three Amazon panels), and the store-name knockout is
+INDETERMINATE on every panel and model, so the confidence is called popularity-linked, not familiarity-linked.
+\DATANEEDED{(iii) Which uses survive a matched control (Section 6.3): selective serving against random and against cheap
+signals, static exposure, item-dependent corrections, uncertainty-selected pruning (S6) and the method slot, to be written from
+the finished runs}
 Table~\ref{tab:guide} condenses the answers to S1--S6.

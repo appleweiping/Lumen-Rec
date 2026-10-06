@@ -14,10 +14,12 @@ We audited what the token confidence of yes/no LLM recommenders encodes, with ma
 and a protocol registered before any confirmatory result was analysed. Splitting the confidence into a user offset, an item prior
 and a pair-specific residual is an accounting identity, and the invariance lemma is a property of within-user metrics; what they
 leave open was measured.
-\DATANEEDED{2--3 sentences from Tables tab:tracks and tab:teaches only: the LLM beside the item mean, the matched item mean and MF,
-the item-prior share and e-share, G and G_wu against G_CF by regime (counts per regime), the FT-C and FT-Q readings and the wording
-of addendum 8, H-F and H-S; direction-free unless the claim-admission rule is met}
-Each route that the lemma leaves open was tested against its own control.
+What the confidence knows is mostly the item. The fine-tuned LLM ranks within users below an item mean computed on the same rows on
+all four rated panels, the item prior explains 0.66 to 0.90 of the within-user variance of its confidence, and the pair-specific
+residual adds at most 0.010 UAUC to the prior and the item mean (ML-1M with Qwen3-8B only; not replicated with Llama-3.1-8B, and
+confirmed negative on one zero-shot panel), nothing detectable to matrix factorisation (confirmed on none of the three Amazon
+panels). Fine-tuning mostly teaches the item: two item-only controls keep 0.85 to 0.92 of its gain on ML-1M, and the item-only teacher
+reaches the real-label adapters' UAUC on Toys. Each route that the lemma leaves open was tested against its own control.
 \DATANEEDED{1--2 sentences from the tables of Section 6.3 only: which of item-dependent corrections, selective serving, static exposure
 and uncertainty-selected pruning beat their placebo, ensemble null, random or class-matched random control, with effect size and
 interval, or that none did}

@@ -21,12 +21,11 @@ question and, zero-shot, on four same-candidate next-item panels (10k users, 101
 non-LLM references on the same pairs and confirmation on untouched users. We split the log-odds into a user offset, an item prior
 (the model's mean answer for the item under other users' histories) and a pair-specific residual, and measure how much the
 residual adds, as a predictor of the label, to an item mean and to matrix factorisation.
-\DATANEEDED{one sentence: the rated-panel result beside the references on the same rows (UAUC of zero-shot and LoRA, the item mean
-and matrix factorisation, with CI), the share of within-user confidence variance the item prior explains, and the personal
-information gain over the item mean, zero-shot versus LoRA}
-\DATANEEDED{one sentence: what the item-only controls (within-item permutation on ML-1M, item-only teacher) and the
-complementarity to collaborative filtering show}
-\DATANEEDED{one sentence: which routes (item-dependent corrections, cross-user selective serving and exposure, uncertainty-selected
-pruning) beat their control, with effect size and CI, or that none did}
+Fine-tuned UAUC is below the item mean on all four rated panels (by 0.016 on ML-1M and, confirmed, by 0.08 to 0.13 on three Amazon
+domains), the item prior explains 66--90\% of the within-user variance of the fine-tuned confidence, and the residual adds at most 0.010 UAUC to
+the prior and the item mean: positive only on ML-1M with Qwen3-8B, and not replicated with Llama. Fine-tuning mostly teaches the
+item: adapters trained on labels permuted within items or on item-mean pseudo-labels keep 85--92\% of the gain (Qwen3-8B).
+\DATANEEDED{one sentence: which routes (cross-user selective serving against random and cheap signals, static exposure,
+item-dependent corrections, uncertainty-selected pruning, the method slot) beat their control, with effect size and CI, or that none did}
 Because per-user recalibration cannot change within-user rankings, we test only the routes that can. All claims are scoped to
 same-candidate evaluation.

@@ -1,0 +1,1581 @@
+{
+  "spec": "idea-stage/PREREG_AMENDMENT_3_ADDENDUM_6.md items 2-8 and its Holm families (with idea-stage/PREREG_AMENDMENT_3.md sections 1, 3, 11 and addendum 1); docs/sigir/FTEXTRA_IMPL_SPEC.md",
+  "n_boot": 2000,
+  "inputs": [
+    {
+      "file": "toys.json",
+      "sha1": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
+      "role": "files",
+      "root_label": "main",
+      "domain": "toys",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "games.json",
+      "sha1": "a79f1a9487912e6646e076d6b95c30011cffcd06",
+      "role": "files",
+      "root_label": "main",
+      "domain": "games",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "sports.json",
+      "sha1": "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+      "role": "files",
+      "root_label": "main",
+      "domain": "sports",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "ml1m.json",
+      "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733",
+      "role": "ml1m",
+      "root_label": "main",
+      "domain": "ml1m",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "ml1m.json",
+      "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733",
+      "role": "ftc",
+      "root_label": "main",
+      "domain": "ml1m",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "ml1m.json",
+      "sha1": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+      "role": "llama",
+      "root_label": "llama",
+      "domain": "ml1m",
+      "backbone": "Llama-3.1-8B-Instruct",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "toys.json",
+      "sha1": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
+      "role": "llama",
+      "root_label": "llama",
+      "domain": "toys",
+      "backbone": "Llama-3.1-8B-Instruct",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "ml1m.json",
+      "sha1": "e0c7560bd713078f2ea0ba9e4c6ab774bf1f096f",
+      "role": "ftq",
+      "root_label": "teacher",
+      "domain": "ml1m",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    },
+    {
+      "file": "toys.json",
+      "sha1": "9aa393b4f5c9bb60b8a4ab4b51b65ea791abc7f2",
+      "role": "ftq",
+      "root_label": "teacher",
+      "domain": "toys",
+      "backbone": "Qwen3-8B",
+      "code_sha1": {
+        "ftgrid_extra.py": "8d0e5d86158b5f61c274d953d75ca63c169d44e5",
+        "ftgrid_report.py": "2604709eaefe15496c10aee259de5ad3f6f72479",
+        "forensics.py": "efd1ad03df0d02be04130737f25729cd8ff32e11",
+        "stats.py": "864b2b82cfd212004afe5bab0f74e83f7250adb0",
+        "metrics.py": "79564e1254b380b02321c164ed919321063bd0c7"
+      }
+    }
+  ],
+  "families": {
+    "E_F": {
+      "hypothesis": "H-F (directional): in the FT regime G_LLM_given_CF = dUAUC(M4 - M3) > 0; family E-F = {G_LLM_given_CF, FT, per Qwen Amazon panel run}",
+      "alpha": 0.05,
+      "m": 3,
+      "members": {
+        "toys": {
+          "est": -0.00022099862785682575,
+          "lo": -0.009243458041022135,
+          "hi": 0.008220351595126438,
+          "p": 0.9575212393803099,
+          "n_users": 943,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": false,
+          "complete": true,
+          "per_seed": [
+            -0.0009359658479651264,
+            0.0004582957259717651,
+            -0.00018532576157711262
+          ],
+          "sigma_seed": 0.0006978149820552022,
+          "in_family": true,
+          "p_for_holm": 0.9575212393803099,
+          "p_holm": 1.0,
+          "sign": -1,
+          "fine_tuned": true,
+          "direction_ok": false,
+          "confirmed": false
+        },
+        "games": {
+          "est": 0.003013436412421647,
+          "lo": -0.006308473195752102,
+          "hi": 0.01215414912791672,
+          "p": 0.5477261369315343,
+          "n_users": 820,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            0.0029826067753579164,
+            0.003619224785411826,
+            0.002438477676495201
+          ],
+          "sigma_seed": 0.0005909769739125655,
+          "in_family": true,
+          "p_for_holm": 0.5477261369315343,
+          "p_holm": 1.0,
+          "sign": 1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": false
+        },
+        "sports": {
+          "est": 0.00491852895201992,
+          "lo": -0.007281647601007996,
+          "hi": 0.01664313819890451,
+          "p": 0.39980009995002497,
+          "n_users": 997,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            0.00623512239375296,
+            0.00586722339152239,
+            0.0026532410707844033
+          ],
+          "sigma_seed": 0.0019704020675016883,
+          "in_family": true,
+          "p_for_holm": 0.39980009995002497,
+          "p_holm": 1.0,
+          "sign": 1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": false
+        }
+      },
+      "outside_family": {},
+      "n_missing_members": 0,
+      "n_confirmed": 0,
+      "rule": "Holm over the members the family lists (a member is outside only by the minimum-n rule; a member whose statistic is unavailable stays in with p = 1, R14); confirmed = Holm p < 0.05, the sigma_seed rule for FT members (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed) and an estimate of the hypothesised sign"
+    },
+    "E_H": {
+      "hypothesis": "H-S (directional): on sparse rows G_prior = dUAUC(M1 - M0) > 0; family E-H = {G_prior on sparse rows, per Qwen Amazon panel run and regime (ZS, FT)}; a panel-regime below 150 users is outside",
+      "alpha": 0.05,
+      "m": 4,
+      "members": {
+        "toys:ZS": {
+          "est": 0.013900220541432945,
+          "lo": -0.0003803864199188453,
+          "hi": 0.029136494354686314,
+          "p": 0.057971014492753624,
+          "n_users": 266,
+          "descriptive_min_n": false,
+          "missing": false,
+          "in_family": true,
+          "p_for_holm": 0.057971014492753624,
+          "p_holm": 0.2318840579710145,
+          "sign": 1,
+          "fine_tuned": false,
+          "direction_ok": true,
+          "confirmed": false
+        },
+        "toys:FT": {
+          "est": 0.01944083920117755,
+          "lo": -0.013065578442634361,
+          "hi": 0.053411905880773346,
+          "p": 0.22488755622188905,
+          "n_users": 266,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            0.018474783188129056,
+            0.016712739189242952,
+            0.023134995226160644
+          ],
+          "sigma_seed": 0.003318326583715322,
+          "in_family": true,
+          "p_for_holm": 0.22488755622188905,
+          "p_holm": 0.4497751124437781,
+          "sign": 1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": false
+        },
+        "sports:ZS": {
+          "est": 0.013344410634208843,
+          "lo": -0.008568051996583389,
+          "hi": 0.03470084948216956,
+          "p": 0.2478760619690155,
+          "n_users": 223,
+          "descriptive_min_n": false,
+          "missing": false,
+          "in_family": true,
+          "p_for_holm": 0.2478760619690155,
+          "p_holm": 0.4497751124437781,
+          "sign": 1,
+          "fine_tuned": false,
+          "direction_ok": true,
+          "confirmed": false
+        },
+        "sports:FT": {
+          "est": 0.024862860939094122,
+          "lo": -0.008150707642299575,
+          "hi": 0.055066623217548086,
+          "p": 0.1409295352323838,
+          "n_users": 223,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            0.030474677913018722,
+            0.02917845576197594,
+            0.014935449142287708
+          ],
+          "sigma_seed": 0.008621785006815114,
+          "in_family": true,
+          "p_for_holm": 0.1409295352323838,
+          "p_holm": 0.4227886056971514,
+          "sign": 1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": false
+        }
+      },
+      "outside_family": {
+        "games:ZS": {
+          "est": -0.0269907622139765,
+          "lo": -0.06197465567666461,
+          "hi": 0.0033841314935064786,
+          "p": null,
+          "n_users": 140,
+          "descriptive_min_n": true,
+          "missing": false,
+          "in_family": false,
+          "reason": "games E-H ZS sparse: fewer than 150 users (descriptive, A3 section 1)"
+        },
+        "games:FT": {
+          "est": -0.010791990912526625,
+          "lo": -0.05746104459776336,
+          "hi": 0.03572154366797222,
+          "p": null,
+          "n_users": 140,
+          "descriptive_min_n": true,
+          "missing": false,
+          "sigma_seed_rule": false,
+          "complete": true,
+          "per_seed": [
+            -0.015056045145330857,
+            0.0004892096990311235,
+            -0.01780913729128015
+          ],
+          "sigma_seed": 0.009866306021996285,
+          "in_family": false,
+          "reason": "games E-H FT sparse: fewer than 150 users (descriptive, A3 section 1)"
+        }
+      },
+      "n_missing_members": 0,
+      "n_confirmed": 0,
+      "rule": "Holm over the members the family lists (a member is outside only by the minimum-n rule; a member whose statistic is unavailable stays in with p = 1, R14); confirmed = Holm p < 0.05, the sigma_seed rule for FT members (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed) and an estimate of the hypothesised sign"
+    },
+    "E_J": {
+      "hypothesis": "H-J (two-sided): in the FT regime dUAUC(L - q-hat) is not 0; family E-J = {dUAUC(L - q-hat), FT, per Qwen Amazon panel run}; the sign of a confirmed member is reported as found",
+      "alpha": 0.05,
+      "m": 3,
+      "members": {
+        "toys": {
+          "est": -0.12599827144418266,
+          "lo": -0.15325878439481969,
+          "hi": -0.09745757584157289,
+          "p": 0.0009995002498750624,
+          "n_users": 943,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            -0.12457252071722995,
+            -0.12821545816252686,
+            -0.1252068354527912
+          ],
+          "sigma_seed": 0.0019461568549166157,
+          "in_family": true,
+          "p_for_holm": 0.0009995002498750624,
+          "p_holm": 0.0029985007496251873,
+          "sign": -1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": true
+        },
+        "games": {
+          "est": -0.08165105807240679,
+          "lo": -0.10908990296956121,
+          "hi": -0.05345620092920694,
+          "p": 0.0009995002498750624,
+          "n_users": 820,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            -0.07801580837387355,
+            -0.0840469066276993,
+            -0.08289045921564751
+          ],
+          "sigma_seed": 0.003200878462582548,
+          "in_family": true,
+          "p_for_holm": 0.0009995002498750624,
+          "p_holm": 0.0029985007496251873,
+          "sign": -1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": true
+        },
+        "sports": {
+          "est": -0.09003700549192328,
+          "lo": -0.11907831346323904,
+          "hi": -0.06205025183203622,
+          "p": 0.0009995002498750624,
+          "n_users": 997,
+          "descriptive_min_n": false,
+          "missing": false,
+          "sigma_seed_rule": true,
+          "complete": true,
+          "per_seed": [
+            -0.0877899425336063,
+            -0.08699131588201107,
+            -0.09532975806015251
+          ],
+          "sigma_seed": 0.004601018739750173,
+          "in_family": true,
+          "p_for_holm": 0.0009995002498750624,
+          "p_holm": 0.0029985007496251873,
+          "sign": -1,
+          "fine_tuned": true,
+          "direction_ok": true,
+          "confirmed": true
+        }
+      },
+      "outside_family": {},
+      "n_missing_members": 0,
+      "n_confirmed": 3,
+      "rule": "Holm over the members the family lists (a member is outside only by the minimum-n rule; a member whose statistic is unavailable stays in with p = 1, R14); confirmed = Holm p < 0.05, the sigma_seed rule for FT members (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed)"
+    }
+  },
+  "not_run": {},
+  "registered": {
+    "E_B": {
+      "hypothesis": "E-B (A3 section 11): Holm over the four Qwen domains of the seed-averaged dUAUC(FT - ZS); confirmed = Holm p < 0.05 and the sigma_seed rule",
+      "complete_family": true,
+      "reason": null,
+      "m": 4,
+      "members": {
+        "ml1m": {
+          "est": 0.14658335825952382,
+          "lo": 0.1243630663633283,
+          "hi": 0.16865819059211973,
+          "p": 0.0009995002498750624,
+          "n_users": 366,
+          "descriptive_min_n": false,
+          "complete": true,
+          "sigma_seed_rule": true,
+          "p_holm": 0.00399800099950025,
+          "confirmed": true
+        },
+        "toys": {
+          "est": 0.031007917301981228,
+          "lo": 0.006263478855880065,
+          "hi": 0.055680996330206387,
+          "p": 0.01699150424787606,
+          "n_users": 943,
+          "descriptive_min_n": false,
+          "complete": true,
+          "sigma_seed_rule": true,
+          "p_holm": 0.01699150424787606,
+          "confirmed": true
+        },
+        "games": {
+          "est": 0.06284254837994824,
+          "lo": 0.0367958148134841,
+          "hi": 0.08843538593438457,
+          "p": 0.0009995002498750624,
+          "n_users": 820,
+          "descriptive_min_n": false,
+          "complete": true,
+          "sigma_seed_rule": true,
+          "p_holm": 0.00399800099950025,
+          "confirmed": true
+        },
+        "sports": {
+          "est": 0.04135007672205663,
+          "lo": 0.015136355328910608,
+          "hi": 0.06879876475902812,
+          "p": 0.00399800099950025,
+          "n_users": 997,
+          "descriptive_min_n": false,
+          "complete": true,
+          "sigma_seed_rule": true,
+          "p_holm": 0.0079960019990005,
+          "confirmed": true
+        }
+      },
+      "rule": "p_holm and confirmed are null unless ML-1M, Toys, Video_Games and Sports are all given with a complete, non-descriptive E-B (fill_paper.eb_family refuses otherwise)"
+    },
+    "E_D": {
+      "toys:Qwen3-8B": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.6646676661669165,
+            "star_permutation": 0.16991504247876063
+          },
+          "p_holm": {
+            "G": 0.6646676661669165,
+            "star_permutation": 0.33983008495752126
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.3488255872063968,
+            "star_permutation": 0.031984007996002
+          },
+          "p_holm": {
+            "G": 0.3488255872063968,
+            "star_permutation": 0.063968015992004
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      },
+      "games:Qwen3-8B": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.19590204897551225,
+            "star_permutation": 0.7006496751624188
+          },
+          "p_holm": {
+            "G": 0.3918040979510245,
+            "star_permutation": 0.7006496751624188
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.026986506746626688,
+            "star_permutation": 0.6896551724137931
+          },
+          "p_holm": {
+            "G": 0.053973013493253376,
+            "star_permutation": 0.6896551724137931
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      },
+      "sports:Qwen3-8B": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.01199400299850075,
+            "star_permutation": 0.2938530734632684
+          },
+          "p_holm": {
+            "G": 0.0239880059970015,
+            "star_permutation": 0.2938530734632684
+          },
+          "confirmed": {
+            "G": true,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.6086956521739131,
+            "star_permutation": 0.7096451774112944
+          },
+          "p_holm": {
+            "G": 1.0,
+            "star_permutation": 1.0
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      },
+      "ml1m:Qwen3-8B": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.5657171414292853,
+            "star_permutation": 0.0069965017491254375
+          },
+          "p_holm": {
+            "G": 0.5657171414292853,
+            "star_permutation": 0.013993003498250875
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": true
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.00399800099950025,
+            "star_permutation": 0.0029985007496251873
+          },
+          "p_holm": {
+            "G": 0.005997001499250375,
+            "star_permutation": 0.005997001499250375
+          },
+          "confirmed": {
+            "G": true,
+            "star_permutation": true
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      }
+    },
+    "P1": {
+      "role": "P1 confirmatory (ML-1M, Qwen3-8B)",
+      "available": true,
+      "decision": {
+        "verdict": "P1_HOLDS",
+        "holds": true,
+        "conditions": {
+          "three_seeds": true,
+          "not_descriptive_min_n": true,
+          "mean_gt_0": true,
+          "p_lt_0.05": true,
+          "all_seeds_positive": true,
+          "mean_gt_2_sigma_seed": true
+        },
+        "mean": 0.01139839440254825,
+        "p": 0.00399800099950025,
+        "per_seed": [
+          0.010084756265020032,
+          0.011272483740086214,
+          0.012837943202538497
+        ],
+        "sigma_seed": 0.0013809053911915173,
+        "wording": "supervised fine-tuning increases the personal information gain (P1)",
+        "rule": "P1 holds iff the mean over seeds of G_FT,s - G_ZS is > 0 with p < 0.05, all 3 seeds are positive and the mean exceeds 2 sigma_seed (A3 section 3); fewer than 150 users makes it descriptive"
+      },
+      "mean_over_seeds": {
+        "est": 0.01139839440254825,
+        "lo": 0.003327717464124875,
+        "hi": 0.01996185612942026,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.00399800099950025,
+        "ci_excludes_0": true
+      },
+      "per_seed": {
+        "s0": {
+          "est": 0.010084756265020032,
+          "lo": 0.001748759248420468,
+          "hi": 0.01908485749364421,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.012993503248375811,
+          "ci_excludes_0": true,
+          "G_FT": 0.008333806190164578
+        },
+        "s1": {
+          "est": 0.011272483740086214,
+          "lo": 0.002941901339213558,
+          "hi": 0.02074402962575512,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0069965017491254375,
+          "ci_excludes_0": true,
+          "G_FT": 0.00952153366523076
+        },
+        "s2": {
+          "est": 0.012837943202538497,
+          "lo": 0.004174351220368573,
+          "hi": 0.02206424648453663,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.0029985007496251873,
+          "ci_excludes_0": true,
+          "G_FT": 0.011086993127683041
+        }
+      }
+    },
+    "note": "copied through from the domain files' registered_pooled blocks with the report's functions (R15); the per-domain reports stay the registered record"
+  },
+  "robust_readings": {
+    "toys:ZS": {
+      "G": {
+        "registered_est": -0.0018920042411506883,
+        "within_user_est": -0.0032680180380677336,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.001500260085033337,
+        "within_user_est": 0.000745651550033165,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "toys:FT": {
+      "G": {
+        "registered_est": -0.004636304224324658,
+        "within_user_est": -0.0031720972658498647,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "all_seeds_same_sign_both_estimators": true,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.001500260085033337,
+        "within_user_est": 0.000745651550033165,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "games:ZS": {
+      "G": {
+        "registered_est": -0.0050681052333094246,
+        "within_user_est": -0.001995522887528806,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": true,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "estimator_dependent",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": -0.0020239420241726044,
+        "within_user_est": -0.0011115258385888899,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "games:FT": {
+      "G": {
+        "registered_est": -0.009129657128452989,
+        "within_user_est": -0.0015116051490091805,
+        "same_sign": true,
+        "registered_ci_excludes_0": true,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "all_seeds_same_sign_both_estimators": true,
+        "robust": false,
+        "reading": "estimator_dependent",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": -0.0020239420241726044,
+        "within_user_est": -0.0011115258385888899,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "sports:ZS": {
+      "G": {
+        "registered_est": -0.009489005041718854,
+        "within_user_est": 0.0015833163780366731,
+        "same_sign": false,
+        "registered_ci_excludes_0": true,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "estimator_dependent",
+        "registered_confirmed": true,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.0024384035406704247,
+        "within_user_est": 0.001939830545484956,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "sports:FT": {
+      "G": {
+        "registered_est": 0.002342512328935184,
+        "within_user_est": 0.0006092517413946678,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "all_seeds_same_sign_both_estimators": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.0024384035406704247,
+        "within_user_est": 0.001939830545484956,
+        "same_sign": true,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "ml1m:ZS": {
+      "G": {
+        "registered_est": -0.001750950074855456,
+        "within_user_est": 6.838715753630778e-05,
+        "same_sign": false,
+        "registered_ci_excludes_0": false,
+        "within_user_ci_excludes_0": false,
+        "descriptive_min_n": false,
+        "robust": false,
+        "reading": "both_intervals_include_0",
+        "registered_confirmed": false,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.03615779661243816,
+        "within_user_est": 0.03731922200161316,
+        "same_sign": true,
+        "registered_ci_excludes_0": true,
+        "within_user_ci_excludes_0": true,
+        "descriptive_min_n": false,
+        "robust": true,
+        "reading": "robust",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "ml1m:FT": {
+      "G": {
+        "registered_est": 0.009647444327692793,
+        "within_user_est": 0.009076183904029476,
+        "same_sign": true,
+        "registered_ci_excludes_0": true,
+        "within_user_ci_excludes_0": true,
+        "descriptive_min_n": false,
+        "all_seeds_same_sign_both_estimators": true,
+        "robust": true,
+        "reading": "robust",
+        "registered_confirmed": true,
+        "registered_confirmed_source": "the E-D Holm family (ftgrid_report.ed_holm_family on the registered_pooled block)",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      },
+      "G_CF": {
+        "registered_est": 0.03615779661243816,
+        "within_user_est": 0.03731922200161316,
+        "same_sign": true,
+        "registered_ci_excludes_0": true,
+        "within_user_ci_excludes_0": true,
+        "descriptive_min_n": false,
+        "robust": true,
+        "reading": "robust",
+        "registered_confirmed": null,
+        "registered_confirmed_source": "none: G_CF is a reference in no registered family",
+        "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+      }
+    },
+    "ml1m:P1": {
+      "registered_est": 0.01139839440254825,
+      "within_user_est": 0.009007796746493171,
+      "same_sign": true,
+      "registered_ci_excludes_0": true,
+      "within_user_ci_excludes_0": true,
+      "descriptive_min_n": false,
+      "all_seeds_same_sign_both_estimators": true,
+      "robust": true,
+      "reading": "robust",
+      "registered_confirmed": true,
+      "registered_confirmed_source": "P1's registered decision (a single test, A3 section 3)",
+      "description": "robust = the A3-6 item 2 reading rule on the UNADJUSTED 95% intervals of the registered pooled and the within-user estimator (same sign, both intervals excluding 0, all seeds agreeing for a fine-tuned mean); it is not a Holm confirmation. registered_confirmed = the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root), the E-D Holm family for G (decided by summarize: a domain file holds raw p-values only), none for G_CF"
+    }
+  },
+  "sensitivity": {
+    "P1_wu": {
+      "decision": {
+        "verdict": "P1_WU_HOLDS",
+        "holds": true,
+        "conditions": {
+          "three_seeds": true,
+          "not_descriptive_min_n": true,
+          "mean_gt_0": true,
+          "p_lt_0.05": true,
+          "all_seeds_positive": true,
+          "mean_gt_2_sigma_seed": true
+        },
+        "mean": 0.009007796746493171,
+        "p": 0.001999000499750125,
+        "per_seed": [
+          0.007339535526453156,
+          0.010062816906989753,
+          0.009621037806036601
+        ],
+        "sigma_seed": 0.0014615450103321454,
+        "rule": "the P1 conditions of A3 section 3 (3 seeds, not descriptive, mean > 0 with p < 0.05, all seeds positive, mean > 2 sigma_seed) applied to the within-user values; a sensitivity estimator, not P1 (registered_pooled.P1 is P1)"
+      },
+      "mean_over_seeds": {
+        "est": 0.009007796746493171,
+        "lo": 0.0028038343317406656,
+        "hi": 0.015596483836001698,
+        "n_users": 366,
+        "n_pairs": 6365,
+        "n_boot": 2000,
+        "descriptive_min_n": false,
+        "p": 0.001999000499750125,
+        "ci_excludes_0": true
+      },
+      "per_seed": {
+        "s0": {
+          "est": 0.007339535526453156,
+          "lo": 0.0009818139372376811,
+          "hi": 0.013925761396250779,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.022988505747126436,
+          "ci_excludes_0": true,
+          "G_FT": 0.007407922683989461
+        },
+        "s1": {
+          "est": 0.010062816906989753,
+          "lo": 0.0037934850456999417,
+          "hi": 0.017130497523740098,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.001999000499750125,
+          "ci_excludes_0": true,
+          "G_FT": 0.01013120406452606
+        },
+        "s2": {
+          "est": 0.009621037806036601,
+          "lo": 0.002892045468027617,
+          "hi": 0.016538291869461628,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.004997501249375313,
+          "ci_excludes_0": true,
+          "G_FT": 0.00968942496357291
+        }
+      },
+      "note": "a within-user sensitivity estimator of P1's quantity (A3-6 item 2); not P1"
+    }
+  },
+  "llama": {
+    "ml1m": {
+      "backbone": "Llama-3.1-8B-Instruct",
+      "E_D": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.28585707146426786,
+            "star_permutation": 0.0009995002498750624
+          },
+          "p_holm": {
+            "G": 0.28585707146426786,
+            "star_permutation": 0.001999000499750125
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": true
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.063968015992004,
+            "star_permutation": 0.0009995002498750624
+          },
+          "p_holm": {
+            "G": 0.063968015992004,
+            "star_permutation": 0.001999000499750125
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": true
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      },
+      "P1_replication": {
+        "role": "replication of P1's sign (Amendment 2 F)",
+        "available": true,
+        "decision": {
+          "verdict": "NO_EVIDENCE",
+          "holds": false,
+          "conditions": {
+            "three_seeds": true,
+            "not_descriptive_min_n": true,
+            "mean_gt_0": true,
+            "p_lt_0.05": false,
+            "all_seeds_positive": true,
+            "mean_gt_2_sigma_seed": true
+          },
+          "mean": 0.003848476267567766,
+          "p": 0.3818090954522739,
+          "per_seed": [
+            0.004512983274740714,
+            0.003200802866022096,
+            0.0038316426619404917
+          ],
+          "sigma_seed": 0.0006562521496841367,
+          "wording": "no evidence that supervision adds personal evidence",
+          "rule": "P1 holds iff the mean over seeds of G_FT,s - G_ZS is > 0 with p < 0.05, all 3 seeds are positive and the mean exceeds 2 sigma_seed (A3 section 3); fewer than 150 users makes it descriptive"
+        },
+        "mean_over_seeds": {
+          "est": 0.003848476267567766,
+          "lo": -0.004074481163509694,
+          "hi": 0.012114847721614279,
+          "n_users": 366,
+          "n_pairs": 6365,
+          "n_boot": 2000,
+          "descriptive_min_n": false,
+          "p": 0.3818090954522739,
+          "ci_excludes_0": false
+        },
+        "per_seed": {
+          "s0": {
+            "est": 0.004512983274740714,
+            "lo": -0.004280511957056326,
+            "hi": 0.013651161175416147,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.3258370814592704,
+            "ci_excludes_0": false,
+            "G_FT": 0.007753158523873233
+          },
+          "s1": {
+            "est": 0.003200802866022096,
+            "lo": -0.004790947210843941,
+            "hi": 0.011175157471210562,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.4607696151924038,
+            "ci_excludes_0": false,
+            "G_FT": 0.006440978115154616
+          },
+          "s2": {
+            "est": 0.0038316426619404917,
+            "lo": -0.004373589504344814,
+            "hi": 0.012719575552268523,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.4007996001999001,
+            "ci_excludes_0": false,
+            "G_FT": 0.007071817911073011
+          }
+        }
+      },
+      "note": "the Llama program (A3 section 8): replication and descriptive values only; never a member of an A3-6 family and never under registered.P1"
+    },
+    "toys": {
+      "backbone": "Llama-3.1-8B-Instruct",
+      "E_D": {
+        "ZS": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.5497251374312844,
+            "star_permutation": 0.9695152423788106
+          },
+          "p_holm": {
+            "G": 1.0,
+            "star_permutation": 1.0
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        },
+        "FT": {
+          "members": [
+            "G (G_mean_over_seeds)",
+            "star-permutation dUAUC (dUAUC_mean_over_seeds)"
+          ],
+          "p": {
+            "G": 0.6506746626686657,
+            "star_permutation": 0.8905547226386806
+          },
+          "p_holm": {
+            "G": 1.0,
+            "star_permutation": 1.0
+          },
+          "confirmed": {
+            "G": false,
+            "star_permutation": false
+          },
+          "rule": "Holm over the members with a p-value; confirmed = Holm p < 0.05 (+ sigma_seed rule for FT)"
+        }
+      },
+      "P1_replication": {
+        "available": false,
+        "reason": "P1's replication is ML-1M's"
+      },
+      "note": "the Llama program (A3 section 8): replication and descriptive values only; never a member of an A3-6 family and never under registered.P1"
+    }
+  },
+  "descriptive_outside_families": [
+    {
+      "file": "ml1m.json",
+      "root_label": "main",
+      "domain": "ml1m",
+      "backbone": "Qwen3-8B",
+      "why": "ML-1M (exploratory; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": -0.000422380973460046,
+            "lo": -0.002001631896515797,
+            "hi": 0.0011648207723818184,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.5887056471764118,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n_users": 1,
+            "n_pairs": 2,
+            "n_boot": 2000,
+            "descriptive_min_n": true,
+            "p": null,
+            "ci_excludes_0": null
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.16272922791141314,
+            "lo": -0.18831000488295963,
+            "hi": -0.1367163085910922,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        },
+        "FT": {
+          "G_LLM_given_CF": {
+            "est": 0.0035039474845783305,
+            "lo": -0.0015702966276660514,
+            "hi": 0.009185624053463627,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.19090454772613694,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n_users": 1,
+            "n_pairs": 2,
+            "n_boot": 2000,
+            "descriptive_min_n": true,
+            "p": null,
+            "ci_excludes_0": null
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.016145869651889317,
+            "lo": -0.029092983682509847,
+            "hi": -0.0026154289086330533,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.026986506746626688,
+            "ci_excludes_0": true
+          }
+        }
+      }
+    },
+    {
+      "file": "ml1m.json",
+      "root_label": "llama",
+      "domain": "ml1m",
+      "backbone": "Llama-3.1-8B-Instruct",
+      "why": "the Llama backbone (descriptive; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": -0.0007008312340586637,
+            "lo": -0.0036793120045001864,
+            "hi": 0.0021486805416329677,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.6266866566716641,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n_users": 1,
+            "n_pairs": 2,
+            "n_boot": 2000,
+            "descriptive_min_n": true,
+            "p": null,
+            "ci_excludes_0": null
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.1533117307640218,
+            "lo": -0.18217848909540005,
+            "hi": -0.1250802084588315,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        },
+        "FT": {
+          "G_LLM_given_CF": {
+            "est": 0.004439183489740062,
+            "lo": -0.0014032245548675501,
+            "hi": 0.01095005684510731,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.1519240379810095,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n_users": 1,
+            "n_pairs": 2,
+            "n_boot": 2000,
+            "descriptive_min_n": true,
+            "p": null,
+            "ci_excludes_0": null
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": 0.0009680738081616867,
+            "lo": -0.011533640791821483,
+            "hi": 0.014741871103804646,
+            "n_users": 366,
+            "n_pairs": 6365,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.8895552223888056,
+            "ci_excludes_0": false
+          }
+        }
+      }
+    },
+    {
+      "file": "toys.json",
+      "root_label": "llama",
+      "domain": "toys",
+      "backbone": "Llama-3.1-8B-Instruct",
+      "why": "the Llama backbone (descriptive; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": 0.00035471048906930946,
+            "lo": -0.00572515824808833,
+            "hi": 0.0063656510502858995,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.9365317341329336,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.010100381161236422,
+            "lo": -0.005860341267354898,
+            "hi": 0.026998496054123376,
+            "n_users": 266,
+            "n_pairs": 1074,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.20389805097451275,
+            "ci_excludes_0": false
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.1714745377546422,
+            "lo": -0.20127118656334936,
+            "hi": -0.14130370733912342,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        },
+        "FT": {
+          "G_LLM_given_CF": {
+            "est": 0.000879975506296515,
+            "lo": -0.008937601736986841,
+            "hi": 0.009951385470515398,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.8605697151424287,
+            "ci_excludes_0": false
+          },
+          "G_prior_sparse": {
+            "est": 0.02428910404317672,
+            "lo": -0.00955162283602525,
+            "hi": 0.05880601190890586,
+            "n_users": 266,
+            "n_pairs": 1074,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.15792103948025987,
+            "ci_excludes_0": false
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.12333126506384351,
+            "lo": -0.14956971716890605,
+            "hi": -0.0972911197170831,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        }
+      }
+    },
+    {
+      "file": "toys.json",
+      "root_label": "main",
+      "domain": "toys",
+      "backbone": "Qwen3-8B",
+      "why": "the ZS regime of E-F and E-J (descriptive; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": -0.0013273529671264264,
+            "lo": -0.007328126491685526,
+            "hi": 0.004469191070705809,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.6536731634182908,
+            "ci_excludes_0": false
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.1570061887461639,
+            "lo": -0.18775225469627008,
+            "hi": -0.12752833881019018,
+            "n_users": 943,
+            "n_pairs": 6120,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        }
+      }
+    },
+    {
+      "file": "games.json",
+      "root_label": "main",
+      "domain": "games",
+      "backbone": "Qwen3-8B",
+      "why": "the ZS regime of E-F and E-J (descriptive; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": -0.0020312095904558495,
+            "lo": -0.005821309888780472,
+            "hi": 0.0016549965705822342,
+            "n_users": 820,
+            "n_pairs": 5552,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.303848075962019,
+            "ci_excludes_0": false
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.14449360645235504,
+            "lo": -0.17489063829903892,
+            "hi": -0.11348869766116634,
+            "n_users": 820,
+            "n_pairs": 5552,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        }
+      }
+    },
+    {
+      "file": "sports.json",
+      "root_label": "main",
+      "domain": "sports",
+      "backbone": "Qwen3-8B",
+      "why": "the ZS regime of E-F and E-J (descriptive; never a member)",
+      "values": {
+        "ZS": {
+          "G_LLM_given_CF": {
+            "est": -0.0001783641608913118,
+            "lo": -0.00613732201525996,
+            "hi": 0.005783145146527528,
+            "n_users": 997,
+            "n_pairs": 6118,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.9415292353823088,
+            "ci_excludes_0": false
+          },
+          "dUAUC_L_minus_q_hat": {
+            "est": -0.13138708221397993,
+            "lo": -0.16254505340058212,
+            "hi": -0.1011041957660626,
+            "n_users": 997,
+            "n_pairs": 6118,
+            "n_boot": 2000,
+            "descriptive_min_n": false,
+            "p": 0.0009995002498750624,
+            "ci_excludes_0": true
+          }
+        }
+      }
+    }
+  ],
+  "readings": [
+    "R1 Status (A3-6 Consequence; addendum 8). Items 2-7 are exploratory on ML-1M for either backbone (the Qwen ML-1M report was read; the weaker label is used for Llama ML-1M too) and registered, outcome-free on every other panel; FT_C_reading is registered and outcome-free: FT-C on ML-1M (main root) and FT-Q on every dataset of the teacher root; on the main root's other domains FT-C is not registered (addendum 8 section 1 withdrew the Toys permutation run) and the block is not computed; ML-1M and Llama values are never members of an A3-6 family.",
+    "R13 FT-C / FT-Q (DEVIATION: stricter than the registered text, for the paper's deviations table). R is defined only when the registered E-B contrast (s0-s2 vs ZS on TEST) is positive with a CI excluding 0 (registered) and, beyond the registered text, E-B is complete (all 3 seeds; addendum 1 item 7) and the FT-C rows hold at least 150 users (the minimum-n rule of A3 section 1 applied to R's CI-based label); otherwise R is not reported and the label is NOT_DEFINED. A resample with a zero denominator gives a non-finite R, dropped from the percentile CI and counted.",
+    "R14 summarize, families. H-F and H-S are directional: a member is confirmed only with an estimate > 0; H-J is two-sided. FT members need the sigma_seed rule (all registered seeds present, all seeds the sign of the mean, |mean| > 2 sigma_seed). The members are the panel runs and regimes that were run: a panel whose fine-tuned runs were not run (a registered cut of A3 section 10: every FT model s0-s2 without a scoring run) has no FT member in E-F, E-H or E-J, but only with --not_run <dataset> and a pilot-log line holding the exact token 'FTEXTRA_NOT_RUN <dataset>'; without them such a file is refused. Its ZS regime was run, so its ZS member of E-H stays ('per Qwen Amazon panel run and regime'); a dataset cut as a whole has no file and no member. The registered minimum-n rule takes a member out of a family; a member that was run but whose statistic is unavailable (its runs excluded, e.g. by E1) stays in the family with p = 1 (flagged, never confirmed); an incomplete FT member keeps its p-value and is never confirmed.",
+    "R15 summarize, registered copies. The registered E-B / E-D results are copied through by applying the report's own functions (ftgrid_report.holm, ed_holm_family; the E-B family as fill_paper.eb_family computes it) to the files' registered_pooled blocks, which equal the report's blocks (tested). The E-B copy has p_holm and confirmed null unless ML-1M, Toys, Video_Games and Sports are all given with a complete, non-descriptive E-B (fill_paper.eb_family refuses otherwise). P1 is copied from the --ml1m file only (ML-1M, Qwen3-8B, main root); the Llama P1 replication goes to llama.P1_replication and P1_wu to sensitivity.P1_wu, never under registered.P1.",
+    "R16 summarize, inputs. Every file is validated and a bad one is refused (exit 2), never dropped: the schema; a known backbone (Qwen or Llama); empty input_checks.problems; n_boot = --n_boot (2,000 for a registered summary) and seed 0; the code sha1 of ftgrid_extra.py equal to the current file; the root and role: --files = main-root Qwen files of toys / games / sports eligible for the families, --ml1m and --ftc = the main-root Qwen ML-1M file, --llama = Llama-root files, --ftq = teacher-root Qwen files; models_requested holding the registered models of the role (zeroshot, s0-s2; with p0 and p1 for --ftc and --ftq); no (root, domain) twice. A build itself refuses a --root_label that differs from the registered root its --scores_root resolves into.",
+    "R17 robust vs registered_confirmed. `robust` is the A3-6 item 2 reading rule on the unadjusted 95% intervals of the two estimators, not a Holm confirmation; `registered_confirmed` beside it is the registered estimate's confirmation: P1's decision for P1 (ML-1M, Qwen3-8B, main root; null elsewhere), the E-D Holm family for G (null in a domain file, which holds raw p-values only, and filled by summarize), none for G_CF (a reference in no family).",
+    "R18 FT wording (addendum 8 section 2). fine_tuning_mostly_teaches_the_item is true iff FT-C reads ITEM_DRIVEN on ML-1M and FT-Q reads ITEM_DRIVEN on every dataset given (ML-1M and Toys required, addendum 8 section 3; the runner refuses a teacher-root dataset that was scored without its file); null with the reason when an input is missing or its block is unavailable (never true, and never decided, on partial input); NOT_DEFINED is a defined label that is not ITEM_DRIVEN. item_quality_from_item_text additionally needs FT-Q ITEM_DRIVEN on at least one Amazon dataset; evidence_mixed is true iff a label is USER_DRIVEN or MIXED (null on partial input)."
+  ],
+  "ft_wording": {
+    "rule": "addendum 8 section 2: 'fine-tuning mostly teaches the item' only if FT-C reads ITEM_DRIVEN on ML-1M and FT-Q reads ITEM_DRIVEN on every dataset on which it was run; a USER_DRIVEN or MIXED label means the paper reports the labels per dataset and control and calls the evidence mixed; 'the adapter learns item quality from item text' additionally needs FT-Q ITEM_DRIVEN on at least one Amazon dataset (R18)",
+    "labels": {
+      "FT-C": {
+        "ml1m": "ITEM_DRIVEN"
+      },
+      "FT-Q": {
+        "ml1m": "ITEM_DRIVEN",
+        "toys": "ITEM_DRIVEN"
+      }
+    },
+    "complete": true,
+    "reason": null,
+    "fine_tuning_mostly_teaches_the_item": true,
+    "item_quality_from_item_text": true,
+    "evidence_mixed": false
+  }
+}

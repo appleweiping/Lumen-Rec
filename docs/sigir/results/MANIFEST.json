@@ -117,6 +117,30 @@
                   },
                   {
                       "alias":  "ext",
+                      "local_path":  "extra/sports.json",
+                      "server_path":  "outputs/confrec/ftgrid/extra/sports.json",
+                      "size":  225654,
+                      "sha1":  "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+                      "server_mtime_utc":  "2026-10-06T18:47:57Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/sports_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid/extra/sports_tables.csv",
+                      "size":  33428,
+                      "sha1":  "b89aefd0984e27a614ad4183657008122ffd2922",
+                      "server_mtime_utc":  "2026-10-06T18:47:57Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/summary.json",
+                      "server_path":  "outputs/confrec/ftgrid/extra/summary.json",
+                      "size":  65532,
+                      "sha1":  "30507a2e57b7f38e68595a2c8b031c7766af9360",
+                      "server_mtime_utc":  "2026-10-06T18:49:09Z"
+                  },
+                  {
+                      "alias":  "ext",
                       "local_path":  "extra/toys.json",
                       "server_path":  "outputs/confrec/ftgrid/extra/toys.json",
                       "size":  225660,
@@ -395,24 +419,6 @@
                         "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid_q/extra/sports_tables.csv",
                         "local_path":  "extra/ftq/sports_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid/extra/sports.json",
-                        "local_path":  "extra/sports.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid/extra/sports_tables.csv",
-                        "local_path":  "extra/sports_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid/extra/summary.json",
-                        "local_path":  "extra/summary.json",
                         "stale_local_copy_kept":  false
                     },
                     {

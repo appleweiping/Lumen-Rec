@@ -1,5 +1,14 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Wording rules record, update after the Games, Sports, Llama-Toys and FT-Q results were read (a sign added to a count; no decision function changed)
+
+`scripts/sigir/fill_paper.py` sha1 = 5198e7437090796db413fb0a00ae730dc02e6c7f and `tests/test_confrec_fillpaper.py` sha1 = 9b0ff9b8397581d0988ca0e71564bfe4e73b4674 (the previous record, 2026-10-05, is d4948d21... and 856e3bdb...; `docs/sigir/PAPER_DATA_MAP.md`
+is unchanged, cb35d6d4...). Change: the count sentence of the E-D family ("G is confirmed (E-D) on k of 4 ... panels") now states the sign of the confirmed members, because the E-D test is two-sided and the
+registered counts of the real reports contain a confirmed NEGATIVE zero-shot G (Sports: -0.0095, interval [-0.0172, -0.0020]): a bare count would have read as evidence of personal information where the
+residual lowered the UAUC. A confirmed G of each sign is no longer a missing sentence but a count with both signs named (the unanimous cases read "all positive"/"all negative"). No test of any family, threshold
+or label changed; the change was made after the Video_Games and Sports reports and the Llama-Toys and FT-Q extra files had been read, and it makes the statement more conservative. The two other count
+functions (E-B, H-F/H-S) carry a hypothesised sign and need no change.
+
 ## 2026-10-06 · Amendment 3 addendum 11 (cheap-signal controls for selective serving; exploratory; recorded before any control signal was computed on any panel)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_11.md` sha1 = c2e523425883a68f1607b620ea9319a2ebe58a85. The registered audit's selective-serving block (written after the Toys and Sports audits were read: serving the

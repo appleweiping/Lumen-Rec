@@ -1,19 +1,19 @@
 {
  "schema": "fill_paper_unfilled_v1",
  "summary": {
-  "slots_total": 714,
-  "filled": 490,
-  "unfilled": 224,
+  "slots_total": 709,
+  "filled": 526,
+  "unfilled": 183,
   "unfilled_by_reason": {
    "branch_slot": 6,
-   "free_text": 29,
-   "result_file_missing": 189
+   "free_text": 24,
+   "result_file_missing": 153
   },
   "filled_by_alias": {
    "aud": 111,
    "corr": 5,
    "cpu": 25,
-   "ext": 115,
+   "ext": 151,
    "free": 4,
    "gate": 9,
    "gft": 6,
@@ -27,8 +27,8 @@
    "aud2q": 16,
    "branch": 6,
    "corr": 4,
-   "ext": 42,
-   "free": 40,
+   "ext": 6,
+   "free": 35,
    "grid": 1,
    "mir": 7,
    "prn": 17,
@@ -115,6 +115,60 @@
    "a": 943,
    "b": 943,
    "ok": true
+  },
+  {
+   "check": "extra/summary.json input (files, main, toys): sha1 = sha1 of extra/toys.json",
+   "a": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
+   "b": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (files, main, games): sha1 = sha1 of extra/games.json",
+   "a": "a79f1a9487912e6646e076d6b95c30011cffcd06",
+   "b": "a79f1a9487912e6646e076d6b95c30011cffcd06",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (files, main, sports): sha1 = sha1 of extra/sports.json",
+   "a": "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+   "b": "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (ml1m, main, ml1m): sha1 = sha1 of extra/ml1m.json",
+   "a": "b2918d95aa59f4693ede10953ff253b99b85f733",
+   "b": "b2918d95aa59f4693ede10953ff253b99b85f733",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (ftc, main, ml1m): sha1 = sha1 of extra/ml1m.json",
+   "a": "b2918d95aa59f4693ede10953ff253b99b85f733",
+   "b": "b2918d95aa59f4693ede10953ff253b99b85f733",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (llama, llama, ml1m): sha1 = sha1 of extra/llama/ml1m.json",
+   "a": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+   "b": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (llama, llama, toys): sha1 = sha1 of extra/llama/toys.json",
+   "a": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
+   "b": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (ftq, teacher, ml1m): sha1 = sha1 of extra/ftq/ml1m.json",
+   "a": "e0c7560bd713078f2ea0ba9e4c6ab774bf1f096f",
+   "b": "e0c7560bd713078f2ea0ba9e4c6ab774bf1f096f",
+   "ok": true
+  },
+  {
+   "check": "extra/summary.json input (ftq, teacher, toys): sha1 = sha1 of extra/ftq/toys.json",
+   "a": "9aa393b4f5c9bb60b8a4ab4b51b65ea791abc7f2",
+   "b": "9aa393b4f5c9bb60b8a4ab4b51b65ea791abc7f2",
+   "ok": true
   }
  ],
  "check_equal_summary": {
@@ -133,6 +187,8 @@
   "extra/llama/ml1m.json": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
   "extra/llama/toys.json": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
   "extra/ml1m.json": "b2918d95aa59f4693ede10953ff253b99b85f733",
+  "extra/sports.json": "73bb21f5e10aabb40048b691c2ce1a9155e8d984",
+  "extra/summary.json": "30507a2e57b7f38e68595a2c8b031c7766af9360",
   "extra/toys.json": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
@@ -153,32 +209,8 @@
  "unfilled": [
   {
    "file": "sections/abstract.tex",
-   "line": 24,
-   "slot": "one sentence: the rated-panel result beside the references on the same rows (UAUC of zero-shot and LoRA, the item mean\nand matrix factorisation, with CI), the share of within-user confidence variance the item prior explains, and the personal\ninformation gain over the item mean, zero-shot versus LoRA",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "reason": "free_text",
-   "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/abstract.tex",
-   "line": 27,
-   "slot": "one sentence: what the item-only controls (within-item permutation on ML-1M, item-only teacher) and the\ncomplementarity to collaborative filtering show",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "reason": "free_text",
-   "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/abstract.tex",
-   "line": 29,
-   "slot": "one sentence: which routes (item-dependent corrections, cross-user selective serving and exposure, uncertainty-selected\npruning) beat their control, with effect size and CI, or that none did",
+   "line": 28,
+   "slot": "one sentence: which routes (cross-user selective serving against random and cheap signals, static exposure,\nitem-dependent corrections, uncertainty-selected pruning, the method slot) beat their control, with effect size and CI, or that none did",
    "kind": "prose",
    "table": null,
    "row": null,
@@ -203,8 +235,8 @@
   },
   {
    "file": "sections/introduction.tex",
-   "line": 96,
-   "slot": "(i) What the confidence tracks (Section 6.1, Table tab:tracks): zero-shot and LoRA UAUC beside the item mean, the\ninformation-matched item mean and MF on the same rows, item-prior share and e-share, G and G_wu against G_CF, P1; counts per regime;\ndirection-free unless admitted",
+   "line": 112,
+   "slot": "(iii) Which uses survive a matched control (Section 6.3): selective serving against random and against cheap\nsignals, static exposure, item-dependent corrections, uncertainty-selected pruning (S6) and the method slot, to be written from\nthe finished runs",
    "kind": "prose",
    "table": null,
    "row": null,
@@ -212,272 +244,6 @@
    "blocks": [],
    "reason": "free_text",
    "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/introduction.tex",
-   "line": 99,
-   "slot": "(ii) What fine-tuning teaches (Section 6.2, Table tab:teaches): FT-C (ML-1M) and FT-Q retention, their labels and the\nwording of addendum 8, complementarity to CF (H-F), the sparse and unseen strata (H-S), the store-name knockout label and its wording",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "reason": "free_text",
-   "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/introduction.tex",
-   "line": 101,
-   "slot": "(iii) Which uses survive a matched control (Section 6.3): error anatomy (oracle and deployable top-k), corrections against\nplacebo and ensemble null, selective serving against random, static exposure against the pool and the published recommenders,\nuncertainty-selected against class-matched random pruning",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "reason": "free_text",
-   "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 85,
-   "slot": "ext:E\\_J.UAUC\\_q\\_hat\\_T",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "matched mean $m_T$ (ref.)$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 87,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 87,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 88,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 88,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 94,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "e-share$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 94,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "e-share$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 95,
-   "slot": "ext:E\\_G.item\\_share\\_mf",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item share of MF / label$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 95,
-   "slot": "ext:E\\_G.item\\_share\\_label",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "Item share of MF / label$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 97,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 97,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 98,
-   "slot": "ext:E\\_W.G\\_CF\\_wu",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 109,
-   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 109,
-   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 111,
-   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 111,
-   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 113,
-   "slot": "ext:E\\_Cprime.AUROC\\_margin",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 7,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 113,
-   "slot": "ext:E\\_Cprime.AUROC\\_margin",
-   "kind": "table",
-   "table": "tab:tracks",
-   "row": "deployable$^\\dagger$",
-   "column": 8,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 126,
-   "slot": "ext:summary.families.E\\_J count",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "the item mean (H-J) on",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 131,
-   "slot": "ext:summary.robust\\_readings count",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "the within-user estimator finds it",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -493,174 +259,6 @@
   },
   {
    "file": "sections/experiments.tex",
-   "line": 161,
-   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 161,
-   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 162,
-   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 162,
-   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 165,
-   "slot": "ext:E\\_H.sparse.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Sparse rows ($m$ from $<5$ ratings)",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 165,
-   "slot": "ext:E\\_H.sparse.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Sparse rows ($m$ from $<5$ ratings)",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 166,
-   "slot": "ext:E\\_H.dense.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Dense rows",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 166,
-   "slot": "ext:E\\_H.dense.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Dense rows",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 167,
-   "slot": "ext:E\\_H.unseen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Unseen items (no TRAIN example)",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 167,
-   "slot": "ext:E\\_H.unseen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Unseen items (no TRAIN example)",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 168,
-   "slot": "ext:E\\_H.seen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Seen items",
-   "column": 7,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 168,
-   "slot": "ext:E\\_H.seen.G\\_prior",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "Seen items",
-   "column": 8,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_file_missing",
-   "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
    "line": 172,
    "slot": "ext:FT\\_Q\\_reading.R",
    "kind": "table",
@@ -742,58 +340,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "extra/ftq/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 188,
-   "slot": "ext:summary.ft\\_wording (the wording it allows, with the labels per control and dataset)",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "By the wording rule of addendum 8,",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 190,
-   "slot": "ext:summary.families.E\\_F count",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "H-F) on",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 191,
-   "slot": "ext:summary.families.E\\_H count ZS",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "H-S) in",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 191,
-   "slot": "ext:summary.families.E\\_H count FT",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "anchor": "[S] and",
-   "reason": "result_file_missing",
-   "detail": "extra/summary.json"
   },
   {
    "file": "sections/experiments.tex",
@@ -2412,19 +1958,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 17,
-   "slot": "2--3 sentences from Tables tab:tracks and tab:teaches only: the LLM beside the item mean, the matched item mean and MF,\nthe item-prior share and e-share, G and G_wu against G_CF by regime (counts per regime), the FT-C and FT-Q readings and the wording\nof addendum 8, H-F and H-S; direction-free unless the claim-admission rule is met",
-   "kind": "prose",
-   "table": null,
-   "row": null,
-   "column": null,
-   "blocks": [],
-   "reason": "free_text",
-   "detail": "a sentence to be written from the filled tables"
-  },
-  {
-   "file": "sections/conclusion.tex",
-   "line": 21,
+   "line": 23,
    "slot": "1--2 sentences from the tables of Section 6.3 only: which of item-dependent corrections, selective serving, static exposure\nand uncertainty-selected pruning beat their placebo, ensemble null, random or class-matched random control, with effect size and\ninterval, or that none did",
    "kind": "prose",
    "table": null,
@@ -2436,7 +1970,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 25,
+   "line": 27,
    "slot": "branch: only if the nested method slot (prior-offset LoRA) survives its kill rule -- one sentence on its gain over\npost-hoc stacking; else omit",
    "kind": "branch",
    "table": null,
@@ -2450,7 +1984,7 @@
   },
   {
    "file": "sections/conclusion.tex",
-   "line": 31,
+   "line": 33,
    "slot": "one sentence of practitioner guidance drawn only from the admitted rows of that table",
    "kind": "prose",
    "table": null,

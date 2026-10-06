@@ -17,8 +17,9 @@ audit's own `run` on the same inputs (the optional --audit_json makes `run` chec
     python -m src.confrec.nextitem_serving_control record [--pilot_log docs/sigir/PILOT_LOG.md] [--root R] [--files F ...]
 
 Inputs of `run` are those of the audit's `run` (the same score directories <A>/<D>_<test_role> and <A>/<D>_<valid_role>, the same
-panels); --ref_ranks / --ref_exposure are accepted for command-line compatibility and are never read. Only the question `next` is
-registered (--questions next). The registered panels are the TEST segment of the audit (sports events 1,001-10,000, the quarantine
+panels; the VALID panel must carry candidate_popularity_groups, which the audit does not need there but pop_conf and the VALID
+profile do); --ref_ranks / --ref_exposure are accepted for command-line compatibility and are never read. Only the question `next`
+is registered (--questions next). The registered panels are the TEST segment of the audit (sports events 1,001-10,000, the quarantine
 segment of events 1-1,000 is NOT analysed; toys / home / tools all events) and, as the second-backbone replication, the Z2 panels
 (`--segments single`, one segment for the whole supplied panel). One `run` writes ONE json for ONE panel / segment.
 

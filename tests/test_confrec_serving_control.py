@@ -1164,7 +1164,7 @@ def test_the_module_opens_only_the_paths_it_is_given(world, tmp_path, monkeypatc
         decoys["docs/sigir/PILOT_LOG.md"].read_text(encoding="utf-8")
         list(os.scandir(tmp_path / "docs"))
     bad = foreign_paths(events, given)
-    assert [os.path.basename(p) for _, p in bad] == ["PILOT_LOG.md", "docs"] or len(bad) == 2
+    assert sorted(os.path.basename(p) for _, p in bad) == ["PILOT_LOG.md", "docs"]
     # `record` opens only its own files and the pilot log it is given
     log = tmp_path / "log.md"
     log.write_text("x", encoding="utf-8")

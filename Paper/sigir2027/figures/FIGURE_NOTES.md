@@ -17,6 +17,7 @@ The live state (which panel has data, which file is missing) is the manifest's `
 ```
 python scripts/sigir/make_figures.py --results docs/sigir/results --out Paper/sigir2027/figures [--only tracks,shares,serving,decomp]
 python -m pytest tests/test_confrec_figures.py -q -p no:cacheprovider
+FIG_TEST_LATEX=1 python -m pytest tests/test_confrec_figures.py -q -p no:cacheprovider -k compiles    # opt-in: compiles decomp.tex in acmart
 ```
 
 `--only` keeps the manifest entries of the figures not asked for as long as their files still carry the recorded sha1. Exit code 2:
@@ -192,17 +193,26 @@ and one separation (not measured). The deltas depend little on the base; the bas
 
 ## 7. What has to change outside this directory (described, not edited)
 
-1. `scripts/sigir/fill_paper.py`, `run()`: the filled copy is `main.tex`, `references.bib`, `sections/*.tex` and the three JSON files;
-   nothing under `Paper/sigir2027/figures/` is copied into `filled/`. `\includegraphics{figures/tracks.pdf}` and `\input{figures/decomp}`
-   would fail there ("File not found"). Proposed: in `run()`, add every `paper/figures/*.pdf` and `paper/figures/*.tex` to `outputs`
-   (bytes, under `figures/<name>`); the existing loop already rewrites a file only when its bytes change. Do not copy
-   `figures_manifest.json` or this file (they are not part of the build). `scripts/sigir/page_budget.py` calls `fill.run` into
-   `<out>/filled` and compiles there, so it needs no change once `run()` copies the figures; it already records the end of every
-   `figure` and `figure*` (`env/figure/end`, `env/figure*/end`).
-2. `Paper/sigir2027/main.tex`: add `\usepackage{tikz}` and `\usetikzlibrary{arrows.meta,positioning}` after `\usepackage{subcaption}`
-   (only for F4; acmart does not load TikZ).
-3. `sections/experiments.tex`, `sections/preliminaries.tex`: insert the snippets of section 5 (and the sentences that cite
-   `Figure~\ref{fig:tracks}`, `\ref{fig:shares}`, `\ref{fig:serving}`, `\ref{fig:decomp}`). The skeleton cites none today.
+1. The two build paths treat figure files differently.
+   - Slot-filling path (`scripts/sigir/fill_paper.py`, `run()`): the filled copy is `main.tex`, `references.bib`, `sections/*.tex` and the
+     three JSON files; nothing under `Paper/sigir2027/figures/` is copied into `filled/` (verified in the file as read on 2026-10-06: it
+     does not mention figures). `\includegraphics{figures/tracks.pdf}` and `\input{figures/decomp}` would fail there ("File not
+     found"). Proposed: in `run()`, add every `paper/figures/*.pdf` and `paper/figures/*.tex` to `outputs` (bytes, under
+     `figures/<name>`); the existing loop already rewrites a file only when its bytes change. Do not copy `figures_manifest.json` or
+     this file. `scripts/sigir/page_budget.py` calls `fill.run` into `<out>/filled` and compiles there, so it needs no change once
+     `run()` copies the figures; it already records the end of every `figure` and `figure*` (`env/figure/end`, `env/figure*/end`).
+   - Token path (`scripts/sigir/build_paper.py`, `Paper/sigir2027/src` to `Paper/sigir2027/build`, which appeared while this work was
+     under way): it copies every file below `--src`, figure PDFs included, so the figures must live below `src/` (an empty
+     `src/figures/` exists). Not done here (that directory is outside this task): run
+     `python scripts/sigir/make_figures.py --only tracks,shares,serving --out Paper/sigir2027/src/figures` and copy `decomp.tex`
+     beside the PDFs (`--only decomp` needs the file in `--out`). `decomp.tex` holds no result token, so the copy passes through
+     unchanged. `page_budget.py` measures the slot-filling output only; for the token path the page count has to be read from the
+     build's own log.
+2. `main.tex` (`Paper/sigir2027/main.tex` and `Paper/sigir2027/src/main.tex`): add `\usepackage{tikz}` and
+   `\usetikzlibrary{arrows.meta,positioning}` (only for F4; acmart does not load TikZ). `graphicx` is already loaded.
+3. The section files that hold Table `tab:tracks` and the S3 paragraph (`sections/experiments.tex` today, `findings.tex` in `src/`) and
+   the setting section (`preliminaries.tex`, `setting.tex` in `src/`): insert the snippets of section 5 and the sentences that cite
+   `Figure~\ref{fig:tracks}`, `\ref{fig:shares}`, `\ref{fig:serving}`, `\ref{fig:decomp}`. The skeleton cites none today.
 4. Page budget: the three plots and the schematic are new floats on top of a paper that is already near the nine-page limit (section 6):
    something moves to the artefact or into the figures (for example block A and B of Table `tab:tracks` become the figures'
    source and keep only the rows the text cites).
@@ -219,5 +229,5 @@ synthetic tree with the real schemas; the drawn marks equal the manifest; a miss
 malformed file raises an error naming file and key; exploratory and descriptive flags, withheld values and the Gate-FT rule; no read
 outside the results root (a decoy outside it is never opened); byte-identical output in one process and across processes with
 different hash seeds; PDF is vector, TrueType, exact size, text inside the canvas; no result-like literal in the script; no result
-number in the captions above; `decomp.tex` compiles in the paper class (when LaTeX is installed); and a round trip on a snapshot of
-the real result tree.
+number in the captions above; `decomp.tex` static checks, and with `FIG_TEST_LATEX=1` a compile in the paper class (it fits one
+column, no overfull box); and a round trip on a snapshot of the real result tree.

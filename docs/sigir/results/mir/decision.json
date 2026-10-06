@@ -1,0 +1,328 @@
+{
+  "decision": "INDETERMINATE",
+  "gate": {
+    "source": "stage3",
+    "pass": true,
+    "input_checks_ok": true,
+    "input_checks": {
+      "ml1m": {
+        "panel_type": "rated",
+        "base_question": "like",
+        "expected": [
+          "rated",
+          "like"
+        ],
+        "ok": true
+      },
+      "toys": {
+        "panel_type": "rated",
+        "base_question": "like",
+        "expected": [
+          "rated",
+          "like"
+        ],
+        "ok": true
+      },
+      "sports": {
+        "panel_type": "next_item",
+        "base_question": "next",
+        "expected": [
+          "next_item",
+          "next"
+        ],
+        "ok": true
+      }
+    },
+    "rated_component": {
+      "record": "gatefix_select confirm gate.json (amendment 2 G6)",
+      "ok": true,
+      "decision": "GATE_PASS",
+      "v_star": "V1",
+      "UAUC": 0.6032507035223247,
+      "UAUC_min": 0.6,
+      "E1": true,
+      "n_users": 1683.0
+    },
+    "next_item_component": {
+      "record": "Pilot-1 decision.json (sports TEST events 1-1000, V0; G0: not re-tested)",
+      "ok": true,
+      "sports_raw_NDCG@10": 0.20934006726080595,
+      "sports_raw_NDCG@10_min": 0.18632,
+      "input_check_ok": true
+    },
+    "ml1m_n_users_equals_g6": true,
+    "ml1m_n_users": 1683.0,
+    "context_remeasured": {
+      "note": "stage-3 rescoring, reported, never gates",
+      "ml1m_raw_UAUC": 0.6032121742379962,
+      "sports_valid_raw_NDCG@10": 0.19748780187010342,
+      "ccrp_same_events_NDCG@10": null
+    }
+  },
+  "handoff": null,
+  "conditions": {
+    "positive": false,
+    "negative": false,
+    "null": false
+  },
+  "decision_table": {
+    "GATE_FAIL_UNINTERPRETABLE": false,
+    "POSITIVE": false,
+    "NULL": false,
+    "NEGATIVE": false,
+    "INDETERMINATE": true,
+    "INCOMPLETE": false
+  },
+  "overlap_negative_and_null": false,
+  "any_domain_acquiescence_large_and_pop_linked": false,
+  "any_domain_dUAUC_lo_gt_0": true,
+  "any_domain_beats_placebo_and_ensemble_null": false,
+  "missing_inputs": [],
+  "criteria": {
+    "ml1m": {
+      "SD_pair_estimator": "SD_pair_df",
+      "popularity": "all-time",
+      "SD_pair": 2.0630005529699234,
+      "corr_a_logpop": 0.10176844009597277,
+      "dUAUC_mirror_minus_placebo": {
+        "est": 0.016390294232670563,
+        "lo": 0.011994118066844956,
+        "hi": 0.020714401523050655,
+        "n": 1683.0
+      },
+      "dUAUC_mirror_minus_ensemble_null": {
+        "est": -0.0010438210953181667,
+        "lo": -0.004652253923007189,
+        "hi": 0.002710260374203039,
+        "n": 1683.0,
+        "predicted_UAUC": 0.6211689500227979,
+        "observed_UAUC": 0.6201251289274798,
+        "placebo_sanity_est": -0.00022845849372295555
+      },
+      "corr_v_logpop": 0.288557010650623,
+      "corr_pi_logpop": 0.5112551733340299,
+      "reference_SD_pair_df": 2.0630005529699234,
+      "reference_corr_a_logpop_prior_pop": 0.07809327626587549,
+      "SD_pair_ge_0.20": true,
+      "corr_a_logpop_ge_0.20": false,
+      "acquiescence_large_and_pop_linked": false,
+      "SD_pair_lt_0.10": false,
+      "dUAUC_lo_gt_0": true,
+      "dUAUC_hi_le_0": false,
+      "ensemble_null_lo_gt_0": false,
+      "beats_placebo_and_ensemble_null": false,
+      "valence_or_prior_pop_linked": true
+    },
+    "toys": {
+      "SD_pair_estimator": "SD_pair_df",
+      "popularity": "all-time",
+      "SD_pair": 2.456183843236346,
+      "corr_a_logpop": 0.02596563057394558,
+      "dUAUC_mirror_minus_placebo": {
+        "est": 0.009114653324098353,
+        "lo": 0.0017767764620514076,
+        "hi": 0.016858246434182964,
+        "n": 1500.0
+      },
+      "dUAUC_mirror_minus_ensemble_null": {
+        "est": 0.001370010147063654,
+        "lo": -0.0033333486332776164,
+        "hi": 0.005903276941460614,
+        "n": 1500.0,
+        "predicted_UAUC": 0.5449819515334257,
+        "observed_UAUC": 0.5463519616804893,
+        "placebo_sanity_est": -0.00021079851523134467
+      },
+      "corr_v_logpop": 0.11511215423549948,
+      "corr_pi_logpop": 0.2871073832057516,
+      "reference_SD_pair_df": 2.456183843236346,
+      "reference_corr_a_logpop_prior_pop": 0.0010198449026563496,
+      "SD_pair_ge_0.20": true,
+      "corr_a_logpop_ge_0.20": false,
+      "acquiescence_large_and_pop_linked": false,
+      "SD_pair_lt_0.10": false,
+      "dUAUC_lo_gt_0": true,
+      "dUAUC_hi_le_0": false,
+      "ensemble_null_lo_gt_0": false,
+      "beats_placebo_and_ensemble_null": false,
+      "valence_or_prior_pop_linked": true
+    }
+  },
+  "next_item_no_loss": {
+    "metric": "NDCG@10_tie_exact",
+    "loss_vs_raw": 0.010702819677574592,
+    "loss_vs_raw_like": 0.02346802318943992,
+    "max_loss": 0.005,
+    "no_loss": false,
+    "arm_level": {
+      "NDCG@10_raw": 0.19769378066360271,
+      "NDCG@10_raw_like": 0.21045898417546807,
+      "NDCG@10_mirror": 0.18699096098602813,
+      "loss_vs_raw": 0.010702819677574582,
+      "loss_vs_raw_like": 0.02346802318943994
+    },
+    "unscored": {
+      "raw": {
+        "n_events_positive_unscored": 0.0,
+        "n_events_negative_unscored": 0.0
+      },
+      "raw_like": {
+        "n_events_positive_unscored": 0.0,
+        "n_events_negative_unscored": 0.0
+      },
+      "mirror": {
+        "n_events_positive_unscored": 0.0,
+        "n_events_negative_unscored": 0.0
+      },
+      "placebo": {
+        "n_events_positive_unscored": 0.0,
+        "n_events_negative_unscored": 0.0
+      }
+    },
+    "unscored_candidates_present": false,
+    "dNDCG@10_mirror_minus_raw": {
+      "est": -0.01072136132649226,
+      "lo": -0.02029810915206422,
+      "hi": -0.0009291256543391621,
+      "n": 1000,
+      "n_events": 1000,
+      "n_events_positive_unscored_dropped": 0,
+      "n_events_with_candidates_dropped": 0,
+      "tie_exact": {
+        "est": -0.010702819677574592,
+        "lo": -0.020274119721630037,
+        "hi": -0.0008997101519226645,
+        "n": 1000
+      }
+    },
+    "dNDCG@10_mirror_minus_raw_like": {
+      "est": -0.023543842007362176,
+      "lo": -0.03311395672544501,
+      "hi": -0.013728762069239349,
+      "n": 1000,
+      "n_events": 1000,
+      "n_events_positive_unscored_dropped": 0,
+      "n_events_with_candidates_dropped": 0,
+      "tie_exact": {
+        "est": -0.02346802318943992,
+        "lo": -0.03297652779088976,
+        "hi": -0.01380148054808716,
+        "n": 1000
+      }
+    },
+    "dNDCG@10_mirror_minus_placebo": {
+      "est": -0.028462147869366575,
+      "lo": -0.03861125247207513,
+      "hi": -0.017938513430585876,
+      "n": 1000,
+      "n_events": 1000,
+      "n_events_positive_unscored_dropped": 0,
+      "n_events_with_candidates_dropped": 0,
+      "tie_exact": {
+        "est": -0.028267520950987012,
+        "lo": -0.038364493365048685,
+        "hi": -0.01786082692623312,
+        "n": 1000
+      }
+    },
+    "dNDCG@10_raw_minus_ccrp": {
+      "est": null,
+      "lo": null,
+      "hi": null,
+      "n": 0,
+      "n_events": 0,
+      "tie_exact": {
+        "est": null,
+        "lo": null,
+        "hi": null,
+        "n": 0
+      }
+    },
+    "dNDCG@10_raw_like_minus_ccrp": {
+      "est": null,
+      "lo": null,
+      "hi": null,
+      "n": 0,
+      "n_events": 0,
+      "tie_exact": {
+        "est": null,
+        "lo": null,
+        "hi": null,
+        "n": 0
+      }
+    },
+    "dNDCG@10_mirror_minus_ccrp": {
+      "est": null,
+      "lo": null,
+      "hi": null,
+      "n": 0,
+      "n_events": 0,
+      "tie_exact": {
+        "est": null,
+        "lo": null,
+        "hi": null,
+        "n": 0
+      }
+    },
+    "dNDCG@10_placebo_minus_ccrp": {
+      "est": null,
+      "lo": null,
+      "hi": null,
+      "n": 0,
+      "n_events": 0,
+      "tie_exact": {
+        "est": null,
+        "lo": null,
+        "hi": null,
+        "n": 0
+      }
+    }
+  },
+  "sensitivity": {
+    "SD_pair_divisor_N": {
+      "decision": "INDETERMINATE",
+      "handoff": null
+    },
+    "prior_popularity": {
+      "decision": "INDETERMINATE",
+      "handoff": null
+    },
+    "ndcg_plugin_expected_rank": {
+      "decision": "INDETERMINATE",
+      "handoff": null
+    },
+    "NEGATIVE_before_NULL": {
+      "decision": "INDETERMINATE",
+      "handoff": null
+    },
+    "all_agree_with_primary": true
+  },
+  "input_summary": {
+    "ml1m": {
+      "n_users": 1683.0,
+      "n_rows": 33043.0,
+      "n_events": null,
+      "panel_join": {}
+    },
+    "toys": {
+      "n_users": 1500.0,
+      "n_rows": 19240.0,
+      "n_events": null,
+      "panel_join": {}
+    },
+    "sports": {
+      "n_users": 1000.0,
+      "n_rows": 101000.0,
+      "n_events": 1000.0,
+      "panel_join": {}
+    }
+  },
+  "inputs": {
+    "ml1m": "outputs/confrec/gatefix/stage3/ml1m/pilot_mirror.json",
+    "toys": "outputs/confrec/gatefix/stage3/toys/pilot_mirror.json",
+    "sports": "outputs/confrec/gatefix/stage3/sports_valid_1k/pilot_mirror.json",
+    "stage3_gate": "outputs/confrec/gatefix/confirm/gate.json",
+    "pilot1_decision": "outputs/confrec/pilot1_mirror/decision.json"
+  },
+  "rule": "triage_verdict.md section 3.1 as amended by PREREG_AMENDMENT_1.md P1.1/P1.4/P1.5 and PREREG_AMENDMENT_2.md section 0 (INDETERMINATE closes the table) and G7 (POSITIVE also beats the correlation-matched ensemble null in a domain where it beats the placebo; a gain over the placebo that does not beat the ensemble null is not NULL either, so with large acquiescence it is INDETERMINATE: no handoff); stage 3: gate = G6 gate.json + Pilot-1 sports record, re-measured values are context"
+}

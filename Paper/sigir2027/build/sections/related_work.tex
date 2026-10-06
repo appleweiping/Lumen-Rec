@@ -1,0 +1,50 @@
+% Section 2: related work. No result appears here. Each work is described only as far as the verification notes
+% (Paper/sigir2027/CITATION_NOTES_2026-10-06.md) support.
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Pointwise yes/no scoring and its confidence.}
+TALLRec~\citep{bao2023tallrec} tunes an LLM with LoRA to answer whether a user will like an item, CoLLM~\citep{zhang2025collm} and
+BinLLM~\citep{zhang2024binllm} add collaborative information, and ReLLa~\citep{lin2024rella} retrieves behaviours and scores a pair by the
+two-way Yes/No softmax, the sigmoid of the logit audited here. These models are judged by discrimination (AUC, UAUC, log loss), rarely
+by reliability. IR rankers score relevance by the probability of a ``true'' token~\citep{nogueira2020document}; finer relevance grades help
+zero-shot pointwise rankers~\citep{zhuang2024beyond}, and pairwise prompting avoids the calibration across prompts that pointwise scores
+need~\citep{qin2024prp}. Generative recommenders~\citep{geng2022p5,liao2024llara,bao2025bigrec} face distorted sequence-level
+confidence~\citep{bao2024d3}, which one Yes/No position avoids; zero-shot LLM rankers are swayed by popularity and candidate
+position~\citep{hou2024llmrank}, and LLMs partly memorise MovieLens-1M~\citep{dipalma2025memorize}. At the output level, LLM
+recommenders recover personal preference poorly under pointwise rating prompts once user rating bias and item quality are
+controlled~\citep{tan2025perrecbench}, zero-shot LLMs trail collaborative filtering in rating prediction while fine-tuned ones approach
+it~\citep{kang2023llmrating}, and they barely use the order of the history~\citep{kim2025lostinsequence}. None of these measures what the token
+confidence itself encodes, how fine-tuning changes it, or which uses of it survive a matched control.
+
+\paragraph{Uncertainty, calibration and answer priors.}
+LLMs are overconfident when they verbalise confidence~\citep{xiong2024llmuncertainty} but fairly calibrated in token probabilities on
+multiple-choice questions~\citep{kadavath2022language}; fine-tuning shapes confidence~\citep{kapoor2024taught,li2025conftuner}, and
+calibration can depend on how close an input is to others~\citep{xiong2023procal}. Binary answers carry input-independent priors, removed by
+contextual~\citep{zhao2021calibrate} or batch calibration~\citep{zhou2024batch} or PMI scoring~\citep{holtzman2021surface}; yes/no answers
+carry order and wording biases that crossing a statement with its negation separates, leaving idiosyncratic per-item
+residuals~\citep{huang2026yesno}, and LLMs prefer recognised brands~\citep{chu2026incumbent}. The two-view contrast evaluated here is the
+log-odds analogue of the symmetrised inference rule of contrast-consistent search~\citep{burns2023ccs}. For LLM recommenders, UQRec~\citep{kweon2025uqrec}
+decomposes list-wise uncertainty, GUIDER~\citep{xu2026guider} re-ranks by data and model uncertainty, UGR~\citep{fan2026ugr} uses confidence
+tokens for rejection and truncation, EviRank~\citep{yan2026evirank} estimates position-level confidence, an audit scores verbalised
+confidence by popularity stratum~\citep{ravikumar2026hallucinating}, KnowSA~\citep{lee2026knowsa} finds popularity and uncertainty poor proxies
+of item knowledge, uncertainty-aware recommendation adapts to low-active users~\citep{zou2026uncertainty}, FACTER thresholds a fairness
+score conformally~\citep{fayyazi2025facter}, and selective escalation to an LLM did not help in a sparse study~\citep{zhou2026routerec}.
+Calibrating personalised ranking scores is older~\citep{kweon2022calibrated}. The decomposition below is the biased-MF baseline predictor
+applied to log-odds, with the item term read off the model, and echoes the separation of interest from conformity in causal
+embeddings~\citep{zheng2021dice}; a prior-offset LoRA is a product of experts with a bias-only expert~\citep{clark2019easyway}.
+
+\paragraph{Popularity, exposure, pruning and serving.}
+Popularity bias~\citep{abdollahpouri2017controlling} has causal treatments~\citep{wei2021macr,zhang2021pda} and is amplified by SFT and DPO
+in LLM recommenders~\citep{gao2025flower,gao2025sprec}, whereas a prompted LLM recommender showed less of it than conventional
+ones~\citep{lichtenberg2024popularity} and LLM recommenders can be unfair to items~\citep{jiang2024itemfairness}; in entity question
+answering, LLM confidence rises with answer popularity~\citep{ni2026popular}. Feedback loops raise homogeneity and popularity
+bias~\citep{chaney2018feedback,mansoury2020feedback}, also with LLM components~\citep{park2026echotrace}; we measure exposure statically.
+LLM-recommender training data are selected by influence and effort~\citep{lin2024dealrec} or by coresets, where loss- and gradient-based scores
+fall below random~\citep{mei2025goracs} (neither tests the uncertainty of a zero-shot model, so we compare with class-matched random
+pruning); training dynamics and data pruning more generally~\citep{swayamdipta2020cartography,sorscher2022pruning}, uncertainty-aware
+instruction selection~\citep{liu2024selectit} and claim-level cuts at an uncertainty quantile~\citep{wu2025unit} are related, and
+recommenders are denoised by dropping large-loss interactions~\citep{wang2021tce} or by thresholding an LLM's generation
+probability~\citep{wang2026llm4dsr}. Serving by a confidence score is a performance-prediction decision~\citep{bellogin2011predicting}
+and selective classification~\citep{geifman2017selective}, which can widen group gaps~\citep{jones2021selective}. We test each use
+against a matched control.

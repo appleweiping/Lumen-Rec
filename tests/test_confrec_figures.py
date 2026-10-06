@@ -14,7 +14,8 @@ What is checked:
   * no read outside the results root (a decoy outside the root is never opened);
   * the generator is deterministic (same inputs, byte-identical PDFs and manifest, also across processes);
   * style: 7.0 in wide, fonts embedded as TrueType (no Type 3), text inside the canvas; no result-like literal in the script;
-    captions of the proposed LaTeX snippets carry no result number; decomp.tex compiles (when LaTeX is installed)."""
+    captions of the proposed LaTeX snippets carry no result number; decomp.tex is checked statically, and compiled in the paper
+    class when FIG_TEST_LATEX=1 (about 10 s; opt-in so that the default run stays short)."""
 from __future__ import annotations
 
 import ast
@@ -241,7 +242,25 @@ def world(tmp_path_factory):
 
 
 @pytest.fixture(scope="module")
-def full_run(world, tmp_path_factory):
+def child_process(world, tmp_path_factory, request):
+    """A fresh interpreter (another hash seed) that draws F1 from the same tree. Started when the first big fixture is built, so that
+    its start-up overlaps with the other tests; None when the test that reads it is not selected."""
+    if not any("different_hash_seed" in it.name for it in request.session.items):
+        yield None
+        return
+    out = tmp_path_factory.mktemp("figs_child")
+    seed = "2" if os.environ.get("PYTHONHASHSEED") == "1" else "1"
+    env = {**os.environ, "PYTHONHASHSEED": seed, "MPLBACKEND": "Agg"}
+    proc = subprocess.Popen([sys.executable, str(SCRIPT), "--results", str(world), "--out", str(out), "--only", "tracks"], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=ROOT)
+    yield proc, out
+    if proc.poll() is None:
+        proc.kill()
+        proc.communicate()
+
+
+@pytest.fixture(scope="module")
+def full_run(world, child_process, tmp_path_factory):
     out = tmp_path_factory.mktemp("figs_full")
     return world, out, mf.run(world, out, only=ALL3)
 
@@ -268,17 +287,13 @@ def drawn_world(world):
 
 @pytest.fixture(scope="module")
 def holey(tmp_path_factory):
-    """A tree with a rated panel, two next-item panels and one addendum-6 file missing (entries built once; PDFs stubbed)."""
-    root = build_tree(tmp_path_factory.mktemp("results_holes"), skip=HOLES)
-    out = tmp_path_factory.mktemp("figs_holes")
-    with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(mf, "_render_pdf", _fake_render)
-        return root, out, mf.run(root, out, only=ALL3)
+    """A tree with a rated panel, two next-item panels and one addendum-6 file missing."""
+    return build_tree(tmp_path_factory.mktemp("results_holes"), skip=HOLES)
 
 
 @pytest.fixture(scope="module")
 def drawn_holey(holey):
-    figs = _draw_all(holey[0])
+    figs = _draw_all(holey)
     yield figs
     for _, fig in figs.values():
         mf.plt.close(fig)
@@ -400,18 +415,17 @@ def test_pdf_is_vector_truetype_and_exact_size(full_run):
 
 # ------------------------------------------------------------------------------------------------ placeholders and errors
 def test_missing_panel_is_an_explicit_placeholder(holey, drawn_holey):
-    root, out, m = holey
+    entries = {fid: entry_of(spec, holey) for fid, (spec, fig) in drawn_holey.items()}
     for fid, pid, miss in (("tracks", "qwen:sports", "grid/qwen/sports.json"), ("shares", "qwen:sports", "grid/qwen/sports.json"),
                            ("serving", "home:all", "aud/home.json")):
-        e = m["figures"][fid]
+        e = entries[fid]
         assert e["status"] == "partial"
         p = {p["id"]: p for p in e["panels"]}[pid]
         assert p["status"] == "not_run" and p["values"] == []
         assert p["missing"][0]["path"] == miss and p["missing"][0]["kind"] == "file"
         assert any(x["path"] == miss for x in e["missing"])
-        assert (out / e["file"]).stat().st_size > 1000
-    assert {x["path"] for x in m["figures"]["serving"]["missing"]} == {"aud/home.json", "aud/tools.json"}
-    assert "extra/toys.json" in {x["path"] for x in m["figures"]["tracks"]["missing"]}
+    assert {x["path"] for x in entries["serving"]["missing"]} == {"aud/home.json", "aud/tools.json"}
+    assert "extra/toys.json" in {x["path"] for x in entries["tracks"]["missing"]}
     fig = drawn_holey["serving"][1]                                       # the placeholder is drawn: its text names the file
     texts = " ".join(t.get_text() for t in fig.findobj(mf.plt.Text))
     assert "not run yet" in texts and "aud/home.json" in texts and "aud/tools.json" in texts
@@ -429,7 +443,7 @@ def test_every_input_missing_gives_not_run_figures_never_a_crash(tmp_path):
 
 
 def test_a_missing_element_inside_a_panel_is_marked_not_run(holey, drawn_holey):
-    root = holey[0]
+    root = holey
     spec, fig = drawn_holey["tracks"]
     toys = {p.pid: p for p in spec.panels}["qwen:toys"]
     assert toys.status == "partial" and toys.one("zero_shot") is not None and toys.one("matched_mean") is None
@@ -694,18 +708,16 @@ def test_same_inputs_give_byte_identical_pdfs_and_entries(full_run, tmp_path):
     assert not re.search(r"[A-Za-z]:[\\/]", text) and "CreationDate" not in text and Path.home().name not in text
 
 
-def test_determinism_across_processes_with_a_different_hash_seed(full_run, tmp_path):
+def test_determinism_across_processes_with_a_different_hash_seed(full_run, child_process):
     """A fresh interpreter (a hash seed that differs from this process's), same inputs, through the CLI script: the PDF is
     byte-identical to the in-process one and the manifest entry is equal."""
     root, out, manifest = full_run
-    seed = "2" if os.environ.get("PYTHONHASHSEED") == "1" else "1"
-    env = {**os.environ, "PYTHONHASHSEED": seed, "MPLBACKEND": "Agg"}
-    r = subprocess.run([sys.executable, str(SCRIPT), "--results", str(root), "--out", str(tmp_path), "--only", "tracks"], env=env,
-                       capture_output=True, text=True, cwd=ROOT, timeout=300)
-    assert r.returncode == 0, r.stderr
-    assert "tracks" in r.stdout and "sha1" in r.stdout
-    assert (tmp_path / "tracks.pdf").read_bytes() == (out / "tracks.pdf").read_bytes()
-    other = json.loads((tmp_path / mf.MANIFEST_NAME).read_text(encoding="utf-8"))
+    proc, child_out = child_process
+    so, se = proc.communicate(timeout=300)
+    assert proc.returncode == 0, se
+    assert "tracks" in so and "sha1" in so
+    assert (child_out / "tracks.pdf").read_bytes() == (out / "tracks.pdf").read_bytes()
+    other = json.loads((child_out / mf.MANIFEST_NAME).read_text(encoding="utf-8"))
     assert other["figures"]["tracks"] == manifest["figures"]["tracks"] and other["results_root"] == manifest["results_root"]
 
 
@@ -851,11 +863,24 @@ def test_proposed_captions_hold_no_result_number():
         assert set(nums) <= {"95"}, (nums, c[:80])                               # the interval level is a definition, not a result
 
 
+def test_decomp_tex_static_checks():
+    """No LaTeX run (the compile check below is opt-in): balanced, one picture, no data slot, no included file."""
+    f = FIGDIR / "decomp.tex"
+    if not f.is_file():
+        pytest.skip("decomp.tex not written yet")
+    body = "\n".join(re.sub(r"(?<!\\)%.*", "", ln) for ln in f.read_text(encoding="utf-8").splitlines())
+    assert body.count("\\begin{tikzpicture}") == 1 and body.count("\\end{tikzpicture}") == 1
+    assert body.count("\\begingroup") == body.count("\\endgroup") == 1
+    assert body.count("{") == body.count("}") and body.count("[") == body.count("]")
+    assert "DATANEEDED" not in body and "\\includegraphics" not in body and "\\input" not in body   # a schematic: no slot, no file
+
+
 def _have_latex() -> bool:
     return shutil.which("pdflatex") is not None
 
 
-@pytest.mark.skipif(not (FIGDIR / "decomp.tex").is_file() or not _have_latex(), reason="decomp.tex or LaTeX missing")
+@pytest.mark.skipif(os.environ.get("FIG_TEST_LATEX") != "1" or not (FIGDIR / "decomp.tex").is_file() or not _have_latex(),
+                    reason="opt-in (about 10 s): set FIG_TEST_LATEX=1 with pdflatex and the acmart class installed")
 def test_decomp_tex_compiles_in_the_paper_class(tmp_path):
     """The schematic loads with \\input into the sigconf class with the packages main.tex needs plus tikz; no overfull box."""
     tex = tmp_path / "scratch.tex"

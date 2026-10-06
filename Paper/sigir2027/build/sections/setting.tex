@@ -1,0 +1,60 @@
+% Section 3: setting and notation. Definitions and one short lemma; no empirical result.
+\section{Setting and Notation}
+\label{sec:setting}
+
+\paragraph{Confidence of a yes/no recommender.}
+A pointwise yes/no recommender~\citep{bao2023tallrec,zhang2025collm} scores a user $u$ and a candidate item $i$ by asking a binary
+question $q$ about the pair (here ``Would this user like the candidate item?'') and reading the next-token distribution of a
+language model $f$, zero-shot or with a LoRA adapter fitted to yes/no labels. Its \emph{confidence} is the log-odds
+\begin{equation}\label{eq:logit}
+  \ell(u,i)=\log P_f(\texttt{Yes}\mid x_q(u,i))-\log P_f(\texttt{No}\mid x_q(u,i)),
+\end{equation}
+where $P_f(\texttt{Yes}\mid x)$ sums the probabilities of the vocabulary ids that decode, stripped and lower-cased, to ``yes''
+(likewise \texttt{No}). Candidates are ranked by $\ell$.
+
+\paragraph{Panels and metrics.}
+A \emph{unit} is a user (rated panels) or a prediction event (next-item panels) with candidate set $C_u$ and labels
+$y(u,i)\in\{0,1\}$. \emph{Rated panels} show the user's earlier ratings as history and use the user's own later rated items as
+candidates, labelled 1 for a rating of at least 4 and 0 for at most 2 (so the question matches the label). With
+$c(x)=1,\tfrac12,0$ for $x>0,\,x=0,\,x<0$, the per-user AUC of a score $s$ and its mean over users with both classes
+(UAUC~\citep{zhang2025collm,zhang2024binllm}) are
+\[
+  \mathrm{AUC}_u(s)=\frac{1}{|C_u^+||C_u^-|}\sum_{i\in C_u^+}\sum_{j\in C_u^-}c(s_i-s_j),\qquad
+  \mathrm{UAUC}=\operatorname*{mean}_{u}\mathrm{AUC}_u .
+\]
+\emph{Same-candidate next-item panels} hold, per event, one positive and 100 popularity-sampled negatives, ranked identically by
+every system (not full-catalogue ranking~\citep{krichene2020sampled}); with $a$ candidates above the positive and $t$ tied with
+it, its rank is uniform on $1{+}a,\dots,1{+}a{+}t$, and HR@$k$ and NDCG@$k$ are expectations over that rank ($k=10$).
+
+\paragraph{What the confidence is made of.}
+Let $\pi(i)=\mathbb E_D[\ell(D,i)]$ be the \emph{item prior}: the expected confidence for $i$ under the history of a donor $D$ who
+has not seen $i$, estimated by the mean $\hat\pi(i)$ over $K=8$ donors. With the user offset
+$b_u=|C_u|^{-1}\sum_{i\in C_u}[\ell(u,i)-\pi(i)]$ the remainder is the \emph{pair-specific residual} $e$,
+\begin{equation}\label{eq:decomp}
+  \ell(u,i)=b_u+\pi(i)+e(u,i),\qquad \textstyle\sum_{i\in C_u}e(u,i)=0,
+\end{equation}
+so within a unit only $\pi+e$ orders the candidates. This is the biased-matrix-factorisation baseline predictor applied to log-odds,
+with the item term read off the model itself. The residual is \emph{not} personal evidence by construction: it also holds
+donor-population mismatch, user-by-prior interaction and history noise unrelated to the label. We therefore measure personal
+information by prediction. The \emph{information gain} $\mathcal G$ is the UAUC gain of cross-fitted stackers when
+$\hat e=\ell-\hat\pi$ is added to $\hat\pi$ and an item mean $m(i)$ (other users' mean rating of $i$ before the candidate's
+timestamp), and $\mathcal G_{\rm CF}$ is the analogous gain of a matrix-factorisation (MF) residual over $m$. The \emph{item-prior
+share} of the confidence is the share of its within-user variance that $\hat\pi$ explains, $\rho^2/r_8$, with $\rho$ the pooled
+within-user correlation of $\ell$ and $\hat\pi$ and $r_8$ the Spearman--Brown reliability of the 8-donor
+mean~\citep{spearman1910correlation,brown1910experimental}; it is reported only where $r_8\ge0.7$. Estimators are in
+Section~\ref{sec:design} and Appendix~\ref{app:estimators}.
+
+\paragraph{Where can confidence change a ranking?}
+\begin{lemma}[Invariance]\label{lem:invariance}
+If every $g_u:\mathbb R\to\mathbb R$ is strictly increasing and $s'_i=g_u(s_i)$ for $i\in C_u$, then
+$\operatorname{sgn}(s'_i-s'_j)=\operatorname{sgn}(s_i-s_j)$ for all $i,j\in C_u$; hence $\mathrm{AUC}_u$, HR@$k$, NDCG@$k$ and MRR,
+which depend on $s$ only through these signs, are unchanged.
+\end{lemma}
+Temperature and Platt scaling~\citep{guo2017calibration,platt2000probabilities} with positive slope, removal of $b_u$ and the list
+softmax are such maps: \emph{per-user calibration cannot change UAUC or within-unit NDCG}; only non-decreasing maps (isotonic
+regression~\citep{zadrozny2002transforming}) can, through ties. A correction that depends on the item, $s'=s-\lambda b(i)$, exchanges
+or ties a pair exactly when $s_i-s_j\le\lambda(b(i)-b(j))$; contextual and batch calibration~\citep{zhao2021calibrate,zhou2024batch}
+subtract a prior that is a constant of the unit for a binary question, whereas candidate-conditioned priors (the no-history prompt,
+in the spirit of PMI scoring~\citep{holtzman2021surface}; the swap prior $\hat\pi$) are item-dependent. Across units the lemma is
+silent: offsets change pooled AUC, thresholds and selective serving, and training changes $f$. These are the routes left open, and
+Section~\ref{sec:findings} tests each against a matched control.

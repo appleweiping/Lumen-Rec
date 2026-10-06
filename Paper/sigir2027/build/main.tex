@@ -1,0 +1,60 @@
+% SIGIR 2027 full paper (9 pages incl. appendix, references excluded; double-anonymous).
+% Sources with result tokens: every number comes from a committed result file through scripts/sigir/build_paper.py (\jv, \jd, \jp);
+% build with: python scripts/sigir/build_paper.py && (cd Paper/sigir2027/build && latexmk -pdf main.tex).
+\documentclass[sigconf,natbib=true,anonymous=true]{acmart}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}  % acmart already loads newtxmath; amssymb would clash (\Bbbk)
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+% an open item whose text is written once its run has finished (never present in a submitted version)
+\newcommand{\pending}[1]{\textcolor{red}{\textbf{[PENDING: #1]}}}
+\setlength{\emergencystretch}{1.5em}
+\newcommand{\py}{P(\texttt{Yes})}
+\newcommand{\expl}[1]{\textit{#1}}   % exploratory values (analyses added after the ML-1M report was read)
+
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\acmConference[SIGIR '27]{The 50th International ACM SIGIR Conference on Research and Development in Information Retrieval}{July 18--24, 2027}{San Jose, CA, USA}
+
+\begin{document}
+
+\title{What Does a Yes/No LLM Recommender's Confidence Know?\\
+Item Priors, Personal Evidence and Actionable Uncertainty}
+
+\author{Anonymous Author(s)}
+\affiliation{\institution{Anonymous Institution}\country{Anonymous}}
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+<concept><concept_id>10002951.10003317.10003347.10003350</concept_id>
+<concept_desc>Information systems~Recommender systems</concept_desc><concept_significance>500</concept_significance></concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Information systems~Recommender systems}
+\keywords{LLM-based recommendation, confidence and calibration, item prior, popularity bias, selective prediction}
+
+\maketitle
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/setting}
+\input{sections/design}
+\input{sections/findings}
+\input{sections/conclusion}
+
+% The appendix counts toward the 9 pages (SIGIR rule: everything except references), so it comes before the bibliography.
+\appendix
+\input{sections/appendix}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

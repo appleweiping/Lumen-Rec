@@ -316,6 +316,14 @@
                       "server_mtime_utc":  "2026-10-05T02:29:54Z"
                   },
                   {
+                      "alias":  "mir",
+                      "local_path":  "mir/decision.json",
+                      "server_path":  "outputs/confrec/gatefix/stage3/decision.json",
+                      "size":  9398,
+                      "sha1":  "1542f62ff52c0b2d5135e4c30a688c5de79b2d0d",
+                      "server_mtime_utc":  "2026-10-06T20:49:02Z"
+                  },
+                  {
                       "alias":  "sel",
                       "local_path":  "sel/selection.json",
                       "server_path":  "outputs/confrec/gatefix/dev/selection.json",
@@ -419,12 +427,6 @@
                         "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid_q/extra/sports_tables.csv",
                         "local_path":  "extra/ftq/sports_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "mir",
-                        "server_path":  "outputs/confrec/gatefix/stage3/decision.json",
-                        "local_path":  "mir/decision.json",
                         "stale_local_copy_kept":  false
                     },
                     {

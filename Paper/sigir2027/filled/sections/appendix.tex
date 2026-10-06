@@ -111,12 +111,12 @@ addendum $k$ of A3) or the commit history.}
 \toprule
  & ML-1M & Toys & Video Games & Sports\\
 \midrule
-SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & 0.742{\scriptsize$\pm$.019\,(.002)} & 0.558{\scriptsize$\pm$.020\,(.002)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
+SFT, $b=0$ (LoRA of the main grid)~\citep{bao2023tallrec} & 0.742{\scriptsize$\pm$.019\,(.002)} & 0.558{\scriptsize$\pm$.020\,(.002)} & 0.580{\scriptsize$\pm$.021\,(.003)} & 0.534{\scriptsize$\pm$.020\,(.005)}\\
 Post-hoc stacking & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Prior-offset LoRA & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd} & \DATANEEDED{slot:UAUC\_mean\_sd}\\
 Offset $-$ stacking & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack} & \DATANEEDED{slot:d\_offset\_minus\_stack}\\
 \midrule
-Item mean / MF (ref.) & 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & 0.684{\scriptsize$\pm$.021} / 0.539{\scriptsize$\pm$.021} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior, UAUC\_mf\_temporal}\\
+Item mean / MF (ref.) & 0.759{\scriptsize$\pm$.021} / 0.791{\scriptsize$\pm$.018} & 0.684{\scriptsize$\pm$.021} / 0.539{\scriptsize$\pm$.021} & 0.662{\scriptsize$\pm$.022} / 0.532{\scriptsize$\pm$.018} & 0.624{\scriptsize$\pm$.021} / 0.534{\scriptsize$\pm$.022}\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -138,24 +138,24 @@ registered cut; $^\dagger$: addendum 6).}
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
  & ZS & LoRA & ZS & LoRA\\
 \midrule
-UAUC of $\ell$ & 0.605{\scriptsize$\pm$.022} & 0.760{\scriptsize$\pm$.018\,(.001)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
-\quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{0.154{\scriptsize$\pm$.025\,(.001)}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
-\quad item mean $m$ (ref.) & \multicolumn{2}{c}{0.759{\scriptsize$\pm$.021}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
-\quad temporal MF (ref.) & \multicolumn{2}{c}{0.791{\scriptsize$\pm$.018}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
-$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \textit{$-$0.153{\scriptsize$\pm$.029}} & \textit{0.001{\scriptsize$\pm$.013\,(.001)}} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
-ECE (after Platt) & 0.034{\scriptsize$\pm$.015} & 0.020{\scriptsize$\pm$.010\,(.004)} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
-Correct in bottom tertile, oracle & 0.272{\scriptsize$\pm$.009} & 0.263{\scriptsize$\pm$.006\,(.003)} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
-Errors in top tertile, oracle & 0.229{\scriptsize$\pm$.018} & 0.122{\scriptsize$\pm$.015\,(.005)} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
-Item-prior share $\rho^2/r_8$ & uninterpretable & 0.860{\scriptsize$\pm$.020\,(.014)} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share}\\
-e-share$^\dagger$ & \textit{0.748{\scriptsize$\pm$.065}} & \textit{0.140{\scriptsize$\pm$.020\,(.014)}} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
-$\mathcal G=\Delta$UAUC(M2$-$M1), E-D & 0.003{\scriptsize$\pm$.006} & 0.007{\scriptsize$\pm$.008\,(.001)} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
-$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \textit{0.003{\scriptsize$\pm$.004}} & \textit{0.010{\scriptsize$\pm$.007\,(.001)}} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
-$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{0.036{\scriptsize$\pm$.013} / \textit{0.037{\scriptsize$\pm$.013}}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
-Popularity link of $\hat\pi$ & 0.329{\scriptsize$\pm$.040} & 0.147{\scriptsize$\pm$.048\,(.036)} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+UAUC of $\ell$ & 0.605{\scriptsize$\pm$.022} & 0.760{\scriptsize$\pm$.018\,(.001)} & 0.512{\scriptsize$\pm$.022} & 0.560{\scriptsize$\pm$.020\,(.004)}\\
+\quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{0.154{\scriptsize$\pm$.025\,(.001)}} & \multicolumn{2}{c}{0.048{\scriptsize$\pm$.023\,(.004)}}\\
+\quad item mean $m$ (ref.) & \multicolumn{2}{c}{0.759{\scriptsize$\pm$.021}} & \multicolumn{2}{c}{0.684{\scriptsize$\pm$.021}}\\
+\quad temporal MF (ref.) & \multicolumn{2}{c}{0.791{\scriptsize$\pm$.018}} & \multicolumn{2}{c}{0.539{\scriptsize$\pm$.021}}\\
+$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \textit{$-$0.153{\scriptsize$\pm$.029}} & \textit{0.001{\scriptsize$\pm$.013\,(.001)}} & $-$0.171{\scriptsize$\pm$.030} & $-$0.123{\scriptsize$\pm$.026\,(.004)}\\
+ECE (after Platt) & 0.034{\scriptsize$\pm$.015} & 0.020{\scriptsize$\pm$.010\,(.004)} & 0.060{\scriptsize$\pm$.014} & 0.052{\scriptsize$\pm$.013\,(.001)}\\
+Correct in bottom tertile, oracle & 0.272{\scriptsize$\pm$.009} & 0.263{\scriptsize$\pm$.006\,(.003)} & 0.289{\scriptsize$\pm$.011} & 0.280{\scriptsize$\pm$.007\,(.002)}\\
+Errors in top tertile, oracle & 0.229{\scriptsize$\pm$.018} & 0.122{\scriptsize$\pm$.015\,(.005)} & 0.254{\scriptsize$\pm$.015} & 0.237{\scriptsize$\pm$.015\,(.003)}\\
+Item-prior share $\rho^2/r_8$ & uninterpretable & 0.860{\scriptsize$\pm$.020\,(.014)} & uninterpretable & 0.810{\scriptsize$\pm$.021\,(.012)}\\
+e-share$^\dagger$ & \textit{0.748{\scriptsize$\pm$.065}} & \textit{0.140{\scriptsize$\pm$.020\,(.014)}} & 0.973{\scriptsize$\pm$.116} & 0.190{\scriptsize$\pm$.021\,(.012)}\\
+$\mathcal G=\Delta$UAUC(M2$-$M1), E-D & 0.003{\scriptsize$\pm$.006} & 0.007{\scriptsize$\pm$.008\,(.001)} & 0.003{\scriptsize$\pm$.009} & $-$0.002{\scriptsize$\pm$.010\,(.001)}\\
+$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \textit{0.003{\scriptsize$\pm$.004}} & \textit{0.010{\scriptsize$\pm$.007\,(.001)}} & 0.000{\scriptsize$\pm$.005} & $-$0.002{\scriptsize$\pm$.006\,(.001)}\\
+$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{0.036{\scriptsize$\pm$.013} / \textit{0.037{\scriptsize$\pm$.013}}} & \multicolumn{2}{c}{0.002{\scriptsize$\pm$.005} / 0.001{\scriptsize$\pm$.002}}\\
+Popularity link of $\hat\pi$ & 0.329{\scriptsize$\pm$.040} & 0.147{\scriptsize$\pm$.048\,(.036)} & 0.264{\scriptsize$\pm$.024} & 0.224{\scriptsize$\pm$.024\,(.014)}\\
 P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{0.005 / 0.003 / 0.004; 0.004{\scriptsize$\pm$.008}, $p$ 0.382} & \multicolumn{2}{c}{--}\\
 P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\textit{0.006 / 0.008 / 0.006; 0.007{\scriptsize$\pm$.007}, $p$ 0.054}} & \multicolumn{2}{c}{--}\\
-Knockout: head $-$ tail drop of $\ell$ & -- & -- & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta}\\
-Knockout: registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:label}\\
+Knockout: head $-$ tail drop of $\ell$ & -- & -- & 0.054{\scriptsize$\pm$.026} & 0.079{\scriptsize\,(.027)}\\
+Knockout: registered label & -- & -- & INDETERMINATE & INDETERMINATE / INDETERMINATE / INDETERMINATE\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -176,8 +176,8 @@ Knockout: registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:la
 \midrule
 ML-1M & 0.740 / 0.745 / 0.743 & 0.733 / 0.734 / 0.734 & 0.759{\scriptsize$\pm$.021}\\
 Toys & 0.559 / 0.556 / 0.559 & 0.579 / 0.578 / 0.581 & 0.684{\scriptsize$\pm$.021}\\
-Video Games & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
-Sports & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
+Video Games & 0.584 / 0.578 / 0.579 & 0.607 / 0.606 / 0.611 & 0.662{\scriptsize$\pm$.022}\\
+Sports & 0.537 / 0.537 / 0.529 & 0.558 / 0.549 / 0.554 & 0.624{\scriptsize$\pm$.021}\\
 \midrule
 ML-1M, permuted labels (seeds 0 / 1) & 0.731 / 0.730 & 0.721 / 0.722 & --\\
 ML-1M, real $-$ permuted (seeds 0 / 1) & 0.009{\scriptsize$\pm$.008} / 0.014{\scriptsize$\pm$.008} & 0.012{\scriptsize$\pm$.003} / 0.012{\scriptsize$\pm$.003} & --\\

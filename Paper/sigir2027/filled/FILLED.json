@@ -2,23 +2,23 @@
  "schema": "fill_paper_filled_v1",
  "summary": {
   "slots_total": 714,
-  "filled": 331,
-  "unfilled": 383,
+  "filled": 490,
+  "unfilled": 224,
   "unfilled_by_reason": {
    "branch_slot": 6,
    "free_text": 29,
-   "result_file_missing": 348
+   "result_file_missing": 189
   },
   "filled_by_alias": {
    "aud": 111,
-   "corr": 4,
-   "cpu": 13,
-   "ext": 72,
-   "free": 2,
+   "corr": 5,
+   "cpu": 25,
+   "ext": 115,
+   "free": 4,
    "gate": 9,
    "gft": 6,
-   "grid": 99,
-   "ko": 8,
+   "grid": 180,
+   "ko": 28,
    "sel": 7
   },
   "unfilled_by_alias": {
@@ -26,12 +26,10 @@
    "aud2l": 1,
    "aud2q": 16,
    "branch": 6,
-   "corr": 5,
-   "cpu": 12,
-   "ext": 85,
-   "free": 42,
-   "grid": 82,
-   "ko": 20,
+   "corr": 4,
+   "ext": 42,
+   "free": 40,
+   "grid": 1,
    "mir": 7,
    "prn": 17,
    "slot": 13
@@ -59,16 +57,24 @@
  "sources": {
   "aud/sports.json": "a7406bd2509464352eac2e390dfcb7ab5784c837",
   "aud/toys.json": "de15aa117b7811d7cea4d68d734a96434f50ce7a",
+  "extra/ftq/ml1m.json": "e0c7560bd713078f2ea0ba9e4c6ab774bf1f096f",
+  "extra/ftq/toys.json": "9aa393b4f5c9bb60b8a4ab4b51b65ea791abc7f2",
+  "extra/games.json": "a79f1a9487912e6646e076d6b95c30011cffcd06",
   "extra/llama/ml1m.json": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+  "extra/llama/toys.json": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
   "extra/ml1m.json": "b2918d95aa59f4693ede10953ff253b99b85f733",
   "extra/toys.json": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
   "grid/llama/ml1m.json": "3e3c83d94cdb30caef288191b12cc7f173f8220a",
   "grid/llama/ml1m_split.json": "c75ef45b134b3427244b839a251b26dbd875ea95",
+  "grid/llama/toys.json": "b206fd37aab2544f4909e4baeb4833a5b4d96219",
+  "grid/llama/toys_split.json": "eda0ff39c0e110836844a1a679190153c53c36e4",
+  "grid/qwen/games.json": "98f490f4f8124f002032d5f3b4780b569f4a8b9d",
   "grid/qwen/games_split.json": "dfd01e9e4012d19a958c154e848c546774d62121",
   "grid/qwen/ml1m.json": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d",
   "grid/qwen/ml1m_split.json": "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
+  "grid/qwen/sports.json": "cc7ac0b6576c748bff2252ed2553a31ae219aec9",
   "grid/qwen/sports_split.json": "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
   "grid/qwen/toys.json": "a28f219b243e552dab3f753a4aaf64a172bb853d",
   "grid/qwen/toys_split.json": "e43416bb960cb86ae6fb1ed7a2ad16f063de5e28",
@@ -417,6 +423,76 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 82,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "UAUC of $\\ell$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.517{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/games.json:E_A.ZS",
+    "grid/qwen/games.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 82,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "UAUC of $\\ell$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.580{\\scriptsize$\\pm$.021\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 82,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "UAUC of $\\ell$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.493{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/qwen/sports.json:E_A.ZS",
+    "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 82,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "UAUC of $\\ell$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.534{\\scriptsize$\\pm$.020\\,(.005)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 83,
    "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
    "kind": "table",
@@ -455,6 +531,44 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 83,
+   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "LoRA $-$ ZS (E-B)",
+   "column": 5,
+   "blocks": [],
+   "text": "0.063{\\scriptsize$\\pm$.026\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_B",
+    "grid/qwen/games.json:E_B.per_seed.s0.est",
+    "grid/qwen/games.json:E_B.per_seed.s1.est",
+    "grid/qwen/games.json:E_B.per_seed.s2.est",
+    "grid/qwen/games.json:E_B.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 83,
+   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "LoRA $-$ ZS (E-B)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.041{\\scriptsize$\\pm$.027\\,(.005)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_B",
+    "grid/qwen/sports.json:E_B.per_seed.s0.est",
+    "grid/qwen/sports.json:E_B.per_seed.s1.est",
+    "grid/qwen/sports.json:E_B.per_seed.s2.est",
+    "grid/qwen/sports.json:E_B.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 84,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior",
    "kind": "table",
@@ -479,6 +593,34 @@
    "text": "0.684{\\scriptsize$\\pm$.021}",
    "from": [
     "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 84,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "item mean $m$ (ref.)",
+   "column": 5,
+   "blocks": [],
+   "text": "0.662{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 84,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "item mean $m$ (ref.)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.624{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.q_hat"
    ]
   },
   {
@@ -513,6 +655,21 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 85,
+   "slot": "ext:E\\_J.UAUC\\_q\\_hat\\_T",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "matched mean $m_T$ (ref.)$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.580",
+   "from": [
+    "extra/games.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 86,
    "slot": "cpu:UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -537,6 +694,34 @@
    "text": "0.539{\\scriptsize$\\pm$.021}",
    "from": [
     "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 86,
+   "slot": "cpu:UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "temporal MF (ref.)",
+   "column": 5,
+   "blocks": [],
+   "text": "0.532{\\scriptsize$\\pm$.018}",
+   "from": [
+    "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 86,
+   "slot": "cpu:UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "temporal MF (ref.)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.534{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.mf"
    ]
   },
   {
@@ -619,6 +804,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.144{\\scriptsize$\\pm$.031}",
+   "from": [
+    "extra/games.json:E_J.ZS",
+    "extra/games.json:E_J.ZS.dUAUC_L_minus_q_hat",
+    "extra/games.json:E_J.ZS.dUAUC_L_minus_q_hat.per_seed.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 87,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "$-$0.082{\\scriptsize$\\pm$.028\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_J.FT",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s0.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s1.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s2.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_q_hat.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 88,
    "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
    "kind": "table",
@@ -693,6 +917,45 @@
     "extra/toys.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s2.est",
     "extra/toys.json:E_J.FT.dUAUC_L_minus_MF_warm.mean_over_seeds",
     "extra/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.073{\\scriptsize$\\pm$.050}",
+   "from": [
+    "extra/games.json:E_J.ZS",
+    "extra/games.json:E_J.ZS.dUAUC_L_minus_MF_warm",
+    "extra/games.json:E_J.ZS.dUAUC_L_minus_MF_warm.per_seed.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 88,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\Delta$UAUC($\\ell-$MF), warm$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "$-$0.007{\\scriptsize$\\pm$.047\\,(.007)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_J.FT",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s0.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s1.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.per_seed.s2.est",
+    "extra/games.json:E_J.FT.dUAUC_L_minus_MF_warm.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
    ]
   },
   {
@@ -879,6 +1142,76 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 92,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.624{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 92,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.837{\\scriptsize$\\pm$.011\\,(.031)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_D.FT",
+    "grid/qwen/games.json:E_D.FT.shares.per_model",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s0.r8c",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s1.r8c",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s2.r8c",
+    "grid/qwen/games.json:E_D.FT.shares.mean_over_seeds.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 92,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.733{\\scriptsize$\\pm$.016}",
+   "from": [
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.shares.per_model.zeroshot.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 92,
+   "slot": "grid:r8c",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Reliability $r_8$ of $\\hat\\pi$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.762{\\scriptsize$\\pm$.013\\,(.059)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_D.FT",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s0.r8c",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s1.r8c",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s2.r8c",
+    "grid/qwen/sports.json:E_D.FT.shares.mean_over_seeds.r8c"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 93,
    "slot": "grid:item\\_prior\\_share",
    "kind": "table",
@@ -949,6 +1282,80 @@
     "grid/qwen/toys.json:E_D.FT.shares.per_model.s2.item_prior_share",
     "grid/qwen/toys.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
     "grid/qwen/toys.json:E_D.FT.shares.mean_over_seeds.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 93,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 5,
+   "blocks": [],
+   "text": "uninterpretable",
+   "from": [
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+    "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 93,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.724{\\scriptsize$\\pm$.027\\,(.033)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_D.FT",
+    "grid/qwen/games.json:E_D.FT.shares.per_model",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s0.item_prior_share",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s1.item_prior_share",
+    "grid/qwen/games.json:E_D.FT.shares.per_model.s2.item_prior_share",
+    "grid/qwen/games.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+    "grid/qwen/games.json:E_D.FT.shares.mean_over_seeds.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 93,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.329{\\scriptsize$\\pm$.047}",
+   "from": [
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+    "grid/qwen/sports.json:E_D.ZS.shares.per_model.zeroshot.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 93,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.741{\\scriptsize$\\pm$.026\\,(.033)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_D.FT",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s0.item_prior_share",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s1.item_prior_share",
+    "grid/qwen/sports.json:E_D.FT.shares.per_model.s2.item_prior_share",
+    "grid/qwen/sports.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+    "grid/qwen/sports.json:E_D.FT.shares.mean_over_seeds.shares_reading"
    ]
   },
   {
@@ -1031,6 +1438,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.699{\\scriptsize$\\pm$.047}",
+   "from": [
+    "extra/games.json:E_G.ZS",
+    "extra/games.json:E_G.ZS.e_share",
+    "extra/games.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 94,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "e-share$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.283{\\scriptsize$\\pm$.025\\,(.033)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_G.FT",
+    "extra/games.json:E_G.FT.e_share",
+    "extra/games.json:E_G.FT.e_share.per_model",
+    "extra/games.json:E_G.FT.e_share.per_model.s0.e_share.est",
+    "extra/games.json:E_G.FT.e_share.per_model.s1.e_share.est",
+    "extra/games.json:E_G.FT.e_share.per_model.s2.e_share.est",
+    "extra/games.json:E_G.FT.e_share.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 95,
    "slot": "ext:E\\_G.item\\_share\\_mf",
    "kind": "table",
@@ -1087,6 +1533,36 @@
    "from": [
     "extra/toys.json:E_G.label_q_hat.item_share",
     "extra/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_mf",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.129{\\scriptsize$\\pm$.036}",
+   "from": [
+    "extra/games.json:E_G.MF_score_item_bias.item_share",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 95,
+   "slot": "ext:E\\_G.item\\_share\\_label",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Item share of MF / label$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.075{\\scriptsize$\\pm$.015}",
+   "from": [
+    "extra/games.json:E_G.label_q_hat.item_share",
+    "extra/games.json:status.items_2_to_7"
    ]
   },
   {
@@ -1157,6 +1633,76 @@
     "grid/qwen/toys.json:E_D.FT.information_gain.per_model.s1.G.est",
     "grid/qwen/toys.json:E_D.FT.information_gain.per_model.s2.G.est",
     "grid/qwen/toys.json:E_D.FT.information_gain.G_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 96,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.005{\\scriptsize$\\pm$.007}",
+   "from": [
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.information_gain.per_model.zeroshot.G"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 96,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 6,
+   "blocks": [],
+   "text": "$-$0.009{\\scriptsize$\\pm$.008\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_D.FT",
+    "grid/qwen/games.json:E_D.FT.information_gain.per_model",
+    "grid/qwen/games.json:E_D.FT.information_gain.per_model.s0.G.est",
+    "grid/qwen/games.json:E_D.FT.information_gain.per_model.s1.G.est",
+    "grid/qwen/games.json:E_D.FT.information_gain.per_model.s2.G.est",
+    "grid/qwen/games.json:E_D.FT.information_gain.G_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 96,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 7,
+   "blocks": [],
+   "text": "$-$0.009{\\scriptsize$\\pm$.008}",
+   "from": [
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.information_gain.per_model.zeroshot.G"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 96,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 8,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.009\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_D.FT",
+    "grid/qwen/sports.json:E_D.FT.information_gain.per_model",
+    "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s0.G.est",
+    "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s1.G.est",
+    "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s2.G.est",
+    "grid/qwen/sports.json:E_D.FT.information_gain.G_mean_over_seeds"
    ]
   },
   {
@@ -1239,6 +1785,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.002}",
+   "from": [
+    "extra/games.json:E_W.ZS",
+    "extra/games.json:E_W.ZS.G_wu",
+    "extra/games.json:E_W.ZS.G_wu.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 97,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.002\\,(.000)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_W.FT",
+    "extra/games.json:E_W.FT.G_wu",
+    "extra/games.json:E_W.FT.G_wu.per_model",
+    "extra/games.json:E_W.FT.G_wu.per_model.s0.est",
+    "extra/games.json:E_W.FT.G_wu.per_model.s1.est",
+    "extra/games.json:E_W.FT.G_wu.per_model.s2.est",
+    "extra/games.json:E_W.FT.G_wu.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 98,
    "slot": "grid:G\\_CF",
    "kind": "table",
@@ -1299,6 +1884,51 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 98,
+   "slot": "grid:G\\_CF",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.005}",
+   "from": [
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 98,
+   "slot": "ext:E\\_W.G\\_CF\\_wu",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.001{\\scriptsize$\\pm$.002}",
+   "from": [
+    "extra/games.json:E_W.ZS.G_CF_wu",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 98,
+   "slot": "grid:G\\_CF",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.007}",
+   "from": [
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 99,
    "slot": "cpu:UAUC\\_mf\\_personal\\_residual",
    "kind": "table",
@@ -1323,6 +1953,34 @@
    "text": "0.503{\\scriptsize$\\pm$.028}",
    "from": [
     "grid/qwen/toys.json:E_A.ZS.mf_personal_residual_warm_pairs_only"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 99,
+   "slot": "cpu:UAUC\\_mf\\_personal\\_residual",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "MF personal residual (ref.)",
+   "column": 5,
+   "blocks": [],
+   "text": "0.519{\\scriptsize$\\pm$.035}",
+   "from": [
+    "grid/qwen/games.json:E_A.ZS.mf_personal_residual_warm_pairs_only"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 99,
+   "slot": "cpu:UAUC\\_mf\\_personal\\_residual",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "MF personal residual (ref.)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.505{\\scriptsize$\\pm$.025}",
+   "from": [
+    "grid/qwen/sports.json:E_A.ZS.mf_personal_residual_warm_pairs_only"
    ]
   },
   {
@@ -1397,6 +2055,76 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 100,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.011}",
+   "from": [
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.star_permutation.per_model.zeroshot.dUAUC_L_minus_perm"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 100,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 6,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.009\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_D.FT",
+    "grid/qwen/games.json:E_D.FT.star_permutation.per_model",
+    "grid/qwen/games.json:E_D.FT.star_permutation.per_model.s0.dUAUC_L_minus_perm.est",
+    "grid/qwen/games.json:E_D.FT.star_permutation.per_model.s1.dUAUC_L_minus_perm.est",
+    "grid/qwen/games.json:E_D.FT.star_permutation.per_model.s2.dUAUC_L_minus_perm.est",
+    "grid/qwen/games.json:E_D.FT.star_permutation.dUAUC_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 100,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 7,
+   "blocks": [],
+   "text": "0.005{\\scriptsize$\\pm$.010}",
+   "from": [
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.star_permutation.per_model.zeroshot.dUAUC_L_minus_perm"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 100,
+   "slot": "grid:starperm\\_dUAUC",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Star permutation $\\Delta$UAUC",
+   "column": 8,
+   "blocks": [],
+   "text": "$-$0.001{\\scriptsize$\\pm$.007\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_D.FT",
+    "grid/qwen/sports.json:E_D.FT.star_permutation.per_model",
+    "grid/qwen/sports.json:E_D.FT.star_permutation.per_model.s0.dUAUC_L_minus_perm.est",
+    "grid/qwen/sports.json:E_D.FT.star_permutation.per_model.s1.dUAUC_L_minus_perm.est",
+    "grid/qwen/sports.json:E_D.FT.star_permutation.per_model.s2.dUAUC_L_minus_perm.est",
+    "grid/qwen/sports.json:E_D.FT.star_permutation.dUAUC_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 101,
    "slot": "grid:partial\\_rho\\_pi\\_logpop",
    "kind": "table",
@@ -1467,6 +2195,76 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 101,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.098{\\scriptsize$\\pm$.032}",
+   "from": [
+    "grid/qwen/games.json:E_E.ZS",
+    "grid/qwen/games.json:E_E.ZS.partial_spearman.pi_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 101,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.072{\\scriptsize$\\pm$.030\\,(.025)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_E.FT",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.pi_item.per_model",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.pi_item.per_model.s0",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.pi_item.per_model.s1",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.pi_item.per_model.s2",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.pi_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 101,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.212{\\scriptsize$\\pm$.025}",
+   "from": [
+    "grid/qwen/sports.json:E_E.ZS",
+    "grid/qwen/sports.json:E_E.ZS.partial_spearman.pi_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 101,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 8,
+   "blocks": [],
+   "text": "0.027{\\scriptsize$\\pm$.025\\,(.006)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_E.FT",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.pi_item.per_model",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.pi_item.per_model.s0",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.pi_item.per_model.s1",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.pi_item.per_model.s2",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.pi_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 102,
    "slot": "grid:partial\\_rho\\_L\\_logpop",
    "kind": "table",
@@ -1533,6 +2331,76 @@
     "grid/qwen/toys.json:E_E.FT.partial_spearman.L_item.per_model.s1",
     "grid/qwen/toys.json:E_E.FT.partial_spearman.L_item.per_model.s2",
     "grid/qwen/toys.json:E_E.FT.partial_spearman.L_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 102,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\ell$",
+   "column": 5,
+   "blocks": [],
+   "text": "$-$0.014{\\scriptsize$\\pm$.028}",
+   "from": [
+    "grid/qwen/games.json:E_E.ZS",
+    "grid/qwen/games.json:E_E.ZS.partial_spearman.L_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 102,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\ell$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.018{\\scriptsize$\\pm$.028\\,(.022)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_E.FT",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.L_item.per_model",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.L_item.per_model.s0",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.L_item.per_model.s1",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.L_item.per_model.s2",
+    "grid/qwen/games.json:E_E.FT.partial_spearman.L_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 102,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\ell$",
+   "column": 7,
+   "blocks": [],
+   "text": "0.004{\\scriptsize$\\pm$.023}",
+   "from": [
+    "grid/qwen/sports.json:E_E.ZS",
+    "grid/qwen/sports.json:E_E.ZS.partial_spearman.L_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 102,
+   "slot": "grid:partial\\_rho\\_L\\_logpop",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Popularity link of $\\ell$",
+   "column": 8,
+   "blocks": [],
+   "text": "$-$0.048{\\scriptsize$\\pm$.023\\,(.009)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_E.FT",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.L_item.per_model",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.L_item.per_model.s0",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.L_item.per_model.s1",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.L_item.per_model.s2",
+    "grid/qwen/sports.json:E_E.FT.partial_spearman.L_item.mean_over_seeds"
    ]
   },
   {
@@ -1647,6 +2515,76 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 107,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "ECE (after Platt)",
+   "column": 5,
+   "blocks": [],
+   "text": "0.058{\\scriptsize$\\pm$.014}",
+   "from": [
+    "grid/qwen/games.json:E_C.ZS",
+    "grid/qwen/games.json:E_C.ZS.per_model.zeroshot.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 107,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "ECE (after Platt)",
+   "column": 6,
+   "blocks": [],
+   "text": "0.069{\\scriptsize$\\pm$.015\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_C.FT",
+    "grid/qwen/games.json:E_C.FT.per_model",
+    "grid/qwen/games.json:E_C.FT.per_model.s0.ECE",
+    "grid/qwen/games.json:E_C.FT.per_model.s1.ECE",
+    "grid/qwen/games.json:E_C.FT.per_model.s2.ECE",
+    "grid/qwen/games.json:E_C.FT.mean_over_seeds.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 107,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "ECE (after Platt)",
+   "column": 7,
+   "blocks": [],
+   "text": "0.060{\\scriptsize$\\pm$.014}",
+   "from": [
+    "grid/qwen/sports.json:E_C.ZS",
+    "grid/qwen/sports.json:E_C.ZS.per_model.zeroshot.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 107,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "ECE (after Platt)",
+   "column": 8,
+   "blocks": [],
+   "text": "0.056{\\scriptsize$\\pm$.013\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_C.FT",
+    "grid/qwen/sports.json:E_C.FT.per_model",
+    "grid/qwen/sports.json:E_C.FT.per_model.s0.ECE",
+    "grid/qwen/sports.json:E_C.FT.per_model.s1.ECE",
+    "grid/qwen/sports.json:E_C.FT.per_model.s2.ECE",
+    "grid/qwen/sports.json:E_C.FT.mean_over_seeds.ECE"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 108,
    "slot": "grid:share\\_correct\\_bottom\\_tertile",
    "kind": "table",
@@ -1713,6 +2651,76 @@
     "grid/qwen/toys.json:E_C.FT.per_model.s1.share_correct_bottom",
     "grid/qwen/toys.json:E_C.FT.per_model.s2.share_correct_bottom",
     "grid/qwen/toys.json:E_C.FT.mean_over_seeds.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 108,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 5,
+   "blocks": [],
+   "text": "0.288{\\scriptsize$\\pm$.011}",
+   "from": [
+    "grid/qwen/games.json:E_C.ZS",
+    "grid/qwen/games.json:E_C.ZS.per_model.zeroshot.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 108,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 6,
+   "blocks": [],
+   "text": "0.282{\\scriptsize$\\pm$.008\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_C.FT",
+    "grid/qwen/games.json:E_C.FT.per_model",
+    "grid/qwen/games.json:E_C.FT.per_model.s0.share_correct_bottom",
+    "grid/qwen/games.json:E_C.FT.per_model.s1.share_correct_bottom",
+    "grid/qwen/games.json:E_C.FT.per_model.s2.share_correct_bottom",
+    "grid/qwen/games.json:E_C.FT.mean_over_seeds.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 108,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 7,
+   "blocks": [],
+   "text": "0.289{\\scriptsize$\\pm$.011}",
+   "from": [
+    "grid/qwen/sports.json:E_C.ZS",
+    "grid/qwen/sports.json:E_C.ZS.per_model.zeroshot.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 108,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 8,
+   "blocks": [],
+   "text": "0.275{\\scriptsize$\\pm$.007\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_C.FT",
+    "grid/qwen/sports.json:E_C.FT.per_model",
+    "grid/qwen/sports.json:E_C.FT.per_model.s0.share_correct_bottom",
+    "grid/qwen/sports.json:E_C.FT.per_model.s1.share_correct_bottom",
+    "grid/qwen/sports.json:E_C.FT.per_model.s2.share_correct_bottom",
+    "grid/qwen/sports.json:E_C.FT.mean_over_seeds.share_correct_bottom"
    ]
   },
   {
@@ -1795,6 +2803,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.304{\\scriptsize$\\pm$.012}",
+   "from": [
+    "extra/games.json:E_Cprime.ZS",
+    "extra/games.json:E_Cprime.ZS.deployable",
+    "extra/games.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_correct_bottom",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 109,
+   "slot": "ext:E\\_Cprime.share\\_correct\\_bottom",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.301{\\scriptsize$\\pm$.008\\,(.008)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_Cprime.FT",
+    "extra/games.json:E_Cprime.FT.deployable",
+    "extra/games.json:E_Cprime.FT.deployable.per_model",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s0.share_correct_bottom.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s1.share_correct_bottom.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s2.share_correct_bottom.est",
+    "extra/games.json:E_Cprime.FT.deployable.mean_over_seeds.share_correct_bottom",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 110,
    "slot": "grid:share\\_errors\\_top\\_tertile",
    "kind": "table",
@@ -1861,6 +2908,76 @@
     "grid/qwen/toys.json:E_C.FT.per_model.s1.share_errors_top",
     "grid/qwen/toys.json:E_C.FT.per_model.s2.share_errors_top",
     "grid/qwen/toys.json:E_C.FT.mean_over_seeds.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 110,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Errors in top tertile, oracle",
+   "column": 5,
+   "blocks": [],
+   "text": "0.274{\\scriptsize$\\pm$.015}",
+   "from": [
+    "grid/qwen/games.json:E_C.ZS",
+    "grid/qwen/games.json:E_C.ZS.per_model.zeroshot.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 110,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Errors in top tertile, oracle",
+   "column": 6,
+   "blocks": [],
+   "text": "0.237{\\scriptsize$\\pm$.017\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_C.FT",
+    "grid/qwen/games.json:E_C.FT.per_model",
+    "grid/qwen/games.json:E_C.FT.per_model.s0.share_errors_top",
+    "grid/qwen/games.json:E_C.FT.per_model.s1.share_errors_top",
+    "grid/qwen/games.json:E_C.FT.per_model.s2.share_errors_top",
+    "grid/qwen/games.json:E_C.FT.mean_over_seeds.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 110,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Errors in top tertile, oracle",
+   "column": 7,
+   "blocks": [],
+   "text": "0.256{\\scriptsize$\\pm$.016}",
+   "from": [
+    "grid/qwen/sports.json:E_C.ZS",
+    "grid/qwen/sports.json:E_C.ZS.per_model.zeroshot.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 110,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Errors in top tertile, oracle",
+   "column": 8,
+   "blocks": [],
+   "text": "0.224{\\scriptsize$\\pm$.014\\,(.008)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_C.FT",
+    "grid/qwen/sports.json:E_C.FT.per_model",
+    "grid/qwen/sports.json:E_C.FT.per_model.s0.share_errors_top",
+    "grid/qwen/sports.json:E_C.FT.per_model.s1.share_errors_top",
+    "grid/qwen/sports.json:E_C.FT.per_model.s2.share_errors_top",
+    "grid/qwen/sports.json:E_C.FT.mean_over_seeds.share_errors_top"
    ]
   },
   {
@@ -1943,6 +3060,45 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.299{\\scriptsize$\\pm$.014}",
+   "from": [
+    "extra/games.json:E_Cprime.ZS",
+    "extra/games.json:E_Cprime.ZS.deployable",
+    "extra/games.json:E_Cprime.ZS.deployable.per_model.zeroshot.share_errors_top",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 111,
+   "slot": "ext:E\\_Cprime.share\\_errors\\_top",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.276{\\scriptsize$\\pm$.014\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_Cprime.FT",
+    "extra/games.json:E_Cprime.FT.deployable",
+    "extra/games.json:E_Cprime.FT.deployable.per_model",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s0.share_errors_top.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s1.share_errors_top.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s2.share_errors_top.est",
+    "extra/games.json:E_Cprime.FT.deployable.mean_over_seeds.share_errors_top",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 112,
    "slot": "grid:auroc\\_margin\\_correct",
    "kind": "table",
@@ -2009,6 +3165,76 @@
     "grid/qwen/toys.json:E_C.FT.per_model.s1.AUROC_margin_correct",
     "grid/qwen/toys.json:E_C.FT.per_model.s2.AUROC_margin_correct",
     "grid/qwen/toys.json:E_C.FT.mean_over_seeds.AUROC_margin_correct"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 112,
+   "slot": "grid:auroc\\_margin\\_correct",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Margin AUROC, oracle",
+   "column": 5,
+   "blocks": [],
+   "text": "0.579{\\scriptsize$\\pm$.015}",
+   "from": [
+    "grid/qwen/games.json:E_C.ZS",
+    "grid/qwen/games.json:E_C.ZS.per_model.zeroshot.AUROC_margin_correct"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 112,
+   "slot": "grid:auroc\\_margin\\_correct",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Margin AUROC, oracle",
+   "column": 6,
+   "blocks": [],
+   "text": "0.611{\\scriptsize$\\pm$.015\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_C.FT",
+    "grid/qwen/games.json:E_C.FT.per_model",
+    "grid/qwen/games.json:E_C.FT.per_model.s0.AUROC_margin_correct",
+    "grid/qwen/games.json:E_C.FT.per_model.s1.AUROC_margin_correct",
+    "grid/qwen/games.json:E_C.FT.per_model.s2.AUROC_margin_correct",
+    "grid/qwen/games.json:E_C.FT.mean_over_seeds.AUROC_margin_correct"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 112,
+   "slot": "grid:auroc\\_margin\\_correct",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Margin AUROC, oracle",
+   "column": 7,
+   "blocks": [],
+   "text": "0.588{\\scriptsize$\\pm$.016}",
+   "from": [
+    "grid/qwen/sports.json:E_C.ZS",
+    "grid/qwen/sports.json:E_C.ZS.per_model.zeroshot.AUROC_margin_correct"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 112,
+   "slot": "grid:auroc\\_margin\\_correct",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "Margin AUROC, oracle",
+   "column": 8,
+   "blocks": [],
+   "text": "0.627{\\scriptsize$\\pm$.012\\,(.008)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_C.FT",
+    "grid/qwen/sports.json:E_C.FT.per_model",
+    "grid/qwen/sports.json:E_C.FT.per_model.s0.AUROC_margin_correct",
+    "grid/qwen/sports.json:E_C.FT.per_model.s1.AUROC_margin_correct",
+    "grid/qwen/sports.json:E_C.FT.per_model.s2.AUROC_margin_correct",
+    "grid/qwen/sports.json:E_C.FT.mean_over_seeds.AUROC_margin_correct"
    ]
   },
   {
@@ -2087,6 +3313,160 @@
     "extra/toys.json:E_Cprime.FT.deployable.per_model.s2.AUROC_margin_correct.est",
     "extra/toys.json:E_Cprime.FT.deployable.mean_over_seeds.AUROC_margin_correct",
     "extra/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 5,
+   "blocks": [],
+   "text": "0.547{\\scriptsize$\\pm$.015}",
+   "from": [
+    "extra/games.json:E_Cprime.ZS",
+    "extra/games.json:E_Cprime.ZS.deployable",
+    "extra/games.json:E_Cprime.ZS.deployable.per_model.zeroshot.AUROC_margin_correct",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 113,
+   "slot": "ext:E\\_Cprime.AUROC\\_margin",
+   "kind": "table",
+   "table": "tab:tracks",
+   "row": "deployable$^\\dagger$",
+   "column": 6,
+   "blocks": [],
+   "text": "0.566{\\scriptsize$\\pm$.014\\,(.007)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_Cprime.FT",
+    "extra/games.json:E_Cprime.FT.deployable",
+    "extra/games.json:E_Cprime.FT.deployable.per_model",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s0.AUROC_margin_correct.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s1.AUROC_margin_correct.est",
+    "extra/games.json:E_Cprime.FT.deployable.per_model.s2.AUROC_margin_correct.est",
+    "extra/games.json:E_Cprime.FT.deployable.mean_over_seeds.AUROC_margin_correct",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 125,
+   "slot": "raises / leaves / lowers",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "Fine-tuning",
+   "text": "raises",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_B",
+    "grid/qwen/toys.json:E_B",
+    "grid/qwen/games.json:E_B",
+    "grid/qwen/sports.json:E_B",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds",
+    "grid/qwen/ml1m.json:E_B.seeds",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds.est",
+    "grid/qwen/toys.json:E_B.mean_over_seeds",
+    "grid/qwen/toys.json:E_B.seeds",
+    "grid/qwen/toys.json:E_B.mean_over_seeds.est",
+    "grid/qwen/games.json:E_B.mean_over_seeds",
+    "grid/qwen/games.json:E_B.seeds",
+    "grid/qwen/games.json:E_B.mean_over_seeds.est",
+    "grid/qwen/sports.json:E_B.mean_over_seeds",
+    "grid/qwen/sports.json:E_B.seeds",
+    "grid/qwen/sports.json:E_B.mean_over_seeds.est"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 125,
+   "slot": "grid:E\\_B confirmed, k of 4",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "(E-B, confirmed on",
+   "text": "4 of 4",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_B",
+    "grid/qwen/toys.json:E_B",
+    "grid/qwen/games.json:E_B",
+    "grid/qwen/sports.json:E_B",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds",
+    "grid/qwen/ml1m.json:E_B.seeds",
+    "grid/qwen/ml1m.json:E_B.mean_over_seeds.est",
+    "grid/qwen/toys.json:E_B.mean_over_seeds",
+    "grid/qwen/toys.json:E_B.seeds",
+    "grid/qwen/toys.json:E_B.mean_over_seeds.est",
+    "grid/qwen/games.json:E_B.mean_over_seeds",
+    "grid/qwen/games.json:E_B.seeds",
+    "grid/qwen/games.json:E_B.mean_over_seeds.est",
+    "grid/qwen/sports.json:E_B.mean_over_seeds",
+    "grid/qwen/sports.json:E_B.seeds",
+    "grid/qwen/sports.json:E_B.mean_over_seeds.est"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 129,
+   "slot": "grid:G confirmed, k of 4 zero-shot",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "is confirmed (E-D) on",
+   "text": "1 of 4",
+   "from": [
+    "grid/qwen/ml1m.json:E_D.ZS",
+    "grid/qwen/ml1m.json:E_D.ZS.holm_family_E_D",
+    "grid/qwen/ml1m.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+    "grid/qwen/toys.json:E_D.ZS",
+    "grid/qwen/toys.json:E_D.ZS.holm_family_E_D",
+    "grid/qwen/toys.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+    "grid/qwen/games.json:E_D.ZS",
+    "grid/qwen/games.json:E_D.ZS.holm_family_E_D",
+    "grid/qwen/games.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+    "grid/qwen/sports.json:E_D.ZS",
+    "grid/qwen/sports.json:E_D.ZS.holm_family_E_D",
+    "grid/qwen/sports.json:E_D.ZS.information_gain.per_model.zeroshot.G"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 129,
+   "slot": "grid:G confirmed, k of 4\nLoRA",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "zero-shot and",
+   "text": "1 of 4",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/ml1m.json:E_D.FT",
+    "grid/qwen/ml1m.json:E_D.FT.holm_family_E_D",
+    "grid/qwen/ml1m.json:E_D.FT.information_gain.G_mean_over_seeds",
+    "grid/qwen/toys.json:E_D.FT",
+    "grid/qwen/toys.json:E_D.FT.holm_family_E_D",
+    "grid/qwen/toys.json:E_D.FT.information_gain.G_mean_over_seeds",
+    "grid/qwen/games.json:E_D.FT",
+    "grid/qwen/games.json:E_D.FT.holm_family_E_D",
+    "grid/qwen/games.json:E_D.FT.information_gain.G_mean_over_seeds",
+    "grid/qwen/sports.json:E_D.FT",
+    "grid/qwen/sports.json:E_D.FT.holm_family_E_D",
+    "grid/qwen/sports.json:E_D.FT.information_gain.G_mean_over_seeds"
    ]
   },
   {
@@ -2250,6 +3630,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.002{\\scriptsize$\\pm$.004}",
+   "from": [
+    "extra/games.json:E_F.ZS",
+    "extra/games.json:E_F.ZS.G_LLM_given_CF",
+    "extra/games.json:E_F.ZS.G_LLM_given_CF.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 161,
+   "slot": "ext:E\\_F.G\\_LLM\\_given\\_CF",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm LLM|CF}=\\Delta$UAUC(M4$-$M3)",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.003{\\scriptsize$\\pm$.009\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_F.FT",
+    "extra/games.json:E_F.FT.G_LLM_given_CF",
+    "extra/games.json:E_F.FT.G_LLM_given_CF.per_model",
+    "extra/games.json:E_F.FT.G_LLM_given_CF.per_model.s0.est",
+    "extra/games.json:E_F.FT.G_LLM_given_CF.per_model.s1.est",
+    "extra/games.json:E_F.FT.G_LLM_given_CF.per_model.s2.est",
+    "extra/games.json:E_F.FT.G_LLM_given_CF.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 162,
    "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
    "kind": "table",
@@ -2332,6 +3755,49 @@
     "extra/toys.json:E_F.FT.G_CF_given_LLM.per_model.s2.est",
     "extra/toys.json:E_F.FT.G_CF_given_LLM.mean_over_seeds",
     "extra/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.001{\\scriptsize$\\pm$.001}",
+   "from": [
+    "extra/games.json:E_F.ZS",
+    "extra/games.json:E_F.ZS.G_CF_given_LLM",
+    "extra/games.json:E_F.ZS.G_CF_given_LLM.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 162,
+   "slot": "ext:E\\_F.G\\_CF\\_given\\_LLM",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "$\\mathcal G_{\\rm CF|LLM}=\\Delta$UAUC(M4$-$M2)",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.000{\\scriptsize$\\pm$.001\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_F.FT",
+    "extra/games.json:E_F.FT.G_CF_given_LLM",
+    "extra/games.json:E_F.FT.G_CF_given_LLM.per_model",
+    "extra/games.json:E_F.FT.G_CF_given_LLM.per_model.s0.est",
+    "extra/games.json:E_F.FT.G_CF_given_LLM.per_model.s1.est",
+    "extra/games.json:E_F.FT.G_CF_given_LLM.per_model.s2.est",
+    "extra/games.json:E_F.FT.G_CF_given_LLM.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
    ]
   },
   {
@@ -2422,6 +3888,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.027{\\scriptsize$\\pm$.033}{\\scriptsize\\,(descriptive)}",
+   "from": [
+    "extra/games.json:E_H.ZS",
+    "extra/games.json:E_H.ZS.strata.sparse.G_prior",
+    "extra/games.json:E_H.ZS.strata.sparse.G_prior.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 165,
+   "slot": "ext:E\\_H.sparse.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Sparse rows ($m$ from $<5$ ratings)",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.011{\\scriptsize$\\pm$.047\\,(.010)}{\\scriptsize\\,(descriptive)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_H.FT",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior.per_model",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior.per_model.s0.est",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior.per_model.s1.est",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior.per_model.s2.est",
+    "extra/games.json:E_H.FT.strata.sparse.G_prior.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 166,
    "slot": "ext:E\\_H.dense.G\\_prior",
    "kind": "table",
@@ -2504,6 +4013,49 @@
     "extra/toys.json:E_H.FT.strata.dense.G_prior.per_model.s2.est",
     "extra/toys.json:E_H.FT.strata.dense.G_prior.mean_over_seeds",
     "extra/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.000{\\scriptsize$\\pm$.004}",
+   "from": [
+    "extra/games.json:E_H.ZS",
+    "extra/games.json:E_H.ZS.strata.dense.G_prior",
+    "extra/games.json:E_H.ZS.strata.dense.G_prior.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 166,
+   "slot": "ext:E\\_H.dense.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Dense rows",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.000{\\scriptsize$\\pm$.011\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_H.FT",
+    "extra/games.json:E_H.FT.strata.dense.G_prior",
+    "extra/games.json:E_H.FT.strata.dense.G_prior.per_model",
+    "extra/games.json:E_H.FT.strata.dense.G_prior.per_model.s0.est",
+    "extra/games.json:E_H.FT.strata.dense.G_prior.per_model.s1.est",
+    "extra/games.json:E_H.FT.strata.dense.G_prior.per_model.s2.est",
+    "extra/games.json:E_H.FT.strata.dense.G_prior.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
    ]
   },
   {
@@ -2594,6 +4146,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.002{\\scriptsize$\\pm$.005}",
+   "from": [
+    "extra/games.json:E_H.ZS",
+    "extra/games.json:E_H.ZS.strata.unseen.G_prior",
+    "extra/games.json:E_H.ZS.strata.unseen.G_prior.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 167,
+   "slot": "ext:E\\_H.unseen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Unseen items (no TRAIN example)",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.000{\\scriptsize$\\pm$.012\\,(.000)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_H.FT",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior.per_model",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior.per_model.s0.est",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior.per_model.s1.est",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior.per_model.s2.est",
+    "extra/games.json:E_H.FT.strata.unseen.G_prior.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 168,
    "slot": "ext:E\\_H.seen.G\\_prior",
    "kind": "table",
@@ -2680,6 +4275,49 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.006{\\scriptsize$\\pm$.012}",
+   "from": [
+    "extra/games.json:E_H.ZS",
+    "extra/games.json:E_H.ZS.strata.seen.G_prior",
+    "extra/games.json:E_H.ZS.strata.seen.G_prior.per_model.zeroshot",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 168,
+   "slot": "ext:E\\_H.seen.G\\_prior",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Seen items",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.011{\\scriptsize$\\pm$.025\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/games.json:E_H.FT",
+    "extra/games.json:E_H.FT.strata.seen.G_prior",
+    "extra/games.json:E_H.FT.strata.seen.G_prior.per_model",
+    "extra/games.json:E_H.FT.strata.seen.G_prior.per_model.s0.est",
+    "extra/games.json:E_H.FT.strata.seen.G_prior.per_model.s1.est",
+    "extra/games.json:E_H.FT.strata.seen.G_prior.per_model.s2.est",
+    "extra/games.json:E_H.FT.strata.seen.G_prior.mean_over_seeds",
+    "extra/games.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 171,
    "slot": "ext:FT\\_C\\_reading.R",
    "kind": "table",
@@ -2713,6 +4351,120 @@
     "gft/gate_ft.json:decision",
     "extra/ml1m.json:FT_C_reading",
     "extra/ml1m.json:FT_C_reading.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 172,
+   "slot": "ext:FT\\_Q\\_reading.R",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "FT-Q (teacher): $R_Q$ / reading",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.851{\\scriptsize$\\pm$.087}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/ml1m.json:FT_C_reading",
+    "extra/ftq/ml1m.json:FT_C_reading.defined",
+    "extra/ftq/ml1m.json:FT_C_reading.R"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 172,
+   "slot": "ext:FT\\_Q\\_reading.label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "FT-Q (teacher): $R_Q$ / reading",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "ITEM\\_DRIVEN",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/ml1m.json:FT_C_reading",
+    "extra/ftq/ml1m.json:FT_C_reading.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 172,
+   "slot": "ext:FT\\_Q\\_reading.R",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "FT-Q (teacher): $R_Q$ / reading",
+   "column": 4,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "1.335{\\scriptsize$\\pm$1.186}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/toys.json:FT_C_reading",
+    "extra/ftq/toys.json:FT_C_reading.defined",
+    "extra/ftq/toys.json:FT_C_reading.R"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 172,
+   "slot": "ext:FT\\_Q\\_reading.label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "FT-Q (teacher): $R_Q$ / reading",
+   "column": 4,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "ITEM\\_DRIVEN",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/toys.json:FT_C_reading",
+    "extra/ftq/toys.json:FT_C_reading.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 173,
+   "slot": "ext:FT\\_Q\\_reading.UAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "UAUC of $q_0$ / $q_1$ / $m$",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.720 / 0.720 / 0.759",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/ml1m.json:FT_C_reading",
+    "extra/ftq/ml1m.json:FT_C_reading.UAUC.p0.est",
+    "extra/ftq/ml1m.json:FT_C_reading.UAUC.p1.est",
+    "extra/ftq/ml1m.json:FT_C_reading.UAUC_q_hat.est"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 173,
+   "slot": "ext:FT\\_Q\\_reading.UAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "UAUC of $q_0$ / $q_1$ / $m$",
+   "column": 4,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.564 / 0.571 / 0.684",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/ftq/toys.json:FT_C_reading",
+    "extra/ftq/toys.json:FT_C_reading.UAUC.p0.est",
+    "extra/ftq/toys.json:FT_C_reading.UAUC.p1.est",
+    "extra/ftq/toys.json:FT_C_reading.UAUC_q_hat.est"
    ]
   },
   {
@@ -2755,6 +4507,82 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 176,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Head $-$ tail drop of $\\ell$",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.542{\\scriptsize$\\pm$.308}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.zeroshot.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 176,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Head $-$ tail drop of $\\ell$",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.107{\\scriptsize\\,(.018)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.s0.delta.pseudo.head_minus_tail",
+    "grid/qwen/games.json:knockout.analyses.s1.delta.pseudo.head_minus_tail",
+    "grid/qwen/games.json:knockout.analyses.s2.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 176,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Head $-$ tail drop of $\\ell$",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.161{\\scriptsize$\\pm$.121}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.zeroshot.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 176,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Head $-$ tail drop of $\\ell$",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.011{\\scriptsize\\,(.006)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.s0.delta.pseudo.head_minus_tail",
+    "grid/qwen/sports.json:knockout.analyses.s1.delta.pseudo.head_minus_tail",
+    "grid/qwen/sports.json:knockout.analyses.s2.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 177,
    "slot": "ko:placebo.delta",
    "kind": "table",
@@ -2789,6 +4617,82 @@
     "grid/qwen/toys.json:knockout.analyses.s0.delta.placebo.head_minus_tail",
     "grid/qwen/toys.json:knockout.analyses.s1.delta.placebo.head_minus_tail",
     "grid/qwen/toys.json:knockout.analyses.s2.delta.placebo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 177,
+   "slot": "ko:placebo.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Placebo drop",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.589{\\scriptsize$\\pm$.310}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.zeroshot.delta.placebo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 177,
+   "slot": "ko:placebo.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Placebo drop",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.101{\\scriptsize\\,(.023)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.s0.delta.placebo.head_minus_tail",
+    "grid/qwen/games.json:knockout.analyses.s1.delta.placebo.head_minus_tail",
+    "grid/qwen/games.json:knockout.analyses.s2.delta.placebo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 177,
+   "slot": "ko:placebo.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Placebo drop",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "$-$0.015{\\scriptsize$\\pm$.131}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.zeroshot.delta.placebo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 177,
+   "slot": "ko:placebo.delta",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Placebo drop",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.006{\\scriptsize\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.s0.delta.placebo.head_minus_tail",
+    "grid/qwen/sports.json:knockout.analyses.s1.delta.placebo.head_minus_tail",
+    "grid/qwen/sports.json:knockout.analyses.s2.delta.placebo.head_minus_tail"
    ]
   },
   {
@@ -2831,6 +4735,82 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 178,
+   "slot": "ko:tail\\_dUAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Tail $\\Delta$UAUC",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.004{\\scriptsize$\\pm$.018}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.zeroshot.dUAUC.real_minus_pseudo.tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 178,
+   "slot": "ko:tail\\_dUAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Tail $\\Delta$UAUC",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.003{\\scriptsize\\,(.008)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.analyses.s0.dUAUC.real_minus_pseudo.tail",
+    "grid/qwen/games.json:knockout.analyses.s1.dUAUC.real_minus_pseudo.tail",
+    "grid/qwen/games.json:knockout.analyses.s2.dUAUC.real_minus_pseudo.tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 178,
+   "slot": "ko:tail\\_dUAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Tail $\\Delta$UAUC",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.009{\\scriptsize$\\pm$.015}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.zeroshot.dUAUC.real_minus_pseudo.tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 178,
+   "slot": "ko:tail\\_dUAUC",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Tail $\\Delta$UAUC",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.020{\\scriptsize\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.analyses.s0.dUAUC.real_minus_pseudo.tail",
+    "grid/qwen/sports.json:knockout.analyses.s1.dUAUC.real_minus_pseudo.tail",
+    "grid/qwen/sports.json:knockout.analyses.s2.dUAUC.real_minus_pseudo.tail"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 179,
    "slot": "ko:label",
    "kind": "table",
@@ -2865,6 +4845,105 @@
     "grid/qwen/toys.json:knockout.labels.s0.label",
     "grid/qwen/toys.json:knockout.labels.s1.label",
     "grid/qwen/toys.json:knockout.labels.s2.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 179,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Registered label",
+   "column": 5,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.labels.zeroshot.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 179,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Registered label",
+   "column": 6,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "INDETERMINATE / INDETERMINATE / INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:knockout",
+    "grid/qwen/games.json:knockout.labels.s0.label",
+    "grid/qwen/games.json:knockout.labels.s1.label",
+    "grid/qwen/games.json:knockout.labels.s2.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 179,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Registered label",
+   "column": 7,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.labels.zeroshot.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 179,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:teaches",
+   "row": "Registered label",
+   "column": 8,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "INDETERMINATE / INDETERMINATE / INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:knockout",
+    "grid/qwen/sports.json:knockout.labels.s0.label",
+    "grid/qwen/sports.json:knockout.labels.s1.label",
+    "grid/qwen/sports.json:knockout.labels.s2.label"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
+   "line": 192,
+   "slot": "POSITIVE / NEGATIVE / NULL / INDETERMINATE",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "the Qwen3-8B knockout is labelled",
+   "text": "INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/toys.json:knockout.labels.zeroshot.label",
+    "grid/qwen/toys.json:knockout.labels.s0.label",
+    "grid/qwen/toys.json:knockout.labels.s1.label",
+    "grid/qwen/toys.json:knockout.labels.s2.label",
+    "grid/qwen/games.json:knockout.labels.zeroshot.label",
+    "grid/qwen/games.json:knockout.labels.s0.label",
+    "grid/qwen/games.json:knockout.labels.s1.label",
+    "grid/qwen/games.json:knockout.labels.s2.label"
    ]
   },
   {
@@ -4612,6 +6691,28 @@
   },
   {
    "file": "sections/experiments.tex",
+   "line": 314,
+   "slot": "corr:max\\_abs\\_dAUC\\_user",
+   "kind": "prose",
+   "table": null,
+   "row": null,
+   "column": null,
+   "blocks": [],
+   "anchor": "change per-user AUC by at most",
+   "text": "0.000",
+   "from": [
+    "grid/qwen/ml1m.json:E_A.ZS",
+    "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+    "grid/qwen/toys.json:E_A.ZS",
+    "grid/qwen/toys.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+    "grid/qwen/games.json:E_A.ZS",
+    "grid/qwen/games.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+    "grid/qwen/sports.json:E_A.ZS",
+    "grid/qwen/sports.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user"
+   ]
+  },
+  {
+   "file": "sections/experiments.tex",
    "line": 346,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_popularity, UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -4828,6 +6929,50 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 114,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+   "column": 3,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.580{\\scriptsize$\\pm$.021\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 114,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+   "column": 4,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.534{\\scriptsize$\\pm$.020\\,(.005)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 119,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -4860,6 +7005,42 @@
     "gft/gate_ft.json:decision",
     "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.q_hat",
     "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 119,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "Item mean / MF (ref.)",
+   "column": 3,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.662{\\scriptsize$\\pm$.022} / 0.532{\\scriptsize$\\pm$.018}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.q_hat",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 119,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior, UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:slot",
+   "row": "Item mean / MF (ref.)",
+   "column": 4,
+   "blocks": [
+    "METHOD-SLOT"
+   ],
+   "text": "0.624{\\scriptsize$\\pm$.021} / 0.534{\\scriptsize$\\pm$.022}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.q_hat",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.mf"
    ]
   },
   {
@@ -4899,6 +7080,41 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 141,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "UAUC of $\\ell$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.512{\\scriptsize$\\pm$.022}",
+   "from": [
+    "grid/llama/toys.json:E_A.ZS",
+    "grid/llama/toys.json:E_A.ZS.UAUC_TEST.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 141,
+   "slot": "grid:UAUC",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "UAUC of $\\ell$",
+   "column": 4,
+   "blocks": [],
+   "text": "0.560{\\scriptsize$\\pm$.020\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_A.FT",
+    "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model",
+    "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s0",
+    "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s1",
+    "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s2",
+    "grid/llama/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 142,
    "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
    "kind": "table",
@@ -4918,6 +7134,25 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 142,
+   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "LoRA $-$ ZS (E-B)",
+   "column": 3,
+   "blocks": [],
+   "text": "0.048{\\scriptsize$\\pm$.023\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_B",
+    "grid/llama/toys.json:E_B.per_seed.s0.est",
+    "grid/llama/toys.json:E_B.per_seed.s1.est",
+    "grid/llama/toys.json:E_B.per_seed.s2.est",
+    "grid/llama/toys.json:E_B.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 143,
    "slot": "cpu:UAUC\\_item\\_mean\\_prior",
    "kind": "table",
@@ -4932,6 +7167,20 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 143,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "item mean $m$ (ref.)",
+   "column": 3,
+   "blocks": [],
+   "text": "0.684{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/llama/toys.json:E_A.ZS.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 144,
    "slot": "cpu:UAUC\\_mf\\_temporal",
    "kind": "table",
@@ -4942,6 +7191,20 @@
    "text": "0.791{\\scriptsize$\\pm$.018}",
    "from": [
     "grid/llama/ml1m.json:E_A.ZS.UAUC_TEST.references.mf"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 144,
+   "slot": "cpu:UAUC\\_mf\\_temporal",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "temporal MF (ref.)",
+   "column": 3,
+   "blocks": [],
+   "text": "0.539{\\scriptsize$\\pm$.021}",
+   "from": [
+    "grid/llama/toys.json:E_A.ZS.UAUC_TEST.references.mf"
    ]
   },
   {
@@ -4985,6 +7248,45 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 145,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 3,
+   "blocks": [],
+   "text": "$-$0.171{\\scriptsize$\\pm$.030}",
+   "from": [
+    "extra/llama/toys.json:E_J.ZS",
+    "extra/llama/toys.json:E_J.ZS.dUAUC_L_minus_q_hat",
+    "extra/llama/toys.json:E_J.ZS.dUAUC_L_minus_q_hat.per_seed.zeroshot",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 145,
+   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
+   "column": 4,
+   "blocks": [],
+   "text": "$-$0.123{\\scriptsize$\\pm$.026\\,(.004)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/llama/toys.json:E_J.FT",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s0.est",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s1.est",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat.per_seed.s2.est",
+    "extra/llama/toys.json:E_J.FT.dUAUC_L_minus_q_hat.mean_over_seeds",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 146,
    "slot": "grid:ece10\\_platt",
    "kind": "table",
@@ -5016,6 +7318,41 @@
     "grid/llama/ml1m.json:E_C.FT.per_model.s1.ECE",
     "grid/llama/ml1m.json:E_C.FT.per_model.s2.ECE",
     "grid/llama/ml1m.json:E_C.FT.mean_over_seeds.ECE"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 146,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "ECE (after Platt)",
+   "column": 3,
+   "blocks": [],
+   "text": "0.060{\\scriptsize$\\pm$.014}",
+   "from": [
+    "grid/llama/toys.json:E_C.ZS",
+    "grid/llama/toys.json:E_C.ZS.per_model.zeroshot.ECE"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 146,
+   "slot": "grid:ece10\\_platt",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "ECE (after Platt)",
+   "column": 4,
+   "blocks": [],
+   "text": "0.052{\\scriptsize$\\pm$.013\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_C.FT",
+    "grid/llama/toys.json:E_C.FT.per_model",
+    "grid/llama/toys.json:E_C.FT.per_model.s0.ECE",
+    "grid/llama/toys.json:E_C.FT.per_model.s1.ECE",
+    "grid/llama/toys.json:E_C.FT.per_model.s2.ECE",
+    "grid/llama/toys.json:E_C.FT.mean_over_seeds.ECE"
    ]
   },
   {
@@ -5055,6 +7392,41 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 147,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 3,
+   "blocks": [],
+   "text": "0.289{\\scriptsize$\\pm$.011}",
+   "from": [
+    "grid/llama/toys.json:E_C.ZS",
+    "grid/llama/toys.json:E_C.ZS.per_model.zeroshot.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 147,
+   "slot": "grid:share\\_correct\\_bottom\\_tertile",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Correct in bottom tertile, oracle",
+   "column": 4,
+   "blocks": [],
+   "text": "0.280{\\scriptsize$\\pm$.007\\,(.002)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_C.FT",
+    "grid/llama/toys.json:E_C.FT.per_model",
+    "grid/llama/toys.json:E_C.FT.per_model.s0.share_correct_bottom",
+    "grid/llama/toys.json:E_C.FT.per_model.s1.share_correct_bottom",
+    "grid/llama/toys.json:E_C.FT.per_model.s2.share_correct_bottom",
+    "grid/llama/toys.json:E_C.FT.mean_over_seeds.share_correct_bottom"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 148,
    "slot": "grid:share\\_errors\\_top\\_tertile",
    "kind": "table",
@@ -5086,6 +7458,41 @@
     "grid/llama/ml1m.json:E_C.FT.per_model.s1.share_errors_top",
     "grid/llama/ml1m.json:E_C.FT.per_model.s2.share_errors_top",
     "grid/llama/ml1m.json:E_C.FT.mean_over_seeds.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 148,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Errors in top tertile, oracle",
+   "column": 3,
+   "blocks": [],
+   "text": "0.254{\\scriptsize$\\pm$.015}",
+   "from": [
+    "grid/llama/toys.json:E_C.ZS",
+    "grid/llama/toys.json:E_C.ZS.per_model.zeroshot.share_errors_top"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 148,
+   "slot": "grid:share\\_errors\\_top\\_tertile",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Errors in top tertile, oracle",
+   "column": 4,
+   "blocks": [],
+   "text": "0.237{\\scriptsize$\\pm$.015\\,(.003)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_C.FT",
+    "grid/llama/toys.json:E_C.FT.per_model",
+    "grid/llama/toys.json:E_C.FT.per_model.s0.share_errors_top",
+    "grid/llama/toys.json:E_C.FT.per_model.s1.share_errors_top",
+    "grid/llama/toys.json:E_C.FT.per_model.s2.share_errors_top",
+    "grid/llama/toys.json:E_C.FT.mean_over_seeds.share_errors_top"
    ]
   },
   {
@@ -5123,6 +7530,43 @@
     "grid/llama/ml1m.json:E_D.FT.shares.per_model.s2.item_prior_share",
     "grid/llama/ml1m.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
     "grid/llama/ml1m.json:E_D.FT.shares.mean_over_seeds.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 149,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 3,
+   "blocks": [],
+   "text": "uninterpretable",
+   "from": [
+    "grid/llama/toys.json:E_D.ZS",
+    "grid/llama/toys.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+    "grid/llama/toys.json:E_D.ZS.shares.per_model.zeroshot.shares_reading"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 149,
+   "slot": "grid:item\\_prior\\_share",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Item-prior share $\\rho^2/r_8$",
+   "column": 4,
+   "blocks": [],
+   "text": "0.810{\\scriptsize$\\pm$.021\\,(.012)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_D.FT",
+    "grid/llama/toys.json:E_D.FT.shares.per_model",
+    "grid/llama/toys.json:E_D.FT.shares.per_model.s0.item_prior_share",
+    "grid/llama/toys.json:E_D.FT.shares.per_model.s1.item_prior_share",
+    "grid/llama/toys.json:E_D.FT.shares.per_model.s2.item_prior_share",
+    "grid/llama/toys.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+    "grid/llama/toys.json:E_D.FT.shares.mean_over_seeds.shares_reading"
    ]
   },
   {
@@ -5166,6 +7610,45 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 150,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "e-share$^\\dagger$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.973{\\scriptsize$\\pm$.116}",
+   "from": [
+    "extra/llama/toys.json:E_G.ZS",
+    "extra/llama/toys.json:E_G.ZS.e_share",
+    "extra/llama/toys.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 150,
+   "slot": "ext:E\\_G.e\\_share",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "e-share$^\\dagger$",
+   "column": 4,
+   "blocks": [],
+   "text": "0.190{\\scriptsize$\\pm$.021\\,(.012)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/llama/toys.json:E_G.FT",
+    "extra/llama/toys.json:E_G.FT.e_share",
+    "extra/llama/toys.json:E_G.FT.e_share.per_model",
+    "extra/llama/toys.json:E_G.FT.e_share.per_model.s0.e_share.est",
+    "extra/llama/toys.json:E_G.FT.e_share.per_model.s1.e_share.est",
+    "extra/llama/toys.json:E_G.FT.e_share.per_model.s2.e_share.est",
+    "extra/llama/toys.json:E_G.FT.e_share.mean_over_seeds",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 151,
    "slot": "grid:G",
    "kind": "table",
@@ -5197,6 +7680,41 @@
     "grid/llama/ml1m.json:E_D.FT.information_gain.per_model.s1.G.est",
     "grid/llama/ml1m.json:E_D.FT.information_gain.per_model.s2.G.est",
     "grid/llama/ml1m.json:E_D.FT.information_gain.G_mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 151,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 3,
+   "blocks": [],
+   "text": "0.003{\\scriptsize$\\pm$.009}",
+   "from": [
+    "grid/llama/toys.json:E_D.ZS",
+    "grid/llama/toys.json:E_D.ZS.information_gain.per_model.zeroshot.G"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 151,
+   "slot": "grid:G",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
+   "column": 4,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.010\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_D.FT",
+    "grid/llama/toys.json:E_D.FT.information_gain.per_model",
+    "grid/llama/toys.json:E_D.FT.information_gain.per_model.s0.G.est",
+    "grid/llama/toys.json:E_D.FT.information_gain.per_model.s1.G.est",
+    "grid/llama/toys.json:E_D.FT.information_gain.per_model.s2.G.est",
+    "grid/llama/toys.json:E_D.FT.information_gain.G_mean_over_seeds"
    ]
   },
   {
@@ -5240,6 +7758,45 @@
   },
   {
    "file": "sections/appendix.tex",
+   "line": 152,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.000{\\scriptsize$\\pm$.005}",
+   "from": [
+    "extra/llama/toys.json:E_W.ZS",
+    "extra/llama/toys.json:E_W.ZS.G_wu",
+    "extra/llama/toys.json:E_W.ZS.G_wu.per_model.zeroshot",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 152,
+   "slot": "ext:E\\_W.G\\_wu",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
+   "column": 4,
+   "blocks": [],
+   "text": "$-$0.002{\\scriptsize$\\pm$.006\\,(.001)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "extra/llama/toys.json:E_W.FT",
+    "extra/llama/toys.json:E_W.FT.G_wu",
+    "extra/llama/toys.json:E_W.FT.G_wu.per_model",
+    "extra/llama/toys.json:E_W.FT.G_wu.per_model.s0.est",
+    "extra/llama/toys.json:E_W.FT.G_wu.per_model.s1.est",
+    "extra/llama/toys.json:E_W.FT.G_wu.per_model.s2.est",
+    "extra/llama/toys.json:E_W.FT.G_wu.mean_over_seeds",
+    "extra/llama/toys.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
    "line": 153,
    "slot": "grid:G\\_CF",
    "kind": "table",
@@ -5266,6 +7823,36 @@
    "from": [
     "extra/llama/ml1m.json:E_W.ZS.G_CF_wu",
     "extra/llama/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 153,
+   "slot": "grid:G\\_CF",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.002{\\scriptsize$\\pm$.005}",
+   "from": [
+    "grid/llama/toys.json:E_D.ZS",
+    "grid/llama/toys.json:E_D.ZS.information_gain.G_CF"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 153,
+   "slot": "ext:E\\_W.G\\_CF\\_wu",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.001{\\scriptsize$\\pm$.002}",
+   "from": [
+    "extra/llama/toys.json:E_W.ZS.G_CF_wu",
+    "extra/llama/toys.json:status.items_2_to_7"
    ]
   },
   {
@@ -5301,6 +7888,41 @@
     "grid/llama/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model.s1",
     "grid/llama/ml1m.json:E_E.FT.partial_spearman.pi_item.per_model.s2",
     "grid/llama/ml1m.json:E_E.FT.partial_spearman.pi_item.mean_over_seeds"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 154,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.264{\\scriptsize$\\pm$.024}",
+   "from": [
+    "grid/llama/toys.json:E_E.ZS",
+    "grid/llama/toys.json:E_E.ZS.partial_spearman.pi_item.per_model.zeroshot"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 154,
+   "slot": "grid:partial\\_rho\\_pi\\_logpop",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Popularity link of $\\hat\\pi$",
+   "column": 4,
+   "blocks": [],
+   "text": "0.224{\\scriptsize$\\pm$.024\\,(.014)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:E_E.FT",
+    "grid/llama/toys.json:E_E.FT.partial_spearman.pi_item.per_model",
+    "grid/llama/toys.json:E_E.FT.partial_spearman.pi_item.per_model.s0",
+    "grid/llama/toys.json:E_E.FT.partial_spearman.pi_item.per_model.s1",
+    "grid/llama/toys.json:E_E.FT.partial_spearman.pi_item.per_model.s2",
+    "grid/llama/toys.json:E_E.FT.partial_spearman.pi_item.mean_over_seeds"
    ]
   },
   {
@@ -5341,6 +7963,74 @@
     "extra/llama/ml1m.json:E_W.P1_wu.per_seed.s2.est",
     "extra/llama/ml1m.json:E_W.P1_wu.mean_over_seeds",
     "extra/llama/ml1m.json:status.items_2_to_7"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 157,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Knockout: head $-$ tail drop of $\\ell$",
+   "column": 3,
+   "blocks": [],
+   "text": "0.054{\\scriptsize$\\pm$.026}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:knockout",
+    "grid/llama/toys.json:knockout.analyses.zeroshot.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 157,
+   "slot": "ko:head\\_minus\\_tail.delta",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Knockout: head $-$ tail drop of $\\ell$",
+   "column": 4,
+   "blocks": [],
+   "text": "0.079{\\scriptsize\\,(.027)}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:knockout",
+    "grid/llama/toys.json:knockout.analyses.s0.delta.pseudo.head_minus_tail",
+    "grid/llama/toys.json:knockout.analyses.s1.delta.pseudo.head_minus_tail",
+    "grid/llama/toys.json:knockout.analyses.s2.delta.pseudo.head_minus_tail"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 158,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Knockout: registered label",
+   "column": 3,
+   "blocks": [],
+   "text": "INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:knockout",
+    "grid/llama/toys.json:knockout.labels.zeroshot.label"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 158,
+   "slot": "ko:label",
+   "kind": "table",
+   "table": "tab:app-llama",
+   "row": "Knockout: registered label",
+   "column": 4,
+   "blocks": [],
+   "text": "INDETERMINATE / INDETERMINATE / INDETERMINATE",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/llama/toys.json:knockout",
+    "grid/llama/toys.json:knockout.labels.s0.label",
+    "grid/llama/toys.json:knockout.labels.s1.label",
+    "grid/llama/toys.json:knockout.labels.s2.label"
    ]
   },
   {
@@ -5591,6 +8281,256 @@
    "from": [
     "gft/gate_ft.json:decision",
     "grid/qwen/toys.json:E_A.FT.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.584",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.578",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.579",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC\\_all\\_rows seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.607",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.secondary.UAUC_all_rows.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC\\_all\\_rows seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.606",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.secondary.UAUC_all_rows.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "grid:UAUC\\_all\\_rows seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.611",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT",
+    "grid/qwen/games.json:E_A.FT.secondary.UAUC_all_rows.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 179,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Video Games",
+   "column": 3,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.662{\\scriptsize$\\pm$.022}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.q_hat"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.537",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.537",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 1,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.529",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC\\_all\\_rows seed 0",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.558",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.secondary.UAUC_all_rows.per_model.s0.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC\\_all\\_rows seed 1",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.549",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.secondary.UAUC_all_rows.per_model.s1.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "grid:UAUC\\_all\\_rows seed 2",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 2,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.554",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT",
+    "grid/qwen/sports.json:E_A.FT.secondary.UAUC_all_rows.per_model.s2.est"
+   ]
+  },
+  {
+   "file": "sections/appendix.tex",
+   "line": 180,
+   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
+   "kind": "table",
+   "table": "tab:app-seeds",
+   "row": "Sports",
+   "column": 3,
+   "blocks": [
+    "BRANCH-GATEFT"
+   ],
+   "text": "0.624{\\scriptsize$\\pm$.021}",
+   "from": [
+    "gft/gate_ft.json:decision",
+    "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.q_hat"
    ]
   },
   {

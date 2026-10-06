@@ -1,5 +1,22 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addendum 11 (cheap-signal controls for selective serving; exploratory; recorded before any control signal was computed on any panel)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_11.md` sha1 = c2e523425883a68f1607b620ea9319a2ebe58a85. The registered audit's selective-serving block (written after the Toys and Sports audits were read: serving the
+confident half raised NDCG@10, a random signal did not) compares the LLM's confidence with a random signal only. The addendum adds a descriptive control: three cheap signals that need no
+LLM score (history length, the user popularity profile, the confidence of a popularity-only ranker; directions fixed on the VALID events), the paired contrast of the gain of serving 50% (the LLM
+signal minus the cheap signal) with the audit's event bootstrap, the labels `LLM_BETTER`, `CHEAP_BETTER`, `MATCHED`, `INCONCLUSIVE` per signal and `ADDS`, `CHEAP_SUFFICES`, `MIXED` per panel, counts
+across panels and no family. It changes no registered number. The code (`src/confrec/nextitem_serving_control.py` and its tests) is not written yet; its sha1 will be recorded before the first
+run on a real panel. No control signal has been computed.
+
+## 2026-10-06 · Results opened after their code and wording hashes were recorded (record of the read, no new rule)
+
+Read on 2026-10-06 (the server clock was 2026-10-07 02:00-03:00 +0800): the Video_Games and Sports fine-tuned grid reports (`outputs/confrec/ftgrid/report/{games,sports}.json`; the queue jobs `35_ft_games` and
+`37_ft_sports` finished 2026-10-06 09:05 and 2026-10-06 18:33 server time as listed in `queue.log`), the Video_Games extra-analysis file, the Llama-3.1-8B Toys grid report and extra file, and the FT-Q
+teacher reports for ML-1M and Toys (extra files under `outputs/confrec/ftgrid_q/extra/`). Every statistic comes from code recorded before the corresponding job started (`ftgrid_extra` 8d0e5d86..., `run_ftq.sh`
+f8fa2e3a..., `ftq_panel.py` dab8d1a5..., `fill_paper.py` d4948d21... of the wording record). The Sports extra-analysis build was killed by the container's 60 GiB memory limit (exit 137) while three other
+CPU builds ran; it was rerun alone. No S6, method-slot, MIRROR stage-3, Z2 or home/tools audit result has been opened. The composition diagnostics `ftprune_compose` (CPU, no outcome) ran on the prune manifest.
+
 ## 2026-10-06 · Prune record (FREEZE `prune`): `ftprune.py`, `run_ftprune.sh` and the prune manifest of stages A and B; recorded before any pruned adapter was trained (stages C to E)
 
 - `src/confrec/ftprune.py` = d9dd0f101d7aa5d27d07a0391b0088aa28f4bad7

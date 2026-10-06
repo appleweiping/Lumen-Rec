@@ -1,8 +1,8 @@
 {
  "schema": "fill_paper_check_equal_v1",
  "summary": {
-  "quantities_printed_more_than_once": 16,
-  "printed_in_more_than_one_table": 15,
+  "quantities_printed_more_than_once": 23,
+  "printed_in_more_than_one_table": 22,
   "estimates_differ": 0,
   "format_or_interval_differs": 5,
   "numbers_without_a_source": 0
@@ -159,6 +159,116 @@
      "source": "gate/gate.json:v0_context.UAUC",
      "estimate": "0.576",
      "printed": "0.576{\\scriptsize$\\pm$.009}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/games.json:E_A.*.UAUC_TEST.references.mf",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 86,
+     "table": "tab:tracks",
+     "row": "temporal MF (ref.)",
+     "column": 5,
+     "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.mf",
+     "estimate": "0.532",
+     "printed": "0.532{\\scriptsize$\\pm$.018}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 3,
+     "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.mf",
+     "estimate": "0.532",
+     "printed": "0.532{\\scriptsize$\\pm$.018}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/games.json:E_A.*.UAUC_TEST.references.q_hat",
+   "n_printed": 3,
+   "n_tables": 3,
+   "tables": [
+    "tab:app-seeds",
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 84,
+     "table": "tab:tracks",
+     "row": "item mean $m$ (ref.)",
+     "column": 5,
+     "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.q_hat",
+     "estimate": "0.662",
+     "printed": "0.662{\\scriptsize$\\pm$.022}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 3,
+     "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.662",
+     "printed": "0.662{\\scriptsize$\\pm$.022}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 179,
+     "table": "tab:app-seeds",
+     "row": "Video Games",
+     "column": 3,
+     "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.662",
+     "printed": "0.662{\\scriptsize$\\pm$.022}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 82,
+     "table": "tab:tracks",
+     "row": "UAUC of $\\ell$",
+     "column": 6,
+     "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.580",
+     "printed": "0.580{\\scriptsize$\\pm$.021\\,(.003)}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 114,
+     "table": "tab:slot",
+     "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+     "column": 3,
+     "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.580",
+     "printed": "0.580{\\scriptsize$\\pm$.021\\,(.003)}"
     }
    ]
   },
@@ -526,6 +636,39 @@
    ]
   },
   {
+   "quantity": "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "prose:sections/experiments.tex",
+    "tab:corrections"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 314,
+     "table": null,
+     "row": null,
+     "column": null,
+     "source": "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+     "estimate": "0.000",
+     "printed": "0.000"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 89,
+     "table": "tab:corrections",
+     "row": "1",
+     "column": 2,
+     "source": "grid/qwen/ml1m.json:E_A.ZS.invariance.per_model.zeroshot.max_abs_dAUC_user",
+     "estimate": "0.000",
+     "printed": "0.000"
+    }
+   ]
+  },
+  {
    "quantity": "grid/qwen/ml1m.json:P1.mean_over_seeds",
    "n_printed": 2,
    "n_tables": 2,
@@ -555,6 +698,116 @@
      "source": "grid/qwen/ml1m.json:P1.mean_over_seeds",
      "estimate": "0.011",
      "printed": "0.011$\\pm$.008"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/sports.json:E_A.*.UAUC_TEST.references.mf",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 86,
+     "table": "tab:tracks",
+     "row": "temporal MF (ref.)",
+     "column": 7,
+     "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.mf",
+     "estimate": "0.534",
+     "printed": "0.534{\\scriptsize$\\pm$.022}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 4,
+     "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.mf",
+     "estimate": "0.534",
+     "printed": "0.534{\\scriptsize$\\pm$.022}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/sports.json:E_A.*.UAUC_TEST.references.q_hat",
+   "n_printed": 3,
+   "n_tables": 3,
+   "tables": [
+    "tab:app-seeds",
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 84,
+     "table": "tab:tracks",
+     "row": "item mean $m$ (ref.)",
+     "column": 7,
+     "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.q_hat",
+     "estimate": "0.624",
+     "printed": "0.624{\\scriptsize$\\pm$.021}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 119,
+     "table": "tab:slot",
+     "row": "Item mean / MF (ref.)",
+     "column": 4,
+     "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.624",
+     "printed": "0.624{\\scriptsize$\\pm$.021}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 180,
+     "table": "tab:app-seeds",
+     "row": "Sports",
+     "column": 3,
+     "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.references.q_hat",
+     "estimate": "0.624",
+     "printed": "0.624{\\scriptsize$\\pm$.021}"
+    }
+   ]
+  },
+  {
+   "quantity": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+   "n_printed": 2,
+   "n_tables": 2,
+   "tables": [
+    "tab:slot",
+    "tab:tracks"
+   ],
+   "estimates_equal": true,
+   "printed_equal": true,
+   "occurrences": [
+    {
+     "file": "sections/experiments.tex",
+     "line": 82,
+     "table": "tab:tracks",
+     "row": "UAUC of $\\ell$",
+     "column": 8,
+     "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.534",
+     "printed": "0.534{\\scriptsize$\\pm$.020\\,(.005)}"
+    },
+    {
+     "file": "sections/appendix.tex",
+     "line": 114,
+     "table": "tab:slot",
+     "row": "SFT, $b=0$ (LoRA of the main grid)~\\citep{bao2023tallrec}",
+     "column": 4,
+     "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+     "estimate": "0.534",
+     "printed": "0.534{\\scriptsize$\\pm$.020\\,(.005)}"
     }
    ]
   },

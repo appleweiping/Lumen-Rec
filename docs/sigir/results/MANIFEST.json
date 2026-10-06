@@ -21,6 +21,54 @@
                   },
                   {
                       "alias":  "ext",
+                      "local_path":  "extra/ftq/ml1m.json",
+                      "server_path":  "outputs/confrec/ftgrid_q/extra/ml1m.json",
+                      "size":  231460,
+                      "sha1":  "e0c7560bd713078f2ea0ba9e4c6ab774bf1f096f",
+                      "server_mtime_utc":  "2026-10-06T17:59:57Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/ftq/ml1m_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_q/extra/ml1m_tables.csv",
+                      "size":  32552,
+                      "sha1":  "6305e47fe57f2b2797b2a253a8d46fb6e10b8ad1",
+                      "server_mtime_utc":  "2026-10-06T17:59:57Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/ftq/toys.json",
+                      "server_path":  "outputs/confrec/ftgrid_q/extra/toys.json",
+                      "size":  231736,
+                      "sha1":  "9aa393b4f5c9bb60b8a4ab4b51b65ea791abc7f2",
+                      "server_mtime_utc":  "2026-10-06T18:20:36Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/ftq/toys_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_q/extra/toys_tables.csv",
+                      "size":  33901,
+                      "sha1":  "f2df0bf4847ce33d67a860dfd0634bcdd3cb4aee",
+                      "server_mtime_utc":  "2026-10-06T18:20:36Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/games.json",
+                      "server_path":  "outputs/confrec/ftgrid/extra/games.json",
+                      "size":  225740,
+                      "sha1":  "a79f1a9487912e6646e076d6b95c30011cffcd06",
+                      "server_mtime_utc":  "2026-10-06T18:03:59Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/games_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid/extra/games_tables.csv",
+                      "size":  33241,
+                      "sha1":  "c5c0c37ef260466775a66ebcd934d6ab182a2928",
+                      "server_mtime_utc":  "2026-10-06T18:03:59Z"
+                  },
+                  {
+                      "alias":  "ext",
                       "local_path":  "extra/llama/ml1m.json",
                       "server_path":  "outputs/confrec/ftgrid_llama/extra/ml1m.json",
                       "size":  225235,
@@ -34,6 +82,22 @@
                       "size":  35142,
                       "sha1":  "36dd0034efa2d006fe86f72de11f2dd6584437c8",
                       "server_mtime_utc":  "2026-10-05T12:45:11Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/llama/toys.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/extra/toys.json",
+                      "size":  225858,
+                      "sha1":  "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1",
+                      "server_mtime_utc":  "2026-10-06T18:22:07Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/llama/toys_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_llama/extra/toys_tables.csv",
+                      "size":  36488,
+                      "sha1":  "4b94a510b16681fa5b1288c87882ee784d3f019b",
+                      "server_mtime_utc":  "2026-10-06T18:22:07Z"
                   },
                   {
                       "alias":  "ext",
@@ -109,6 +173,14 @@
                   },
                   {
                       "alias":  "grid",
+                      "local_path":  "grid/llama/toys.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/report/toys.json",
+                      "size":  246827,
+                      "sha1":  "b206fd37aab2544f4909e4baeb4833a5b4d96219",
+                      "server_mtime_utc":  "2026-10-06T17:36:00Z"
+                  },
+                  {
+                      "alias":  "grid",
                       "local_path":  "grid/llama/toys_split.json",
                       "server_path":  "outputs/confrec/ftgrid_llama/panels/toys/ftgrid_split.json",
                       "size":  2021,
@@ -117,11 +189,35 @@
                   },
                   {
                       "alias":  "grid",
+                      "local_path":  "grid/llama/toys_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_llama/report/toys_tables.csv",
+                      "size":  30148,
+                      "sha1":  "604790fc9761c9c1902855df5c975154cc6193cc",
+                      "server_mtime_utc":  "2026-10-06T17:36:00Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/games.json",
+                      "server_path":  "outputs/confrec/ftgrid/report/games.json",
+                      "size":  247370,
+                      "sha1":  "98f490f4f8124f002032d5f3b4780b569f4a8b9d",
+                      "server_mtime_utc":  "2026-10-06T01:05:14Z"
+                  },
+                  {
+                      "alias":  "grid",
                       "local_path":  "grid/qwen/games_split.json",
                       "server_path":  "outputs/confrec/ftgrid/panels/games/ftgrid_split.json",
                       "size":  2009,
                       "sha1":  "dfd01e9e4012d19a958c154e848c546774d62121",
                       "server_mtime_utc":  "2026-10-04T12:27:31Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/games_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid/report/games_tables.csv",
+                      "size":  27202,
+                      "sha1":  "fe97ace3986a4773d3483d3591f1443105992686",
+                      "server_mtime_utc":  "2026-10-06T01:05:14Z"
                   },
                   {
                       "alias":  "grid",
@@ -149,11 +245,27 @@
                   },
                   {
                       "alias":  "grid",
+                      "local_path":  "grid/qwen/sports.json",
+                      "server_path":  "outputs/confrec/ftgrid/report/sports.json",
+                      "size":  245321,
+                      "sha1":  "cc7ac0b6576c748bff2252ed2553a31ae219aec9",
+                      "server_mtime_utc":  "2026-10-06T10:33:02Z"
+                  },
+                  {
+                      "alias":  "grid",
                       "local_path":  "grid/qwen/sports_split.json",
                       "server_path":  "outputs/confrec/ftgrid/panels/sports/ftgrid_split.json",
                       "size":  1998,
                       "sha1":  "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
                       "server_mtime_utc":  "2026-10-04T12:30:48Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/qwen/sports_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid/report/sports_tables.csv",
+                      "size":  27358,
+                      "sha1":  "e2e7275d98fce9d888443a117af3ba987cc0d6f4",
+                      "server_mtime_utc":  "2026-10-06T10:33:02Z"
                   },
                   {
                       "alias":  "grid",
@@ -275,18 +387,6 @@
                     },
                     {
                         "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_q/extra/ml1m.json",
-                        "local_path":  "extra/ftq/ml1m.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_q/extra/ml1m_tables.csv",
-                        "local_path":  "extra/ftq/ml1m_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid_q/extra/sports.json",
                         "local_path":  "extra/ftq/sports.json",
                         "stale_local_copy_kept":  false
@@ -295,42 +395,6 @@
                         "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid_q/extra/sports_tables.csv",
                         "local_path":  "extra/ftq/sports_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_q/extra/toys.json",
-                        "local_path":  "extra/ftq/toys.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_q/extra/toys_tables.csv",
-                        "local_path":  "extra/ftq/toys_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid/extra/games.json",
-                        "local_path":  "extra/games.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid/extra/games_tables.csv",
-                        "local_path":  "extra/games_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_llama/extra/toys.json",
-                        "local_path":  "extra/llama/toys.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_llama/extra/toys_tables.csv",
-                        "local_path":  "extra/llama/toys_tables.csv",
                         "stale_local_copy_kept":  false
                     },
                     {
@@ -349,42 +413,6 @@
                         "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid/extra/summary.json",
                         "local_path":  "extra/summary.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid_llama/report/toys.json",
-                        "local_path":  "grid/llama/toys.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid_llama/report/toys_tables.csv",
-                        "local_path":  "grid/llama/toys_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid/report/games.json",
-                        "local_path":  "grid/qwen/games.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid/report/games_tables.csv",
-                        "local_path":  "grid/qwen/games_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid/report/sports.json",
-                        "local_path":  "grid/qwen/sports.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid/report/sports_tables.csv",
-                        "local_path":  "grid/qwen/sports_tables.csv",
                         "stale_local_copy_kept":  false
                     },
                     {

@@ -275,3 +275,12 @@ E-C',ml1m,FT,deployable_minus_oracle:topk_error_rate,0.06855197696,0.05801418629
 E-C',ml1m,FT,deployable_minus_oracle:AUROC_margin_correct,-0.06294638292,-0.0767639233,-0.04919440761,366,true,,Qwen3-8B,mean_over_seeds,,,6365,false,
 E-C',ml1m,FT,deployable_minus_oracle:share_errors_top,0.07141579757,0.05591362108,0.08791243311,366,true,,Qwen3-8B,mean_over_seeds,,,6365,false,
 E-C',ml1m,FT,deployable_minus_oracle:AURC,0.08786104629,0.07674980818,0.09985099526,366,true,,Qwen3-8B,mean_over_seeds,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST,0.595882707,0.5733706937,0.6179673713,366,true,,Qwen3-8B,zeroshot,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST,0.7400062261,0.7197097258,0.7584675392,366,true,,Qwen3-8B,s0,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST,0.7446659444,0.7255967532,0.763498586,366,true,,Qwen3-8B,s1,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST,0.7313484155,0.7109915758,0.7511192084,366,true,,Qwen3-8B,p0,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST,0.7301768542,0.7081952059,0.750371266,366,true,,Qwen3-8B,p1,,,6365,false,
+FT-C,ml1m,FT-PERM,UAUC_TEST_q_hat,0.7586119349,0.7371140401,0.7795605492,366,true,,Qwen3-8B,reference,,,6365,false,descriptive companion
+FT-C,ml1m,FT-PERM,retention_R,0.9399278433,0.8821517318,0.9936678078,366,true,,Qwen3-8B,s0,,,6365,false,
+FT-C,ml1m,FT-PERM,retention_R,0.9026161117,0.8375007802,0.9562760259,366,true,,Qwen3-8B,s1,,,6365,false,
+FT-C,ml1m,FT-PERM,retention_R,0.9212719775,0.8674141238,0.9676635404,366,true,,Qwen3-8B,mean_over_seeds,,,6365,false,ITEM_DRIVEN

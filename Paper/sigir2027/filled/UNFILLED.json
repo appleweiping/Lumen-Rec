@@ -2,23 +2,22 @@
  "schema": "fill_paper_unfilled_v1",
  "summary": {
   "slots_total": 714,
-  "filled": 294,
-  "unfilled": 420,
+  "filled": 331,
+  "unfilled": 383,
   "unfilled_by_reason": {
    "branch_slot": 6,
    "free_text": 29,
-   "result_file_missing": 375,
-   "result_not_in_report": 10
+   "result_file_missing": 348
   },
   "filled_by_alias": {
    "aud": 111,
    "corr": 4,
-   "cpu": 11,
-   "ext": 62,
+   "cpu": 13,
+   "ext": 72,
    "free": 2,
    "gate": 9,
    "gft": 6,
-   "grid": 74,
+   "grid": 99,
    "ko": 8,
    "sel": 7
   },
@@ -28,10 +27,10 @@
    "aud2q": 16,
    "branch": 6,
    "corr": 5,
-   "cpu": 14,
-   "ext": 95,
+   "cpu": 12,
+   "ext": 85,
    "free": 42,
-   "grid": 107,
+   "grid": 82,
    "ko": 20,
    "mir": 7,
    "prn": 17,
@@ -94,6 +93,12 @@
    "a": 943,
    "b": 943,
    "ok": true
+  },
+  {
+   "check": "llama ml1m: report meta n_users_both_classes_test = ftgrid_split eval.users_both_classes_test",
+   "a": 366,
+   "b": 366,
+   "ok": true
   }
  ],
  "check_equal_summary": {
@@ -106,12 +111,15 @@
  "sources": {
   "aud/sports.json": "a7406bd2509464352eac2e390dfcb7ab5784c837",
   "aud/toys.json": "de15aa117b7811d7cea4d68d734a96434f50ce7a",
-  "extra/ml1m.json": "7f4a1da43c34d93e3516ed874c7e8831bc3631b1",
+  "extra/llama/ml1m.json": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+  "extra/ml1m.json": "b2918d95aa59f4693ede10953ff253b99b85f733",
   "extra/toys.json": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743",
   "gate/gate.json": "38aa39f19ffb7ee724cf87aa5f36f54e78fbd50f",
   "gft/gate_ft.json": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d",
+  "grid/llama/ml1m.json": "3e3c83d94cdb30caef288191b12cc7f173f8220a",
+  "grid/llama/ml1m_split.json": "c75ef45b134b3427244b839a251b26dbd875ea95",
   "grid/qwen/games_split.json": "dfd01e9e4012d19a958c154e848c546774d62121",
-  "grid/qwen/ml1m.json": "bf76f48414ac99a887dbc63a4e2f29617269a46e",
+  "grid/qwen/ml1m.json": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d",
   "grid/qwen/ml1m_split.json": "e5e97ca6316e97173d72d5f3f1b476e34da3e8b6",
   "grid/qwen/sports_split.json": "ad02a5962a63a352f74444eb050b5d5cdd3c3340",
   "grid/qwen/toys.json": "a28f219b243e552dab3f753a4aaf64a172bb853d",
@@ -1710,34 +1718,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "extra/sports.json"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 171,
-   "slot": "ext:FT\\_C\\_reading.R",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "FT-C (permuted): $R$ / reading",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "extra/ml1m.json: FT_C_reading is not available (needs usable like arms of ['zeroshot', 's0', 's1', 'p0', 'p1']; missing or excluded: ['p0', 'p1'])"
-  },
-  {
-   "file": "sections/experiments.tex",
-   "line": 171,
-   "slot": "ext:FT\\_C\\_reading.label",
-   "kind": "table",
-   "table": "tab:teaches",
-   "row": "FT-C (permuted): $R$ / reading",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "extra/ml1m.json: FT_C_reading is not available (needs usable like arms of ['zeroshot', 's0', 's1', 'p0', 'p1']; missing or excluded: ['p0', 'p1'])"
   },
   {
    "file": "sections/experiments.tex",
@@ -4247,30 +4227,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "UAUC of $\\ell$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 141,
-   "slot": "grid:UAUC",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "UAUC of $\\ell$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 141,
-   "slot": "grid:UAUC",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "UAUC of $\\ell$",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4295,34 +4251,10 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "LoRA $-$ ZS (E-B)",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 142,
-   "slot": "grid:dUAUC\\_ft\\_minus\\_zs",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "LoRA $-$ ZS (E-B)",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 143,
-   "slot": "cpu:UAUC\\_item\\_mean\\_prior",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "item mean $m$ (ref.)",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -4343,46 +4275,10 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "temporal MF (ref.)",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 144,
-   "slot": "cpu:UAUC\\_mf\\_temporal",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "temporal MF (ref.)",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 145,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 145,
-   "slot": "ext:E\\_J.dUAUC\\_L\\_minus\\_q\\_hat",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\Delta$UAUC($\\ell-m$), E-J$^\\dagger$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -4415,30 +4311,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "ECE (after Platt)",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 146,
-   "slot": "grid:ece10\\_platt",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "ECE (after Platt)",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 146,
-   "slot": "grid:ece10\\_platt",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "ECE (after Platt)",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4463,30 +4335,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "Correct in bottom tertile, oracle",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 147,
-   "slot": "grid:share\\_correct\\_bottom\\_tertile",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Correct in bottom tertile, oracle",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 147,
-   "slot": "grid:share\\_correct\\_bottom\\_tertile",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Correct in bottom tertile, oracle",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4503,30 +4351,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 148,
-   "slot": "grid:share\\_errors\\_top\\_tertile",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Errors in top tertile, oracle",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 148,
-   "slot": "grid:share\\_errors\\_top\\_tertile",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Errors in top tertile, oracle",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -4559,30 +4383,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "Item-prior share $\\rho^2/r_8$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 149,
-   "slot": "grid:item\\_prior\\_share",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Item-prior share $\\rho^2/r_8$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 149,
-   "slot": "grid:item\\_prior\\_share",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Item-prior share $\\rho^2/r_8$",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4599,30 +4399,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 150,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "e-share$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 150,
-   "slot": "ext:E\\_G.e\\_share",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "e-share$^\\dagger$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -4655,30 +4431,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 151,
-   "slot": "grid:G",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 151,
-   "slot": "grid:G",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G=\\Delta$UAUC(M2$-$M1), E-D",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4695,30 +4447,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 152,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 152,
-   "slot": "ext:E\\_W.G\\_wu",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G_{\\rm wu}$ (E-W)$^\\dagger$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -4751,30 +4479,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 153,
-   "slot": "ext:E\\_W.G\\_CF\\_wu",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 153,
-   "slot": "grid:G\\_CF",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "$\\mathcal G_{\\rm CF}$: E-D / E-W$^\\dagger$",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4799,30 +4503,6 @@
    "kind": "table",
    "table": "tab:app-llama",
    "row": "Popularity link of $\\hat\\pi$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 154,
-   "slot": "grid:partial\\_rho\\_pi\\_logpop",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Popularity link of $\\hat\\pi$",
-   "column": 2,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 154,
-   "slot": "grid:partial\\_rho\\_pi\\_logpop",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "Popularity link of $\\hat\\pi$",
    "column": 3,
    "blocks": [],
    "reason": "result_file_missing",
@@ -4839,30 +4519,6 @@
    "blocks": [],
    "reason": "result_file_missing",
    "detail": "grid/llama/toys.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 155,
-   "slot": "grid:P1",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "P1: $\\mathcal G_{\\rm FT}-\\mathcal G_{\\rm ZS}$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "grid/llama/ml1m.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 156,
-   "slot": "ext:E\\_W.P1\\_wu",
-   "kind": "table",
-   "table": "tab:app-llama",
-   "row": "P1$_{\\rm wu}$$^\\dagger$",
-   "column": 1,
-   "blocks": [],
-   "reason": "result_file_missing",
-   "detail": "extra/llama/ml1m.json"
   },
   {
    "file": "sections/appendix.tex",
@@ -5107,118 +4763,6 @@
    ],
    "reason": "result_file_missing",
    "detail": "grid/qwen/sports.json"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 182,
-   "slot": "grid:ftc\\_UAUC seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, permuted labels (seeds 0 / 1)",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed0 is not available (needs usable like arms of s0 and p0)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 182,
-   "slot": "grid:ftc\\_UAUC seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, permuted labels (seeds 0 / 1)",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed1 is not available (needs usable like arms of s1 and p1)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 182,
-   "slot": "grid:ftc\\_UAUC\\_all\\_rows seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, permuted labels (seeds 0 / 1)",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed0 is not available (needs usable like arms of s0 and p0)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 182,
-   "slot": "grid:ftc\\_UAUC\\_all\\_rows seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, permuted labels (seeds 0 / 1)",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed1 is not available (needs usable like arms of s1 and p1)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 183,
-   "slot": "grid:ftc\\_dUAUC\\_real\\_minus\\_perm seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, real $-$ permuted (seeds 0 / 1)",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed0 is not available (needs usable like arms of s0 and p0)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 183,
-   "slot": "grid:ftc\\_dUAUC\\_real\\_minus\\_perm seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, real $-$ permuted (seeds 0 / 1)",
-   "column": 1,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed1 is not available (needs usable like arms of s1 and p1)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 183,
-   "slot": "grid:ftc\\_dUAUC\\_all\\_rows seed 0",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, real $-$ permuted (seeds 0 / 1)",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed0 is not available (needs usable like arms of s0 and p0)"
-  },
-  {
-   "file": "sections/appendix.tex",
-   "line": 183,
-   "slot": "grid:ftc\\_dUAUC\\_all\\_rows seed 1",
-   "kind": "table",
-   "table": "tab:app-seeds",
-   "row": "ML-1M, real $-$ permuted (seeds 0 / 1)",
-   "column": 2,
-   "blocks": [
-    "BRANCH-GATEFT"
-   ],
-   "reason": "result_not_in_report",
-   "detail": "grid/qwen/ml1m.json: FT_C.seed1 is not available (needs usable like arms of s1 and p1)"
   },
   {
    "file": "sections/appendix.tex",

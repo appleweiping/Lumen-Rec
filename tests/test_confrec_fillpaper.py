@@ -198,8 +198,10 @@ def _slot_report(fr, fm, d: str, delta: float, seed: int) -> dict:
             "prior_offset_LoRA": fr.uauc_models({f"o{k}": offs[k] for k in range(3)}, y, users, rows, 100, 0,
                                                 n_registered=3),
             "difference": diff}
-    return {"spec": fm.SPEC, "alias": "slot", "meta": {"domain": d, "backbone": "Qwen3-8B"}, "slot": slot,
-            "decision": fm.decide(diff, 3, [])}
+    # addendum 10 item 2: only a registered report (dry_run_inputs false, n_boot 2000, seed 0) can be decided
+    return {"spec": fm.SPEC, "alias": "slot",
+            "meta": {"domain": d, "backbone": "Qwen3-8B", "dry_run_inputs": False, "n_boot": 2000, "seed": 0},
+            "slot": slot, "decision": fm.decide(diff, 3, [])}
 
 
 def _mirror_inputs(d_lo: float, e_lo: float) -> dict:
@@ -1029,15 +1031,22 @@ def test_ext_cells_fill_from_the_real_ml1m_extra_file(real_ext):
     flat = " ".join(text.split())
     word = fill.ROBUST_WORDS[pw["reading_P1"]["reading"]]
     assert f"seeds positive; within-user reading {word} (exploratory))" in flat
+    # the FT-C block is read from the file's own state: red with the file's reason while it is unavailable, filled once the
+    # registered control has run (the file is re-pulled as results arrive, so the test must not pin one state)
     ftc = unfilled_of(real_ext.doc, slot=r"ext:FT\_C\_reading.R")
-    assert ftc and ftc[0]["reason"] == "result_not_in_report" and "record missing" in ftc[0]["detail"]
-    assert ex["FT_C_reading"]["available"] is False
+    if ex["FT_C_reading"]["available"]:
+        assert not ftc and ex["FT_C_reading"]["label"] in {"ITEM_DRIVEN", "USER_DRIVEN", "MIXED", "NOT_DEFINED"}
+    else:
+        assert ftc and ftc[0]["reason"] == "result_not_in_report" and "record missing" in ftc[0]["detail"]
     reds = {u["detail"] for u in real_ext.doc["unfilled"] if fill.norm(u["slot"]).startswith("ext:")
             and u["reason"] == "result_file_missing"}
     assert {"extra/summary.json", "extra/toys.json", "extra/ftq/ml1m.json", "extra/llama/ml1m.json"} <= reds
     assert not unfilled_of(real_ext.doc, reason="skeleton_changed")
     filled_ext = [f for f in real_ext.filled["filled"] if fill.norm(f["slot"]).startswith("ext:")]
-    assert len(filled_ext) == 32 and all(any(s.startswith("extra/ml1m.json:") for s in f["from"]) for f in filled_ext)
+    ftc_filled = [f for f in filled_ext if "FT_C_reading" in fill.norm(f["slot"])]
+    assert bool(ftc_filled) == bool(ex["FT_C_reading"]["available"])
+    assert len(filled_ext) - len(ftc_filled) == 32
+    assert all(any(s.startswith("extra/ml1m.json:") for s in f["from"]) for f in filled_ext)
 
 
 def _ft_reading(control, est, lo, hi, n=366, defined=True):

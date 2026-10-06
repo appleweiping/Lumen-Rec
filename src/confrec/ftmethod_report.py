@@ -1,17 +1,21 @@
-"""Method-slot report (idea-stage/PREREG_AMENDMENT_3.md section 7, FT-M; addendum 1 item 8; addendum 2 item 2).
+"""Method-slot report (idea-stage/PREREG_AMENDMENT_3.md section 7, FT-M; addendum 1 item 8; addendum 2 item 2; addendum 10
+section 1, which supersedes the code record of addendum 5 for this file).
 
     # one dataset (stage 5 of scripts/sigir/run_ftmethod.sh)
     python -m src.confrec.ftmethod_report dataset --domain ml1m \
         --split outputs/confrec/ftgrid/panels/ml1m/ftgrid_split.json --panels outputs/confrec/ftgrid/panels/ml1m \
         --sft_scores outputs/confrec/ftgrid/scores/ml1m --method_dir outputs/confrec/ftmethod/ml1m \
         --out outputs/confrec/ftmethod/ml1m/report.json [--n_boot 2000] [--seed 0]
-    # the slot-level state over the per-dataset reports <root>/<d>/report.json (registered order, kill rule, Holm)
-    python -m src.confrec.ftmethod_report slot --root outputs/confrec/ftmethod [--out outputs/confrec/ftmethod/slot.json] \
-        [--check_next D]
+    # the slot-level state over the per-dataset reports <root>/<d>/report.json (registered order, kill rule, Holm, cuts)
+    python -m src.confrec.ftmethod_report slot --root outputs/confrec/ftmethod --pilot_log docs/sigir/PILOT_LOG.md \
+        [--out outputs/confrec/ftmethod/slot.json] [--check_next D] [--today YYYYMMDD] [--allow_missing_log]
 
 dataset (TEST rows; seeds 0-2 paired by seed; the conventions of src/confrec/ftgrid_report.py, imported):
   SFT_b0             the section-2 SFT adapters' like logits on eval.jsonl (--sft_scores/s<k>/like; ML-1M: Gate-FT's),
-                     i.e. comparator (i), b fixed at 0: UAUC per seed and seed-averaged
+                     i.e. comparator (i), b fixed at 0: UAUC per seed and seed-averaged. (Addendum 10 item 7: "with b = 0
+                     the run is SFT's" holds for a FROZEN b, as train_lora_offset's test has it. The registered prior-offset
+                     run TRAINS b, so it is not SFT even where b stays near 0: b's gradient enters the Trainer's global
+                     gradient-norm clip together with the LoRA gradients and rescales their update.)
   post_hoc_stacking  comparator (ii): per seed, a logistic regression of the label on [SFT logit, z(q-hat)] fit on the
                      CAL rows of the EVAL users (ftgrid_report.logit_fit) and applied to TEST: UAUC of its linear
                      predictor; the coefficients
@@ -24,26 +28,45 @@ dataset (TEST rows; seeds 0-2 paired by seed; the conventions of src/confrec/ftg
                      (ftgrid_report.contrast_models: 2,000 resamples, seed 0, p = 2 min(P*(d <= 0), P*(d >= 0)) with
                      +1/(B + 1)), sigma_seed = SD (ddof 1) of the per-seed differences
   reference          UAUC of q-hat (the prior-only item mean, forensics.prior_means k = 5) on the same rows
-  decision           PASS iff the seed-averaged dUAUC >= +0.01, its CI excludes 0 and the sigma_seed rule holds (all 3
-                     per-seed differences positive and the mean > 2 sigma_seed); INCOMPLETE when a seed is missing (a
-                     like pass absent, incomplete or failing E1, or no offset.json); INVALID on an input problem; FAIL
-                     otherwise (an endpoint on fewer than 150 users is descriptive: no CI-based claim, so no pass).
+  decision           PASS iff the seed-averaged dUAUC >= +0.01 (compared as mean >= 0.01 - 1e-12: a mean of exactly +0.0100
+                     in exact arithmetic is computed as 0.009999999999999998; addendum 10 item 3), its CI excludes 0 and
+                     the sigma_seed rule holds (all 3 per-seed differences positive and the mean > 2 sigma_seed);
+                     INCOMPLETE when a seed is missing (a like pass absent, incomplete or failing E1, or no offset.json);
+                     INVALID on an input problem; FAIL otherwise (an endpoint on fewer than 150 users is descriptive: no
+                     CI-based claim, so no pass).
   Every block uses the identical rows (TEST rows finite in every SFT and prior-offset logit of the seeds present, and in
   z) and users (those with both classes there). The report carries the raw p only (addendum 1 item 8).
 slot (the cross-dataset step of addendum 1 item 8, the kill rule "in the registered dataset order by the report code" of
   addendum 2 item 2): datasets in the order ML-1M, Toys, Video_Games, Sports; killed as soon as 2 have failed; survives
   only with passes on at least 3 of the 4; Holm over the datasets run (the decided ones with a p-value); single-backbone.
-  --check_next D exits 4 (refused) unless every dataset before D is decided (PASS or FAIL) and fewer than 2 of them failed.
+  --check_next D exits 4 (refused) unless every dataset before D is decided (PASS or FAIL) or NOT_RUN and fewer than 2
+  of them failed (and D itself is not NOT_RUN). Addendum 10 changes what a dataset's status can be:
+  * a report is the registered report of its dataset only when its meta says dry_run_inputs false, n_boot 2000 and seed 0
+    (and its domain and decision status are right); any other report (a DRY_RUN rehearsal, a bootstrap of another size or
+    seed, a hand-written file, a report of another dataset) is INVALID: never counted as decided, never as a failure
+    and never unlocking the next dataset (item 2);
+  * a dataset cut at the 2026-10-29 checkpoint (A3 section 10) is recorded as a line of --pilot_log holding the exact token
+    `FTMETHOD_NOT_RUN <dataset>` (case-sensitive, one space) and reads NOT_RUN: neither decided nor failed, it blocks
+    nobody, the next dataset skips it, it does not run (check_next refuses it) and it can lift an INCOMPLETE / INVALID
+    report (addendum 5 item 2 asked for exactly this record). A cut recorded for a dataset that already has a decided
+    report is an INVALID record (a cut is decided on GPU-hours alone, never after a result);
+  * on the day after the hard kill date 2026-11-30 (--today YYYYMMDD, default: the system date) every dataset that has no
+    finished (PASS / FAIL) report reads NOT_RUN (A3 section 10: anything unfinished on 2026-11-30 is reported as not run).
+    A dataset that lies behind the kill point keeps its "not run" (status null): the slot was killed before it.
+  Slot states: KILLED (2 failures); SURVIVES (3 passes); NOT_SURVIVED (not killed, but fewer than 3 passes with the datasets
+  still open unable to make up the difference, e.g. after two cuts or after the hard kill date); OPEN otherwise.
 Outputs: strict JSON (stats.strict_json, allow_nan=False; no wall-clock, host or path) and <out stem>_tables.csv.
 """
 from __future__ import annotations
 
 import argparse
 import csv
+import datetime
 import hashlib
 import io
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -56,18 +79,25 @@ from src.confrec.stats import strict_json
 
 NAN = float("nan")
 SPEC = ("idea-stage/PREREG_AMENDMENT_3.md section 7 (FT-M) with sections 1, 3 and 11; PREREG_AMENDMENT_3_ADDENDUM_1.md "
-        "item 8; PREREG_AMENDMENT_3_ADDENDUM_2.md item 2")
+        "item 8; PREREG_AMENDMENT_3_ADDENDUM_2.md item 2; PREREG_AMENDMENT_3_ADDENDUM_10.md section 1")
 DATASETS = ("ml1m", "toys", "games", "sports")     # the registered order (A3 section 7)
 SEEDS = (0, 1, 2)                                   # A3 section 2
 PASS_MIN = 0.01                                     # seed-averaged dUAUC >= +0.01
+PASS_TOL = 1e-12                                    # addendum 10 item 3: mean >= 0.01 - 1e-12 (float arithmetic of the mean)
 MAX_FAILS = 2                                       # killed as soon as it has failed on 2 datasets
 MIN_PASSES = 3                                      # survives only with passes on at least 3 of the 4
 HARD_KILL_DATE = "2026-11-30"
+HARD_KILL = int(HARD_KILL_DATE.replace("-", ""))   # 20261130: the slot is over on the day after
+REGISTERED_N_BOOT, REGISTERED_SEED = fr.N_BOOT, fr.SEED   # A3 section 3: 2,000 user resamples, seed 0 (addendum 10 item 2)
+CUT_TOKEN = "FTMETHOD_NOT_RUN"                      # addendum 10 item 5: `FTMETHOD_NOT_RUN <dataset>` in the pilot log
+NOT_RUN = "NOT_RUN"
 DECIDED = ("PASS", "FAIL")
-STATUSES = ("PASS", "FAIL", "INCOMPLETE", "INVALID")
+REPORT_STATUSES = ("PASS", "FAIL", "INCOMPLETE", "INVALID")   # what ftmethod_report dataset itself can write
+STATUSES = REPORT_STATUSES + (NOT_RUN,)
 ALIAS = ("SFT_b0", "post_hoc_stacking", "prior_offset_LoRA", "difference", "reference")
 SLOT_COLS = ("dataset", "order", "status", "dUAUC", "lo", "hi", "p", "p_holm", "confirmed", "sigma_seed",
              "sigma_seed_rule", "n_users", "descriptive_min_n", "note")
+_CUT = re.compile(r"(?<![A-Za-z0-9_])" + CUT_TOKEN + r" (" + "|".join(DATASETS) + r")(?![A-Za-z0-9_])")
 
 OPERATIONALIZATIONS = (
     "pairs: one per (user_id, item_id) of eval.jsonl (ftgrid_report.make_ctx); TEST = candidate_timestamps >= T and CAL "
@@ -95,13 +125,17 @@ OPERATIONALIZATIONS = (
     "endpoint = ftgrid_report.contrast_models({seed k: (prior-offset score, stacking predictor)}): per-seed dUAUC, the "
     "seed-averaged dUAUC with the 95% percentile CI over 2,000 user resamples (seed 0) and p = min(1, 2 min((#{d* <= 0} "
     "+ 1)/(B + 1), (#{d* >= 0} + 1)/(B + 1))); sigma_seed = SD (ddof 1) of the 3 per-seed values",
-    "pass = complete (3 seeds) and seed-averaged dUAUC >= 0.01 and ci_excludes_0 (the literal 'CI excludes 0', kept by "
-    "the main-session decision of 2026-10-04) and every per-seed dUAUC > 0 and mean > 2 sigma_seed; fewer than 150 "
-    "users makes the endpoint descriptive (p and ci_excludes_0 null, A3 section 1), which cannot pass: FAIL with that "
-    "reason",
+    "pass = complete (3 seeds) and seed-averaged dUAUC >= 0.01 - 1e-12 (addendum 10 item 3: the mean of per-user "
+    "differences that is +0.0100 in exact arithmetic is computed as 0.009999999999999998) and ci_excludes_0 (the "
+    "literal 'CI excludes 0', kept by the main-session decision of 2026-10-04) and every per-seed dUAUC > 0 and mean > "
+    "2 sigma_seed; fewer than 150 users makes the endpoint descriptive (p and ci_excludes_0 null, A3 section 1), which "
+    "cannot pass: FAIL with that reason",
     "status INCOMPLETE (a registered seed missing) and INVALID (an input problem: sha1, pairing, manifest or b-group "
     "mismatch) are neither PASS nor FAIL: the slot step does not count them as failed and refuses every later dataset "
-    "until they are resolved (main-session decision of 2026-10-04)",
+    "until they are resolved (main-session decision of 2026-10-04). The slot step also reads a report whose meta says "
+    "dry_run_inputs, n_boot != 2000 or seed != 0 as INVALID (addendum 10 item 2), and NOT_RUN for a dataset cut at the "
+    "2026-10-29 checkpoint (a pilot-log line with `FTMETHOD_NOT_RUN <dataset>`, item 5) or without a finished report "
+    "after 2026-11-30 (item 4)",
 )
 
 
@@ -255,10 +289,12 @@ def stacking(L, z, y, fit_rows) -> tuple[np.ndarray | None, dict]:
 
 
 def decide(diff: dict | None, n_seeds_present: int, problems: list) -> dict:
-    """A3 section 7: PASS iff the seed-averaged dUAUC >= +0.01, its CI excludes 0 and the sigma_seed rule holds (all 3
-    per-seed differences positive, mean > 2 sigma_seed); INVALID on an input problem; INCOMPLETE without all 3 seeds."""
-    rule = ("PASS iff complete (seeds 0-2) and seed-averaged dUAUC(prior-offset - post-hoc stacking) >= +0.01 and its CI "
-            "excludes 0 and every per-seed dUAUC > 0 and mean > 2 sigma_seed (SD ddof 1 of the 3 per-seed values)")
+    """A3 section 7: PASS iff the seed-averaged dUAUC >= +0.01 (mean >= 0.01 - 1e-12, addendum 10 item 3), its CI excludes
+    0 and the sigma_seed rule holds (all 3 per-seed differences positive, mean > 2 sigma_seed); INVALID on an input
+    problem; INCOMPLETE without all 3 seeds."""
+    rule = ("PASS iff complete (seeds 0-2) and seed-averaged dUAUC(prior-offset - post-hoc stacking) >= +0.01 (compared as "
+            ">= 0.01 - 1e-12) and its CI excludes 0 and every per-seed dUAUC > 0 and mean > 2 sigma_seed (SD ddof 1 of the "
+            "3 per-seed values)")
     if problems:
         return {"status": "INVALID", "reason": "input problems: " + "; ".join(problems), "conditions": None, "rule": rule}
     if n_seeds_present < len(SEEDS) or diff is None or "mean_over_seeds" not in diff:
@@ -272,14 +308,14 @@ def decide(diff: dict | None, n_seeds_present: int, problems: list) -> dict:
                 "conditions": None, "rule": rule}
     cond = {"complete": True,
             "n_users_ge_150": not mean.get("descriptive_min_n"),
-            "mean_ge_0.01": bool(est >= PASS_MIN),
+            "mean_ge_0.01": bool(est >= PASS_MIN - PASS_TOL),          # addendum 10 item 3: not a bare float comparison
             "ci_excludes_0": mean.get("ci_excludes_0") is True,
             "all_seeds_positive": all(_fin(x) and x > 0 for x in per),
             "mean_gt_2_sigma_seed": bool(_fin(sd) and est > 2 * sd)}
     cond["sigma_seed_rule"] = cond["all_seeds_positive"] and cond["mean_gt_2_sigma_seed"]
     passed = cond["mean_ge_0.01"] and cond["ci_excludes_0"] and cond["sigma_seed_rule"]
     why = {"n_users_ge_150": f"descriptive: {mean.get('n_users')} users < {fr.MIN_N}, no CI-based claim (A3 section 1)",
-           "mean_ge_0.01": f"seed-averaged dUAUC {est:.4f} < +0.01",
+           "mean_ge_0.01": f"seed-averaged dUAUC {est:.6g} < +0.01 (tolerance {PASS_TOL:g})",
            "ci_excludes_0": (f"its CI [{mean.get('lo')}, {mean.get('hi')}] does not exclude 0"
                              if mean.get("ci_excludes_0") is False else "no CI-based claim (descriptive or no CI)"),
            "all_seeds_positive": f"a per-seed dUAUC is not positive ({per})",
@@ -453,17 +489,23 @@ def table_rows(res: dict) -> list:
 
 
 # ---------------------------------------------------------------- the slot across datasets
-def slot_state(statuses: dict) -> dict:
-    """The slot-level state of A3 section 7 from per-dataset statuses (PASS, FAIL, INCOMPLETE, INVALID; None or absent =
-    no report), walked in the registered order: killed as soon as 2 datasets failed; survives with >= 3 passes; a
-    dataset that is not decided stops the walk (it is the next to complete); a report after the kill point or after an
-    undecided dataset is a violation of the order."""
-    passes, fails, decided, violations = [], [], [], []
+def slot_state(statuses: dict, past_hard_kill_date: bool = False) -> dict:
+    """The slot-level state of A3 section 7 from per-dataset statuses (PASS, FAIL, INCOMPLETE, INVALID, NOT_RUN; None or
+    absent = no report), walked in the registered order: killed as soon as 2 datasets failed; survives with >= 3 passes;
+    a dataset that is not decided stops the walk (it is the next to complete); a report after the kill point or after an
+    undecided dataset is a violation of the order. A NOT_RUN dataset (addendum 10 item 5: a cut) is neither decided nor
+    failed and stops nothing: the walk goes on to the next dataset. past_hard_kill_date (the day after 2026-11-30):
+    nothing is next any more, the walk's pending dataset and every later one that is not decided read NOT_RUN (item 4),
+    except those behind the kill point (the slot was killed before them)."""
+    passes, fails, decided, not_run, violations = [], [], [], [], []
     killed_after = pending = None
     for d in DATASETS:
         s = statuses.get(d)
         if s is not None and s not in STATUSES:
             raise ValueError(f"{d}: unknown status {s!r}")
+        if s == NOT_RUN:
+            not_run.append(d)                  # a record of a cut, not a report: no violation, no count, no block
+            continue
         if killed_after is not None or pending is not None:
             if s is not None:
                 violations.append(f"{d}: a report exists although " + (
@@ -477,40 +519,87 @@ def slot_state(statuses: dict) -> dict:
                 killed_after = d
         else:
             pending = d
+    last = DATASETS.index(killed_after) if killed_after is not None else len(DATASETS) - 1
+    by_date = ([d for d in DATASETS[:last + 1] if d not in decided and d not in not_run] if past_hard_kill_date else [])
+    open_ = [d for d in DATASETS if d not in decided and d not in not_run]          # could still be decided
     if killed_after is not None:
         state = "KILLED"
     elif len(passes) >= MIN_PASSES:
         state = "SURVIVES"
+    elif past_hard_kill_date or len(passes) + len(open_) < MIN_PASSES:
+        state = "NOT_SURVIVED"                  # fewer than 3 passes and no way left to make them up (cuts, the date)
     else:
         state = "OPEN"
-    final = killed_after is not None or len(decided) == len(DATASETS)
-    nxt = None if killed_after is not None else pending
+    final = killed_after is not None or pending is None or past_hard_kill_date
+    nxt = None if (killed_after is not None or past_hard_kill_date) else pending
     return {"state": state, "final": final, "killed_after": killed_after, "passes": passes, "fails": fails,
-            "decided": decided, "pending": pending, "pending_status": statuses.get(pending) if pending else None,
-            "next_dataset": nxt, "violations": violations}
+            "decided": decided, "not_run": not_run + by_date, "not_run_by_date": by_date,
+            "past_hard_kill_date": bool(past_hard_kill_date), "pending": pending,
+            "pending_status": statuses.get(pending) if pending else None, "next_dataset": nxt,
+            "violations": violations}
 
 
-def check_next(statuses: dict, d: str) -> tuple[bool, str]:
-    """May dataset d run (its training, scoring and report)? Every earlier dataset in the registered order must be
-    decided, and fewer than 2 of them failed (a dataset already decided may be resumed)."""
+def check_next(statuses: dict, d: str, reasons: dict | None = None) -> tuple[bool, str]:
+    """May dataset d run (its training, scoring and report)? d is not NOT_RUN (cut, or unfinished after the hard kill
+    date); every earlier dataset in the registered order is decided or NOT_RUN (a cut is skipped) and fewer than 2 of
+    them failed (a dataset already decided may be resumed). `reasons` ({dataset: why}) is quoted when given."""
     if d not in DATASETS:
         raise ValueError(f"unknown dataset {d!r}")
+    why = reasons or {}
+    if statuses.get(d) == NOT_RUN:
+        return False, (f"{d} refused: it reads NOT_RUN ({why.get(d) or CUT_TOKEN + ' ' + d}): it does not run (A3 "
+                       "section 10; addendum 10 items 4 and 5)")
     before = DATASETS[:DATASETS.index(d)]
-    open_ = [x for x in before if statuses.get(x) not in DECIDED]
+    open_ = [x for x in before if statuses.get(x) not in DECIDED + (NOT_RUN,)]
     if open_:
         x = open_[0]
         return False, (f"{d} refused: the registered order is {', '.join(DATASETS)} (A3 section 7) and {x} has "
                        f"{'no report' if statuses.get(x) is None else 'status ' + str(statuses.get(x))}: it is "
-                       "decided (PASS or FAIL) before a later dataset runs")
+                       "decided (PASS or FAIL) before a later dataset runs"
+                       + (f" [{why[x]}]" if why.get(x) else ""))
     failed = [x for x in before if statuses.get(x) == "FAIL"]
     if len(failed) >= MAX_FAILS:
         return False, (f"{d} refused: the slot was killed after {failed[MAX_FAILS - 1]} (it failed on "
                        f"{' and '.join(failed[:MAX_FAILS])}; A3 section 7: killed as soon as it has failed on 2 "
                        "datasets); a killed slot is reported once, in the appendix, as a negative result")
-    return True, f"{d} may run ({len(before)} earlier dataset(s) decided, {len(failed)} failed)"
+    skipped = [x for x in before if statuses.get(x) == NOT_RUN]
+    return True, (f"{d} may run ({len([x for x in before if statuses.get(x) in DECIDED])} earlier dataset(s) decided, "
+                  f"{len(failed)} failed" + (f", {len(skipped)} NOT_RUN skipped: {' '.join(skipped)}" if skipped else "")
+                  + ")")
+
+
+def report_problems(rep, d: str) -> list:
+    """Why a dataset report is not the registered report of d (empty = it is): addendum 10 item 2. The report must say
+    that it was built from real inputs (meta.dry_run_inputs false), with the registered bootstrap (n_boot 2000, seed 0),
+    and be of this dataset with a decision status ftmethod_report dataset can write. A key that is missing is a
+    problem (a hand-written or truncated file is not a registered report)."""
+    if not isinstance(rep, dict):
+        return ["the file is not a JSON object"]
+    meta, dec = rep.get("meta"), rep.get("decision")
+    probs = []
+    if not isinstance(meta, dict):
+        probs.append("no meta")
+        meta = {}
+    if not isinstance(dec, dict):
+        probs.append("no decision")
+        dec = {}
+    if meta.get("domain") != d:
+        probs.append(f"the report at {d}/report.json is of {meta.get('domain')!r}")
+    if meta.get("dry_run_inputs") is not False:
+        probs.append("meta.dry_run_inputs is " + ("true: a DRY_RUN rehearsal, built from stand-in adapters"
+                                                  if meta.get("dry_run_inputs") else f"{meta.get('dry_run_inputs')!r}, not false"))
+    for key, want in (("n_boot", REGISTERED_N_BOOT), ("seed", REGISTERED_SEED)):
+        v = meta.get(key)
+        if isinstance(v, bool) or not isinstance(v, int) or v != want:
+            probs.append(f"meta.{key} is {v!r}, not the registered {want}")
+    if dec.get("status") not in REPORT_STATUSES:
+        probs.append(f"no decision status ({dec.get('status')!r})")
+    return probs
 
 
 def read_dataset_report(root: Path, d: str) -> dict | None:
+    """The dataset's report.json as the slot reads it, or None without a file. Only a registered report (see
+    report_problems) carries its decision: anything else is INVALID, with the report's own claim kept as report_status."""
     p = Path(root) / d / "report.json"
     if not p.is_file():
         return None
@@ -518,26 +607,77 @@ def read_dataset_report(root: Path, d: str) -> dict | None:
         rep = json.loads(p.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
         return {"status": "INVALID", "reason": f"unreadable report ({type(e).__name__})", "report_sha1": fx.file_sha1(p)}
-    dec = rep.get("decision") or {}
-    status = dec.get("status")
-    reason = dec.get("reason")
-    if (rep.get("meta") or {}).get("domain") != d:
-        status, reason = "INVALID", f"the report at {d}/report.json is of {(rep.get('meta') or {}).get('domain')!r}"
-    elif status not in STATUSES:
-        status, reason = "INVALID", f"no decision status ({status!r})"
-    return {"status": status, "reason": reason, "report_sha1": fx.file_sha1(p),
+    probs = report_problems(rep, d)
+    meta = (rep.get("meta") if isinstance(rep, dict) else None) or {}
+    dec = (rep.get("decision") if isinstance(rep, dict) else None) or {}
+    meta, dec = (meta if isinstance(meta, dict) else {}), (dec if isinstance(dec, dict) else {})
+    if probs:
+        return {"status": "INVALID", "reason": "not the registered report of " + d + ": " + "; ".join(probs),
+                "report_sha1": fx.file_sha1(p), "report_status": dec.get("status"), "backbone": meta.get("backbone"),
+                "dry_run_inputs": bool(meta.get("dry_run_inputs"))}
+    return {"status": dec["status"], "reason": dec.get("reason"), "report_sha1": fx.file_sha1(p),
             "dUAUC": dec.get("dUAUC"), "lo": dec.get("lo"), "hi": dec.get("hi"), "p": dec.get("p"),
             "sigma_seed": dec.get("sigma_seed"), "sigma_seed_rule": (dec.get("conditions") or {}).get("sigma_seed_rule"),
             "n_users": dec.get("n_users"), "descriptive_min_n": dec.get("descriptive_min_n"),
-            "backbone": (rep.get("meta") or {}).get("backbone"),
-            "dry_run_inputs": bool((rep.get("meta") or {}).get("dry_run_inputs"))}
+            "backbone": meta.get("backbone"), "dry_run_inputs": False}
 
 
-def slot_summary(root) -> dict:
+def read_cuts(pilot_log, allow_missing: bool = False) -> dict:
+    """{dataset: [line numbers]} of the pilot-log lines that hold the exact token `FTMETHOD_NOT_RUN <dataset>` (case-
+    sensitive, one space, the dataset one of ml1m, toys, games, sports; addendum 10 item 5). A pilot log that does not
+    exist is an error (SystemExit), or holds no cut when allow_missing (a DRY_RUN rehearsal before its log exists)."""
+    p = Path(pilot_log)
+    if not p.is_file():
+        if allow_missing:
+            return {}
+        raise SystemExit(f"pilot log {p} does not exist: the cuts ({CUT_TOKEN} <dataset>) cannot be read")
+    try:
+        text = p.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        raise SystemExit(f"pilot log {p} cannot be read ({type(e).__name__}): the cuts cannot be read") from None
+    out: dict = {}
+    for n, line in enumerate(text.splitlines(), 1):
+        for m in _CUT.finditer(line):
+            lines = out.setdefault(m.group(1), [])
+            if n not in lines:
+                lines.append(n)
+    return out
+
+
+def dataset_infos(root, cuts: dict | None = None) -> dict:
+    """{dataset: info or None} from the reports under root with the cut records laid over them: a cut turns the dataset
+    NOT_RUN (a report that was INCOMPLETE or INVALID is dropped from the reading); a cut recorded although the dataset
+    has a decided report is an INVALID record (the cut would come after a result, which A3 section 10 rules out)."""
     infos = {d: read_dataset_report(root, d) for d in DATASETS}
+    for d, lines in (cuts or {}).items():
+        i = infos.get(d)
+        s = (i or {}).get("status")
+        where = f"{CUT_TOKEN} {d} (pilot-log line {', '.join(map(str, lines))})"
+        if s in DECIDED:
+            infos[d] = {**i, "status": "INVALID", "report_status": s,
+                        "reason": f"{where} is recorded although a decided report ({s}) exists: a cut is decided on "
+                                  "GPU-hours alone, never after a result (A3 section 10)"}
+        else:
+            infos[d] = {"status": NOT_RUN, "report_status": s, "cut_lines": list(lines),
+                        "reason": f"cut at the section-10 checkpoint: {where}"}
+    return infos
+
+
+def slot_summary(root, pilot_log=None, today=None, allow_missing_log: bool = False) -> dict:
+    """The slot across the datasets. pilot_log: the file whose `FTMETHOD_NOT_RUN <dataset>` lines are the cuts (None: no
+    cut is read). today: YYYYMMDD; after 20261130 every dataset without a finished report reads NOT_RUN (None: the date
+    is not applied). Both default to nothing, so a plain slot_summary(root) is the old reading of the reports."""
+    cuts = read_cuts(pilot_log, allow_missing_log) if pilot_log is not None else {}
+    past = today is not None and int(today) > HARD_KILL
+    infos = dataset_infos(root, cuts)
     statuses = {d: (i or {}).get("status") for d, i in infos.items()}
-    st = slot_state(statuses)
-    run = [d for d in DATASETS if infos[d] is not None]
+    st = slot_state(statuses, past)
+    for d in st["not_run_by_date"]:
+        was = (infos[d] or {}).get("status")
+        infos[d] = {"status": NOT_RUN, "report_status": was,
+                    "reason": f"no finished (PASS / FAIL) report on the hard kill date {HARD_KILL_DATE}"
+                              + (f" (its report reads {was})" if was else "")}
+    run = [d for d in DATASETS if infos[d] is not None and infos[d].get("status") != NOT_RUN]
     pvals = {d: infos[d]["p"] for d in st["decided"]}
     adj = fr.holm(pvals)
     confirmed = {d: bool(adj[d] is not None and adj[d] < 0.05 and infos[d].get("sigma_seed_rule") is True)
@@ -551,11 +691,18 @@ def slot_summary(root) -> dict:
                       "holm": "Holm family = the datasets run (decided, with a p-value; a descriptive endpoint has none)",
                       "confirmed": "Holm p < 0.05 and the sigma_seed rule (A3 section 11)",
                       "undecided": "INCOMPLETE / INVALID datasets are not counted as failed; every later dataset is "
-                                   "refused until they are decided",
+                                   "refused until they are decided or recorded NOT_RUN",
+                      "invalid_reports": "a report whose meta says dry_run_inputs, n_boot != 2000 or seed != 0 (or that "
+                                         "is not of its dataset) is INVALID: never decided, never a failure, never "
+                                         "unlocks the next dataset (addendum 10 item 2)",
+                      "cut": f"a pilot-log line with `{CUT_TOKEN} <dataset>` (the section-10 checkpoint) reads NOT_RUN: "
+                             "neither decided nor failed, skipped by the next dataset (addendum 10 item 5)",
                       "hard_kill_date": HARD_KILL_DATE,
+                      "after_hard_kill_date": "from the next day every dataset without a finished (PASS / FAIL) report "
+                                              "reads NOT_RUN, up to the kill point (addendum 10 item 4)",
                       "reporting": "a killed slot is reported once, in the appendix, as a negative result"},
             "datasets": {d: infos[d] or {"status": None, "reason": "not run"} for d in DATASETS},
-            "datasets_run": run, **st,
+            "datasets_run": run, "cuts": {d: cuts[d] for d in DATASETS if d in cuts}, **st,
             "holm": {"family": "the slot {datasets run} (A3 section 11)", "members": [d for d in st["decided"]
                                                                                       if _fin(pvals[d])],
                      "p_raw": pvals, "p_holm": adj, "confirmed": confirmed},
@@ -576,7 +723,8 @@ def slot_table_rows(s: dict) -> list:
                      "descriptive_min_n": i.get("descriptive_min_n"), "note": i.get("reason") or ""})
     rows.append({"dataset": "slot", "order": None, "status": s["state"], "note":
                  f"killed after {s['killed_after']}" if s["killed_after"] else
-                 f"next dataset: {s['next_dataset']}" if s["next_dataset"] else "all datasets decided"})
+                 f"next dataset: {s['next_dataset']}" if s["next_dataset"] else
+                 "after the hard kill date" if s.get("past_hard_kill_date") else "all datasets decided or NOT_RUN"})
     return rows
 
 
@@ -613,11 +761,25 @@ def parse_args(argv=None) -> argparse.Namespace:
     s.add_argument("--root", required=True, help="outputs/confrec/ftmethod (holding <d>/report.json)")
     s.add_argument("--out", default=None, help="slot.json; the tables go to <stem>_tables.csv")
     s.add_argument("--check_next", default=None, choices=list(DATASETS),
-                   help="exit 4 unless this dataset may run (registered order, kill rule)")
+                   help="exit 4 unless this dataset may run (registered order, kill rule, cuts, hard kill date)")
+    s.add_argument("--pilot_log", required=True,
+                   help="docs/sigir/PILOT_LOG.md: its `" + CUT_TOKEN + " <dataset>` lines are the cuts (addendum 10 item 5)")
+    s.add_argument("--allow_missing_log", action="store_true",
+                   help="DRY_RUN rehearsals only: a pilot log that does not exist yet holds no cut")
+    s.add_argument("--today", type=_yyyymmdd, default=None,
+                   help="YYYYMMDD (default: the system date): after " + HARD_KILL_DATE.replace("-", "")
+                        + " a dataset without a finished report reads NOT_RUN")
     a = ap.parse_args(argv)
     if a.cmd == "dataset" and a.n_boot < 0:
         ap.error("--n_boot must be >= 0")
     return a
+
+
+def _yyyymmdd(text: str) -> int:
+    """argparse type of --today: eight digits (a date such as 2026-12-01 is refused, not compared as a string)."""
+    if not re.fullmatch(r"[0-9]{8}", text):
+        raise argparse.ArgumentTypeError(f"{text!r} is not eight digits (YYYYMMDD)")
+    return int(text)
 
 
 def main(argv=None) -> dict:
@@ -629,17 +791,21 @@ def main(argv=None) -> dict:
         dec = res["decision"]
         print(f"wrote {out}: {a.domain} {dec['status']}" + (f" ({dec['reason']})" if dec.get("reason") else ""))
         return res
-    summary = strict_json(slot_summary(a.root))
+    today = a.today if a.today is not None else int(datetime.date.today().strftime("%Y%m%d"))
+    summary = strict_json(slot_summary(a.root, a.pilot_log, today, a.allow_missing_log))
     if a.out:
         write_outputs(Path(a.out), summary, SLOT_COLS, slot_table_rows(summary))
     st = summary["state"]
     tail = (f"killed after {summary['killed_after']}: no further dataset runs" if st == "KILLED" else
-            f"next dataset: {summary['next_dataset']}" if summary["next_dataset"] else "every dataset decided")
-    print(f"slot state {st} (passes {summary['passes']}, fails {summary['fails']}); {tail}")
+            f"next dataset: {summary['next_dataset']}" if summary["next_dataset"] else
+            "past the hard kill date: nothing runs" if summary["past_hard_kill_date"] else
+            "every dataset decided or NOT_RUN")
+    print(f"slot state {st} (passes {summary['passes']}, fails {summary['fails']}, NOT_RUN {summary['not_run']}); {tail}")
     for v in summary["violations"]:
         print(f"WARNING order violation: {v}", file=sys.stderr)
     if a.check_next:
-        ok, why = check_next({d: (i or {}).get("status") for d, i in summary["datasets"].items()}, a.check_next)
+        ok, why = check_next({d: (i or {}).get("status") for d, i in summary["datasets"].items()}, a.check_next,
+                             {d: (i or {}).get("reason") for d, i in summary["datasets"].items()})
         if not ok:
             print(why, file=sys.stderr)
             raise SystemExit(4)

@@ -19,12 +19,25 @@ no network, no GPU.
   7. the run script: LF, bash -n, set -euo pipefail, the freeze lists, every flag in the real argparse (subcommand aware,
      and the integration audit of tests/test_confrec_contracts.py), the refusals, the DRY_RUN chain end to end on ML-1M and
      its resume, the freeze / gate / date / order / kill refusals after it, the E1 rerun-once rule and INCOMPLETE, and
-     stage 1 for a dataset that is not next.
+     stage 1 for a dataset that is not next;
+  8. the corrections of idea-stage/PREREG_AMENDMENT_3_ADDENDUM_10.md section 1 (the review of the first version of the
+     slot code), one test per finding that replays the reviewer's scenario (section 8 below, test names carry the finding):
+     M1 the DRY_RUN root guard compares canonical forms (every spelling of a registered root is refused, links are
+     refused) and the slot does not trust any report (a rehearsal report, another bootstrap, a hand-written file is INVALID
+     and cannot use up a failure); M2 DRY_RUN is 0 or 1; m1 the +0.01 threshold; m2 the hard kill date before every seed,
+     DRY_TODAY eight digits, NOT_RUN after the date; m3 the "b = 0 is SFT" wording and the untouched trainer (m6: its
+     recorded sha1); m4 NOT_RUN and the `FTMETHOD_NOT_RUN <dataset>` cut record; m5 the E1 same-key rule;
+     and the stage-5 gate on the shift diagnostic of section 2 (tests/test_confrec_ftmethod_shift_diag.py has the rest).
+
+Run time: the DRY worlds are built once and cached across sessions (a sha1 of the code that builds them is the key; the
+shift-diagnostic tests share the cache); the script runs of the guard and refusal tests run concurrently (a script run is
+dominated by process starts). FTMETHOD_FAST=1 skips every test that runs the script's DRY chain.
 """
 from __future__ import annotations
 
 import argparse
 import ast
+import concurrent.futures as cf
 import csv
 import gzip
 import hashlib
@@ -39,6 +52,8 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
+import time
 import types
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -59,9 +74,16 @@ from src.confrec.split_panel import filter_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "sigir" / "run_ftmethod.sh"
-DRY_ROOT = "outputs/confrec/ftmethod_dryrun"
-GRID_DRY = "outputs/confrec/ftgrid_dryrun"
+DIAG_SCRIPT = ROOT / "scripts" / "sigir" / "run_ftmethod_shift_diag.sh"
+DIAG_TESTS = ROOT / "tests" / "test_confrec_ftmethod_shift_diag.py"
+FAST = os.environ.get("FTMETHOD_FAST") == "1"
+WORKERS = max(2, min(6, (os.cpu_count() or 4) - 2))       # concurrent script runs of the guard and refusal tests
+# a DRY_RUN lives in a temporary directory outside outputs/confrec (addendum 10 item 1): the world run_ftgrid.sh builds and the slot root
+DRYB = "tmp_outputs/ftmethod_dryrun"
+DRY_ROOT = f"{DRYB}/ftmethod"
+GRID_DRY = f"{DRYB}/ftgrid"
 QWEN = "dryrun/Qwen3-8B"
+TRAINER_SHA1_PREFIX = "aaae5e81"      # train_lora_offset.py as recorded in PILOT_LOG (addendum 10 item 7 / review m6: never edited)
 YES, NO = 1, 2                      # the answer ids of the word tokenizer below (and of the hand-built batches)
 
 
@@ -1272,22 +1294,34 @@ def test_undecided_datasets_block_the_order_and_reports_out_of_order_are_violati
         fm.slot_state(st("MAYBE"))
 
 
-def write_dataset_report(root: Path, d: str, status: str, p=None, rule=True, est=0.02) -> None:
+REGISTERED_META = {"backbone": "Qwen3-8B", "dry_run_inputs": False, "n_boot": 2000, "seed": 0}   # what a real run's report says
+
+
+def write_dataset_report(root: Path, d: str, status: str, p=None, rule=True, est=0.02, **meta) -> None:
+    """A per-dataset report as a REGISTERED run writes it (meta: real inputs, n_boot 2000, seed 0); **meta overrides a key."""
     (root / d).mkdir(parents=True, exist_ok=True)
     (root / d / "report.json").write_text(json.dumps(
-        {"meta": {"domain": d, "backbone": "Qwen3-8B"},
+        {"meta": {"domain": d, **REGISTERED_META, **meta},
          "decision": {"status": status, "dUAUC": est, "lo": 0.01, "hi": 0.03, "p": p, "sigma_seed": 0.002,
                       "n_users": 400, "descriptive_min_n": False, "conditions": {"sigma_seed_rule": rule}}}),
         encoding="utf-8")
 
 
+def pilot_log(tmp: Path, *lines: str) -> Path:
+    """A pilot log (the file the slot reads its cuts from) holding the given lines."""
+    p = tmp / "PILOT_LOG.md"
+    p.write_text("# pilot log\n" + "".join(x + "\n" for x in lines), encoding="utf-8")
+    return p
+
+
 def test_slot_summary_holm_over_the_datasets_run_and_check_next_cli(tmp_path, capsys):
     root = tmp_path / "ftmethod"
+    log = ["--pilot_log", str(pilot_log(tmp_path))]                  # no cut recorded (the slot CLI needs its pilot log)
     write_dataset_report(root, "ml1m", "PASS", p=0.01)
     write_dataset_report(root, "toys", "FAIL", p=0.04, est=0.005)
     write_dataset_report(root, "games", "PASS", p=0.03)
     out = root / "slot.json"
-    s = fm.main(["slot", "--root", str(root), "--out", str(out)])
+    s = fm.main(["slot", "--root", str(root), "--out", str(out), *log])
     assert s["datasets_run"] == ["ml1m", "toys", "games"] and s["state"] == "OPEN" and s["next_dataset"] == "sports"
     # Holm over the three datasets run: 3 x 0.01, 2 x 0.03 (step-down), max(running, 1 x 0.04)
     assert s["holm"]["p_holm"] == {"ml1m": pytest.approx(0.03), "toys": pytest.approx(0.06), "games": pytest.approx(0.06)}
@@ -1295,12 +1329,12 @@ def test_slot_summary_holm_over_the_datasets_run_and_check_next_cli(tmp_path, ca
     assert s["single_backbone"] is True and s["abstract_eligible"] is False and s["backbones"] == ["Qwen3-8B"]
     assert read_json(out)["state"] == "OPEN" and (root / "slot_tables.csv").is_file()
     write_dataset_report(root, "sports", "FAIL", p=0.2)
-    s = fm.main(["slot", "--root", str(root)])
+    s = fm.main(["slot", "--root", str(root), *log])
     assert s["state"] == "KILLED" and s["killed_after"] == "sports" and s["passes"] == ["ml1m", "games"]
     write_dataset_report(root, "toys", "FAIL", p=0.04)
     write_dataset_report(root, "ml1m", "FAIL", p=0.5)
     with pytest.raises(SystemExit) as e:
-        fm.main(["slot", "--root", str(root), "--check_next", "games"])
+        fm.main(["slot", "--root", str(root), "--check_next", "games", *log])
     assert e.value.code == 4 and "killed after toys" in capsys.readouterr().err
     (root / "games" / "report.json").write_text(json.dumps({"meta": {"domain": "toys"}}), encoding="utf-8")
     assert fm.slot_summary(root)["datasets"]["games"]["status"] == "INVALID"   # a report of the wrong dataset
@@ -1484,7 +1518,8 @@ def test_every_flag_the_script_passes_exists_in_the_real_argparse():
     assert trains and all("--b_lr" not in {f for f, _ in flags} for flags in trains)   # addendum 3: the default applies
     for key, n in {("src.confrec.train_lora_offset", "qhat"): 1, ("src.confrec.train_lora_offset", "train"): 1,
                    ("src.confrec.ftmethod_report", "dataset"): 1, ("src.confrec.ftmethod_report", "slot"): 2,
-                   ("src.confrec.pyes_scorer", None): 2, ("src.confrec.ftgrid_freeze", None): 4}.items():
+                   ("src.confrec.pyes_scorer", None): 2, ("src.confrec.ftgrid_freeze", None): 4,
+                   ("src.confrec.ftmethod_shift_diag", "verify"): 1}.items():
         assert count.get(key, 0) >= n, (key, count)
 
 
@@ -1507,13 +1542,15 @@ def test_the_integration_audit_of_test_confrec_contracts_accepts_the_script():
 
 def make_repo(dest: Path) -> Path:
     """A copy of the repo parts the chain runs: src/confrec, the amendment and its addenda, every file of their core and
-    method freeze lists (a listed file that does not exist yet becomes a placeholder) and the run scripts."""
+    method freeze lists (a listed file that does not exist yet becomes a placeholder), the run scripts (the shift
+    diagnostic's too) and the diagnostic's tests file (the third file of its record)."""
     (dest / "src" / "confrec").mkdir(parents=True)
     shutil.copy2(ROOT / "src" / "__init__.py", dest / "src" / "__init__.py")
     for f in (ROOT / "src" / "confrec").glob("*.py"):
         shutil.copy2(f, dest / "src" / "confrec" / f.name)
     blocks = freeze_blocks()
-    rels = ["scripts/sigir/run_ftgrid.sh", "scripts/sigir/run_ftmethod.sh", "scripts/sigir/starperm_panel.py", ff.AMENDMENT]
+    rels = ["scripts/sigir/run_ftgrid.sh", "scripts/sigir/run_ftmethod.sh", "scripts/sigir/run_ftmethod_shift_diag.sh",
+            "scripts/sigir/starperm_panel.py", "tests/test_confrec_ftmethod_shift_diag.py", ff.AMENDMENT]
     rels += [p.relative_to(ROOT).as_posix() for p in (ROOT / "idea-stage").glob("PREREG_AMENDMENT_3_ADDENDUM_*.md")]
     for rel in rels + blocks["core"] + blocks["method"]:
         (dest / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -1525,16 +1562,33 @@ def make_repo(dest: Path) -> Path:
     return dest
 
 
-def run_script(repo: Path, domain: str, dry: bool = True, **env) -> subprocess.CompletedProcess:
-    e = {k: v for k, v in os.environ.items() if k not in (
-        "MODEL", "OUT_ROOT", "VARIANT", "STAGES", "DRY_RUN", "DRY_GATE", "DRY_E1_FAIL", "DRY_TODAY", "KNOCKOUT_SPORTS",
-        "PYTHONPATH")}
+CLEAN_ENV = ("MODEL", "OUT_ROOT", "VARIANT", "STAGES", "DRY_RUN", "DRY_GATE", "DRY_E1_FAIL", "DRY_TODAY", "DRY_NO_RECORD",
+             "DRY_SHIFT_SHARE", "DRY_SHIFT_LOW_FRAC", "KNOCKOUT_SPORTS", "FAKE_DATE_FLIP", "BASH_ENV", "PYTHONPATH")
+FIXED_TODAY = "20261001"      # a rehearsal's date: before the hard kill date whatever day the tests run (None removes it)
+
+
+def run_script(repo: Path, domain: str, dry: bool = True, script: str = "run_ftmethod.sh", **env) -> subprocess.CompletedProcess:
+    """A run of a script of the repo copy; a value None removes the variable; a rehearsal has a fixed DRY_TODAY."""
+    e = {k: v for k, v in os.environ.items() if k not in CLEAN_ENV}
     e.update(PYTHON=sys.executable.replace("\\", "/"), PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     if dry:
         e["DRY_RUN"] = "1"
-    e.update(env)
-    return subprocess.run([BASH, (repo / "scripts" / "sigir" / "run_ftmethod.sh").as_posix(), domain], env=e,
-                          capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=3600)
+        e["DRY_TODAY"] = FIXED_TODAY
+    e.update({k: v for k, v in env.items() if v is not None})
+    for k, v in env.items():
+        if v is None:
+            e.pop(k, None)
+    for attempt in range(3):
+        r = subprocess.run([BASH, (repo / "scripts" / "sigir" / script).as_posix(), domain], env=e,
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=3600)
+        if r.returncode == 0 or r.stdout.strip() or r.stderr.strip():
+            return r                                      # every exit of the scripts says something; silence is bash failing to start
+        time.sleep(1 + attempt)
+    return r
+
+
+def run_diag(repo: Path, domain: str, dry: bool = True, **env) -> subprocess.CompletedProcess:
+    return run_script(repo, domain, dry, "run_ftmethod_shift_diag.sh", **env)
 
 
 def tail(r: subprocess.CompletedProcess, n: int = 4000) -> str:
@@ -1548,6 +1602,154 @@ def snapshot(root: Path) -> dict:
             s = p.stat()
             out[p.relative_to(root).as_posix()] = (s.st_size, s.st_mtime_ns, sha1_file(p))
     return out
+
+
+needs_bash = pytest.mark.skipif(BASH is None, reason=NO_BASH)
+needs_chain = pytest.mark.skipif(BASH is None or FAST, reason=NO_BASH if BASH is None else "FTMETHOD_FAST=1")
+
+
+# ---------------------------------------------------------------- the cached DRY states (shared with the shift-diagnostic tests)
+STATE_DIRS = (GRID_DRY, DRY_ROOT)
+
+
+def state_key() -> str:
+    """sha1 over the code that builds a DRY state (every src/confrec file but the diagnostic's own, every bound file, the
+    scripts it runs, the amendment and its addenda): a changed key rebuilds the states. FTMETHOD_STATE_KEY pins the key (mutation
+    experiments on a scratch copy of the repo reuse the states of the real one: a planted bug in a guard does not change them)."""
+    if os.environ.get("FTMETHOD_STATE_KEY"):
+        return os.environ["FTMETHOD_STATE_KEY"]
+    h = hashlib.sha1(sys.version.encode())
+    h.update(DRYB.encode())
+    blocks = freeze_blocks()
+    files = [p for p in sorted((ROOT / "src" / "confrec").glob("*.py")) if p.name != "ftmethod_shift_diag.py"]
+    files += [ROOT / n for n in sorted({*blocks["core"], *blocks["method"]}) if (ROOT / n).exists()]
+    files += [ROOT / "scripts" / "sigir" / n for n in ("run_ftgrid.sh", "run_ftmethod.sh", "starperm_panel.py")]
+    files += [ROOT / ff.AMENDMENT] + sorted((ROOT / "idea-stage").glob("PREREG_AMENDMENT_3_ADDENDUM_*.md"))
+    for p in files:
+        h.update(p.relative_to(ROOT).as_posix().encode())
+        h.update(p.read_bytes())
+    return h.hexdigest()[:20]
+
+
+def state_cache(tmp_path_factory) -> Path:
+    base = tmp_path_factory.getbasetemp().parent / "ftmethod_state_cache"
+    key = state_key()
+    base.mkdir(parents=True, exist_ok=True)
+    for old in base.iterdir():                         # one key at a time: a changed code base drops the old states
+        if old.name != key:
+            shutil.rmtree(old, ignore_errors=True)
+    (base / key).mkdir(exist_ok=True)
+    return base / key
+
+
+STATE_STAGES = {"ml1m": "1,2,3,4", "games": "1"}      # ml1m: the world, q-hat, the freeze record, the adapters and their scores
+
+
+def build_state(cache: Path, d: str) -> None:
+    """The DRY state of dataset d (run_ftgrid.sh's world and the stages of run_ftmethod.sh in STATE_STAGES), built by the
+    script itself in a scratch repo and kept without that repo."""
+    tmp = Path(tempfile.mkdtemp(prefix=f"state_{d}_", dir=str(cache)))
+    try:
+        repo = make_repo(tmp / "repo")
+        r = run_script(repo, d, STAGES=STATE_STAGES[d])
+        assert r.returncode == 0, tail(r)
+        dest = cache / f"{d}.part{os.getpid()}"
+        for rel in STATE_DIRS:
+            shutil.copytree(repo / rel, dest / rel)
+        (dest / "build.json").write_text(json.dumps({"stdout": r.stdout, "stderr": r.stderr, "stages": STATE_STAGES[d]}),
+                                         encoding="utf-8")
+        (dest / ".complete").write_text("ok", encoding="utf-8")
+        if (cache / d).exists():
+            shutil.rmtree(dest, ignore_errors=True)    # another session finished first
+        else:
+            os.replace(dest, cache / d)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def build_state_once(cache: Path, d: str) -> None:
+    """build_state for one builder at a time (a lock directory, atomic to make): the test modules of this slot share the cache, and a
+    second one that wants a state under construction waits for it. A lock older than 30 minutes is a killed session's."""
+    done, lock = cache / d / ".complete", cache / f"{d}.lock"
+    while not done.exists():
+        try:
+            os.mkdir(lock)
+        except FileExistsError:
+            try:
+                if time.time() - lock.stat().st_mtime > 1800:
+                    shutil.rmtree(lock, ignore_errors=True)
+            except OSError:
+                pass
+            time.sleep(1)
+            continue
+        try:
+            if not done.exists():
+                build_state(cache, d)
+        finally:
+            shutil.rmtree(lock, ignore_errors=True)
+
+
+_BUILDERS = cf.ThreadPoolExecutor(max_workers=2)
+_PREBUILT: dict = {}
+
+
+def start_states(cache: Path, datasets) -> None:
+    """Start building the DRY states of `datasets` in the background (once per state in this process)."""
+    for d in datasets:
+        if (cache, d) not in _PREBUILT and not (cache / d / ".complete").exists():
+            _PREBUILT[(cache, d)] = _BUILDERS.submit(build_state_once, cache, d)
+
+
+def ensure_states(tmp_path_factory, datasets=("ml1m",)) -> Path:
+    """The cache directory holding the DRY states of `datasets`: built now if nobody did, waited for if a background build runs."""
+    cache = state_cache(tmp_path_factory)
+    start_states(cache, datasets)
+    for d in datasets:
+        if (cache, d) in _PREBUILT:
+            _PREBUILT[(cache, d)].result()
+        assert (cache / d / ".complete").exists(), d
+    return cache
+
+
+def seed_state(repo: Path, cache: Path, d: str) -> dict:
+    """Copy the cached state of d into the repo copy; the step markers are made newer than the freshly copied sources (a skip is
+    by timestamp), so that the run's steps are skipped as they would be in the session that built them. Returns build.json."""
+    for rel in STATE_DIRS:
+        shutil.copytree(cache / d / rel, repo / rel, dirs_exist_ok=True)
+    for f in (repo / DRY_ROOT / "build").rglob("*.done"):
+        os.utime(f)
+    return json.loads((cache / d / "build.json").read_text(encoding="utf-8"))
+
+
+def prebuild_for(request, tmp_path_factory, wants: dict) -> None:
+    """The autouse fixtures of the test modules call this: when a selected test of the module uses one of the fixtures in `wants`
+    ({fixture name: [datasets]}), the states it needs start building at once, so that the cold build overlaps the tests that run
+    before it (the first test with a script run waits only for what is left)."""
+    if BASH is None or FAST:
+        return
+    names = {n for it in request.session.items if it.module is request.module for n in it.fixturenames}
+    datasets = sorted({d for fx_name, ds in wants.items() if fx_name in names for d in ds})
+    if datasets:
+        start_states(state_cache(tmp_path_factory), datasets)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def prebuild_states(request, tmp_path_factory):
+    prebuild_for(request, tmp_path_factory, {"states": ["ml1m"], "games_state": ["games"]})
+
+
+@pytest.fixture(scope="module")
+def states(tmp_path_factory):
+    if BASH is None or FAST:
+        pytest.skip(NO_BASH if BASH is None else "FTMETHOD_FAST=1")
+    return ensure_states(tmp_path_factory, ("ml1m",))
+
+
+@pytest.fixture(scope="module")
+def games_state(tmp_path_factory):
+    if BASH is None or FAST:
+        pytest.skip(NO_BASH if BASH is None else "FTMETHOD_FAST=1")
+    return ensure_states(tmp_path_factory, ("games",))
 
 
 @pytest.fixture(scope="module")
@@ -1568,13 +1770,13 @@ def guard_repo(tmp_path_factory):
 def test_input_guards_refuse_before_anything_is_written(guard_repo, domain, env, dry, msg):
     r = run_script(guard_repo, domain, dry=dry, **env)
     assert r.returncode == 2 and msg in r.stderr, tail(r)
-    assert not (guard_repo / "outputs").exists()
+    assert not (guard_repo / "outputs").exists() and not (guard_repo / "tmp_outputs").exists()
 
 
 def test_the_order_and_the_kill_rule_refuse_at_the_start(guard_repo):
     r = run_script(guard_repo, "toys")
     assert r.returncode == 4 and "ml1m has no report" in r.stderr, tail(r)
-    assert not (guard_repo / "outputs").exists()                            # nothing built for a refused dataset
+    assert not (guard_repo / "tmp_outputs").exists()                        # nothing built for a refused dataset
     root = guard_repo / DRY_ROOT
     write_dataset_report(root, "ml1m", "FAIL", p=0.4)
     write_dataset_report(root, "toys", "FAIL", p=0.3)
@@ -1582,31 +1784,30 @@ def test_the_order_and_the_kill_rule_refuse_at_the_start(guard_repo):
     r = run_script(guard_repo, "games")
     assert r.returncode == 4 and "killed after toys" in r.stderr and "games refused" in r.stderr, tail(r)
     assert snapshot(root) == before and not (guard_repo / GRID_DRY).exists()
-    shutil.rmtree(guard_repo / "outputs")
+    shutil.rmtree(guard_repo / "tmp_outputs")
 
 
 @pytest.fixture(scope="module")
-def chain(tmp_path_factory):
-    """The whole DRY_RUN chain on ML-1M (run_ftgrid.sh's synthetic world first), then the same command a second time."""
-    if BASH is None:
-        pytest.skip(NO_BASH)
+def chain(states, tmp_path_factory):
+    """The whole DRY chain on ML-1M: the cached state (run_ftgrid.sh's world and stages 1-4 of run_ftmethod.sh), then the shift
+    diagnostic of the rehearsal, which stage 5 waits for (addendum 10 section 2), then stage 5."""
     repo = make_repo(tmp_path_factory.mktemp("ftmethod_chain") / "repo")
-    r = run_script(repo, "ml1m")
-    assert r.returncode == 0, tail(r)
+    build = seed_state(repo, states, "ml1m")
     root = repo / DRY_ROOT
-    c = {"repo": repo, "root": root, "r": r, "s1": snapshot(root)}
-    c["r2"] = run_script(repo, "ml1m")
-    assert c["r2"].returncode == 0, tail(c["r2"])
-    c["s2"] = snapshot(root)
-    return c
+    r_diag = run_diag(repo, "ml1m")
+    assert r_diag.returncode == 0, tail(r_diag)
+    r5 = run_script(repo, "ml1m", STAGES="5")
+    assert r5.returncode == 0, tail(r5)
+    return {"repo": repo, "root": root, "build": build, "r_diag": r_diag, "r": r5, "s1": snapshot(root)}
 
 
+@needs_chain
 def test_chain_layout_and_adapters(chain):
     repo, root = chain["repo"], chain["root"]
     m = root / "ml1m"
     assert {p.name for p in root.iterdir()} == {"_dry", "build", "freeze", "ml1m", "slot.json", "slot_tables.csv"}
     assert {p.name for p in m.iterdir()} == {"train_qhat.csv.gz", "eval_qhat.csv.gz", "qhat_manifest.json", "adapters",
-                                             "scores", "report.json", "report_tables.csv"}
+                                             "scores", "report.json", "report_tables.csv", "shift_diag"}
     assert {p.name for p in (m / "adapters").iterdir()} == {"o0", "o1", "o2"}
     grid = repo / GRID_DRY
     train = grid / "panels" / "ml1m" / "train.jsonl"
@@ -1637,88 +1838,800 @@ def test_chain_layout_and_adapters(chain):
         assert cfg_s["data_sha1"] == key[0] and cfg_s["questions"] == ["like"] and cfg_s["dtype"] == "float16"
 
 
+@needs_chain
 def test_chain_freeze_record_report_and_slot(chain):
-    repo, root, out = chain["repo"], chain["root"], chain["r"].stdout
+    repo, root, out = chain["repo"], chain["root"], chain["build"]["stdout"]
     assert "[dry] freeze rehearsal" in out and "freeze check OK (stage method)" in out
     assert out.index("freeze check OK (stage method)") < out.index("== stage 3")
     log = (repo / GRID_DRY / "_dry" / "PILOT_LOG.md").read_text(encoding="utf-8").lower()
     for rel in ("src/confrec/train_lora_offset.py", "scripts/sigir/run_ftmethod.sh", "src/confrec/ftmethod_report.py",
-                f"{DRY_ROOT}/ml1m/qhat_manifest.json"):
+                f"{DRY_ROOT}/ml1m/qhat_manifest.json",
+                # the human step of the diagnostic's own record (addendum 10 section 2), done on the temporary log
+                "scripts/sigir/run_ftmethod_shift_diag.sh", "src/confrec/ftmethod_shift_diag.py",
+                "tests/test_confrec_ftmethod_shift_diag.py"):
         assert sha1_file(repo / rel) in log, rel
     mark = (root / "freeze" / "ml1m.method.ok").read_text(encoding="utf-8")
     assert sha1_file(root / "ml1m" / "qhat_manifest.json") in mark and sha1_file(repo / SCRIPT.relative_to(ROOT)) in mark
     rep = read_json(root / "ml1m" / "report.json")
-    assert rep["decision"]["status"] == "FAIL" and rep["meta"]["dry_run_inputs"] is True
+    assert rep["decision"]["status"] == "FAIL" and rep["meta"]["dry_run_inputs"] is True and rep["meta"]["n_boot"] == 200
     assert "descriptive" in rep["decision"]["reason"]                       # the dry world has fewer than 150 users
     assert rep["input_checks"] == {"problems": [], "excluded_runs": [], "seeds_present": ["seed0", "seed1", "seed2"],
                                    "seeds_missing": []}
+    # review M1: this FAIL is a rehearsal's, so the slot reads it INVALID: it neither fails the dataset nor unlocks toys
     slot = read_json(root / "slot.json")
-    assert (slot["state"], slot["fails"], slot["next_dataset"]) == ("OPEN", ["ml1m"], "toys")
+    assert (slot["state"], slot["fails"], slot["decided"], slot["next_dataset"]) == ("OPEN", [], [], "ml1m")
+    i = slot["datasets"]["ml1m"]
+    assert i["status"] == "INVALID" and i["report_status"] == "FAIL" and i["dry_run_inputs"] is True
+    assert "dry_run_inputs" in i["reason"] and "n_boot" in i["reason"] and i.get("dUAUC") is None
+    assert slot["dry_run_inputs"] is True and slot["pending"] == "ml1m"
 
 
-def test_chain_second_run_skips_everything_and_touches_nothing(chain):
-    assert chain["s1"] == chain["s2"]
-    out = chain["r2"].stdout
-    assert "dry-run prior-offset trainer" not in out and "scores chunk" not in out
-    assert out.count(": scored") == 3 and out.count("[skip] adapter") == 3
+# the refusals, on clones of the finished chain: each scenario works on its own copy and is small (one to three script runs); they run
+# concurrently (a script run is dominated by process starts). A scenario returns the list of its errors.
+def clone(c: dict, tmp: Path) -> Path:
+    dest = tmp / "repo"
+    shutil.copytree(c["repo"], dest)
+    return dest
+
+
+def forbid_training(r) -> str:
+    return "" if "dry-run prior-offset trainer" not in r.stdout else "a training started"
+
+
+def scenario_second_run(c, repo):
+    """The whole command a second time (stages 1-5): every finished step is skipped and no file of the chain is touched."""
+    root = repo / DRY_ROOT
+    before = snapshot(root)
+    r = run_script(repo, "ml1m", STAGES="1,2,3,4,5")
+    out = r.stdout
+    errs = [] if r.returncode == 0 else [tail(r)]
+    errs += [] if snapshot(root) == before else ["a file of the chain was touched"]
+    errs += [] if "dry-run prior-offset trainer" not in out and "scores chunk" not in out else ["something was run again"]
+    errs += [] if out.count(": scored") == 3 and out.count("[skip] adapter") == 3 else ["scored / adapter skips"]
     for product in ("ml1m/qhat_manifest.json", "ml1m/report.json"):
-        assert f"[skip] {DRY_ROOT}/{product}" in out, product
-    assert "[skip] run_ftgrid.sh's DRY_RUN world for ml1m exists" in out
+        errs += [] if f"[skip] {DRY_ROOT}/{product}" in out else [f"no skip of {product}"]
+    return errs + ([] if "[skip] run_ftgrid.sh's DRY_RUN world for ml1m exists" in out else ["the world was rebuilt"])
 
 
-def test_refusals_after_the_chain(chain):
-    repo, root = chain["repo"], chain["root"]
-    r = run_script(repo, "sports")                                          # order: toys is not decided
-    assert r.returncode == 4 and "toys has no report" in r.stderr, tail(r)
+def scenario_gate_ft_fail(c, repo):
     gate = repo / GRID_DRY / "_dry" / "gateft" / "gate_ft.json"
-    saved = gate.read_bytes()
     gate.write_text(json.dumps({"decision": "GATE_FT_FAIL"}), encoding="utf-8")
     r = run_script(repo, "ml1m", STAGES="3")
-    assert r.returncode == 4 and "Gate-FT decision GATE_FT_FAIL" in r.stderr, tail(r)
-    gate.write_bytes(saved)
-    r = run_script(repo, "ml1m", STAGES="3", DRY_TODAY="20261201")
-    assert r.returncode == 4 and "hard kill date" in r.stderr, tail(r)
-    r = run_script(repo, "ml1m", STAGES="5", DRY_TODAY="20261201")          # the report still runs after the date
-    assert r.returncode == 0, tail(r)
+    return [] if r.returncode == 4 and "Gate-FT decision GATE_FT_FAIL" in r.stderr and forbid_training(r) == "" else [tail(r)]
+
+
+def scenario_a_bound_file_changed_after_the_freeze_check(c, repo, stage="3"):
     bound = repo / "src" / "confrec" / "ftmethod_report.py"
-    code = bound.read_bytes()
-    bound.write_bytes(code + b"\n# changed after the freeze check\n")
-    for stage in ("3", "4", "5"):
-        r = run_script(repo, "ml1m", STAGES=stage)
-        assert r.returncode == 4 and f"stage {stage} refused" in r.stderr and "no longer equals" in r.stderr, tail(r)
-    bound.write_bytes(code)
-    write_dataset_report(root, "toys", "FAIL", p=0.3)                       # ml1m's real FAIL + toys: killed
+    bound.write_bytes(bound.read_bytes() + b"\n# changed after the freeze check\n")
+    r = run_script(repo, "ml1m", STAGES=stage)
+    return [] if r.returncode == 4 and f"stage {stage} refused" in r.stderr and "no longer equals" in r.stderr else [tail(r)]
+
+
+def scenario_a_rehearsal_report_does_not_unlock_the_next_dataset(c, repo):
+    r = run_script(repo, "sports")        # the rehearsal's report of ml1m is INVALID: it is not decided, so toys is not next
+    return [] if r.returncode == 4 and "ml1m has status INVALID" in r.stderr and "dry_run_inputs" in r.stderr else [tail(r)]
+
+
+def scenario_kill_rule(c, repo):
+    root = repo / DRY_ROOT
+    write_dataset_report(root, "ml1m", "FAIL", p=0.4)                         # registered-looking reports: ml1m and toys failed
+    write_dataset_report(root, "toys", "FAIL", p=0.3)
     r = run_script(repo, "games")
-    assert r.returncode == 4 and "killed after toys" in r.stderr, tail(r)
-    (root / "toys" / "report.json").unlink()
-    (root / "toys").rmdir()
-    assert snapshot(root) == chain["s2"]
+    return [] if r.returncode == 4 and "killed after toys" in r.stderr and "games refused" in r.stderr else [tail(r)]
 
 
-def test_stage_1_runs_for_a_dataset_that_is_not_next(chain):
-    """games is not next (toys is undecided), yet its q-hat manifest is built: every manifest can be recorded before the
-    slot's first run (addendum 2 item 2); stages 2-5 for it are refused."""
-    repo, root = chain["repo"], chain["root"]
-    r = run_script(repo, "games", STAGES="1")
-    assert r.returncode == 0, tail(r)
+def scenario_the_date_without_a_finished_report(c, repo):
+    """m2 on the script: after 2026-11-30 a dataset without a finished report reads NOT_RUN and does not run (stages 3 and 5), and
+    nothing is written."""
+    root, errs = repo / DRY_ROOT, []
+    before = snapshot(root)
+    r = run_script(repo, "ml1m", STAGES="3", DRY_TODAY="20261201")             # no finished report: NOT_RUN by the date
+    errs += [] if r.returncode == 4 and "reads NOT_RUN" in r.stderr and "hard kill date" in r.stderr else [tail(r)]
+    return errs + ([] if snapshot(root) == before else ["a refused run wrote"])
+
+
+def scenario_the_date_with_a_finished_report_refuses_stages_2_and_4(c, repo):
+    root, errs = repo / DRY_ROOT, []
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)                          # a finished report: the order rule lets the run through
+    for stage in ("4",):                                                        # ... to the script's own check of the date
+        r = run_script(repo, "ml1m", STAGES=stage, DRY_TODAY="20261201")
+        errs += [] if r.returncode == 4 and "hard kill date" in r.stderr and forbid_training(r) == "" else [tail(r)]
+    return errs
+
+
+def scenario_the_date_stage_5_still_reports_a_finished_dataset(c, repo):
+    root, errs = repo / DRY_ROOT, []
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)
+    planted = (root / "ml1m" / "report.json").read_bytes()
+    r = run_script(repo, "ml1m", STAGES="5", DRY_TODAY="20261201")            # the report still runs after the date
+    errs += [] if r.returncode == 0 else [tail(r)]
+    slot = read_json(root / "slot.json")
+    errs += [] if (slot["passes"] == ["ml1m"] and slot["past_hard_kill_date"] is True and slot["not_run"] == ["toys", "games", "sports"]
+                   and slot["state"] == "NOT_SURVIVED") else [f"slot after the date: {slot['state']} {slot['not_run']}"]
+    r = run_script(repo, "toys", STAGES="2", DRY_TODAY="20261201")             # the next dataset does not run after the date
+    errs += [] if r.returncode == 4 and "toys refused" in r.stderr and "reads NOT_RUN" in r.stderr else [tail(r)]
+    return errs + ([] if (root / "ml1m" / "report.json").read_bytes() == planted else ["the decided report was rewritten"])
+
+
+def fake_date_env(tmp: Path) -> Path:
+    """A file for BASH_ENV that defines `date` as a function: +%Y%m%d prints 20261130 until the file $FAKE_DATE_FLIP exists and 20261201
+    after it, every other call is the real date. (A function, not a `date` on the PATH: Git Bash puts /usr/bin ahead of the inherited
+    PATH, so a fake executable there is never found; BASH_ENV is read by every non-interactive bash, the script's and its children.)"""
+    f = tmp / "fake_date_env.sh"
+    f.write_text('date() {\n  if [ "${1:-}" = "+%Y%m%d" ]; then\n'
+                 '    if [ -e "${FAKE_DATE_FLIP:-/nonexistent/flip}" ]; then echo 20261201; else echo 20261130; fi\n'
+                 '  else\n    command date "$@"\n  fi\n}\n', encoding="utf-8", newline="\n")
+    return f
+
+
+def test_review_m2_the_hard_kill_date_is_checked_before_every_seed_not_once_per_stage(states, tmp_path):
+    """The reviewer's scenario: the date turns while stage 3 runs (a stage of five GPU hours crosses midnight). The old script read the
+    date once, at the start of the stage, and went on to train every seed. Here the clock is a `date` function that reads 2026-11-30
+    until the first adapter exists and 2026-12-01 after it: the second seed is refused (exit 4), the third never starts."""
+    if BASH is None or FAST:
+        pytest.skip(NO_BASH if BASH is None else "FTMETHOD_FAST=1")
+    repo = make_repo(tmp_path / "repo")
+    build = seed_state(repo, states, "ml1m")
+    root = repo / DRY_ROOT
+    shutil.rmtree(root / "ml1m" / "adapters")                                 # stage 3 has to train all three seeds
+    shutil.rmtree(root / "ml1m" / "scores")
+    flip = root / "ml1m" / "adapters" / "o0" / "offset.json"
+    r = run_script(repo, "ml1m", STAGES="3", DRY_TODAY=None, BASH_ENV=fake_date_env(tmp_path).as_posix(), FAKE_DATE_FLIP=flip.as_posix())
+    assert r.returncode == 4 and "hard kill date" in r.stderr and "it is 20261201" in r.stderr, tail(r)
+    assert r.stdout.count("dry-run prior-offset trainer") == 1 and (root / "ml1m" / "adapters" / "o0" / "offset.json").is_file()
+    assert not (root / "ml1m" / "adapters" / "o1").exists() and not (root / "ml1m" / "adapters" / "o2").exists()
+    # the control is the state build itself: its stage 3 trained all three seeds under an ordinary clock
+    assert build["stdout"].count("dry-run prior-offset trainer") == 3
+
+
+def stage_5_refused(repo, tag):
+    """Stage 5 refuses (exit 4, naming the diagnostic) and builds no report."""
+    root = repo / DRY_ROOT
+    for name in ("report.json", "report_tables.csv"):
+        (root / "ml1m" / name).unlink()
+    r = run_script(repo, "ml1m", STAGES="5")
+    ok = r.returncode == 4 and "stage 5 refused" in r.stderr and "shift diagnostic" in r.stderr and not (root / "ml1m" / "report.json").exists()
+    return [] if ok else [f"{tag}: " + tail(r)]
+
+
+def scenario_stage_5_waits_for_the_shift_diagnostic(c, repo):
+    """Addendum 10 section 2: the slot report is built after the diagnostic. Stage 5 refuses without it."""
+    shutil.rmtree(repo / DRY_ROOT / "ml1m" / "shift_diag")
+    return stage_5_refused(repo, "no diagnostic")
+
+
+def scenario_stage_5_refuses_a_damaged_scoring_file(c, repo):
+    top = repo / DRY_ROOT / "ml1m" / "shift_diag" / "o1" / "top50.jsonl.gz"
+    top.write_bytes(top.read_bytes()[:-9] + b"damaged!!")
+    return stage_5_refused(repo, "damaged scoring file")
+
+
+def scenario_stage_5_refuses_a_diagnostic_of_another_adapter(c, repo):
+    w = repo / DRY_ROOT / "ml1m" / "adapters" / "o2" / "adapter_model.safetensors"
+    w.write_bytes(w.read_bytes() + b" retrained")
+    return stage_5_refused(repo, "another adapter")
+
+
+def patch_fakes_for_a_transient_failure(repo: Path) -> None:
+    """Test only: in this scratch repo's copy of run_ftgrid.sh's scorer stand-in DRY_E1_FAIL fails just the FIRST run of a run.key
+    (a transient failure): once a DIR.e1fail.* sibling with the same run.key exists, the rerun passes."""
+    fakes = repo / GRID_DRY / "_dry" / "ftgrid_fakes.py"
+    text = fakes.read_text(encoding="utf-8")
+    helper = ("def _failed_before(output):\n"
+              "    out = Path(str(output))\n"
+              "    key = (out / 'run.key').read_text(encoding='utf-8') if (out / 'run.key').is_file() else None\n"
+              "    return any((d / 'run.key').is_file() and (d / 'run.key').read_text(encoding='utf-8') == key\n"
+              "               for d in out.parent.glob(out.name + '.e1fail.*'))\n\n\n")
+    assert text.count("def fake_model(args):") == 1
+    text = text.replace("def fake_model(args):", helper + "def fake_model(args):")
+    text, n = re.subn(r"(mass = 0\.5 if fail and fail in str\(args\.output\)\.replace\(.*?\))( else 0\.99999)",
+                      r"\1 and not _failed_before(args.output)\2", text)
+    assert n == 1
+    fakes.write_text(text, encoding="utf-8")
+
+
+E1_FAIL = "ftmethod/ml1m/scores/o1"          # DRY_E1_FAIL: the like pass of o1 gets Yes+No mass 0.5 (it fails E1)
+
+
+def leftover_e1fail(root: Path, run_key) -> Path:
+    """o1's finished like pass moved aside as like.e1fail.<an old time> (with the given run.key; None: the current one), so that o1
+    is scored again with a failed run of some earlier time left next to it."""
+    like = root / "ml1m" / "scores" / "o1" / "like"
+    left = like.parent / "like.e1fail.20200101000000"
+    shutil.copytree(like, left)
+    if run_key is not None:
+        (left / "run.key").write_text(run_key, encoding="utf-8")
+    shutil.rmtree(like)
+    return left
+
+
+def scenario_review_m5_a_leftover_e1fail_of_an_earlier_run_does_not_use_the_rerun_up(c, repo):
+    """The reviewer's plant (as for run_ftq.sh): an o1/like.e1fail.<time> left by an earlier run (another panel, adapter or argument
+    vector: another run.key) used to turn a TRANSIENT first E1 failure into the final one (FAILED_INTEGRITY without the rerun). Now
+    only an e1fail directory of the current run.key uses the rerun up."""
+    root = repo / DRY_ROOT
+    left = leftover_e1fail(root, f"{'0' * 40} {QWEN} V3 {'1' * 40} --lora elsewhere/o1\n")
+    patch_fakes_for_a_transient_failure(repo)
+    r = run_script(repo, "ml1m", STAGES="4", DRY_E1_FAIL=E1_FAIL)
+    like = root / "ml1m" / "scores" / "o1" / "like"
+    errs = [] if r.returncode == 0 else [tail(r)]
+    errs += [] if r.stderr.count("[E1 failed]") == 1 and "failed E1 twice" not in r.stderr else ["no rerun: " + tail(r)]
+    errs += [] if (like / "report.json").is_file() and not (like / "FAILED_INTEGRITY").exists() else ["the rerun did not stand"]
+    return errs + ([] if left.is_dir() and len(list(like.parent.glob("like.e1fail.*"))) == 2 else ["the leftover and this run's e1fail"])
+
+
+def scenario_review_m5_an_e1fail_of_the_same_run_key_uses_the_rerun_up(c, repo):
+    """The rule itself, as run_ftgrid.sh and run_ftq.sh have it: an e1fail directory of the CURRENT run.key (an earlier failed attempt of
+    the very same panel, adapter and arguments) leaves no rerun: the next failure is final."""
+    root = repo / DRY_ROOT
+    leftover_e1fail(root, None)
+    r = run_script(repo, "ml1m", STAGES="4", DRY_E1_FAIL=E1_FAIL)
+    like = root / "ml1m" / "scores" / "o1" / "like"
+    errs = [] if r.returncode == 0 else [tail(r)]
+    errs += [] if r.stderr.count("[E1 failed]") == 0 and r.stderr.count("failed E1 twice") == 1 else ["no immediate end: " + tail(r)]
+    return errs + ([] if (like / "FAILED_INTEGRITY").is_file() and len(list(like.parent.glob("like.e1fail.*"))) == 1
+                   else ["no FAILED_INTEGRITY"])
+
+
+def scenario_e1_failure_reruns_once_then_the_missing_seed_makes_the_report_incomplete(c, repo):
+    root, errs = repo / DRY_ROOT, []
+    shutil.rmtree(root / "ml1m" / "scores" / "o1" / "like")
+    r = run_script(repo, "ml1m", STAGES="4,5", DRY_E1_FAIL=E1_FAIL)
+    errs += [] if r.returncode == 0 else [tail(r)]
+    d = root / "ml1m" / "scores" / "o1"
+    errs += [] if (d / "like" / "FAILED_INTEGRITY").is_file() and len(list(d.glob("like.e1fail.*"))) == 1 else ["no FAILED_INTEGRITY"]
+    errs += [] if r.stderr.count("[E1 failed]") == 1 and r.stderr.count("FAILED_INTEGRITY:") == 1 else ["rerun-once messages"]
+    rep = read_json(root / "ml1m" / "report.json")
+    errs += [] if (rep["decision"]["status"] == "INCOMPLETE" and rep["input_checks"]["seeds_present"] == ["seed0", "seed2"]
+                   and rep["input_checks"]["excluded_runs"][0]["status"] == "FAILED_INTEGRITY") else ["report"]
+    slot = read_json(root / "slot.json")      # the rehearsal's report is INVALID to the slot (review M1), INCOMPLETE in its own words
+    errs += [] if (slot["state"], slot["pending"], slot["pending_status"]) == ("OPEN", "ml1m", "INVALID") else [f"slot {slot['state']}"]
+    errs += [] if slot["datasets"]["ml1m"]["report_status"] == "INCOMPLETE" else ["report_status"]
+    return errs
+
+
+def scenario_a_cut_dataset_does_not_run(c, repo):
+    """Review m4 on the script: a pilot-log line with `FTMETHOD_NOT_RUN toys` makes toys NOT_RUN (cut at the checkpoint): it is refused,
+    and nothing is built for it."""
+    log = repo / GRID_DRY / "_dry" / "PILOT_LOG.md"
+    log.write_text(log.read_text(encoding="utf-8") + "\n- 2026-10-29 FTMETHOD_NOT_RUN toys: cut at the checkpoint (GPU-h)\n", encoding="utf-8")
+    before = snapshot(repo / DRY_ROOT)
+    r = run_script(repo, "toys")
+    errs = [] if r.returncode == 4 and "toys refused" in r.stderr and "FTMETHOD_NOT_RUN toys" in r.stderr else [tail(r)]
+    return errs + ([] if snapshot(repo / DRY_ROOT) == before and not (repo / DRY_ROOT / "toys").exists() else ["something was built"])
+
+
+SCENARIOS = {
+    "second_run": scenario_second_run, "gate_ft_fail": scenario_gate_ft_fail,
+    "bound_file_stage_3": scenario_a_bound_file_changed_after_the_freeze_check,
+    "dry_report_does_not_unlock": scenario_a_rehearsal_report_does_not_unlock_the_next_dataset, "kill_rule": scenario_kill_rule,
+    "date_no_report": scenario_the_date_without_a_finished_report,
+    "date_finished_stage_4": scenario_the_date_with_a_finished_report_refuses_stages_2_and_4,
+    "date_stage_5_reports": scenario_the_date_stage_5_still_reports_a_finished_dataset,
+    "diag_missing": scenario_stage_5_waits_for_the_shift_diagnostic, "diag_damaged": scenario_stage_5_refuses_a_damaged_scoring_file,
+    "diag_other_adapter": scenario_stage_5_refuses_a_diagnostic_of_another_adapter,
+    "m5_leftover": scenario_review_m5_a_leftover_e1fail_of_an_earlier_run_does_not_use_the_rerun_up,
+    "m5_same_key": scenario_review_m5_an_e1fail_of_the_same_run_key_uses_the_rerun_up,
+    "e1_incomplete": scenario_e1_failure_reruns_once_then_the_missing_seed_makes_the_report_incomplete,
+    "cut_dataset": scenario_a_cut_dataset_does_not_run}
+
+
+@needs_chain
+def test_refusals_the_date_the_e1_rules_and_the_diagnostic_gate_on_clones_of_the_chain(chain, tmp_path):
+    def work(name):
+        sub = tmp_path / name
+        sub.mkdir()
+        return name, SCENARIOS[name](chain, clone(chain, sub))
+    with cf.ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        results = dict(ex.map(work, SCENARIOS))
+    failed = {name: errs for name, errs in results.items() if errs}
+    assert not failed, "\n\n".join(f"== {name}\n" + "\n".join(map(str, errs)) for name, errs in failed.items())
+
+
+@needs_chain
+def test_stage_1_runs_for_a_dataset_that_is_not_next(games_state, tmp_path):
+    """games is not next, yet its q-hat manifest is built (the cached state of games is the product of `STAGES=1 run_ftmethod.sh games`,
+    run by the script itself): every manifest can be recorded before the slot's first run (addendum 2 item 2); stages 2-5 for it are
+    refused."""
+    build = json.loads((games_state / "games" / "build.json").read_text(encoding="utf-8"))
+    assert build["stages"] == "1" and "== stage 1" in build["stdout"] and "== stage 2" not in build["stdout"]
+    repo = make_repo(tmp_path / "repo")
+    seed_state(repo, games_state, "games")
+    root = repo / DRY_ROOT
     assert (root / "games" / "qhat_manifest.json").is_file() and not (root / "games" / "adapters").exists()
     assert read_json(root / "games" / "qhat_manifest.json")["domain"] == "games"
     r = run_script(repo, "games", STAGES="2")
-    assert r.returncode == 4 and "toys has no report" in r.stderr, tail(r)
+    assert r.returncode == 4 and "ml1m has no report" in r.stderr, tail(r)
 
 
-def test_e1_failure_reruns_once_then_the_missing_seed_makes_the_report_incomplete(chain):
-    repo, root = chain["repo"], chain["root"]
-    shutil.rmtree(root / "ml1m" / "scores" / "o1" / "like")
-    r = run_script(repo, "ml1m", STAGES="4,5", DRY_E1_FAIL="ftmethod_dryrun/ml1m/scores/o1")
-    assert r.returncode == 0, tail(r)
-    d = root / "ml1m" / "scores" / "o1"
-    assert (d / "like" / "FAILED_INTEGRITY").is_file() and len(list(d.glob("like.e1fail.*"))) == 1
-    assert r.stderr.count("[E1 failed]") == 1 and r.stderr.count("FAILED_INTEGRITY:") == 1
-    rep = read_json(root / "ml1m" / "report.json")
-    assert rep["decision"]["status"] == "INCOMPLETE" and rep["input_checks"]["seeds_present"] == ["seed0", "seed2"]
-    assert rep["input_checks"]["excluded_runs"][0]["status"] == "FAILED_INTEGRITY"
-    slot = read_json(root / "slot.json")
-    assert (slot["state"], slot["pending"], slot["pending_status"]) == ("OPEN", "ml1m", "INCOMPLETE")
-    r = run_script(repo, "toys")
-    assert r.returncode == 4 and "ml1m has status INCOMPLETE" in r.stderr, tail(r)
+# ---------------------------------------------------------------- 8. addendum 10 section 1: one test per finding of the review
+# M1 (a): the DRY_RUN root guard compares canonical forms, never the spelling
+REGISTERED_FILES = {                                  # what the registered trees hold: a refused run must leave all of it as it is
+    "outputs/confrec/ftmethod/ml1m/report.json": b"registered report\n",
+    "outputs/confrec/ftmethod/ml1m/qhat_manifest.json": b"registered manifest\n",
+    "outputs/confrec/ftmethod/slot.json": b"registered slot\n",
+    "outputs/confrec/ftgrid/report/ml1m.json": b"registered grid report\n",
+    "outputs/confrec/ftgrid/panels/ml1m/train.jsonl": b"rows\n",
+    "outputs/confrec/gateft/gate_ft.json": b"{}\n",
+    "outputs/confrec/gatefix/dev/note.txt": b"gate fix\n"}
+
+
+def registered_repo(dest: Path) -> Path:
+    """A scratch repo whose registered roots (the slot, the grid, Gate-FT, the gate fix) hold files."""
+    repo = make_repo(dest)
+    for rel, data in REGISTERED_FILES.items():
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        (repo / rel).write_bytes(data)
+    return repo
+
+
+READ_ONLY_ROOTS = ("ftgrid", "gateft", "gatefix")        # the registered roots the slot only reads
+
+
+def registered_state(repo: Path, roots=("ftmethod", "ftgrid", "gateft", "gatefix")) -> dict:
+    """{path: (size, mtime_ns, sha1)} of everything below the registered roots, names included."""
+    out = {}
+    for rel in roots:
+        base = repo / "outputs" / "confrec" / rel
+        for p in sorted(base.rglob("*")) if base.exists() else []:
+            out[p.relative_to(repo).as_posix()] = (p.stat().st_size, p.stat().st_mtime_ns, sha1_file(p)) if p.is_file() else "dir"
+    return out
+
+
+def run_many(repo: Path, cases: list, **kw) -> list:
+    """[(OUT_ROOT spelling, result)], the script runs concurrently (every run is dominated by process starts)."""
+    with cf.ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        return list(ex.map(lambda oc: (oc, run_script(repo, "ml1m", OUT_ROOT=oc, **kw)), cases))
+
+
+def spellings(repo: Path, rel: str) -> list:
+    """The spellings of a path below the repo that a string comparison does not equate with `rel` (// . .. absolute, native)."""
+    absolute = (repo / rel).as_posix()
+    head, _, last = rel.rpartition("/")
+    out = [rel + "//", rel.replace("/", "//", 1), head + "/./" + last, "tmp_outputs/../" + rel, absolute, str(repo / rel)]
+    if os.name == "nt":                                # D:\... spellings and a case-insensitive filesystem
+        out += [absolute.replace("/", "\\"), absolute.upper(), rel.upper()]
+    return out
+
+
+@needs_bash
+def test_review_M1_a_dry_run_never_writes_under_outputs_confrec_in_any_spelling(tmp_path):
+    """The reviewer's plant: DRY_RUN=1 OUT_ROOT=outputs/confrec/ftmethod// (one trailing slash was stripped, the string comparison with
+    the registered root failed) wrote a synthetic q-hat manifest, adapters and report into the registered root. Now every spelling of
+    every registered root, and anything in the repo but tmp_outputs, beside it or above it, is refused (exit 2) before anything is
+    written."""
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    cases = spellings(repo, "outputs/confrec/ftmethod") + [
+        "outputs/confrec/ftmethod", "outputs/confrec/ftmethod///", "outputs/confrec/ftgrid", "outputs/confrec/ftgrid//",
+        "outputs/confrec/gateft", "outputs/confrec/gatefix", "outputs/confrec/ftmethod/sub", "outputs/confrec/ftgrid/../ftmethod",
+        "outputs/confrec/ftmethod_dryrun", "outputs/confrec", "outputs", ".", "/", "data/raw", "src", "tests", "../outside_repo",
+        "..", "tmp_outputs/../src"]
+    bad = [(oc, tail(r)) for oc, r in run_many(repo, cases)
+           if r.returncode != 2 or not ("never writes to a registered output root" in r.stderr or "root is empty" in r.stderr
+                                        or "filesystem root" in r.stderr)]
+    assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{t}" for oc, t in bad)
+    assert registered_state(repo) == before and not (repo / "tmp_outputs").exists()
+    assert (repo / "outputs/confrec/ftmethod/ml1m/report.json").read_bytes() == REGISTERED_FILES["outputs/confrec/ftmethod/ml1m/report.json"]
+
+
+@needs_bash
+def test_review_M1_a_dry_run_accepts_a_root_in_tmp_outputs_or_outside_the_repo_parent_in_any_spelling(tmp_path):
+    """Acceptance is as canonical as refusal: tmp_outputs of the repo, and a directory outside the repo's parent directory, are fine
+    however they are spelled (the run stops at the stage list here, after every guard has passed)."""
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    away = Path(tempfile.mkdtemp(prefix="ftmethod_dry_away_"))               # outside the repo and outside its parent directory
+    try:
+        outside = (away / "slot root").as_posix()
+        cases = [DRY_ROOT, DRY_ROOT + "//", "tmp_outputs//ftmethod_dryrun/./y", "tmp_outputs/a/../b", outside, str(away / "slot root")]
+        if os.name == "nt":
+            cases += [DRY_ROOT.upper(), outside.replace("/", "\\")]
+        bad = [(oc, tail(r)) for oc, r in run_many(repo, cases, STAGES="9")
+               if r.returncode != 2 or "unknown stage" not in r.stderr]
+        assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{t}" for oc, t in bad)
+        assert registered_state(repo) == before and not (repo / "tmp_outputs").exists() and not (away / "slot root").exists()
+    finally:
+        shutil.rmtree(away, ignore_errors=True)
+
+
+@needs_bash
+def test_review_M1_a_real_run_takes_the_registered_root_in_any_spelling_and_no_other_directory(tmp_path):
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    real = {"MODEL": "/models/Qwen3-8B", "STAGES": "1"}      # stage 1 is not gated by the order: the next refusal is the selection
+    refused = spellings(repo, "outputs/confrec/ftgrid")[:3] + [
+        "outputs/confrec/ftgrid", "outputs/confrec/ftmethod_dryrun", "outputs/confrec/ftmethod/sub", "outputs/confrec/ftmethod/..",
+        "outputs/confrec/gateft", DRY_ROOT, "outputs/confrec", "."]
+    accepted = spellings(repo, "outputs/confrec/ftmethod")[:4] + ["outputs/confrec/ftmethod", "outputs/confrec/./ftmethod/"]
+    bad = [(oc, tail(r)) for oc, r in run_many(repo, refused, dry=False, **real) if r.returncode != 2 or "one registered root" not in r.stderr]
+    bad += [(oc, tail(r)) for oc, r in run_many(repo, accepted, dry=False, **real)      # the guards pass: the next refusal is
+            if r.returncode != 1 or "missing outputs/confrec/gatefix/dev/selection.json" not in r.stderr]    # the missing selection
+    assert not bad, "\n\n".join(f"== OUT_ROOT={oc!r}\n{t}" for oc, t in bad)
+    assert registered_state(repo) == before and not (repo / "tmp_outputs").exists()
+
+
+def link_dir(link: Path, target: Path) -> bool:
+    """A directory link at `link` to `target`: a symlink, or an NTFS junction where the symlink privilege is missing (a Windows
+    box). False when neither can be made (the test then skips)."""
+    link.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.symlink(str(target), str(link), target_is_directory=True)
+        return True
+    except (OSError, NotImplementedError):
+        pass
+    if os.name == "nt":
+        made = subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(target)], capture_output=True)
+        return made.returncode == 0 and link.exists()
+    return False
+
+
+def unlink_dir(link: Path) -> None:
+    """Remove a directory link (or an empty directory) without touching what it points to."""
+    try:
+        os.unlink(link)
+    except OSError:
+        os.rmdir(link)
+
+
+@needs_bash
+def test_review_M1_a_link_between_the_registered_roots_and_the_files_a_run_writes_is_refused(tmp_path):
+    """Planted links (symlinks, or junctions on a Windows box): an alias of the registered slot as a DRY root, the synthetic world's own
+    path leading into the grid, a link inside that world, a link below the DRY root, the registered root itself a link to the grid, the
+    whole outputs tree reached through a link, and a link below the registered root. Every one is refused with exit 2 before anything is
+    written, and the registered tree is left as it was."""
+    base = registered_repo(tmp_path / "base")
+    probe = tmp_path / "probe"
+    (probe / "t").mkdir(parents=True)
+    if not link_dir(probe / "l", probe / "t"):
+        pytest.skip("no directory links can be made here (no symlink privilege, no junctions)")
+    unlink_dir(probe / "l")
+    slot, grid, real = "outputs/confrec/ftmethod", "outputs/confrec/ftgrid", {"MODEL": "/models/Qwen3-8B"}
+    state = registered_state(base, READ_ONLY_ROOTS)       # a plant replaces a part of the slot root itself: the roots it only reads must stay
+
+    def clone_of(name: str) -> Path:
+        dest = tmp_path / name / "repo"
+        shutil.copytree(base, dest)
+        return dest
+
+    def plant(repo: Path, rel: str, target: str) -> None:
+        link = repo / rel
+        if link.exists():
+            shutil.rmtree(link)                                            # a real directory is replaced by the link
+        assert link_dir(link, repo / target), rel
+
+    def refused(repo: Path, name: str, r, msg: str) -> list:
+        ok = r.returncode == 2 and msg in r.stderr and registered_state(repo, READ_ONLY_ROOTS) == state
+        return [] if ok else [(name, tail(r) + "\nregistered tree unchanged: "
+                               + str(registered_state(repo, READ_ONLY_ROOTS) == state))]
+
+    def dry_cases() -> list:
+        repo, bad = clone_of("dry"), []
+        plant(repo, "tmp_outputs/alias", slot)                             # an alias of the registered slot root as the DRY root
+        bad += refused(repo, "alias", run_script(repo, "ml1m", OUT_ROOT="tmp_outputs/alias/sub"), "never writes to a registered")
+        bad += [] if os.listdir(repo / "tmp_outputs") == ["alias"] else [("alias", "something was written")]
+        unlink_dir(repo / "tmp_outputs" / "alias")
+        plant(repo, GRID_DRY, grid)                                        # the synthetic world's own path leads into the grid
+        bad += refused(repo, "world", run_script(repo, "ml1m"), "never writes to a registered")
+        unlink_dir(repo / GRID_DRY)
+        plant(repo, DRY_ROOT + "/ml1m", slot + "/ml1m")                    # a link below the DRY root
+        r = run_script(repo, "ml1m")
+        bad += refused(repo, "dry child", r, "resolves to") + ([] if not (repo / GRID_DRY).exists() else [("dry child", "built")])
+        unlink_dir(repo / DRY_ROOT / "ml1m")
+        plant(repo, GRID_DRY + "/panels", grid + "/panels")                # a link inside the synthetic world
+        bad += refused(repo, "world child", run_script(repo, "ml1m"), "never writes to a registered")
+        unlink_dir(repo / GRID_DRY / "panels")
+        return bad
+
+    def registered_cases() -> list:
+        repo, bad = clone_of("registered"), []
+        shutil.rmtree(repo / slot)
+        plant(repo, slot, grid)                                            # the registered slot root is a link to the grid
+        bad += refused(repo, "registered root", run_script(repo, "ml1m", dry=False, STAGES="1", **real), "one registered root")
+        unlink_dir(repo / slot)
+        return bad
+
+    def ancestor_cases() -> list:
+        repo = clone_of("ancestor")
+        os.rename(repo / "outputs", repo / "real_outputs")                 # the whole outputs tree is reached through a link
+        assert link_dir(repo / "outputs", repo / "real_outputs")
+        out = refused(repo, "outputs is a link", run_script(repo, "ml1m", dry=False, STAGES="1", **real), "one registered root")
+        unlink_dir(repo / "outputs")
+        return out
+
+    def child_cases() -> list:
+        repo, bad = clone_of("child"), []
+        for child, msg in (("ml1m", "redirect"),                           # a path the script lists: the tree check ...
+                           ("scores", "is a link")):                        # ... and one it does not: the sweep for links
+            plant(repo, f"{slot}/{child}", grid + "/panels")
+            r = run_script(repo, "ml1m", dry=False, STAGES="1", **real)
+            bad += refused(repo, "child " + child, r, msg)
+            unlink_dir(repo / slot / child)
+        return bad
+
+    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+        bad = [x for found in [f.result() for f in [ex.submit(fn) for fn in (dry_cases, registered_cases, ancestor_cases, child_cases)]]
+               for x in found]
+    assert not bad, "\n\n".join(f"== {name}\n{t}" for name, t in bad)
+
+
+# M1 (b): the slot does not trust any report
+@pytest.mark.parametrize("meta, why", [
+    ({"dry_run_inputs": True}, "dry_run_inputs"),                                    # the rehearsal's report (the reviewer's plant)
+    ({"n_boot": 200}, "n_boot"), ({"n_boot": 1999}, "n_boot"), ({"n_boot": 2000.0}, "n_boot"), ({"n_boot": "2000"}, "n_boot"),
+    ({"n_boot": True}, "n_boot"), ({"n_boot": None}, "n_boot"), ({"seed": 1}, "seed"), ({"seed": "0"}, "seed"),
+    ({"seed": False}, "seed"), ({"seed": None}, "seed"), ({"dry_run_inputs": None}, "dry_run_inputs"),
+    ({"domain": "toys"}, "is of 'toys'")])
+def test_review_M1_only_a_registered_report_can_be_decided(tmp_path, meta, why):
+    """A report whose meta says dry_run_inputs, n_boot != 2000 or seed != 0 (or that lacks the keys, or is of another dataset) is
+    INVALID: it is never counted as decided, never as a failure and never unlocks the next dataset (addendum 10 item 2)."""
+    root = tmp_path / "ftmethod"
+    write_dataset_report(root, "ml1m", "FAIL", p=0.3, **meta)
+    i = fm.read_dataset_report(root, "ml1m")
+    assert i["status"] == "INVALID" and why in i["reason"] and i["report_status"] == "FAIL" and i.get("dUAUC") is None
+    s = fm.slot_summary(root)
+    assert s["fails"] == [] and s["decided"] == [] and s["pending"] == "ml1m" and s["state"] == "OPEN"
+    ok, text = fm.check_next({"ml1m": i["status"]}, "toys", {"ml1m": i["reason"]})
+    assert not ok and "ml1m has status INVALID" in text and why in text
+
+
+def test_review_M1_a_rehearsal_cannot_use_up_one_of_the_two_failures_of_the_kill_rule(tmp_path, capsys):
+    """The reviewer's scenario: two DRY FAIL reports (dry_run_inputs, n_boot 200) kill the slot in the registered root and refuse the
+    next dataset. They are now INVALID; the registered reports of the same numbers do kill it."""
+    root, log = tmp_path / "ftmethod", pilot_log(tmp_path)
+    for d in ("ml1m", "toys"):
+        write_dataset_report(root, d, "FAIL", p=0.4, dry_run_inputs=True, n_boot=200)
+    s = fm.slot_summary(root)
+    assert (s["state"], s["fails"], s["killed_after"], s["next_dataset"]) == ("OPEN", [], None, "ml1m")
+    assert s["datasets"]["toys"]["status"] == "INVALID" and s["violations"] == [
+        "toys: a report exists although ml1m (earlier in the registered order) is not decided"]
+    with pytest.raises(SystemExit) as e:
+        fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--check_next", "games"])
+    assert e.value.code == 4 and "killed after" not in capsys.readouterr().err
+    for d in ("ml1m", "toys"):
+        write_dataset_report(root, d, "FAIL", p=0.4)
+    s = fm.slot_summary(root)
+    assert (s["state"], s["fails"], s["killed_after"]) == ("KILLED", ["ml1m", "toys"], "toys")
+    with pytest.raises(SystemExit) as e:
+        fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--check_next", "games"])
+    assert e.value.code == 4 and "killed after toys" in capsys.readouterr().err
+    with pytest.raises(SystemExit) as e:                                              # --pilot_log is required (the cuts are read there)
+        fm.main(["slot", "--root", str(root)])
+    assert e.value.code == 2
+
+
+def test_review_M1_an_unreadable_or_foreign_report_is_invalid_too(tmp_path):
+    root = tmp_path / "ftmethod"
+    for d, text in (("ml1m", "{not json"), ("toys", "[]"), ("games", json.dumps({"meta": {"domain": "games"}})),
+                    ("sports", json.dumps({"meta": REGISTERED_META | {"domain": "sports"}, "decision": {"status": "MAYBE"}}))):
+        (root / d).mkdir(parents=True)
+        (root / d / "report.json").write_text(text, encoding="utf-8")
+        assert fm.read_dataset_report(root, d)["status"] == "INVALID", d
+    assert fm.read_dataset_report(root, "ml1m")["reason"].startswith("unreadable report")
+    assert "not a JSON object" in fm.read_dataset_report(root, "toys")["reason"]
+    assert "no decision status" in fm.read_dataset_report(root, "sports")["reason"]
+    assert fm.report_problems(json.loads(json.dumps({"meta": {"domain": "ml1m", **REGISTERED_META},
+                                                     "decision": {"status": "PASS"}})), "ml1m") == []
+
+
+# M2: DRY_RUN is 0 or 1
+@needs_bash
+def test_review_M2_dry_run_values_other_than_0_and_1_start_nothing(tmp_path):
+    """The old script took [ "$DRY_RUN" = 1 ] for a rehearsal and anything else for the real chain: DRY_RUN=true or DRY_RUN=yes
+    started the real job (and wrote below the registered root). Now any other value, an empty one included, is refused (exit 2)."""
+    repo = registered_repo(tmp_path / "repo")
+    before = registered_state(repo)
+    real = {"MODEL": "/models/Qwen3-8B"}
+    cases = ["yes", "true", "2", "", "01", " 1", "on"]
+    with cf.ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        runs = list(ex.map(lambda v: (v, run_script(repo, "ml1m", dry=False, DRY_RUN=v, **real)), cases))
+        runs += list(ex.map(lambda v: (v, run_script(repo, "ml1m", DRY_RUN=v)), ["yes", ""]))
+    bad = [(v, tail(r)) for v, r in runs if r.returncode != 2 or "DRY_RUN must be 0 or 1" not in r.stderr or r.stdout.strip()]
+    assert not bad, "\n\n".join(f"== DRY_RUN={v!r}\n{t}" for v, t in bad)
+    assert registered_state(repo) == before and not (repo / "tmp_outputs").exists()
+    r = run_script(repo, "ml1m", dry=False, DRY_RUN="0", STAGES="1", **real)         # 0 is the real chain: it gets to its own refusals
+    assert r.returncode == 1 and "missing outputs/confrec/gatefix/dev/selection.json" in r.stderr, tail(r)
+
+
+@needs_bash
+def test_review_m2_dry_today_must_be_eight_digits_and_belongs_to_a_rehearsal(tmp_path):
+    """DRY_TODAY=2026-12-01 used to pass silently: [ 2026-12-01 -gt 20261130 ] is an error that an `if` reads as false."""
+    repo = make_repo(tmp_path / "repo")
+    bad_values = ["2026-12-01", "2026121", "202612011", " 20261201", "abc", ""]
+    with cf.ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        runs = list(ex.map(lambda v: (v, run_script(repo, "ml1m", DRY_TODAY=v, STAGES="3")), bad_values))
+        runs += list(ex.map(lambda v: (v, run_diag(repo, "ml1m", DRY_TODAY=v)), ["2026-12-01"]))
+    bad = [(v, tail(r)) for v, r in runs if r.returncode != 2 or "DRY_TODAY must be eight digits" not in r.stderr]
+    assert not bad, "\n\n".join(f"== DRY_TODAY={v!r}\n{t}" for v, t in bad)
+    r = run_script(repo, "ml1m", dry=False, DRY_TODAY="20261201", MODEL="/models/Qwen3-8B", STAGES="1")   # a real run reads the clock
+    assert r.returncode == 2 and "a real run reads the clock" in r.stderr, tail(r)
+    assert not (repo / "tmp_outputs").exists() and not (repo / "outputs").exists()
+
+
+# m1: the +0.01 threshold
+def planted_diff(est: float, per_seed=(0.012, 0.0105, 0.0095), lo=0.002, hi=0.018, n_users=400, sd=0.001) -> dict:
+    """The part of ftgrid_report.contrast_models that decide() reads, with a chosen seed-averaged estimate."""
+    return {"mean_over_seeds": {"est": est, "lo": lo, "hi": hi, "p": 0.01, "n_users": n_users, "descriptive_min_n": False,
+                                "ci_excludes_0": bool(lo > 0 or hi < 0)},
+            "seeds": {"sigma_seed": sd}, "per_seed": {f"seed{k}": {"est": v} for k, v in enumerate(per_seed)}}
+
+
+def test_review_m1_a_mean_of_exactly_plus_001_passes_though_the_float_is_a_hair_below():
+    """The reviewer's number: the mean of per-user differences that is +0.0100 in exact arithmetic was computed as
+    0.009999999999999998 and failed `>= 0.01`. The comparison is est >= 0.01 - 1e-12 (addendum 10 item 3)."""
+    assert 0.009999999999999998 < 0.01
+    ok = fm.decide(planted_diff(0.009999999999999998, per_seed=(0.0101, 0.0100, 0.0099)), 3, [])
+    assert ok["status"] == "PASS" and ok["conditions"]["mean_ge_0.01"] is True and ok["reason"] is None
+    assert fm.decide(planted_diff(0.01), 3, [])["status"] == "PASS"
+    assert fm.decide(planted_diff(0.01 - 0.9e-12), 3, [])["status"] == "PASS"            # inside the tolerance
+    below = fm.decide(planted_diff(0.01 - 2e-12), 3, [])                                  # outside it: a real shortfall
+    assert below["status"] == "FAIL" and below["conditions"]["mean_ge_0.01"] is False and "< +0.01" in below["reason"]
+    assert fm.decide(planted_diff(0.0099), 3, [])["status"] == "FAIL"
+    # the other conditions are untouched by the tolerance: a mean at the threshold still needs its CI, its seeds and the sigma rule
+    assert fm.decide(planted_diff(0.01, lo=-0.001), 3, [])["status"] == "FAIL"
+    assert fm.decide(planted_diff(0.01, sd=0.006), 3, [])["status"] == "FAIL"
+    assert fm.decide(planted_diff(0.01, per_seed=(0.02, 0.0105, -0.0005)), 3, [])["status"] == "FAIL"
+    assert "1e-12" in fm.decide(planted_diff(0.01), 3, [])["rule"]
+
+
+def thirds_design(n_users: int, ks) -> dict:
+    """ftgrid_report.contrast_models on users with labels [1, 0, 0, 0]: in seed s the first ks[s] users have the positive ranked
+    second by the prior-offset score and first by the stacking score (a per-user AUC difference of 1/3), the others no difference."""
+    y = np.tile([1, 0, 0, 0], n_users)
+    users = np.repeat(np.arange(n_users), 4)
+    pairs = {}
+    for s, k in enumerate(ks):
+        a, b = np.tile([3.0, 2.0, 1.0, 0.0], n_users), np.tile([3.0, 2.0, 1.0, 0.0], n_users)
+        for u in range(k):
+            a[4 * u: 4 * u + 4] = [2.0, 3.0, 1.0, 0.0]
+        pairs[f"seed{s}"] = (b, a)                       # (score a, score b): AUC(a) - AUC(b) = +1/3 for the first k users
+    return fr.contrast_models(pairs, y, users, np.ones(4 * n_users, bool), 200, 0, n_registered=3)
+
+
+def test_review_m1_the_threshold_through_the_real_statistics():
+    """The same end to end: 400 users, seeds in which 11, 12 and 13 users gain a per-user AUC of 1/3, so that the seed-averaged mean
+    is (11 + 12 + 13) / 3 / 3 / 400 = +0.01 in exact arithmetic (a search over such designs found this one, whose float mean is the
+    reviewer's number), through ftgrid_report.contrast_models and fm.decide."""
+    diff = thirds_design(400, (11, 12, 13))
+    est = diff["mean_over_seeds"]["est"]
+    assert est == 0.009999999999999998 and est < 0.01 and abs(est - 0.01) < 1e-15
+    assert [round(diff["per_seed"][f"seed{k}"]["est"], 6) for k in range(3)] == [round(x / 3 / 400, 6) for x in (11, 12, 13)]
+    dec = fm.decide(diff, 3, [])
+    assert dec["status"] == "PASS" and dec["conditions"]["mean_ge_0.01"] is True and all(dec["conditions"].values()), dec
+    assert dec["dUAUC"] == est and dec["lo"] > 0
+    # the bare comparison the old code made fails this very estimate
+    assert not (est >= fm.PASS_MIN)
+
+
+# m4: NOT_RUN and the cut record
+def test_review_m4_the_cut_token_is_exact(tmp_path):
+    lines = ["- 2026-10-29 FTMETHOD_NOT_RUN sports: cut",                    # 2
+             "`FTMETHOD_NOT_RUN games`",                                    # 3
+             "FTMETHOD_NOT_RUN  toys", "ftmethod_not_run toys", "FTMETHOD_NOT_RUN_X toys", "xFTMETHOD_NOT_RUN toys",
+             "FTMETHOD_NOT_RUN toys2", "FTMETHOD_NOT_RUN <dataset>", "FTMETHOD_NOT_RUN Toys", "FTMETHOD_NOT_RUN",
+             "FTMETHOD_NOT_RUN ml1m (cut), FTMETHOD_NOT_RUN ml1m again"]
+    cuts = fm.read_cuts(pilot_log(tmp_path, *lines))
+    assert cuts == {"sports": [2], "games": [3], "ml1m": [12]}                   # (line 1 is the log's heading)
+    assert fm.read_cuts(tmp_path / "gone.md", allow_missing=True) == {}
+    with pytest.raises(SystemExit, match="does not exist"):
+        fm.read_cuts(tmp_path / "gone.md")
+    (tmp_path / "bad.md").write_bytes(b"\xff\xfe FTMETHOD_NOT_RUN toys \x80")
+    with pytest.raises(SystemExit, match="cannot be read"):
+        fm.read_cuts(tmp_path / "bad.md")
+
+
+def test_review_m4_a_cut_dataset_reads_not_run_it_is_neither_decided_nor_failed_and_the_next_dataset_skips_it(tmp_path, capsys):
+    root = tmp_path / "ftmethod"
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)
+    log = pilot_log(tmp_path, "- 2026-10-29 FTMETHOD_NOT_RUN toys: cut at the checkpoint (GPU-h remaining)")
+    s = fm.slot_summary(root, log)
+    assert s["datasets"]["toys"]["status"] == "NOT_RUN" and s["datasets"]["toys"]["cut_lines"] == [2]
+    assert (s["state"], s["next_dataset"], s["pending"], s["not_run"], s["decided"], s["fails"]) == (
+        "OPEN", "games", "games", ["toys"], ["ml1m"], [])
+    assert s["cuts"] == {"toys": [2]} and s["datasets_run"] == ["ml1m"] and "toys" not in s["holm"]["p_raw"]
+    ok, why = fm.check_next({d: i["status"] for d, i in s["datasets"].items()}, "games")
+    assert ok and "1 NOT_RUN skipped: toys" in why
+    ok, why = fm.check_next({d: i["status"] for d, i in s["datasets"].items()}, "toys", {"toys": s["datasets"]["toys"]["reason"]})
+    assert not ok and "toys refused" in why and "FTMETHOD_NOT_RUN toys" in why                 # a cut dataset does not run
+    fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--check_next", "games"])   # exit 0 through the CLI
+    assert "games may run" in capsys.readouterr().out
+    with pytest.raises(SystemExit) as e:
+        fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--check_next", "toys"])
+    assert e.value.code == 4 and "reads NOT_RUN" in capsys.readouterr().err
+    # without the record the same reports leave toys next
+    assert fm.slot_summary(root, pilot_log(tmp_path))["next_dataset"] == "toys"
+
+
+def test_review_m4_survival_needs_3_passes_so_cuts_can_make_it_impossible():
+    st = fm.slot_state({"ml1m": "PASS", "toys": "NOT_RUN", "games": "PASS", "sports": "PASS"})
+    assert (st["state"], st["final"], st["passes"], st["not_run"]) == ("SURVIVES", True, ["ml1m", "games", "sports"], ["toys"])
+    st = fm.slot_state({"ml1m": "PASS", "toys": "NOT_RUN", "games": "NOT_RUN"})
+    assert (st["state"], st["final"], st["next_dataset"]) == ("NOT_SURVIVED", False, "sports")    # 1 pass + 1 open dataset < 3
+    st = fm.slot_state({"ml1m": "PASS", "toys": "NOT_RUN", "games": "PASS", "sports": "FAIL"})
+    assert (st["state"], st["final"], st["fails"]) == ("NOT_SURVIVED", True, ["sports"])           # 2 passes, one failure: not killed
+    st = fm.slot_state({"ml1m": "FAIL", "toys": "NOT_RUN", "games": "FAIL"})
+    assert (st["state"], st["killed_after"], st["final"]) == ("KILLED", "games", True)             # a cut does not hide a failure
+    st = fm.slot_state({"ml1m": "PASS", "toys": "NOT_RUN", "games": None, "sports": "PASS"})       # a report behind an open dataset
+    assert st["violations"] == ["sports: a report exists although games (earlier in the registered order) is not decided"]
+    assert fm.slot_state({"ml1m": "NOT_RUN"})["next_dataset"] == "toys"
+    with pytest.raises(ValueError):
+        fm.slot_state({"ml1m": "SKIPPED"})
+
+
+def test_review_m4_a_cut_lifts_an_incomplete_dataset_but_never_hides_a_decided_one(tmp_path):
+    """Addendum 5 item 2: an INCOMPLETE dataset blocks the next one until it is recorded as not run at a section-10 checkpoint, and the
+    report code had no input for that record. The cut record is that input; a cut recorded AFTER a decided report is an INVALID record
+    (a cut is decided on GPU-hours alone, never after a result)."""
+    root = tmp_path / "ftmethod"
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)
+    write_dataset_report(root, "toys", "INCOMPLETE")
+    assert fm.slot_summary(root)["next_dataset"] == "toys"
+    assert not fm.check_next({"ml1m": "PASS", "toys": "INCOMPLETE"}, "games")[0]
+    s = fm.slot_summary(root, pilot_log(tmp_path, "FTMETHOD_NOT_RUN toys"))
+    assert s["datasets"]["toys"]["status"] == "NOT_RUN" and s["datasets"]["toys"]["report_status"] == "INCOMPLETE"
+    assert s["next_dataset"] == "games"
+    root2 = tmp_path / "ftmethod2"
+    write_dataset_report(root2, "ml1m", "FAIL", p=0.4)
+    s = fm.slot_summary(root2, pilot_log(tmp_path, "FTMETHOD_NOT_RUN ml1m"))
+    i = s["datasets"]["ml1m"]
+    assert i["status"] == "INVALID" and "never after a result" in i["reason"] and s["fails"] == [] and s["next_dataset"] == "ml1m"
+
+
+# m2: the date in the slot report
+def test_review_m2_after_the_hard_kill_date_a_dataset_without_a_finished_report_reads_not_run(tmp_path, capsys):
+    root, log = tmp_path / "ftmethod", pilot_log(tmp_path)
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)
+    write_dataset_report(root, "toys", "INCOMPLETE")
+    on_the_day = fm.slot_summary(root, log, 20261130)                           # 2026-11-30 itself is still inside the slot
+    assert on_the_day["past_hard_kill_date"] is False and on_the_day["next_dataset"] == "toys"
+    after = fm.slot_summary(root, log, 20261201)
+    assert after["past_hard_kill_date"] is True and after["next_dataset"] is None and after["final"] is True
+    assert [after["datasets"][d]["status"] for d in fm.DATASETS] == ["PASS", "NOT_RUN", "NOT_RUN", "NOT_RUN"]
+    assert after["datasets"]["toys"]["report_status"] == "INCOMPLETE" and "hard kill date 2026-11-30" in after["datasets"]["toys"]["reason"]
+    assert after["not_run_by_date"] == ["toys", "games", "sports"] and after["state"] == "NOT_SURVIVED"
+    assert after["datasets"]["ml1m"]["status"] == "PASS"                        # a finished report stays decided
+    # a slot killed before the date keeps its "not run" (null status) behind the kill point: the date adds nothing there
+    write_dataset_report(root, "ml1m", "FAIL", p=0.4)
+    write_dataset_report(root, "toys", "FAIL", p=0.3)
+    killed = fm.slot_summary(root, log, 20261215)
+    assert killed["state"] == "KILLED" and killed["datasets"]["games"]["status"] is None and killed["not_run_by_date"] == []
+    # through the CLI: --today is eight digits, and a dataset that reads NOT_RUN by the date does not run
+    for bad in ("2026-12-01", "2026121", "x"):
+        with pytest.raises(SystemExit) as e:
+            fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--today", bad])
+        assert e.value.code == 2
+    write_dataset_report(root, "ml1m", "PASS", p=0.01)
+    (root / "toys" / "report.json").unlink()
+    (root / "toys").rmdir()
+    with pytest.raises(SystemExit) as e:
+        fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--today", "20261201", "--check_next", "toys"])
+    assert e.value.code == 4 and "toys refused" in capsys.readouterr().err
+    fm.main(["slot", "--root", str(root), "--pilot_log", str(log), "--today", "20261201", "--check_next", "ml1m"])   # decided: resumable
+    assert "ml1m may run" in capsys.readouterr().out
+
+
+# m3 and m6: the "b = 0" wording, and the trainer that must not change
+def test_review_m3_b_equal_0_is_sft_only_for_a_frozen_b_and_the_trainer_file_is_untouched():
+    """Addendum 10 item 7. The statement lives in train_lora_offset.py's docstring, which cannot change (its recorded sha1 pins the
+    qhat manifests and FT-Q's inputs: review m6), so the qualification is stated in the files of this slot that can: the report's
+    docstring and the run script's header. The test that backs the statement freezes b."""
+    assert hashlib.sha1(Path(tlo.__file__).read_bytes()).hexdigest().startswith(TRAINER_SHA1_PREFIX)
+    assert "With b = 0 the loss, the gradients and so the run are SFT's (tested)" in re.sub(r"\s+", " ", tlo.__doc__)   # unedited
+    text, script = re.sub(r"\s+", " ", fm.__doc__), re.sub(r"[#\s]+", " ", SCRIPT.read_text(encoding="utf-8"))
+    assert "holds for a FROZEN b" in text and "The registered prior-offset run TRAINS b" in text
+    assert "global gradient-norm clip" in text and "not SFT even where b stays near 0" in text
+    assert "holds for a FROZEN b only" in script and "so it is not SFT even where b ends near 0" in script
+    assert "Addendum 10 section 1" in script and "supersedes the code record of addendum 5" in script
+    me = Path(__file__).read_text(encoding="utf-8")
+    assert "test_tiny_lora_with_b_fixed_at_zero_trains_exactly_like_sft" in me and "learn_b=False" in me   # the backing test: b frozen
+
+
+def test_review_m6_none_of_the_new_files_is_bound_and_the_bound_ones_are_listed():
+    """No bound core file is edited by this task: the new files are outside every FREEZE block, the report and the script are in the
+    `method` block (their new sha1 are recorded before the method record), and the trainer is in it with its recorded sha1."""
+    blocks = freeze_blocks()
+    listed = {f for files in blocks.values() for f in files}
+    assert not listed & {"src/confrec/ftmethod_shift_diag.py", "scripts/sigir/run_ftmethod_shift_diag.sh",
+                         "tests/test_confrec_ftmethod_shift_diag.py", "tests/test_confrec_ftmethod.py"}
+    assert {"src/confrec/train_lora_offset.py", "src/confrec/ftmethod_report.py", "scripts/sigir/run_ftmethod.sh"} <= set(blocks["method"])
+    assert {"src/confrec/pyes_scorer.py", "src/confrec/prompting.py", "src/confrec/ftgrid_report.py"} <= set(blocks["core"])

@@ -138,22 +138,22 @@ registered cut; $^\dagger$: addendum 6).}
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
  & ZS & LoRA & ZS & LoRA\\
 \midrule
-UAUC of $\ell$ & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
-\quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
-\quad item mean $m$ (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
-\quad temporal MF (ref.) & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
-$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
-ECE (after Platt) & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
-Correct in bottom tertile, oracle & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
-Errors in top tertile, oracle & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
-Item-prior share $\rho^2/r_8$ & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share}\\
-e-share$^\dagger$ & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
-$\mathcal G=\Delta$UAUC(M2$-$M1), E-D & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
-$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
-$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
-Popularity link of $\hat\pi$ & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
-P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{\DATANEEDED{grid:P1}} & \multicolumn{2}{c}{--}\\
-P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\DATANEEDED{ext:E\_W.P1\_wu}} & \multicolumn{2}{c}{--}\\
+UAUC of $\ell$ & 0.605{\scriptsize$\pm$.022} & 0.760{\scriptsize$\pm$.018\,(.001)} & \DATANEEDED{grid:UAUC} & \DATANEEDED{grid:UAUC}\\
+\quad LoRA $-$ ZS (E-B) & \multicolumn{2}{c}{0.154{\scriptsize$\pm$.025\,(.001)}} & \multicolumn{2}{c}{\DATANEEDED{grid:dUAUC\_ft\_minus\_zs}}\\
+\quad item mean $m$ (ref.) & \multicolumn{2}{c}{0.759{\scriptsize$\pm$.021}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_item\_mean\_prior}}\\
+\quad temporal MF (ref.) & \multicolumn{2}{c}{0.791{\scriptsize$\pm$.018}} & \multicolumn{2}{c}{\DATANEEDED{cpu:UAUC\_mf\_temporal}}\\
+$\Delta$UAUC($\ell-m$), E-J$^\dagger$ & \textit{$-$0.153{\scriptsize$\pm$.029}} & \textit{0.001{\scriptsize$\pm$.013\,(.001)}} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat} & \DATANEEDED{ext:E\_J.dUAUC\_L\_minus\_q\_hat}\\
+ECE (after Platt) & 0.034{\scriptsize$\pm$.015} & 0.020{\scriptsize$\pm$.010\,(.004)} & \DATANEEDED{grid:ece10\_platt} & \DATANEEDED{grid:ece10\_platt}\\
+Correct in bottom tertile, oracle & 0.272{\scriptsize$\pm$.009} & 0.263{\scriptsize$\pm$.006\,(.003)} & \DATANEEDED{grid:share\_correct\_bottom\_tertile} & \DATANEEDED{grid:share\_correct\_bottom\_tertile}\\
+Errors in top tertile, oracle & 0.229{\scriptsize$\pm$.018} & 0.122{\scriptsize$\pm$.015\,(.005)} & \DATANEEDED{grid:share\_errors\_top\_tertile} & \DATANEEDED{grid:share\_errors\_top\_tertile}\\
+Item-prior share $\rho^2/r_8$ & uninterpretable & 0.860{\scriptsize$\pm$.020\,(.014)} & \DATANEEDED{grid:item\_prior\_share} & \DATANEEDED{grid:item\_prior\_share}\\
+e-share$^\dagger$ & \textit{0.748{\scriptsize$\pm$.065}} & \textit{0.140{\scriptsize$\pm$.020\,(.014)}} & \DATANEEDED{ext:E\_G.e\_share} & \DATANEEDED{ext:E\_G.e\_share}\\
+$\mathcal G=\Delta$UAUC(M2$-$M1), E-D & 0.003{\scriptsize$\pm$.006} & 0.007{\scriptsize$\pm$.008\,(.001)} & \DATANEEDED{grid:G} & \DATANEEDED{grid:G}\\
+$\mathcal G_{\rm wu}$ (E-W)$^\dagger$ & \textit{0.003{\scriptsize$\pm$.004}} & \textit{0.010{\scriptsize$\pm$.007\,(.001)}} & \DATANEEDED{ext:E\_W.G\_wu} & \DATANEEDED{ext:E\_W.G\_wu}\\
+$\mathcal G_{\rm CF}$: E-D / E-W$^\dagger$ & \multicolumn{2}{c}{0.036{\scriptsize$\pm$.013} / \textit{0.037{\scriptsize$\pm$.013}}} & \multicolumn{2}{c}{\DATANEEDED{grid:G\_CF} / \DATANEEDED{ext:E\_W.G\_CF\_wu}}\\
+Popularity link of $\hat\pi$ & 0.329{\scriptsize$\pm$.040} & 0.147{\scriptsize$\pm$.048\,(.036)} & \DATANEEDED{grid:partial\_rho\_pi\_logpop} & \DATANEEDED{grid:partial\_rho\_pi\_logpop}\\
+P1: $\mathcal G_{\rm FT}-\mathcal G_{\rm ZS}$ & \multicolumn{2}{c}{0.005 / 0.003 / 0.004; 0.004{\scriptsize$\pm$.008}, $p$ 0.382} & \multicolumn{2}{c}{--}\\
+P1$_{\rm wu}$$^\dagger$ & \multicolumn{2}{c}{\textit{0.006 / 0.008 / 0.006; 0.007{\scriptsize$\pm$.007}, $p$ 0.054}} & \multicolumn{2}{c}{--}\\
 Knockout: head $-$ tail drop of $\ell$ & -- & -- & \DATANEEDED{ko:head\_minus\_tail.delta} & \DATANEEDED{ko:head\_minus\_tail.delta}\\
 Knockout: registered label & -- & -- & \DATANEEDED{ko:label} & \DATANEEDED{ko:label}\\
 \bottomrule
@@ -179,8 +179,8 @@ Toys & 0.559 / 0.556 / 0.559 & 0.579 / 0.578 / 0.581 & 0.684{\scriptsize$\pm$.02
 Video Games & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 Sports & \DATANEEDED{grid:UAUC seed 0} / \DATANEEDED{grid:UAUC seed 1} / \DATANEEDED{grid:UAUC seed 2} & \DATANEEDED{grid:UAUC\_all\_rows seed 0} / \DATANEEDED{grid:UAUC\_all\_rows seed 1} / \DATANEEDED{grid:UAUC\_all\_rows seed 2} & \DATANEEDED{cpu:UAUC\_item\_mean\_prior}\\
 \midrule
-ML-1M, permuted labels (seeds 0 / 1) & \DATANEEDED{grid:ftc\_UAUC seed 0} / \DATANEEDED{grid:ftc\_UAUC seed 1} & \DATANEEDED{grid:ftc\_UAUC\_all\_rows seed 0} / \DATANEEDED{grid:ftc\_UAUC\_all\_rows seed 1} & --\\
-ML-1M, real $-$ permuted (seeds 0 / 1) & \DATANEEDED{grid:ftc\_dUAUC\_real\_minus\_perm seed 0} / \DATANEEDED{grid:ftc\_dUAUC\_real\_minus\_perm seed 1} & \DATANEEDED{grid:ftc\_dUAUC\_all\_rows seed 0} / \DATANEEDED{grid:ftc\_dUAUC\_all\_rows seed 1} & --\\
+ML-1M, permuted labels (seeds 0 / 1) & 0.731 / 0.730 & 0.721 / 0.722 & --\\
+ML-1M, real $-$ permuted (seeds 0 / 1) & 0.009{\scriptsize$\pm$.008} / 0.014{\scriptsize$\pm$.008} & 0.012{\scriptsize$\pm$.003} / 0.012{\scriptsize$\pm$.003} & --\\
 \bottomrule
 \end{tabular}}
 \end{table}

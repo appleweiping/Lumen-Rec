@@ -1,5 +1,16 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-05 · Amendment 3 addendum 10 (method-slot code hardening and a train/test-shift diagnostic; recorded before any prior-offset adapter existed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_10.md` sha1 = c37b3b6433a234715d5b5e89285a517e23e17345. An independent same-family code review of the method slot (`train_lora_offset.py` aaae5e81, `ftmethod_report.py` 8414bce8,
+`run_ftmethod.sh` 121ad50f; 64 tests pass on the server) found no blocker and three major issues: a dry-run root guard that compares path strings (a rehearsal could write a synthetic
+manifest and report into the registered root and use up a failure of the kill rule), misspelled DRY_RUN values that start the real chain, and the registered train/test shift mismatch
+(training shifts the answer token only; the scorer sums all Yes and No ids), which works against the method and can turn a near-threshold PASS into a FAIL. The addendum corrects the
+implementation without changing any registered rule (isolation, INVALID reports, the +0.01 comparison with a 1e-12 tolerance, the hard kill date checked before every seed, a
+`FTMETHOD_NOT_RUN <dataset>` token for cuts, the E1 same-key rule) and registers an outcome-free diagnostic of the answer-token share s before each slot report is built (a FAIL with a
+1st-percentile s below 0.99 is reported as inconclusive for the method; a PASS stands). The code record of addendum 5 is superseded for `ftmethod_report.py` and `run_ftmethod.sh`; the
+new sha1 will be recorded before the `method` record. No slot adapter has been trained and no Toys, Video_Games or Sports fine-tuned result has been used for the slot.
+
 ## 2026-10-05 · Code record: the longer-training arm FT-L (addendum 9, exploratory); recorded before any 3-epoch adapter was trained
 
 - `scripts/sigir/run_ftlen.sh` = 439f0f1749925896bf1a0b9952fc230c17565a18

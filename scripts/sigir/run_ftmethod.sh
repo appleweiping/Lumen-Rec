@@ -1,19 +1,41 @@
 #!/usr/bin/env bash
-# Amendment-3 nested method slot (idea-stage/PREREG_AMENDMENT_3.md section 7, FT-M; addenda 1 and 2) for ONE dataset: the
+# Amendment-3 nested method slot (idea-stage/PREREG_AMENDMENT_3.md section 7, FT-M; addenda 1, 2 and 10) for ONE dataset: the
 # prior-offset LoRA (src/confrec/train_lora_offset.py) against post-hoc stacking of the section-2 SFT adapters
-# (src/confrec/ftmethod_report.py). GPU server; one job at a time through scripts/sigir/gpu_queue.sh.
+# (src/confrec/ftmethod_report.py). GPU server; one job at a time through scripts/sigir/gpu_queue.sh. Addendum 10 section 1
+# (a review of this file's first version) supersedes the code record of addendum 5 for this script and for ftmethod_report.py.
 #   usage: bash scripts/sigir/run_ftmethod.sh D        D in ml1m, toys, games, sports (registered order, section 7)
+#   queue (per dataset, in this order; the slot report waits for the shift diagnostic, addendum 10 section 2):
+#       cd /root/autodl-tmp/lumen-rec && STAGES=1,2,3,4 bash scripts/sigir/run_ftmethod.sh D
+#       cd /root/autodl-tmp/lumen-rec && bash scripts/sigir/run_ftmethod_shift_diag.sh D
+#       cd /root/autodl-tmp/lumen-rec && STAGES=5 bash scripts/sigir/run_ftmethod.sh D
+#     (a plain `run_ftmethod.sh D` runs stages 1-4 and then stops at stage 5 with exit 4 until the diagnostic is recorded)
 #   env:   MODEL     backbone dir (default /root/autodl-tmp/lumen/models/Qwen3-8B); the slot is single-backbone, so any
 #                    backbone other than Qwen3-8B is refused (section 7)
+#          OUT_ROOT  the slot root outputs/confrec/ftmethod, the only root outside DRY_RUN (a relative OUT_ROOT resolves from the
+#                    repo root, the script's working directory). It is compared canonically, in lower case on every platform
+#                    (realpath -m: //, ., .., absolute paths, symlinks; on Windows also D:/... spellings): any spelling of that root
+#                    is accepted, any other directory is refused, and so is that root reached through a link (outputs,
+#                    outputs/confrec or ftmethod itself a symlink). Addendum 10 item 1: a string comparison was defeated by
+#                    `OUT_ROOT=outputs/confrec/ftmethod//`, which wrote a rehearsal's manifest and report into the registered root
 #          STAGES    comma list of 1-5 or all (default all)
 #          VARIANT   default gate_ft_prompt of outputs/confrec/gatefix/dev/selection.json; any other value is refused
-#          PYTHON    interpreter (skips the conda activation);  DRY_RUN=1  CPU rehearsal, see below
+#          PYTHON    interpreter (skips the conda activation)
+#          DRY_RUN   0 or 1 (any other value, an empty one included, is refused with exit 2 and starts nothing); 1 = a CPU
+#                    rehearsal, see below
+#          DRY_TODAY (DRY_RUN=1 only) YYYYMMDD, eight digits (anything else is refused with exit 2, and so is DRY_TODAY with a real run),
+#                    stands in for the clock in the hard-kill-date rehearsal
 #   inputs: run_ftgrid.sh's panels outputs/confrec/ftgrid/panels/D (train.jsonl, eval.jsonl, ftgrid_split.json), the SFT
 #           comparators of section 7 (i) (the section-2 adapters s0-s2; ML-1M: Gate-FT's) with their like passes
 #           outputs/confrec/ftgrid/scores/D/s0-s2/like, data/raw, the Gate-FT decision and the pilot log
 #   outputs (OUT_ROOT = outputs/confrec/ftmethod): D/train_qhat.csv.gz, D/eval_qhat.csv.gz, D/qhat_manifest.json (stage 1);
 #           D/adapters/o0-o2 (stage 3); D/scores/o0-o2/like (stage 4); D/report.json, D/report_tables.csv, slot.json,
-#           slot_tables.csv (stage 5); freeze/D.method.ok (stage 2); build/D/done (step markers)
+#           slot_tables.csv (stage 5); freeze/D.method.ok (stage 2); build/D/done (step markers). Written by
+#           run_ftmethod_shift_diag.sh and only read here: D/shift_diag/. Nothing below outputs/confrec/ftgrid is written, and
+#           nothing is written through a link: (1) every path this script names below the slot root, with the temporary names
+#           its tools write beside their products (<name>.tmp), must resolve, links included, to the same place below the
+#           canonical root, else the run is refused (exit 2) before it writes anything; (2) a sweep for links (find OUT_ROOT -type
+#           l) at the start and before each stage allows none; (3) stale .tmp files below OUT_ROOT are removed before a stage
+#           writes (a hard link planted under a temporary name would otherwise be written through)
 #   stage 1  (CPU) q-hat of every TRAIN example and EVAL pair (forensics.prior_means, k = 5) and the TRAIN standardisation
 #            constants: train_lora_offset qhat -> D/qhat_manifest.json (addendum 2 item 2: recorded before the dataset's
 #            first prior-offset adapter is trained)
@@ -26,34 +48,56 @@
 #            (micro-batch, accumulation and max_len of its train_config.json; effective batch 32), which the trainer
 #            checks again (--sft_adapter: TRAIN bytes, seed, recipe, examples); b in an AdamW group of its own at lr 1e-2
 #            (Amendment 3 addendum 3: the trainer's --b_lr default, so no flag is passed here); an adapter with
-#            train_config.json, offset.json and weights is never retrained
+#            train_config.json, offset.json and weights is never retrained. The hard kill date is checked before EVERY seed
+#            (addendum 10 item 4; a stage that crosses midnight must not start the next seed after 2026-11-30). Wording (addendum
+#            10 item 7): "with b = 0 the run is SFT's" holds for a FROZEN b only; the registered run trains b, so it is not SFT even
+#            where b ends near 0 (b's gradient enters the Trainer's gradient-norm clip with the LoRA gradients). The SFT comparator
+#            (i) is the section-2 adapters s0-s2, never a prior-offset run with b stopped
 #   stage 4  (GPU) like on eval.jsonl for o0-o2: pyes_scorer --lora exactly as for the SFT adapters; E1 (censored-2 share
 #            <= 0.5%, no overlength prompt, Yes+No mass >= 0.95): a failing run is moved to DIR.e1fail.<time> and rerun
-#            once; a second failure leaves DIR/FAILED_INTEGRITY (the seed is missing, never replaced)
+#            once; a second failure of the SAME run key leaves DIR/FAILED_INTEGRITY (the seed is missing, never replaced). The
+#            rerun is used up only by a DIR.e1fail.* whose run.key equals the current one (addendum 10 item 6: the rule of
+#            run_ftq.sh; run_ftgrid.sh counts every DIR.e1fail.*, so a leftover of an earlier panel, adapter or argument
+#            vector turned a transient first failure into the final one). The date is checked before every seed here too
 #   stage 5  (CPU) ftmethod_report dataset -> D/report.json, then ftmethod_report slot -> slot.json (the kill rule in the
-#            registered order, Holm over the datasets run; addendum 1 item 8)
+#            registered order, Holm over the datasets run; addendum 1 item 8). Before the report is built the shift diagnostic
+#            of D must be recorded: `ftmethod_shift_diag verify` recomputes D/shift_diag/report.json from its files and requires
+#            it to be the real (not DRY_RUN) diagnostic of these adapters and this panel (addendum 10 section 2: "before its
+#            slot report is built"); otherwise exit 4. The slot step reads the cuts (`FTMETHOD_NOT_RUN <dataset>` lines of the
+#            pilot log) and the date (addendum 10 items 4 and 5)
 # Order and kill rule (section 7): before any of stages 2-5, `ftmethod_report slot --check_next D` must accept D: every
-# earlier dataset of ML-1M, Toys, Video_Games, Sports has a decided report (PASS or FAIL) and fewer than 2 of them failed.
-# So the slot stops after the dataset that makes the kill rule fire: the next dataset is refused (exit 4) and says why.
-# Stage 1 (CPU, outcome-free) runs for any dataset, so every manifest can be recorded before the slot's first run.
+# earlier dataset of ML-1M, Toys, Video_Games, Sports has a decided report (PASS or FAIL) or reads NOT_RUN (a cut: a pilot-log
+# line with the exact token `FTMETHOD_NOT_RUN <dataset>`, recorded at the 2026-10-29 checkpoint of section 10; or no finished
+# report on 2026-11-30) and fewer than 2 of them failed, and D itself does not read NOT_RUN. A report of another size or seed
+# (n_boot != 2000, seed != 0) or built from DRY_RUN inputs is INVALID: it never counts as decided or as a failure and never
+# unlocks the next dataset (addendum 10 item 2). So the slot stops after the dataset that makes the kill rule fire: the next
+# dataset is refused (exit 4) and says why. Stage 1 (CPU, outcome-free) runs for any dataset, so every manifest can be recorded
+# before the slot's first run.
 # Not checked here (a scheduling decision for PILOT_LOG): section 7 runs after the main program of section 10, ML-1M
 # earlier only if the GPU would otherwise idle; the section-10 checkpoint cuts of later datasets.
 # Conditionality: section 7 runs only after GATE_FT_PASS (outputs/confrec/gateft/gate_ft.json); after 2026-11-30 stages 2-4
-# are refused (section 7 hard kill date; section 10: unfinished items are reported as not run), stage 5 still reports.
+# are refused (section 7 hard kill date; section 10: unfinished items are reported as not run), stage 5 still rebuilds the
+# report of a dataset that has a finished one (a dataset without one reads NOT_RUN from then on and does not run).
 # Re-runnable: a finished step is skipped (OUT_ROOT/build/D/done markers newer than their inputs); a scoring dir is skipped
 # when report.json exists and run.key (panel sha1, model, variant, adapter-weights sha1, args) is unchanged, else it is
 # moved to DIR.stale.<time>.
-# DRY_RUN=1: the same chain, CPU only, on a tiny synthetic domain shaped like D. OUT_ROOT defaults to
-# outputs/confrec/ftmethod_dryrun (the registered root is refused). The world is run_ftgrid.sh's own DRY_RUN world
-# (outputs/confrec/ftgrid_dryrun: synthetic raw data, panels, Gate-FT context, SFT adapters s0-s2 and their like passes,
-# the temporary pilot log), built first by `DRY_RUN=1 STAGES=0,1,2,3 run_ftgrid.sh D` (skipped once its SFT like passes
-# exist); the trainer is a stand-in
+# DRY_RUN=1: the same chain, CPU only, on a tiny synthetic domain shaped like D. Everything lies in a temporary directory
+# outside outputs/confrec: tmp_outputs/ftmethod_dryrun/{ftgrid: run_ftgrid.sh's own DRY_RUN world, ftmethod: the slot root}. The
+# DRY_RUN guard is an allow-list: an OUT_ROOT and the world must, in any spelling and through any link, lie under tmp_outputs of
+# the repo, or outside the repo's parent directory (so never in the repo: outputs/ with the registered roots ftgrid*, ftmethod,
+# gateft, gatefix and every other result directory, data/, src/, scripts/, docs/, tests/, idea-stage/, Paper/; never beside it: a
+# sibling checkout, the data next to it, ../outside_repo; never above it); anything else is refused with exit 2, and so is an
+# OUT_ROOT that is, or lies inside, the world it reads, and a world that holds a link leading anywhere else. A relative OUT_ROOT
+# resolves from the repo root; every comparison is made on lower-case canonical forms. The world is run_ftgrid.sh's own DRY_RUN
+# world (synthetic raw data, panels, Gate-FT context, SFT adapters s0-s2 and their like passes, the temporary pilot log), built
+# first by `DRY_RUN=1 STAGES=0,1,2,3 run_ftgrid.sh D` (skipped once its SFT like passes exist); the trainer is a stand-in
 # (OUT_ROOT/_dry/ftmethod_fakes.py: train_lora_offset's real argparse, panel check, q-hat / manifest checks, SFT-recipe
 # check and PriorOffsetSet on a word tokenizer; no model) and the scorer is run_ftgrid.sh's stand-in (the real
 # scorer code with a fake model); every other step is the real code, the freeze checks included (on the temporary pilot
 # log). Stage 2 first shows that an empty pilot log fails the method check and that stage 3 then refuses. DRY_E1_FAIL and
-# DRY_GATE act as in run_ftgrid.sh; DRY_TODAY=YYYYMMDD stands in for today's date (hard-kill-date rehearsal).
-# Exit codes: 0 done; 1 error; 2 usage or refused input; 4 refused by the freeze / order / kill / gate / date rules.
+# DRY_GATE act as in run_ftgrid.sh; DRY_TODAY=YYYYMMDD stands in for today's date (hard-kill-date rehearsal). A rehearsal's
+# report is INVALID to the slot step (dry_run_inputs, n_boot 200): it rehearses the chain, never the kill rule.
+# Exit codes: 0 done; 1 error; 2 usage or refused input; 4 refused by the freeze / order / kill / gate / date / diagnostic rules.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 export PYTHONPATH=. PYTHONHASHSEED=0 TOKENIZERS_PARALLELISM=false
@@ -62,31 +106,139 @@ case "$D" in
   ml1m|toys|games|sports) ;;
   *) echo "usage: bash scripts/sigir/run_ftmethod.sh {ml1m|toys|games|sports}" >&2; exit 2 ;;
 esac
-DRY_RUN="${DRY_RUN:-0}"
+# the switches are 0 or 1 and nothing else: DRY_RUN=yes must not start a real job, nor DRY_RUN= a rehearsal
+DRY_RUN="${DRY_RUN-0}"
+case "$DRY_RUN" in 0|1) ;; *) echo "DRY_RUN must be 0 or 1 (it is '$DRY_RUN'): nothing was started" >&2; exit 2 ;; esac
+# DRY_TODAY is a rehearsal's stand-in for the clock: eight digits, and only with DRY_RUN=1 (a real run reads the clock)
+if [ -n "${DRY_TODAY+x}" ]; then
+  if [ "$DRY_RUN" != 1 ]; then
+    echo "DRY_TODAY is the stand-in of a DRY_RUN=1 rehearsal for the date: a real run reads the clock (unset it): nothing was started" >&2
+    exit 2
+  fi
+  case "$DRY_TODAY" in
+    [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
+    *) echo "DRY_TODAY must be eight digits, YYYYMMDD (it is '$DRY_TODAY'): nothing was started" >&2; exit 2 ;;
+  esac
+fi
 if [ -n "${PYTHON:-}" ]; then
   PY="$PYTHON"
 else
   set +u; source /root/miniconda3/etc/profile.d/conda.sh; conda activate lumen; set -u
   PY=python
 fi
-REG=outputs/confrec/ftmethod          # the registered slot root
+REG=outputs/confrec/ftmethod          # the registered slot root: everything this script writes
+REGG=outputs/confrec/ftgrid           # the registered grid root: read, never written
+DRYB=tmp_outputs/ftmethod_dryrun      # DRY_RUN's world and slot root: a temporary directory outside outputs/confrec
+command -v realpath > /dev/null 2>&1 || { echo "realpath (coreutils) is required" >&2; exit 1; }
+FOLD=0                                # MSYS / Cygwin (Git Bash): D:/... and D:\... spellings go through cygpath
+case "${OSTYPE:-}" in msys*|cygwin*) FOLD=1 ;; esac
+# canon_all PATH...: the array CANON gets the canonical absolute path of every argument, in one realpath start (realpath -m: symlinks,
+# //, . and .. resolved, the path need not exist; a relative path resolves from the repo root, the working directory). Every canonical
+# form is lower case on every platform: a case-insensitive filesystem (macOS, a Windows share) is not always MSYS, so every comparison
+# folds case
+canon_all() {
+  local -a a=("$@")
+  if [ "$FOLD" = 1 ] && command -v cygpath > /dev/null 2>&1; then mapfile -t a < <(cygpath -u -- "$@"); fi
+  mapfile -t CANON < <(realpath -m -- "${a[@]}")
+  [ "${#CANON[@]}" = "$#" ] || return 1
+  CANON=("${CANON[@],,}")
+}
 if [ "$DRY_RUN" = 1 ]; then
   MODEL="${MODEL:-dryrun/Qwen3-8B}"
-  OUT_ROOT="${OUT_ROOT:-outputs/confrec/ftmethod_dryrun}"
-  GRID=outputs/confrec/ftgrid_dryrun  # run_ftgrid.sh's DRY_RUN root (its synthetic world)
+  GRID=$DRYB/ftgrid                   # run_ftgrid.sh's DRY_RUN root: the synthetic world the script reads
+  OUT_ROOT="${OUT_ROOT:-$DRYB/ftmethod}"
 else
   MODEL="${MODEL:-/root/autodl-tmp/lumen/models/Qwen3-8B}"
+  GRID="$REGG"                        # the registered (Qwen3-8B) ftgrid root
   OUT_ROOT="${OUT_ROOT:-$REG}"
-  GRID=outputs/confrec/ftgrid         # the registered (Qwen3-8B) ftgrid root
 fi
-OUT_ROOT="${OUT_ROOT%/}"
-OUT_ROOT="${OUT_ROOT#./}"
-if [ "$DRY_RUN" = 1 ] && { [ "$OUT_ROOT" = "$REG" ] || [ "$OUT_ROOT" = "$GRID" ] || [ "$OUT_ROOT" = outputs/confrec/ftgrid ]; }; then
-  echo "DRY_RUN=1 never writes to a registered output root ($OUT_ROOT)" >&2; exit 2
+while [ "${OUT_ROOT%/}" != "$OUT_ROOT" ]; do OUT_ROOT="${OUT_ROOT%/}"; done      # ftmethod// -> ftmethod
+if [ -z "$OUT_ROOT" ]; then echo "OUT_ROOT is empty or the filesystem root: the slot has one registered root, $REG" >&2; exit 2; fi
+# Everything this script writes below the slot root, as a path below it, with the temporary names its tools write beside their
+# products (write_if_changed's <name>.tmp). The shift diagnostic's directory is listed too: run_ftmethod_shift_diag.sh writes it and
+# this script reads it. No link is allowed anywhere below the root: sweep_links
+TREE=(freeze "freeze/$D.method.ok" build "build/$D" "build/$D/done" "$D" "$D/train_qhat.csv.gz" "$D/train_qhat.csv.gz.tmp"
+      "$D/eval_qhat.csv.gz" "$D/eval_qhat.csv.gz.tmp" "$D/qhat_manifest.json" "$D/qhat_manifest.json.tmp" "$D/adapters"
+      "$D/adapters/o0" "$D/adapters/o1" "$D/adapters/o2" "$D/scores" "$D/scores/o0" "$D/scores/o1" "$D/scores/o2"
+      "$D/scores/o0/like" "$D/scores/o1/like" "$D/scores/o2/like" "$D/report.json" "$D/report.json.tmp" "$D/report_tables.csv"
+      "$D/report_tables.csv.tmp" slot.json slot.json.tmp slot_tables.csv slot_tables.csv.tmp "$D/shift_diag" _dry)
+if [ "$DRY_RUN" = 1 ]; then SPELL=$OUT_ROOT; else SPELL=$REG; fi          # the spelling the files are written with
+ARGS=(. .. "$OUT_ROOT" "$GRID")
+for r in "${TREE[@]}"; do ARGS+=("$SPELL/$r"); done
+# the canonical forms decide, never the spelling: a string comparison is defeated by //, ., .., an absolute path, a link or letter case
+canon_all "${ARGS[@]}" || { echo "cannot resolve OUT_ROOT=$OUT_ROOT or the paths below it" >&2; exit 2; }
+ROOTC=${CANON[0]}; PARENTC=${CANON[1]}; OUTC=${CANON[2]}; GRIDC=${CANON[3]}
+# under PATH ROOT: PATH is ROOT or lies below it (canonical forms)
+under() { case "$1/" in "${2%/}/"*) return 0 ;; esac; return 1; }
+# dry_ok PATH: a rehearsal root (canonical) is under the repo's tmp_outputs, or outside the repo's parent directory: never in the repo
+# (outputs/, data/, src/, scripts/, docs/, tests/, idea-stage/, Paper/, ...), never beside it (a sibling checkout, the data next to it)
+# and never above it
+dry_ok() {
+  if under "$1" "$ROOTC/tmp_outputs"; then return 0; fi
+  if under "$1" "$PARENTC" || under "$PARENTC" "$1"; then return 1; fi
+  return 0
+}
+if [ "$DRY_RUN" = 1 ]; then
+  for p in "$OUTC" "$GRIDC"; do
+    if ! dry_ok "$p"; then
+      echo "DRY_RUN=1 never writes to a registered output root, nor anywhere in the repo or beside it ($p): a rehearsal root is under" \
+        "$ROOTC/tmp_outputs (default $DRYB) or outside $PARENTC; a relative OUT_ROOT resolves from the repo root $ROOTC" >&2
+      exit 2
+    fi
+  done
+  if under "$OUTC" "$GRIDC"; then
+    echo "DRY_RUN=1: OUT_ROOT=$OUT_ROOT resolves to $OUTC, the synthetic world it reads or a directory inside it" >&2; exit 2
+  fi
+elif [ "$OUTC" != "$ROOTC/$REG" ]; then
+  # canonical equality with the registered root below the repo root: no link may lie between the repo root and the slot root either
+  echo "OUT_ROOT=$OUT_ROOT resolves to $OUTC, not to $ROOTC/$REG: the slot has one registered root, $REG (single backbone), reached" \
+    "through no link (the grid root $REGG is read, never written); use DRY_RUN=1 for a rehearsal" >&2
+  exit 2
+else
+  OUT_ROOT=$REG
 fi
-if [ "$DRY_RUN" != 1 ] && [ "$OUT_ROOT" != "$REG" ]; then
-  echo "OUT_ROOT=$OUT_ROOT: the slot has one registered root, $REG (single backbone)" >&2; exit 2
+# nothing written below the slot root may leave it through a link: every path of the tree resolves, links included, to the same place
+# below the canonical root
+for i in "${!TREE[@]}"; do
+  expect="$OUTC/${TREE[$i]}"
+  expect="${expect,,}"
+  if [ "${CANON[$((i + 4))]}" != "$expect" ]; then
+    echo "method slot refused: $SPELL/${TREE[$i]} resolves to ${CANON[$((i + 4))]}, not to $expect: a link between the slot root and" \
+      "the files this script writes would redirect them (nothing was written)" >&2
+    exit 2
+  fi
+done
+# DRY_RUN lets run_ftgrid.sh's own DRY_RUN write the synthetic world: a link inside it must stay inside the rehearsal's own places
+if [ "$DRY_RUN" = 1 ] && [ -e "$GRID" ]; then
+  mapfile -t WLINKS < <(find "$GRID" -type l 2> /dev/null)
+  if [ "${#WLINKS[@]}" -gt 0 ]; then
+    canon_all "${WLINKS[@]}" || { echo "cannot resolve the links inside the synthetic world" >&2; exit 2; }
+    for p in "${CANON[@]}"; do
+      if ! dry_ok "$p"; then
+        echo "DRY_RUN=1 never writes to a registered output root: a link inside the synthetic world leads to $p, in the repo or beside" \
+          "it, outside $ROOTC/tmp_outputs" >&2
+        exit 2
+      fi
+    done
+  fi
 fi
+# sweep_links: no link below the slot root (a tool would write through it: a planted <name>.tmp, a scoring directory that is a link, ...)
+sweep_links() {
+  [ -d "$OUT_ROOT" ] || return 0
+  local -a found=()
+  mapfile -t found < <(find "$OUT_ROOT" -type l 2> /dev/null)
+  if [ "${#found[@]}" -gt 0 ]; then
+    echo "method slot refused: ${found[0]} is a link: nothing below $OUT_ROOT is a link, and a tool would write through it" \
+      "(nothing was written)" >&2
+    exit 2
+  fi
+}
+sweep_links
+# clean_tmp: a stale <name>.tmp below the slot root is removed before a stage writes (a hard link planted under a temporary name would
+# otherwise be written through: the tools write <name>.tmp and then rename it)
+clean_tmp() {
+  if [ -d "$OUT_ROOT" ]; then find "$OUT_ROOT" -name '*.tmp' -type f -delete 2> /dev/null || true; fi
+}
 if [ "$(basename "$MODEL")" != Qwen3-8B ]; then
   echo "$MODEL: the method slot is single-backbone, Qwen3-8B only (section 7; a Llama replication is not registered)" >&2
   exit 2
@@ -115,14 +267,16 @@ if [ "$DRY_RUN" = 1 ]; then
   DRYD="$GRID/_dry"
   G="$DRYD/gatefix"; GT="$DRYD/gateft"; RAW="$DRYD/raw"; PILOT_LOG="$DRYD/PILOT_LOG.md"
   N_BOOT=200
-  TODAY="${DRY_TODAY:-$(date +%Y%m%d)}"
   CORE_ARGS=(--split "$SPLIT")
+  DRY_FLAG="--dry_run"               # the shift diagnostic of a rehearsal is a stand-in's (ftmethod_shift_diag verify --dry_run)
+  ALLOW_LOG="--allow_missing_log"    # the rehearsal's temporary pilot log does not exist before its world is built
 else
   G=outputs/confrec/gatefix; GT=outputs/confrec/gateft; RAW=data/raw; PILOT_LOG=docs/sigir/PILOT_LOG.md
   N_BOOT=2000                        # A3 section 3: 2,000 user resamples
-  TODAY=$(date +%Y%m%d)
   CORE_ARGS=(--split "$GRID/panels/ml1m/ftgrid_split.json" --split "$GRID/panels/toys/ftgrid_split.json"
     --split "$GRID/panels/games/ftgrid_split.json" --split "$GRID/panels/sports/ftgrid_split.json")
+  DRY_FLAG=""
+  ALLOW_LOG=""
 fi
 METHOD_ARGS=(--split "$QM")          # addendum 2 item 2: the dataset's q-hat manifest is part of FREEZE method
 FREEZE_OK=0
@@ -175,6 +329,17 @@ fake_py() {
 }
 MPY="$PY"
 if [ "$DRY_RUN" = 1 ]; then MPY=fake_py; fi
+# e1_failed_before DIR KEY: a run with this run.key already failed E1 and was moved aside (DIR.e1fail.*), so its one rerun is used up.
+# A DIR.e1fail.* of another key belongs to an earlier panel, adapter or argument vector and does not count (addendum 10 item 6; the
+# rule of run_ftq.sh. run_ftgrid.sh counts every DIR.e1fail.*: a leftover of an earlier run then turns a transient first failure into
+# the final one)
+e1_failed_before() {
+  local d
+  for d in "$1".e1fail.*; do
+    if [ -f "$d/run.key" ] && [ "$(cat "$d/run.key")" = "$2" ]; then return 0; fi
+  done
+  return 1
+}
 # score DATA DIR --lora A: pyes_scorer (fp16, top-50 logprobs, max_model_len 4096, 100-user chunks, the selected variant,
 # yes/no readout, like), as run_ftgrid.sh scores the SFT adapters; completion marker DIR/report.json, run.key = panel
 # sha1 + model + variant + adapter weights sha1 + args
@@ -189,12 +354,13 @@ score() {
     mv "$dir" "$dir.stale.$(date +%Y%m%d%H%M%S)"; echo "[moved aside] $dir (panel, model, adapter or args changed)"
   fi
   mkdir -p "$dir"
+  find "$dir" -name '*.tmp' -delete 2> /dev/null || true                 # a stale temporary file is not written through
   echo "$key" > "$dir/run.key"
   "$MPY" -m src.confrec.pyes_scorer --data "$data" --output "$dir" --model "$MODEL" --dtype float16 \
     --topk_logprobs 50 --max_model_len 4096 --chunk_users 100 --variant "$VARIANT" --readout yesno \
     --questions like "$@"
   if ! e1_ok "$dir"; then
-    if compgen -G "$dir.e1fail.*" > /dev/null; then
+    if e1_failed_before "$dir" "$key"; then
       touch "$dir/FAILED_INTEGRITY"
       echo "FAILED_INTEGRITY: $dir failed E1 twice (section 2: reported as missing, never replaced)" >&2
     else
@@ -243,10 +409,23 @@ gate_ft_pass() {
     return 1
   fi
 }
+# clock: today's date, YYYYMMDD, read afresh at every call: the hard kill date is checked before every seed, not once per stage (a
+# stage of 5 GPU hours may cross midnight), and an unreadable clock refuses (an arithmetic test on 2026-12-01, or on nothing, would
+# fail silently inside an `if`). DRY_TODAY (eight digits, DRY_RUN=1 only) stands in for it
+clock() {
+  local t
+  if [ "$DRY_RUN" = 1 ] && [ -n "${DRY_TODAY+x}" ]; then t=$DRY_TODAY; else t=$(date +%Y%m%d); fi
+  case "$t" in
+    [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) printf '%s\n' "$t" ;;
+    *) echo "the clock reads '$t', not YYYYMMDD: the hard kill date 2026-11-30 cannot be checked, refused" >&2; return 1 ;;
+  esac
+}
 # date_check N: section 7 hard kill date 2026-11-30 (stages 2-4)
 date_check() {
-  if [ "$TODAY" -gt "$HARD_KILL" ]; then
-    echo "stage $1 refused: the slot's hard kill date 2026-11-30 has passed (section 7; section 10: anything unfinished" \
+  local t
+  t=$(clock) || return 1
+  if [ "$t" -gt "$HARD_KILL" ]; then
+    echo "stage $1 refused: the slot's hard kill date 2026-11-30 has passed (it is $t; section 7; section 10: anything unfinished" \
       "is reported as not run)" >&2
     return 1
   fi
@@ -279,10 +458,13 @@ print(c["bsz"], c["grad_accum"], c["max_len"])' "$sft/train_config.json" | tr -d
     --qhat "$M/train_qhat.csv.gz" --manifest "$QM" --sft_adapter "$sft" 2>&1 | grep -vE "it/s\]|s/it\]" || true
   adapter_done "$out" || { echo "training of $out did not finish" >&2; exit 1; }
 }
-# slot_check: the registered order and the kill rule over the earlier datasets' reports (exit 4 = refused)
+# slot_check: the registered order, the kill rule, the cuts and the date over the datasets' reports (exit 4 = refused). The pilot
+# log is where the cuts (`FTMETHOD_NOT_RUN <dataset>`) are recorded (addendum 10 item 5)
 slot_check() {
-  local rc=0
-  "$PY" -m src.confrec.ftmethod_report slot --root "$OUT_ROOT" --check_next "$D" || rc=$?
+  local rc=0 t
+  t=$(clock) || exit 4
+  "$PY" -m src.confrec.ftmethod_report slot --root "$OUT_ROOT" --pilot_log "$PILOT_LOG" $ALLOW_LOG --today "$t" \
+    --check_next "$D" || rc=$?
   if [ "$rc" = 4 ]; then return 4; fi
   if [ "$rc" != 0 ]; then echo "the slot check failed (exit $rc)" >&2; exit 1; fi
 }
@@ -423,6 +605,8 @@ echo "run_ftmethod $D: model $MODEL, root $OUT_ROOT, variant $VARIANT, stages:$S
 
 # ================= stage 1: q-hat and the TRAIN standardisation (CPU) =================
 if want 1; then
+  sweep_links
+  clean_tmp
   echo "== stage 1: q-hat and the TRAIN standardisation constants ($D)"
   for f in "$P/train.jsonl" "$P/eval.jsonl" "$SPLIT"; do
     [ -f "$f" ] || { echo "missing $f (run_ftgrid.sh stage 0)" >&2; exit 1; }
@@ -435,6 +619,7 @@ fi
 
 # ================= stage 2: gates and the freeze record =================
 if want 2; then
+  sweep_links
   echo "== stage 2: gates and the freeze record ($D)"
   [ -f "$QM" ] || { echo "missing $QM (stage 1)" >&2; exit 1; }
   gate_ft_pass 2 || exit 4
@@ -468,16 +653,24 @@ fi
 
 # ================= stage 3: the prior-offset adapters (GPU) =================
 if want 3; then
+  sweep_links
   echo "== stage 3: prior-offset adapters o0-o2 ($D)"
   method_stage 3
-  for seed in 0 1 2; do train_offset "$seed"; done
+  clean_tmp
+  for seed in 0 1 2; do
+    date_check 3 || exit 4             # before EVERY seed: the date may have turned since the stage started (addendum 10 item 4)
+    train_offset "$seed"
+  done
 fi
 
 # ================= stage 4: like on eval.jsonl (GPU) =================
 if want 4; then
+  sweep_links
   echo "== stage 4: like on eval.jsonl for o0-o2 ($D)"
   method_stage 4
+  clean_tmp
   for seed in 0 1 2; do
+    date_check 4 || exit 4             # before every seed, as in stage 3
     adapter_done "$ADIR/o$seed" || { echo "adapter o$seed of $D is missing or incomplete (stage 3)" >&2; exit 1; }
     score "$P/eval.jsonl" "$S/o$seed/like" --lora "$ADIR/o$seed"
   done
@@ -485,8 +678,17 @@ fi
 
 # ================= stage 5: the report and the slot state (CPU) =================
 if want 5; then
+  sweep_links
   echo "== stage 5: report and slot state ($D)"
   method_stage 5
+  # the shift diagnostic of this dataset is recorded before its slot report is built (addendum 10 section 2): its report is
+  # recomputed from its files and must be the real diagnostic of these adapters and this panel
+  if ! "$PY" -m src.confrec.ftmethod_shift_diag verify --domain "$D" --split "$SPLIT" --panels "$P" --method_dir "$M" $DRY_FLAG; then
+    echo "stage 5 refused: the train/test-shift diagnostic of $D (addendum 10 section 2) is not recorded for these adapters: run" \
+      "scripts/sigir/run_ftmethod_shift_diag.sh $D first, then STAGES=5 (the slot report is built after it)" >&2
+    exit 4
+  fi
+  clean_tmp
   RDEPS=("$SPLIT" "$P/eval.jsonl" "$QM" src/confrec/ftmethod_report.py src/confrec/ftgrid_report.py
     src/confrec/train_lora_offset.py)
   for f in "$SFT_S"/s[012]/like/report.json "$S"/o[012]/like/report.json "$ADIR"/o[012]/offset.json; do
@@ -495,6 +697,7 @@ if want 5; then
   step "$REP" "${RDEPS[@]}" -- \
     "$PY" -m src.confrec.ftmethod_report dataset --domain "$D" --split "$SPLIT" --panels "$P" --sft_scores "$SFT_S" \
       --method_dir "$M" --out "$REP" --n_boot "$N_BOOT" --seed 0
-  "$PY" -m src.confrec.ftmethod_report slot --root "$OUT_ROOT" --out "$SLOT"
+  T=$(clock) || exit 4
+  "$PY" -m src.confrec.ftmethod_report slot --root "$OUT_ROOT" --out "$SLOT" --pilot_log "$PILOT_LOG" $ALLOW_LOG --today "$T"
 fi
 echo "run_ftmethod $D: done (stages:$STAGES)"

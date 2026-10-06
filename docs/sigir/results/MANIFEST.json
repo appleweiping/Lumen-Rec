@@ -21,19 +21,35 @@
                   },
                   {
                       "alias":  "ext",
+                      "local_path":  "extra/llama/ml1m.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/extra/ml1m.json",
+                      "size":  225235,
+                      "sha1":  "50687251b3d0c60cdc2cfb0d0a784b90860e7d68",
+                      "server_mtime_utc":  "2026-10-05T12:45:11Z"
+                  },
+                  {
+                      "alias":  "ext",
+                      "local_path":  "extra/llama/ml1m_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_llama/extra/ml1m_tables.csv",
+                      "size":  35142,
+                      "sha1":  "36dd0034efa2d006fe86f72de11f2dd6584437c8",
+                      "server_mtime_utc":  "2026-10-05T12:45:11Z"
+                  },
+                  {
+                      "alias":  "ext",
                       "local_path":  "extra/ml1m.json",
                       "server_path":  "outputs/confrec/ftgrid/extra/ml1m.json",
-                      "size":  226663,
-                      "sha1":  "7f4a1da43c34d93e3516ed874c7e8831bc3631b1",
-                      "server_mtime_utc":  "2026-10-05T09:43:10Z"
+                      "size":  231387,
+                      "sha1":  "b2918d95aa59f4693ede10953ff253b99b85f733",
+                      "server_mtime_utc":  "2026-10-05T14:00:44Z"
                   },
                   {
                       "alias":  "ext",
                       "local_path":  "extra/ml1m_tables.csv",
                       "server_path":  "outputs/confrec/ftgrid/extra/ml1m_tables.csv",
-                      "size":  31567,
-                      "sha1":  "af87622857b18a90183d1618d17db42a9a21d3c5",
-                      "server_mtime_utc":  "2026-10-05T09:43:10Z"
+                      "size":  32561,
+                      "sha1":  "e6c0de7f54f0e5a6b293db4310c478c5d23aea40",
+                      "server_mtime_utc":  "2026-10-05T14:00:44Z"
                   },
                   {
                       "alias":  "ext",
@@ -69,11 +85,27 @@
                   },
                   {
                       "alias":  "grid",
+                      "local_path":  "grid/llama/ml1m.json",
+                      "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m.json",
+                      "size":  166062,
+                      "sha1":  "3e3c83d94cdb30caef288191b12cc7f173f8220a",
+                      "server_mtime_utc":  "2026-10-05T12:01:39Z"
+                  },
+                  {
+                      "alias":  "grid",
                       "local_path":  "grid/llama/ml1m_split.json",
                       "server_path":  "outputs/confrec/ftgrid_llama/panels/ml1m/ftgrid_split.json",
                       "size":  2070,
                       "sha1":  "c75ef45b134b3427244b839a251b26dbd875ea95",
                       "server_mtime_utc":  "2026-10-04T12:43:28Z"
+                  },
+                  {
+                      "alias":  "grid",
+                      "local_path":  "grid/llama/ml1m_tables.csv",
+                      "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m_tables.csv",
+                      "size":  30387,
+                      "sha1":  "34545aa46ac2eeaafd526217fbbcc888d6a7f9ae",
+                      "server_mtime_utc":  "2026-10-05T12:01:39Z"
                   },
                   {
                       "alias":  "grid",
@@ -95,9 +127,9 @@
                       "alias":  "grid",
                       "local_path":  "grid/qwen/ml1m.json",
                       "server_path":  "outputs/confrec/ftgrid/report/ml1m.json",
-                      "size":  165533,
-                      "sha1":  "bf76f48414ac99a887dbc63a4e2f29617269a46e",
-                      "server_mtime_utc":  "2026-10-04T16:50:26Z"
+                      "size":  221126,
+                      "sha1":  "5ee446fc55cc85ae1df8def4e14e2c8826dd413d",
+                      "server_mtime_utc":  "2026-10-05T13:56:08Z"
                   },
                   {
                       "alias":  "grid",
@@ -111,9 +143,9 @@
                       "alias":  "grid",
                       "local_path":  "grid/qwen/ml1m_tables.csv",
                       "server_path":  "outputs/confrec/ftgrid/report/ml1m_tables.csv",
-                      "size":  27068,
-                      "sha1":  "4274485237bb2314c41f3aae2a4998d5f22379aa",
-                      "server_mtime_utc":  "2026-10-04T16:50:26Z"
+                      "size":  36399,
+                      "sha1":  "f188b891f10df5f722c296171cccb3745f7f559e",
+                      "server_mtime_utc":  "2026-10-05T13:56:08Z"
                   },
                   {
                       "alias":  "grid",
@@ -291,18 +323,6 @@
                     },
                     {
                         "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_llama/extra/ml1m.json",
-                        "local_path":  "extra/llama/ml1m.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
-                        "server_path":  "outputs/confrec/ftgrid_llama/extra/ml1m_tables.csv",
-                        "local_path":  "extra/llama/ml1m_tables.csv",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid_llama/extra/toys.json",
                         "local_path":  "extra/llama/toys.json",
                         "stale_local_copy_kept":  false
@@ -329,18 +349,6 @@
                         "alias":  "ext",
                         "server_path":  "outputs/confrec/ftgrid/extra/summary.json",
                         "local_path":  "extra/summary.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m.json",
-                        "local_path":  "grid/llama/ml1m.json",
-                        "stale_local_copy_kept":  false
-                    },
-                    {
-                        "alias":  "grid",
-                        "server_path":  "outputs/confrec/ftgrid_llama/report/ml1m_tables.csv",
-                        "local_path":  "grid/llama/ml1m_tables.csv",
                         "stale_local_copy_kept":  false
                     },
                     {

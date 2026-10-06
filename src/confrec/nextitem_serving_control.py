@@ -462,8 +462,8 @@ def resolve_output(out, domain=None, panel_kind=None) -> Path:
     return p
 
 
-def write_json(path: Path, doc: dict) -> None:
-    """Strict JSON (NaN / inf -> null), LF line ends, UTF-8, written to <name>.tmp and renamed."""
+def write_json(path: Path, doc: dict) -> dict:
+    """Strict JSON (NaN / inf -> null), LF line ends, UTF-8, written to <name>.tmp and renamed. Returns the document as written."""
     text = json.dumps(stats.strict_json(doc), indent=1, allow_nan=False) + "\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
@@ -473,6 +473,7 @@ def write_json(path: Path, doc: dict) -> None:
     finally:
         if tmp.exists():
             tmp.unlink()
+    return json.loads(text)
 
 
 def code_sha1() -> dict:
@@ -529,8 +530,7 @@ def run_control(domain: str, audit_dir, panel_test, panel_valid, out=None, *, pa
     if audit_doc is not None and doc["label"] != "NOT_RUN":
         meta["audit_consistency"] = check_audit_consistency(audit_doc, doc)
     doc["meta"] = meta
-    write_json(target, doc)
-    return doc
+    return write_json(target, doc)
 
 
 # --------------------------------------------------------------------------------------------------------- summarize

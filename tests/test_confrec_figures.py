@@ -256,6 +256,7 @@ def test_manifest_values_equal_source_files(full_run):
         assert e["status"] == "ok" and e["missing"] == []
         for panel, v in all_values(e):
             node = resolve(root, v["source"])
+            assert set(v["fields"]) <= {"est", "lo", "hi", "coverage", "n_users", "n_events"}, v["fields"]   # no p-value, no Holm flag
             if isinstance(node, dict):
                 for k, x in v["fields"].items():
                     assert node[k] == x, (v["uid"], k)
@@ -528,7 +529,7 @@ def test_uninterpretable_shares_are_withheld_not_drawn(tmp_path):
     assert {w["series"] for w in p.withheld} == {"item_prior_share.zs", "non_prior_share.zs"}
     assert all("uninterpretable" in w["reason"] and w["source"].startswith("grid/qwen/toys.json:E_D.ZS.shares") for w in p.withheld)
     assert p.one("item_prior_share.lora") is not None and p.one("e_share.zs") is not None      # the other regime and e-share stay
-    assert p.status == "partial"
+    assert p.status == "partial" and any("e_share.zs" in n and "withheld" in n for n in p.notes)
     withheld = load_rel(root, "grid/qwen/toys.json")["E_D"]["ZS"]["shares"]["per_model"]["zeroshot"]["item_prior_share"]["est"]
     assert withheld not in [v["fields"].get("est") for _, v in all_values(entry_of(spec, root))]   # the withheld number is not listed
     fig = mf.draw_shares(spec)

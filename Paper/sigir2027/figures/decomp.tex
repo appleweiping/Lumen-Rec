@@ -1,0 +1,43 @@
+% decomp.tex -- conceptual schematic of the decomposition of the Yes/No confidence logit. No data: nothing here is a result.
+% Load it with \input inside a single-column figure (the picture is 3.3 in wide):
+%   \begin{figure}[t]\centering\input{figures/decomp}\caption{...}\label{fig:decomp}\end{figure}
+% Needs in the preamble of main.tex:  \usepackage{tikz}  \usetikzlibrary{arrows.meta,positioning}  (xcolor is already loaded).
+% Notation as in Section "Setting and Notation": l = confidence logit, b_u user offset, pi item prior (swap prior, K donors),
+% e pair-specific residual, G information gain of cross-fitted stackers, G_CF the same for a matrix-factorisation residual.
+\begingroup%
+\definecolor{dcAccent}{HTML}{0F766E}%
+\definecolor{dcInk}{HTML}{4D4D4D}%
+\definecolor{dcBand}{HTML}{F2F1EC}%
+\begin{tikzpicture}[x=1in,y=1in,font=\fontsize{7}{8}\selectfont,
+  box/.style={draw=dcInk,rounded corners=1.5pt,line width=0.4pt,fill=dcBand,inner sep=2.5pt,align=center},
+  term/.style={draw=dcInk,line width=0.4pt,fill=white,inner sep=2pt,minimum height=0.2in,minimum width=0.46in,anchor=west},
+  acc/.style={draw=dcAccent,line width=0.8pt},
+  desc/.style={anchor=west,text width=1.48in,align=left,inner sep=1pt},
+  arr/.style={-{Stealth[length=3.2pt,width=2.6pt]},line width=0.5pt,draw=dcInk},
+  op/.style={inner sep=0pt,anchor=east}]
+  % left: prompt -> LLM -> confidence logit
+  \node[box,text width=0.86in] (P) at (0.465,0.88) {\textbf{Yes/No prompt} for a user--item pair $(u,i)$: history of $u$, candidate $i$};
+  \node[box,text width=0.86in] (L) at (0.465,0.27) {\textbf{confidence logit} $\ell(u,i)$: log-odds of \texttt{Yes} against \texttt{No}};
+  \draw[arr] (P.south) -- (L.north) node[midway,right=1pt,inner sep=1pt] {LLM};
+  % right: the decomposition  l = b_u + pi(i) + e
+  \node[term] (b) at (1.27,0.98) {$b_u$};
+  \node[term] (p) at (1.27,0.57) {$\pi(i)$};
+  \node[term,acc] (e) at (1.27,0.16) {$e(u,i)$};
+  \node[op] at (1.23,0.98) {$=$};
+  \node[op] at (1.23,0.57) {$+$};
+  \node[op] at (1.23,0.16) {$+$};
+  \node[desc] at (1.78,0.98) {\textbf{user offset}: mean of $\ell-\pi$ over $u$'s candidate pairs; it cancels within a user};
+  \node[desc] at (1.78,0.57) {\textbf{item prior}: mean $\ell$ of item $i$ under the histories of $K{=}8$ donor users (``swap prior'')};
+  \node[desc] at (1.78,0.16) {\textbf{pair-specific residual}: what is left, $\sum_{i}e(u,i)=0$};
+  % bracket from the logit to the three terms
+  \draw[line width=0.4pt,draw=dcInk] (L.east) -- ++(0.09,0) coordinate (m) -- (m |- b.west) -- ([xshift=-0.16in]b.west);
+  \draw[line width=0.4pt,draw=dcInk] (m) -- (m |- e.west) -- ([xshift=-0.16in]e.west);
+  \draw[line width=0.4pt,draw=dcInk] (m |- p.west) -- ([xshift=-0.16in]p.west);
+  % the question
+  \node[box,acc,text width=3.23in,fill=white] (Q) at (1.65,-0.37)
+    {\textbf{What does $e$ add} to an item mean $m(i)$ and to matrix factorisation (MF)?\\
+     Information gain $\mathcal G$: UAUC gain when $\hat e$ joins $m(i)$ and $\hat\pi$;\\
+     $\mathcal G_{\rm CF}$: the same for an MF residual.};
+  \draw[arr,draw=dcAccent,line width=0.7pt] (e.south) -- (e.south |- Q.north);
+\end{tikzpicture}%
+\endgroup%

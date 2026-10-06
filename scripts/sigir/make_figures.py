@@ -758,6 +758,11 @@ def _shares_panel(res: Results, bb: str, d: str, gate: FtGate) -> Panel:
             p.add(f"{qid}.{'zs' if reg == 'ZS' else 'lora'}", lambda qid=qid, reg=reg: build_q(qid, reg))
     p.add("G_CF", lambda: single(grid, ("E_D", None, "information_gain", "G_CF"), "G_CF"))
     p.add("G_CF_wu", g_cf_wu)
+    for tag in ("zs", "lora"):
+        if any(w["series"].endswith(f".{tag}") for w in p.withheld) and p.one(f"e_share.{tag}") is not None:
+            p.notes.append(f"e_share.{tag} is drawn (the paper prints it) although the item-prior share of the same regime is "
+                           "withheld as uninterpretable: the e-share is a reliability-corrected variance share, exploratory or "
+                           "descriptive in every file")
     if gate.state != "missing":
         p.extra_sources.append(GATE_FT)
     if not gate.ok:                                                           # one explicit entry: the LoRA series wait
@@ -1145,7 +1150,7 @@ def _draw_share_bottom(ax, p: Panel, ylim: tuple, *, show_y: bool) -> None:
     _axes_style(ax, left=show_y)
     ax.set_ylim(*ylim)
     _xpos_label(ax, GAIN_X, GAIN_LABEL, (-0.62, 2.22))
-    ax.yaxis.set_major_locator(MaxNLocator(nbins=4, steps=[1, 2, 5, 10]))
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=5, steps=[1, 2, 5, 10]))
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
     ax.tick_params(axis="y", length=2.0 if show_y else 0, labelleft=show_y)
     ax.grid(axis="y", color=GRID, lw=0.4)

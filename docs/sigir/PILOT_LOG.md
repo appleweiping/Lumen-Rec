@@ -1,5 +1,15 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addendum 13 (item-balanced fine-tuning FT-B and its size-matched control FT-S; exploratory; recorded before any FT-B or FT-S adapter existed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_13.md` sha1 = 6d83afb23ca8597e222b9327382a00524178bb72. FT-C (labels permuted within items) keeps 0.92 and FT-Q (item-mean labels) 0.85 of the LoRA gain on ML-1M and
+the pair-specific residual adds at most 0.010 UAUC: a reviewer can object that this reflects the objective (the item label rate is learnable) and not the model. FT-B keeps, for every ML-1M TRAIN item with both
+classes, min(n+, n-) examples of each class (seed-0 `tie_key` order), so that every kept item has label rate exactly 0.5 and the adapter can reach the labels only through the user--item pair or the user; FT-S draws the
+same number K of examples uniformly (seed of the adapter), isolating the item-level signal from the sample size and the number of steps. Registered recipe, seeds 0-2 per arm, the grid's scorer, swap arm and integrity check;
+endpoints: UAUC against the item mean, MF and each other, G and G_wu with the paired contrast FT-B minus FT-S, the stack gain of [q-hat, confidence], item-prior share and e-share. Reading rule fixed now
+(`PERSONAL_EVIDENCE_LEARNABLE` / `NOT_LEARNED` / `INCONCLUSIVE`); Llama replication only if the Qwen reading is LEARNABLE; Amazon not run. Exploratory throughout. Written after every rated-panel result of the
+fine-tuned programme had been read, before any FT-B or FT-S adapter, panel or score existed. New code only; its sha1 and those of the built panels will be recorded before the first adapter is trained.
+
 ## 2026-10-06 · Amendment 3 addendum 12 (uncertainty-aware routing between the LLM and a published recommender; exploratory; recorded before any routed ranking was computed)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_12.md` sha1 = 28563f69d80ccc93391be6bb056eb9b95ce61ab6. The audit's selective-serving block shows on which events the LLM ranks well; the addendum asks what to do with the other

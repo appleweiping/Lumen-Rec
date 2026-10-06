@@ -1,5 +1,14 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addenda 16 and 17 (a readout control FT-G; artefact checks and effect-size floors for the next-item endpoints; exploratory; recorded before any adapter, panel or quantity of either existed)
+
+- `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_16.md` sha1 = 52ad0c4d5c2e3794d0346f478938c2b4a9a70c3b: FT-G, adapters g0, g1 trained on the registered TRAIN panel with all labels permuted globally (seed-0 key) on ML-1M and Toys (Video_Games and Sports if the GPU is idle at the 2026-10-22 checkpoint), the readout shift
+  UAUC(FT-G) - UAUC(zero-shot) and its share of the E-B gain (Fieller interval), the readout-adjusted retention R_adj of every control (FT-C, FT-Q, FT-B/S/N), labels READOUT_SHIFT / NO_READOUT_SHIFT / INCONCLUSIVE; a mode of the FT-B code of addendum 13.
+- `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_17.md` sha1 = 005f065153dd3a3a3191668b45f6362050f34fd5: strata of the serving, routing and calibration endpoints by the popularity group of the positive item and by the user popularity profile, exposure against the target (the positives' head share) with every system's NDCG@10 beside it, calibration sensitivity (10 equal-mass bins, top-1 Brier
+  against the multiclass list Brier, the share of events in the first equal-width bin) and smallest effect sizes of interest (NDCG@10/HR@1 gains 0.01, Delta_head 0.02, head-minus-tail mean p 0.005, ECE and Brier 0.01, AUROC 0.02) with labels NEGLIGIBLE / LARGER_THAN_SESOI / UNRESOLVED.
+Both were prompted by the third independent same-family review (recomputed from the stored files: the Toys user-popularity quintiles hold 1,704 / 2,285 / 1,265 / 4,717 / 0 of 9,971 events with a profile; under random serving the niche bin is served 0.517 and under `p_max` 0.634 of its events; the review also reports random-serving NDCG@10 0.335 for niche against 0.201 for mainstream users, a head-share
+excess of 0.059 over the pool and 0.040 over the target, and 69% of the events in the first equal-width calibration bin, which I did not recompute). No quantity of either addendum had been computed. CPU/GPU records of their code follow before any run.
+
 ## 2026-10-06 · Amendment 3 addenda 14 and 15 (instrument validity of G; reference extensions for the rated panels; exploratory; recorded before any quantity of either was computed)
 
 - `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_14.md` sha1 = e023cc67d4ea32fd21f2d02bb905caee2f778c25 (permutation null of G and G_wu, planted-signal recovery and minimum detectable gain, a donor placebo that separates personal evidence from denoising of the 8-donor prior, full-refit and two-way

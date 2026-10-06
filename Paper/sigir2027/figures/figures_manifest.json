@@ -2,7 +2,7 @@
  "schema": "lumen_figures_manifest_v1",
  "generator": {
   "script": "scripts/sigir/make_figures.py",
-  "script_sha1": "6ecf3ba0acd18ee3358e8696a09c8700400cb7f4",
+  "script_sha1": "bd723ab76f38607f3df51b95adea32bec1031153",
   "environment": {
    "python": "3.14.5",
    "matplotlib": "3.10.9"
@@ -15,8 +15,8 @@
    "kind": "plot",
    "title": "UAUC of the confidence beside its same-row references",
    "file": "tracks.pdf",
-   "sha1": "2abed350c2f1da94691c2d2033f9586b865b54bd",
-   "bytes": 24034,
+   "sha1": "c7ef35dd5c31832af5b69111fbcedf844265d02b",
+   "bytes": 24094,
    "size_in": [
     7.0,
     2.3
@@ -917,8 +917,8 @@
    "kind": "plot",
    "title": "What the confidence is made of, and the information it adds",
    "file": "shares.pdf",
-   "sha1": "7117d0af06fc3ed5a9f73a309d7c59470e71e3c7",
-   "bytes": 35338,
+   "sha1": "c99d11b1210a410f78c129d42bfc278818902db8",
+   "bytes": 35430,
    "size_in": [
     7.0,
     2.3

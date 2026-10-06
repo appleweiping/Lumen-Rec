@@ -18,6 +18,8 @@
 #          AUDIT_JSON_QWEN_Z2, AUDIT_JSON_LLAMA_Z2   optional directories of the audit's Z2 result files <d>.json: when set, `run` requires
 #                    that the p_max and random numbers of the audit are reproduced (the registered panels use outputs/confrec/
 #                    nextitem_audit/<d>.json when that file exists)
+#          NICE_N    niceness of the analysis processes, 0-19 (default 19: the lowest priority; on a busy Windows workstation Git Bash
+#                    maps 19 to the idle class, where a rehearsal can starve: use 0 there)
 #          PYTHON    interpreter (skips the conda activation; default: conda env lumen)
 #          DRY_RUN   0 or 1 (anything else is refused): 1 = a rehearsal on a synthetic fixture (tests/test_confrec_serving_control.py
 #                    write_dry_world): no pilot log, no freeze check, no real path; DRY_N_BOOT (default 40) resamples
@@ -42,6 +44,8 @@ done
 if [ "$DRY_RUN" != 1 ] && [ -n "${DRY_N_BOOT+x}" ]; then
   echo "DRY_N_BOOT belongs to a DRY_RUN=1 rehearsal: nothing was started" >&2; exit 2
 fi
+NICE_N="${NICE_N:-19}"
+case "$NICE_N" in [0-9]|1[0-9]) ;; *) echo "NICE_N must be an integer 0-19 (it is '$NICE_N'): nothing was started" >&2; exit 2 ;; esac
 DOMAINS="${DOMAINS:-sports toys home tools}"
 PANELS="${PANELS:-registered z2_qwen z2_llama}"
 for d in $DOMAINS; do
@@ -111,7 +115,7 @@ run_panel() {
   local -a extra=("$@")
   if [ -n "$aj" ] && [ -f "$aj" ]; then extra+=(--audit_json "$aj"); fi
   echo "== $kind / $d -> $OUTK/$kind/$d.json"
-  nice -n 19 "$PY" -m src.confrec.nextitem_serving_control run --domain "$d" --audit_dir "$audit" --panel_test "$pt" \
+  nice -n "$NICE_N" "$PY" -m src.confrec.nextitem_serving_control run --domain "$d" --audit_dir "$audit" --panel_test "$pt" \
     --panel_valid "$pv" --panel_kind "$kind" --out "$OUTK/$kind/$d.json" --n_boot "$NB" --seed "$SEED" "${extra[@]}"
 }
 summarize_kind() {
@@ -120,7 +124,7 @@ summarize_kind() {
     if [ -f "$OUTK/$kind/$d.json" ]; then list="${list:+$list,}$OUTK/$kind/$d.json"; fi
   done
   if [ -n "$list" ]; then
-    nice -n 19 "$PY" -m src.confrec.nextitem_serving_control summarize --inputs "$list" --out "$OUTK/$kind/summary.json"
+    nice -n "$NICE_N" "$PY" -m src.confrec.nextitem_serving_control summarize --inputs "$list" --out "$OUTK/$kind/summary.json"
   fi
 }
 

@@ -1338,7 +1338,7 @@ def make_scratch_repo(dest: Path, pilot_log: str = "# pilot log\n") -> Path:
 def run_script(repo: Path, **env) -> subprocess.CompletedProcess:
     e = {k: v for k, v in os.environ.items() if k not in ("DOMAINS", "PANELS", "N_BOOT", "SEED", "DRY_RUN", "DRY_N_BOOT", "PYTHONPATH",
                                                           "AUDIT_QWEN", "AUDIT_QWEN_Z2", "AUDIT_LLAMA", "PYTHON")}
-    e.update(PYTHON=sys.executable.replace("\\", "/"), PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
+    e.update(PYTHON=sys.executable.replace("\\", "/"), PYTHONUTF8="1", PYTHONIOENCODING="utf-8", NICE_N="0")     # not the idle class
     e.update(env)
     return subprocess.run([BASH, (repo / "scripts" / "sigir" / "run_servingctrl.sh").as_posix()], env=e, capture_output=True, text=True,
                           encoding="utf-8", errors="replace", timeout=900)
@@ -1368,7 +1368,8 @@ def test_the_script_is_lf_bash_clean_cpu_only_offline_and_writes_one_directory()
     code = [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
     body = "\n".join(code)
     assert not re.search(r"\b(curl|wget|ssh|scp|rsync|git|pip|apt|apt-get|ping|nvidia-smi|torch|vllm)\b", body)
-    assert "CUDA_VISIBLE_DEVICES=" in body and "nice -n 19" in body and "PYTHONDONTWRITEBYTECODE=1" in body
+    assert "CUDA_VISIBLE_DEVICES=" in body and 'NICE_N="${NICE_N:-19}"' in body and body.count('nice -n "$NICE_N" ') == 2
+    assert "PYTHONDONTWRITEBYTECODE=1" in body
     assert "OUT=outputs/confrec/nextitem_audit_ctrl" in body and "conda activate lumen" in body
     assert not re.search(r"(?<![0-9&])>>?\s*[^&\s]", body.replace("2>&1", "").replace(">&2", "").replace("->", ""))   # no redirection to a file
     assert re.findall(r'--out "\$OUTK/\$kind/(?:\$d|summary)\.json"', body) and body.count("--out ") == 2
@@ -1424,7 +1425,9 @@ def test_the_script_refuses_bad_switches_and_settings_before_anything_else(tmp_p
     for env, want in ((dict(DRY_RUN="yes"), "DRY_RUN must be 0 or 1"), (dict(DRY_RUN=""), "DRY_RUN must be 0 or 1"),
                       (dict(N_BOOT="100"), "N_BOOT is registered"), (dict(SEED="1"), "SEED is registered"),
                       (dict(DRY_N_BOOT="5"), "DRY_N_BOOT belongs to a DRY_RUN=1 rehearsal"),
-                      (dict(DOMAINS="toys books"), "unknown domain 'books'"), (dict(PANELS="registered bogus"), "unknown panel 'bogus'")):
+                      (dict(DOMAINS="toys books"), "unknown domain 'books'"), (dict(PANELS="registered bogus"), "unknown panel 'bogus'"),
+                      (dict(NICE_N="20"), "NICE_N must be an integer 0-19"), (dict(NICE_N="-5"), "NICE_N must be an integer 0-19"),
+                      (dict(NICE_N="x"), "NICE_N must be an integer 0-19")):
         r = run_script(repo, **env)
         assert r.returncode == 2 and want in r.stderr, (env, msg(r))
     assert tree(repo) == before and not (repo / "outputs").exists()

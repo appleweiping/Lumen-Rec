@@ -1,0 +1,63 @@
+% Section 4: audit design. Compact; estimator details are in the appendix and the artefact.
+\section{Audit Design}
+\label{sec:design}
+
+\paragraph{Panels, users and backbones.}
+\emph{Rated panels} (MovieLens-1M~\citep{harper2015movielens}; Amazon Reviews 2023~\citep{hou2024bridging} Toys, Video Games, Sports) show
+up to ten earlier ratings of a user as history (at least three are required) and use the user's latest labelled items, at most 20, as
+candidates; a user needs three likes and three dislikes among them. Eligible users are shuffled with a fixed seed: the first 1,500 are TRAIN users, the next (up to 3,000) EVAL
+users, disjoint and never trained on. With $T_d$ the 0.8-quantile of a panel's candidate timestamps, adapters train on TRAIN
+candidates before $T_d$, calibrators use EVAL candidates before $T_d$, and every endpoint is computed on EVAL candidates at or after
+$T_d$ (TEST). \emph{Next-item panels} are four frozen same-candidate panels of an earlier benchmark protocol~\citep{anon2026benchmark}
+(Amazon Sports, Toys, Home, Tools; 10,000 events each, 101 candidates) with the top-10 lists of a verbalised reranker and eight
+published recommenders~\citep{wang2024elmrec,wang2025irllrec,he2025llm2rec,liu2025llmemb,liu2024llmesr,zhang2026proex,zhang2026promax,ren2024rlmrec}
+as context, scored zero-shot. The primary backbone is Qwen3-8B~\citep{yang2025qwen3}; Llama-3.1-8B-Instruct~\citep{grattafiori2024llama3}
+replicates on ML-1M and Toys (both regimes) and on next-item events 1,001--3,000. Scoring is one fp16 prefill pass in
+vLLM~\citep{kwon2023vllm} reading Yes and No by token id; a run that fails the integrity check (answer tokens present, no over-length
+prompt, Yes+No mass at least 0.95) is rerun once and otherwise reported missing. The fine-tuned regime is TALLRec-style LoRA
+yes/no tuning~\citep{bao2023tallrec,hu2022lora} with one fixed recipe (rank 16, one epoch, three seeds).
+
+\paragraph{References on the same rows.}
+Every rated table carries, on identical rows, the item mean $m(i)$ (other users' mean rating of $i$, shrunk, before the candidate's
+timestamp). $m$ sees the whole rating corpus up to the candidate, far more than the LLM does, so it is the demanding reference; a
+\emph{time-matched} mean $m_T$ (ratings before $T_d$ only) and the mean of the adapter's own TRAIN labels $m_{\rm TR}$ stand beside it.
+A temporal biased MF fitted before $T_d$~\citep{koren2009matrix} gives the collaborative reference, with its personal residual
+(MF $-\,b_u-b_i$); as registered it over-fits the three Amazon panels, so a regularisation-tuned MF restricted to the ten events the
+prompt shows, and a content-based personal reference that uses exactly the titles, categories and brands of the prompt, are added
+as exploratory references (Appendix~\ref{app:estimators}).
+
+\paragraph{Measures.}
+Besides UAUC and the contrast with each reference, we report the item-prior share, the share of variance of $\hat e$, the
+information gain $\mathcal G$ with its registered pooled estimator and a within-user estimator that refits the stackers on user-centred
+features, and $\mathcal G_{\rm CF}$ and $\mathcal G_{\rm LLM|CF}$ (what the LLM residual adds to MF). Because $\mathcal G$ can be positive
+when $\ell$ merely denoises the 8-donor prior, three validity checks accompany it: a permutation null of $\hat e$ within users, the
+recovery of planted signals (power and minimum detectable gain), and a donor placebo that replaces the user's own confidence by a
+held-out donor's for the same item.
+
+\paragraph{Training controls.}
+Four adapter families remove user--item evidence from the training labels. \emph{Permuted-label adapters} train on labels permuted within
+each item (ML-1M only: an item seen once cannot change); \emph{item-teacher adapters} train on labels from the TRAIN item mean alone, so
+they use no user information; \emph{item-balanced adapters} keep, for every item with both classes, equally many positive and negative
+examples, so the item label rate is 0.5 and the labels can be reached only through the user--item pair, with a size-matched random
+subsample and a within-item-permuted copy as controls; a globally permuted adapter measures the readout and format shift. The retention
+$R$ is the share of the LoRA gain over zero-shot that the control adapters keep.
+
+\paragraph{Uses of the confidence.}
+The lemma leaves four routes open, each tested against a matched control: cross-user \emph{serving} and \emph{routing} on the next-item
+panels (serve the most confident events, or send the others to a published recommender) against a random signal and cheap signals that
+need no LLM (history length, user popularity profile, the confidence of a popularity-only ranker); static \emph{exposure} of the top-10
+lists against the candidate pool and the published recommenders; item-dependent \emph{corrections} against a paraphrase placebo and an
+ensemble null; and \emph{pruning} of the LoRA training set by the zero-shot model's uncertainty against class-matched random pruning
+(five seeds). A prior-offset LoRA, which lets a learned offset absorb the item prior, is an optional method compared with post-hoc
+stacking.
+
+\paragraph{Statistics, registration and what is claimed.}
+Intervals are 95\% percentile bootstraps over users or events (2,000 resamples, seed 0); contrasts are paired. Holm's
+correction~\citep{holm1979simple} applies within registered families (the effect of fine-tuning over the four Qwen panels; the
+LLM-minus-item-mean contrast over the three Amazon panels; $\mathcal G$ per panel and regime; the method slot), a fine-tuned effect
+counts only if its seed mean exceeds twice the seed s.d.\ with all three seeds of one sign, and an endpoint on fewer than 150 users is
+descriptive. A statement beyond one panel is made only if it is confirmed on untouched users and replicates, with the same sign and
+its own interval excluding zero, on a fresh Amazon domain and on the second backbone; every other estimate is labelled descriptive.
+Each analysis was registered in a dated internal amendment whose SHA-1 hash was logged before it ran (the first amendment
+retroactively); the audit design followed a failed pilot (Appendix~\ref{app:registration}); the analyses written after the ML-1M
+report was read, and every later addendum, are exploratory where the results they concern had been seen and are set in italics.

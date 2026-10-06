@@ -206,6 +206,14 @@ def all_values(entry: dict):
             yield p, v
 
 
+def stub_render(monkeypatch):
+    """Replace the PDF renderer by deterministic bytes (the drawing still runs); for tests of file handling only."""
+    def fake(fig):
+        mf.plt.close(fig)
+        return b"%PDF-1.4 stub\n" + b"x" * 2000
+    monkeypatch.setattr(mf, "_render_pdf", fake)
+
+
 def collect_all(root: Path):
     """The data layer of the three figures (no drawing): where a malformed file must raise."""
     res = mf.Results(root)
@@ -333,7 +341,7 @@ def test_drawn_marks_equal_manifest(drawn_world, fid, minimum):
                 continue
             pt = gids[f"{v.uid}:pt"]
             assert (pt.get_xdata() if horizontal else pt.get_ydata())[0] == v.est
-            assert (pt.get_markerfacecolor() == "white") == bool(v.flags), v.uid
+            assert (pt.get_markerfacecolor() == "none") == bool(v.flags), v.uid
             n_pt += 1
             if v.lo is not None:
                 ci = gids[f"{v.uid}:ci"]
@@ -531,8 +539,8 @@ def test_exploratory_and_descriptive_flags_reach_the_manifest_and_the_marks(tmp_
         assert resolve(root, v["flag_sources"][0]) == "exploratory"
     fig = mf.draw_tracks(spec)                          # the marker is hollow exactly where a flag stands
     g = _artists_by_gid(fig)
-    assert g[f"{mt.uid}:pt"].get_markerfacecolor() == "white" and g[f"{z.uid}:pt"].get_markerfacecolor() == "white"
-    assert g[f"{pan['qwen:toys'].one('matched_mean').uid}:pt"].get_markerfacecolor() != "white"
+    assert g[f"{mt.uid}:pt"].get_markerfacecolor() == "none" and g[f"{z.uid}:pt"].get_markerfacecolor() == "none"
+    assert g[f"{pan['qwen:toys'].one('matched_mean').uid}:pt"].get_markerfacecolor() != "none"
     mf.plt.close(fig)
 
 
@@ -633,6 +641,7 @@ def test_a_link_pointing_outside_the_root_is_refused(tmp_path):
 
 
 def test_no_figure_function_opens_a_file_outside_the_results_root(tmp_path, monkeypatch):
+    stub_render(monkeypatch)
     root = build_tree(tmp_path / "results", skip=("grid/qwen/sports.json",))
     decoy = tmp_path / "outside" / "decoy.json"
     decoy.parent.mkdir()
@@ -676,24 +685,23 @@ def test_same_inputs_give_byte_identical_pdfs_and_entries(full_run, tmp_path):
     assert not re.search(r"[A-Za-z]:[\\/]", text) and "CreationDate" not in text and Path.home().name not in text
 
 
-def test_determinism_across_processes_with_different_hash_seeds(world, tmp_path):
-    """Two fresh interpreters (different PYTHONHASHSEED), same inputs: byte-identical PDF and manifest, through the CLI script."""
-    procs = []
-    for k, seed in enumerate(("1", "2")):
-        out = tmp_path / f"p{k}"
-        env = {**os.environ, "PYTHONHASHSEED": seed, "MPLBACKEND": "Agg"}
-        procs.append((out, subprocess.Popen([sys.executable, str(SCRIPT), "--results", str(world), "--out", str(out), "--only", "tracks"],
-                                            env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=ROOT)))
-    for out, p in procs:
-        so, se = p.communicate(timeout=150)
-        assert p.returncode == 0, se
-        assert "tracks" in so and "sha1" in so
-    a, b = procs[0][0], procs[1][0]
-    for name in ("tracks.pdf", mf.MANIFEST_NAME):
-        assert (a / name).read_bytes() == (b / name).read_bytes(), name
+def test_determinism_across_processes_with_a_different_hash_seed(full_run, tmp_path):
+    """A fresh interpreter (a hash seed that differs from this process's), same inputs, through the CLI script: the PDF is
+    byte-identical to the in-process one and the manifest entry is equal."""
+    root, out, manifest = full_run
+    seed = "2" if os.environ.get("PYTHONHASHSEED") == "1" else "1"
+    env = {**os.environ, "PYTHONHASHSEED": seed, "MPLBACKEND": "Agg"}
+    r = subprocess.run([sys.executable, str(SCRIPT), "--results", str(root), "--out", str(tmp_path), "--only", "tracks"], env=env,
+                       capture_output=True, text=True, cwd=ROOT, timeout=300)
+    assert r.returncode == 0, r.stderr
+    assert "tracks" in r.stdout and "sha1" in r.stdout
+    assert (tmp_path / "tracks.pdf").read_bytes() == (out / "tracks.pdf").read_bytes()
+    other = json.loads((tmp_path / mf.MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert other["figures"]["tracks"] == manifest["figures"]["tracks"] and other["results_root"] == manifest["results_root"]
 
 
-def test_cli_main_merges_entries_and_drops_stale_ones(world, tmp_path, capsys):
+def test_cli_main_merges_entries_and_drops_stale_ones(world, tmp_path, capsys, monkeypatch):
+    stub_render(monkeypatch)
     a = tmp_path / "a"
     assert mf.main(["--results", str(world), "--out", str(a), "--only", "serving"]) == 0
     assert "serving" in capsys.readouterr().out
@@ -711,8 +719,9 @@ def test_cli_main_merges_entries_and_drops_stale_ones(world, tmp_path, capsys):
     capsys.readouterr()
 
 
-def test_a_malformed_file_leaves_the_output_directory_untouched(tmp_path):
+def test_a_malformed_file_leaves_the_output_directory_untouched(tmp_path, monkeypatch):
     """All requested figures are built in memory first: an error in the last one writes no PDF and no manifest."""
+    stub_render(monkeypatch)
     root = build_tree(tmp_path / "r")
     d = load_rel(root, "aud/toys.json")
     del d["segments"]["all"]["questions"]

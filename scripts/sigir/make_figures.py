@@ -887,12 +887,12 @@ def fig_not_run_placeholder(ax, title: str, missing: list, *, note: str = "not r
 
 
 def _marker(ax, x, y, st: dict, *, hollow: bool, gid: str, zorder: int = 5, **kw):
-    ax.plot([x], [y], ls="none", marker=st["marker"], ms=st["ms"], mfc="white" if hollow else st["color"], mec=st["color"],
+    ax.plot([x], [y], ls="none", marker=st["marker"], ms=st["ms"], mfc="none" if hollow else st["color"], mec=st["color"],
             mew=EDGE_W, zorder=zorder, gid=gid, clip_on=False, **kw)
 
 
 def _seed_dot(ax, x, y, color, gid: str, hollow: bool = False):
-    ax.plot([x], [y], ls="none", marker="o", ms=SEED_MS, mfc="white" if hollow else color, mec=color if hollow else "white",
+    ax.plot([x], [y], ls="none", marker="o", ms=SEED_MS, mfc="none" if hollow else color, mec=color if hollow else "white",
             mew=0.6 if hollow else 0.3, alpha=0.85, zorder=4, gid=gid, clip_on=False)
 
 
@@ -906,7 +906,7 @@ def _legend(fig, handles, labels, *, loc, anchor, ncol):
 
 
 def _proxy(marker="o", color=C_REF, hollow=False, ms=4.0, ls="none", lw=LW_CI):
-    return Line2D([], [], ls=ls, lw=lw, marker=marker, ms=ms, mfc="white" if hollow else color, mec=color, mew=EDGE_W, color=color)
+    return Line2D([], [], ls=ls, lw=lw, marker=marker, ms=ms, mfc="none" if hollow else color, mec=color, mew=EDGE_W, color=color)
 
 
 def _any_hollow(spec: "FigureSpec") -> bool:
@@ -1132,8 +1132,8 @@ def _draw_share_top(ax, p: Panel, ylim: tuple, *, show_y: bool) -> None:
                     _seed_dot(ax, xm + SEED_DX, v.est, C_LORA, f"{v.uid}:pt", v.hollow)
             for w in p.withheld:
                 if w["series"] == f"{qid}.{tag}":
-                    ax.text(xm, ylim[0] + 0.09, "n/i", ha="center", va="center", fontsize=SMALL_PT, style="italic", color=st["color"],
-                            gid=f"{p.pid}:{qid}.{tag}:withheld")
+                    ax.text(xm, ylim[0] + 0.09, "n/i", ha="center", va="center", fontsize=SMALL_PT, style="italic", color=INK2,
+                            gid=f"{p.pid}:{qid}.{tag}:withheld")                  # text wears ink; its slot (left: zero-shot) is its key
         for m in p.missing:
             if m.get("series") == f"{qid}.zs" and qid not in ("item_prior_share", "non_prior_share"):
                 ax.text(x0, 0.5, "not run\nyet", ha="center", va="center", fontsize=SMALL_PT, style="italic", color=INK2, linespacing=1.0,
@@ -1224,7 +1224,7 @@ def _draw_serving_panel(ax, p: Panel, ymax: float, *, show_y: bool) -> None:
         ax.plot(x, [v.est for v in vals], color=st["color"], lw=LW_LINE, zorder=st["z"], gid=f"serving/{p.pid}/{sig}:line")
         for v in vals:
             ax.plot([v.fields["coverage"]], [v.est], ls="none", marker=st["marker"], ms=st["ms"],
-                    mfc="white" if v.hollow else st["color"], mec=st["color"], mew=EDGE_W, zorder=st["z"] + 1, gid=f"{v.uid}:pt")
+                    mfc="none" if v.hollow else st["color"], mec=st["color"], mew=EDGE_W, zorder=st["z"] + 1, gid=f"{v.uid}:pt")
     for m in p.missing:
         if m.get("series") in SERVING_SIGNALS:
             ax.text(0.55, ymax * (0.7 if m["series"] == "p_max" else 0.55), f"{m['series']}: not run yet", ha="center", va="center",

@@ -1063,7 +1063,7 @@ def draw_shares(spec: FigureSpec):
         n = len(spec.panels)
         L, R, GAP = 0.56, 0.05, 0.11
         pw = (W - L - R - (n - 1) * GAP) / n
-        TOP1, H1, GAP12, H2, BOT2 = 0.40, 0.66, 0.26, 0.66, 0.34
+        TOP1, H1, H2, BOT2 = 0.40, 0.66, 0.66, 0.34
         y1, y2 = H - TOP1 - H1, BOT2
         ok = [p for p in spec.panels if p.status != "not_run"]
         s_lo = [v.lo if v.lo is not None else v.est for p in ok for v in p.data() if v.series.split(".")[0] in SHARE_QUANTITIES]
@@ -1074,21 +1074,15 @@ def draw_shares(spec: FigureSpec):
         glo, ghi = min([0.0] + g_lo), max([0.0] + g_hi)
         pad = 0.10 * (ghi - glo or 0.1)
         ylim2 = (glo - pad if glo < 0 else 0.0 - pad * 0.5, ghi + pad)
-        axes_top, axes_bot = [], []
         for i, p in enumerate(spec.panels):
             x = L + i * (pw + GAP)
             _header_text(cv, x + pw / 2, H - 0.25, p.title + (f"  ({p.n_text()} users)" if p.n_text() else ""), fontsize=7.5, color=INK)
             if p.status == "not_run":
                 ax = cv.axes(x, y2, pw, y1 + H1 - y2)
                 fig_not_run_placeholder(ax, p.title, p.missing)
-                axes_top.append(None)
-                axes_bot.append(None)
                 continue
-            at, ab = cv.axes(x, y1, pw, H1), cv.axes(x, y2, pw, H2)
-            axes_top.append(at)
-            axes_bot.append(ab)
-            _draw_share_top(at, p, ylim1, show_y=(i == 0))
-            _draw_share_bottom(ab, p, ylim2, show_y=(i == 0))
+            _draw_share_top(cv.axes(x, y1, pw, H1), p, ylim1, show_y=(i == 0))
+            _draw_share_bottom(cv.axes(x, y2, pw, H2), p, ylim2, show_y=(i == 0))
         cv.text(0.13, y1 + H1 / 2, "share of within-user\nvariance of " + r"$\ell$", rotation=90, ha="center", va="center", fontsize=LABEL_PT,
                 color=INK2, linespacing=1.1)
         cv.text(0.13, y2 + H2 / 2, r"gain $\Delta$UAUC", rotation=90, ha="center", va="center", fontsize=LABEL_PT, color=INK2)
@@ -1256,28 +1250,38 @@ def _write_if_changed(path: Path, data: bytes) -> bool:
     return True
 
 
-def _finish(fig, spec: FigureSpec, res: Results, out_dir, file: str) -> dict:
-    data = _render_pdf(fig)
-    _write_if_changed(Path(out_dir) / file, data)
-    return spec.entry(res, file=file, sha1=hashlib.sha1(data).hexdigest(), nbytes=len(data))
+PLOTS = {"tracks": (collect_tracks, draw_tracks, "tracks.pdf"), "shares": (collect_shares, draw_shares, "shares.pdf"),
+         "serving": (collect_serving, draw_serving, "serving.pdf")}
+
+
+def _build_plot(fid: str, res: Results) -> tuple:
+    """(manifest entry, {file name: bytes}) of one plot, built in memory: nothing is written here."""
+    collect, draw, file = PLOTS[fid]
+    spec = collect(res)
+    data = _render_pdf(draw(spec))
+    return spec.entry(res, file=file, sha1=hashlib.sha1(data).hexdigest(), nbytes=len(data)), {file: data}
+
+
+def _write_plot(fid: str, res: Results, out_dir) -> dict:
+    entry, files = _build_plot(fid, res)
+    for name, data in files.items():
+        _write_if_changed(Path(out_dir) / name, data)
+    return entry
 
 
 def fig_tracks(results, out_dir) -> dict:
     """F1 'tracks': UAUC of the confidence beside its same-row references. Writes tracks.pdf, returns its manifest entry."""
-    res = _as_results(results)
-    return _finish(draw_tracks(spec := collect_tracks(res)), spec, res, out_dir, "tracks.pdf")
+    return _write_plot("tracks", _as_results(results), out_dir)
 
 
 def fig_shares(results, out_dir) -> dict:
     """F2 'shares': shares of the within-user variance of the confidence logit, and the information gains. Writes shares.pdf."""
-    res = _as_results(results)
-    return _finish(draw_shares(spec := collect_shares(res)), spec, res, out_dir, "shares.pdf")
+    return _write_plot("shares", _as_results(results), out_dir)
 
 
 def fig_serving(results, out_dir) -> dict:
     """F3 'serving': NDCG@10 of serving only the most confident events against the random subset. Writes serving.pdf."""
-    res = _as_results(results)
-    return _finish(draw_serving(spec := collect_serving(res)), spec, res, out_dir, "serving.pdf")
+    return _write_plot("serving", _as_results(results), out_dir)
 
 
 def fig_decomp(results, out_dir) -> dict:
@@ -1322,7 +1326,15 @@ def run(results, out_dir, only=None) -> dict:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     ids = normalise_ids(only)
-    entries = {fid: FIG_FUNCS[fid](res, out) for fid in ids}
+    entries, pending = {}, {}
+    for fid in ids:                                    # build everything first: a malformed file leaves the directory untouched
+        if fid == "decomp":
+            entries[fid] = fig_decomp(res, out)
+        else:
+            entries[fid], files = _build_plot(fid, res)
+            pending.update(files)
+    for name, data in pending.items():
+        _write_if_changed(out / name, data)
     kept: dict = {}
     mpath = out / MANIFEST_NAME
     if mpath.is_file() and len(ids) < len(FIG_IDS):

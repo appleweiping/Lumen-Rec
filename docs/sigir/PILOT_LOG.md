@@ -1,5 +1,12 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addendum 13, REVISED (adds the falsification arm FT-N and the validity rule of the probe; recorded before any code, panel or adapter of the addendum existed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_13.md` sha1 = 0b5f21243e4f2b2b60029047c7d0cfb8dbcaeac3 (supersedes the first version, sha1 6d83afb23ca8597e222b9327382a00524178bb72 recorded below a few hours earlier; no code, panel, adapter
+or score of the addendum existed at either time). Change: FT-N, the FT-B panel with its labels permuted within each kept item (an adapter trained on it must show no personal evidence), two seeds, and the rule that a FT-N
+with a 95% interval of G (or of its seed mean of G_wu) above 0 makes the probe INVALID_PROBE; the labels LEARNABLE additionally need G(FT-B) - G(FT-N) > 0; the upper 95% bound of every G is reported. The change was prompted by two
+independent same-family reviews of the draft (2026-10-06), which asked whether the null reflects the objective or the model and whether the instrument can produce a positive.
+
 ## 2026-10-06 · Amendment 3 addendum 13 (item-balanced fine-tuning FT-B and its size-matched control FT-S; exploratory; recorded before any FT-B or FT-S adapter existed)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_13.md` sha1 = 6d83afb23ca8597e222b9327382a00524178bb72. FT-C (labels permuted within items) keeps 0.92 and FT-Q (item-mean labels) 0.85 of the LoRA gain on ML-1M and

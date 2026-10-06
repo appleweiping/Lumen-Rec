@@ -873,10 +873,10 @@ def test_labels_end_to_end_and_every_label_is_the_rule_applied_to_the_stored_int
     adds = labelled["adds"][1]
     assert adds["signals"]["p_max"]["gain50"]["ndcg10"]["lo"] > 0.1
     assert all(adds["signals"][s]["delta_vs_p_max"]["ndcg10"]["lo"] > 0 for s in CONTROLS)
-    # MATCHED: the contrast is exactly zero on every resample (a constant utility), the interval is [0, 0]
+    # MATCHED: the contrast is zero on every resample (a constant utility: every gain is zero up to rounding), the interval is ~[0, 0]
     for s in CONTROLS:
         ci = labelled["matched"][1]["signals"][s]["delta_vs_p_max"]["ndcg10"]
-        assert (ci["est"], ci["lo"], ci["hi"]) == (0.0, 0.0, 0.0)
+        assert (ci["est"], ci["lo"], ci["hi"]) == pytest.approx((0.0, 0.0, 0.0), abs=1e-15, rel=0)
 
 
 def test_the_reading_uses_ndcg10_not_hr1_and_the_cheap_signal_order_is_the_registered_one(labelled):
@@ -895,7 +895,7 @@ def test_not_run_when_the_valid_score_file_is_missing(labelled):
     for absent in ("signals", "readings", "direction", "counts", "temperature", "panel"):
         assert absent not in doc, absent                                   # nothing was analysed
     assert doc["meta"]["input_sha1"]["scores_valid"] is None and doc["meta"]["input_sha1"]["scores_test"]
-    assert doc["meta"]["code_sha1"] and doc["meta"]["registered_settings"] is True
+    assert doc["meta"]["code_sha1"] and doc["meta"]["registered_settings"] is False                # 60 resamples, not the registered 2,000
     assert (w.audit_dir / "books_valid2k").exists() is False and path.exists()
 
 
@@ -1043,7 +1043,7 @@ def test_same_input_same_bytes_registered_defaults_and_no_timestamps(world, tmp_
             for v in x:
                 walk(v)
     walk(doc)
-    assert not [k for k in keys if re.search(r"time|date|clock|elapsed|timing|host|stamp", k, re.I)]
+    assert not [k for k in keys if re.search(r"(^|_)(time|timing|timestamp|date|datetime|clock|elapsed|host|hostname|stamp)($|_)", k, re.I)]
     # another seed changes the random block only (p_max, the controls' directions and the counts do not depend on it)
     d3 = run(world, "s3.json", seed=3, n_boot=2000)
     assert d3["signals"]["random"]["gain50"] != doc["signals"]["random"]["gain50"]
@@ -1273,3 +1273,184 @@ def test_record_prints_path_equals_sha1_and_checks_the_pilot_log(tmp_path, capsy
     for rel in sc.RECORD_FILES:
         assert b"\r" not in (ROOT / rel).read_bytes(), rel
     assert hashlib.sha1(MODULE.read_bytes()).hexdigest() in real[0] and hashlib.sha1(SCRIPT.read_bytes()).hexdigest() in real[2]
+
+
+# ============================================================================================== 9. the runner script
+def write_dry_world(root, n_boot: int = 40) -> None:
+    """The synthetic fixture of `DRY_RUN=1 bash scripts/sigir/run_servingctrl.sh`: one domain (toys) in the layouts of the three
+    panel kinds (registered, Z2 Qwen restricted, Z2 Llama) and the audit's own results for --audit_json (made with the same resamples)."""
+    import gzip
+    root = Path(root)
+    w = build_world(root, "toys", E=80, N=15, n_valid=40, seed=31, hist_max=7)
+    for p in (w.audit_dir / "toys_test" / "scores.csv.gz", w.audit_dir / "toys_valid2k" / "scores.csv.gz"):       # byte-reproducible
+        p.write_bytes(gzip.compress(gzip.decompress(p.read_bytes()), compresslevel=9, mtime=0))
+    shutil.copytree(w.audit_dir, root / "audit_qwen_z2", dirs_exist_ok=True)                    # the restricted Qwen audit
+    llama = root / "audit_llama"
+    shutil.copytree(w.audit_dir / "toys_test", llama / "toys_test1001_3000", dirs_exist_ok=True)
+    shutil.copytree(w.audit_dir / "toys_valid2k", llama / "toys_valid500", dirs_exist_ok=True)
+    z2_panel = root / "panels" / "toys_test1001_3000.jsonl"
+    shutil.copyfile(w.panel_test, z2_panel)
+    for name, kw in (("audit_results", dict(audit_dir=w.audit_dir, panel=w.panel_test)),
+                     ("audit_results_z2_qwen", dict(audit_dir=root / "audit_qwen_z2", panel=z2_panel, segments="single", first_event=1001)),
+                     ("audit_results_z2_llama", dict(audit_dir=llama, panel=z2_panel, segments="single", first_event=1001,
+                                                     test_role="test1001_3000", valid_role="valid500"))):
+        panel, audit_dir = kw.pop("panel"), kw.pop("audit_dir")
+        res = na.run_domain("toys", audit_dir, panel, w.panel_valid, None, None, questions=("next",), n_boot=n_boot, seed=0, **kw)
+        (root / name).mkdir(parents=True, exist_ok=True)
+        (root / name / "toys.json").write_text(json.dumps(stats.strict_json(res), allow_nan=False), encoding="utf-8")
+
+
+def _bash():
+    for c in ("C:/Program Files/Git/bin/bash.exe", shutil.which("bash")):
+        if c and Path(c).exists() and "system32" not in str(c).lower():                  # not WSL's bash.exe
+            return str(c)
+    return None
+
+
+BASH = _bash()
+needs_bash = pytest.mark.skipif(BASH is None, reason="no bash (Git Bash or a POSIX bash) on PATH")
+
+
+def make_scratch_repo(dest: Path, pilot_log: str = "# pilot log\n") -> Path:
+    """The parts of the repo the script and its DRY rehearsal need, in a scratch directory: src, the script, the two test files, the
+    amendment text (the freeze check reads it) and a pilot log."""
+    (dest / "src" / "confrec").mkdir(parents=True)
+    shutil.copy2(ROOT / "src" / "__init__.py", dest / "src" / "__init__.py")
+    for f in (ROOT / "src" / "confrec").glob("*.py"):
+        shutil.copy2(f, dest / "src" / "confrec" / f.name)
+    (dest / "tests").mkdir()
+    for name in ("conftest.py", "test_confrec_nextitem_audit.py", "test_confrec_serving_control.py"):
+        shutil.copy2(ROOT / "tests" / name, dest / "tests" / name)
+    (dest / "scripts" / "sigir").mkdir(parents=True)
+    for name in ("run_servingctrl.sh", "export_ref_exposure.py"):
+        shutil.copy2(ROOT / "scripts" / "sigir" / name, dest / "scripts" / "sigir" / name)
+    (dest / "idea-stage").mkdir()
+    for f in (ROOT / "idea-stage").glob("PREREG_AMENDMENT_3*.md"):
+        shutil.copy2(f, dest / "idea-stage" / f.name)
+    (dest / "docs" / "sigir").mkdir(parents=True)
+    (dest / "docs" / "sigir" / "PILOT_LOG.md").write_text(pilot_log, encoding="utf-8", newline="\n")
+    return dest
+
+
+def run_script(repo: Path, **env) -> subprocess.CompletedProcess:
+    e = {k: v for k, v in os.environ.items() if k not in ("DOMAINS", "PANELS", "N_BOOT", "SEED", "DRY_RUN", "DRY_N_BOOT", "PYTHONPATH",
+                                                          "AUDIT_QWEN", "AUDIT_QWEN_Z2", "AUDIT_LLAMA", "PYTHON")}
+    e.update(PYTHON=sys.executable.replace("\\", "/"), PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
+    e.update(env)
+    return subprocess.run([BASH, (repo / "scripts" / "sigir" / "run_servingctrl.sh").as_posix()], env=e, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=900)
+
+
+def tree(root: Path) -> dict:
+    return {p.relative_to(root).as_posix(): p.stat().st_size for p in sorted(root.rglob("*")) if p.is_file()}
+
+
+def pilot_log_with(repo: Path, amendment=True, own=True) -> str:
+    from src.confrec import ftgrid_freeze as ff
+    lines = ["# pilot log"]
+    if amendment:
+        lines += ff.lines_for("amendment", repo)
+    if own:
+        lines += sc.record_lines(root=repo)
+    return "\n".join(lines) + "\n"
+
+
+def msg(r: subprocess.CompletedProcess) -> str:
+    return f"rc={r.returncode}\n--- stdout ---\n{r.stdout[-3000:]}\n--- stderr ---\n{r.stderr[-3000:]}"
+
+
+def test_the_script_is_lf_bash_clean_cpu_only_offline_and_writes_one_directory():
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert text.startswith("#!/usr/bin/env bash\n") and "\r" not in text and "set -euo pipefail" in text
+    code = [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+    body = "\n".join(code)
+    assert not re.search(r"\b(curl|wget|ssh|scp|rsync|git|pip|apt|apt-get|ping|nvidia-smi|torch|vllm)\b", body)
+    assert "CUDA_VISIBLE_DEVICES=" in body and "nice -n 19" in body and "PYTHONDONTWRITEBYTECODE=1" in body
+    assert "OUT=outputs/confrec/nextitem_audit_ctrl" in body and "conda activate lumen" in body
+    assert not re.search(r"(?<![0-9&])>>?\s*[^&\s]", body.replace("2>&1", "").replace(">&2", "").replace("->", ""))   # no redirection to a file
+    assert re.findall(r'--out "\$OUTK/\$kind/(?:\$d|summary)\.json"', body) and body.count("--out ") == 2
+    assert "outputs/confrec/nextitem_audit/" not in body.replace("AUDIT_RESULTS=outputs/confrec/nextitem_audit ", "")
+    # the gates come before any run, in the registered order: freeze record, then the sha1 of the analysis's own files
+    i_freeze = body.index("ftgrid_freeze --check --stage amendment")
+    i_record = body.index("nextitem_serving_control record --pilot_log docs/sigir/PILOT_LOG.md")
+    i_run = body.index("nextitem_serving_control run ")
+    assert i_freeze < i_record < i_run
+    # the registered constants are fixed in the script, the registered kinds and layouts are spelt as the audit job and Z2 have them
+    assert "NB=2000" in body and "SEED=0" in body
+    assert "--segments single --test_role test1001_3000 --valid_role valid500 --first_event 1001" in body
+    assert "--segments single --first_event 1001" in body and "_large10000_100neg_test_same_candidate/ranking_test.jsonl" in body
+    assert "_large10000_100neg_valid_same_candidate/ranking_valid.jsonl" in body and "/root/autodl-tmp/lumen-audit-out" in body
+    if BASH:
+        r = subprocess.run([BASH, "-n", SCRIPT.as_posix()], capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr
+
+
+@needs_bash
+def test_the_script_refuses_without_the_freeze_record_and_the_sha1_of_its_own_files_and_starts_nothing(tmp_path):
+    repo = make_scratch_repo(tmp_path / "repo")
+    before = tree(repo)
+    env = dict(DOMAINS="toys", PANELS="registered", AUDIT_QWEN=str(tmp_path / "nowhere"))
+    # 1. nothing recorded: the freeze check fails
+    r = run_script(repo, **env)
+    assert r.returncode == 4 and "freeze record is not complete" in r.stderr, msg(r)
+    # 2. the amendment is recorded, the sha1 of the analysis's files are not
+    (repo / "docs" / "sigir" / "PILOT_LOG.md").write_text(pilot_log_with(repo, amendment=True, own=False), encoding="utf-8")
+    r = run_script(repo, **env)
+    assert r.returncode == 4 and "must be in docs/sigir/PILOT_LOG.md first" in r.stderr, msg(r)
+    # 3. one of the three files changed after it was recorded: refused again (the script itself is one of them)
+    (repo / "docs" / "sigir" / "PILOT_LOG.md").write_text(pilot_log_with(repo), encoding="utf-8")
+    script = repo / "scripts" / "sigir" / "run_servingctrl.sh"
+    script.write_bytes(script.read_bytes() + b"# edited after the record\n")
+    r = run_script(repo, **env)
+    assert r.returncode == 4 and "scripts/sigir/run_servingctrl.sh" in r.stderr, msg(r)
+    assert not (repo / "outputs").exists() and tree(repo).keys() - before.keys() == set(), msg(r)
+    # 4. everything recorded: a registered panel without TEST scores is an error (exit 1), a Z2 panel without them is skipped
+    script.write_bytes(script.read_bytes()[: -len(b"# edited after the record\n")])
+    (repo / "docs" / "sigir" / "PILOT_LOG.md").write_text(pilot_log_with(repo), encoding="utf-8")
+    r = run_script(repo, **env)
+    assert r.returncode == 1 and "no TEST scores" in r.stderr and not (repo / "outputs").exists(), msg(r)
+    r = run_script(repo, DOMAINS="toys tools", PANELS="z2_qwen z2_llama", AUDIT_QWEN_Z2=str(tmp_path / "nowhere"), AUDIT_LLAMA=str(tmp_path / "nowhere"))
+    assert r.returncode == 0 and r.stdout.count("skip z2_") == 4 and "SERVINGCTRL_DONE" in r.stdout, msg(r)
+    assert not (repo / "outputs").exists() and tree(repo).keys() - before.keys() == set(), msg(r)
+
+
+@needs_bash
+def test_the_script_refuses_bad_switches_and_settings_before_anything_else(tmp_path):
+    repo = make_scratch_repo(tmp_path / "repo")
+    before = tree(repo)
+    for env, want in ((dict(DRY_RUN="yes"), "DRY_RUN must be 0 or 1"), (dict(DRY_RUN=""), "DRY_RUN must be 0 or 1"),
+                      (dict(N_BOOT="100"), "N_BOOT is registered"), (dict(SEED="1"), "SEED is registered"),
+                      (dict(DRY_N_BOOT="5"), "DRY_N_BOOT belongs to a DRY_RUN=1 rehearsal"),
+                      (dict(DOMAINS="toys books"), "unknown domain 'books'"), (dict(PANELS="registered bogus"), "unknown panel 'bogus'")):
+        r = run_script(repo, **env)
+        assert r.returncode == 2 and want in r.stderr, (env, msg(r))
+    assert tree(repo) == before and not (repo / "outputs").exists()
+
+
+@needs_bash
+def test_the_dry_rehearsal_runs_the_three_panel_kinds_on_a_synthetic_fixture_and_writes_only_below_the_ctrl_directory(tmp_path):
+    repo = make_scratch_repo(tmp_path / "repo")                                   # an EMPTY pilot log: a rehearsal reads none
+    before = tree(repo)
+    r = run_script(repo, DRY_RUN="1", DRY_N_BOOT="20")
+    assert r.returncode == 0 and "SERVINGCTRL_DONE: panels=registered z2_qwen z2_llama domains=toys dry_run=1" in r.stdout, msg(r)
+    new = set(tree(repo)) - set(before)
+    assert new and all(p.startswith("outputs/confrec/nextitem_audit_ctrl/_dry/") for p in new), sorted(new)[:10]
+    assert not any("/nextitem_audit/" in p for p in new)                           # the registered audit directory is never written
+    assert all(tree(repo)[p] == before[p] for p in before), "an existing file was changed"
+    out = repo / "outputs" / "confrec" / "nextitem_audit_ctrl" / "_dry" / "out"
+    panels = {}
+    for kind, segment, first in (("qwen_registered", "all", 1), ("qwen_z2", "test", 1001), ("llama_z2", "test1001_3000", 1001)):
+        doc = jload(out / kind / "toys.json")
+        assert doc["panel_kind"] == kind and doc["panel"]["segment"] == segment and doc["panel"]["event_range"][0] == first
+        assert doc["n_boot"] == 20 and doc["seed"] == 0 and doc["status"] == "EXPLORATORY_DESCRIPTIVE"
+        assert doc["meta"]["audit_consistency"]["checked"] is True and doc["meta"]["audit_consistency"]["max_abs_diff"] == 0.0     # --audit_json
+        summary = jload(out / kind / "summary.json")
+        assert summary["panel_kind"] == kind and summary["n_panels"] == 1 and sum(summary["panel_labels"].values()) == 1
+        panels[kind] = doc
+    assert panels["llama_z2"]["layout"] == {"segments": "single", "test_role": "test1001_3000", "valid_role": "valid500", "first_event": 1001, "quarantine_n": None}
+    assert panels["qwen_registered"]["layout"]["segments"] == "auto" and panels["qwen_z2"]["layout"]["segments"] == "single"
+    assert "ftgrid_freeze" not in r.stdout + r.stderr                                # no freeze check in a rehearsal
+    # a second rehearsal rewrites its own files (same bytes)
+    snap = {p: (repo / p).read_bytes() for p in new if p.endswith(".json") and "/out/" in p}
+    r2 = run_script(repo, DRY_RUN="1", DRY_N_BOOT="20")
+    assert r2.returncode == 0 and all((repo / p).read_bytes() == b for p, b in snap.items()), msg(r2)

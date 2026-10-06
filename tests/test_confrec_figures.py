@@ -696,6 +696,18 @@ def test_cli_main_merges_entries_and_drops_stale_ones(world, tmp_path, capsys):
     capsys.readouterr()
 
 
+def test_a_malformed_file_leaves_the_output_directory_untouched(tmp_path):
+    """All requested figures are built in memory first: an error in the last one writes no PDF and no manifest."""
+    root = build_tree(tmp_path / "r")
+    d = load_rel(root, "aud/toys.json")
+    del d["segments"]["all"]["questions"]
+    write_json(root, "aud/toys.json", d)
+    out = tmp_path / "o"
+    with pytest.raises(mf.FigureDataError):
+        mf.run(root, out, only=ALL3)
+    assert not out.exists() or list(out.iterdir()) == []
+
+
 def test_cli_errors(world, tmp_path, capsys):
     with pytest.raises(SystemExit) as e:
         mf.main(["--results", str(world), "--out", str(tmp_path / "x"), "--only", "nonsense"])
@@ -796,6 +808,8 @@ def test_proposed_captions_hold_no_result_number():
     for c in caps:
         body = re.sub(r"\\(?:ref|label|cite[a-z]*)\{[^}]*\}", "", c)
         body = re.sub(r"\$[^$]*\$", "", body)                                    # symbols such as $m_T$ or $S_d$
+        for name in ("Qwen3-8B", "Llama-3.1-8B", "NDCG@10"):                    # names, not results
+            body = body.replace(name, "")
         nums = re.findall(r"\d[\d.,]*", body)
         assert set(nums) <= {"95"}, (nums, c[:80])                               # the interval level is a definition, not a result
 

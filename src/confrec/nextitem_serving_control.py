@@ -621,7 +621,8 @@ def cmd_record(a) -> int:
 def parse_args(argv=None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0], allow_abbrev=False)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    r = sub.add_parser("run", help="one panel / segment: gain at 50%, contrasts with p_max, readings (CPU)", allow_abbrev=False)
+    r = sub.add_parser("run", help="one panel / segment: gain at 50%% coverage, contrasts with p_max, readings (CPU)",
+                       allow_abbrev=False)
     r.add_argument("--domain", required=True)
     r.add_argument("--audit_dir", required=True, help="holds <domain>_<test_role>/scores.csv.gz and <domain>_<valid_role>/scores.csv.gz")
     r.add_argument("--panel_test", required=True)

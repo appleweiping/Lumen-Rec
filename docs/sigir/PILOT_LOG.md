@@ -1,5 +1,15 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addendum 12 (uncertainty-aware routing between the LLM and a published recommender; exploratory; recorded before any routed ranking was computed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_12.md` sha1 = 28563f69d80ccc93391be6bb056eb9b95ce61ab6. The audit's selective-serving block shows on which events the LLM ranks well; the addendum asks what to do with the other
+events: route each event between the LLM's ranking and the ranking of the published recommender with the highest TEST NDCG@10 (rule fixed now, computed from the reference rank files, all eight values
+recorded), by the LLM's `p_max`, against random routing (closed form) and the cheap signals of addendum 11 (history length, user popularity profile, popularity-only ranker confidence; directions fixed on
+VALID by the LLM's own utility). Primary: NDCG@10 of the routed system at coverage 0.5 minus the better single system (paired event bootstrap, 2,000 resamples, seed 0); labels BEATS_BOTH, BELOW_BEST,
+MATCHED (+-0.005), INCONCLUSIVE; counts across panels, no family. Written after the Toys and Sports audit results and the reference NDCG@10 of the published recommenders on those panels had been read
+(zero-shot LLM 0.245 and 0.207, eight recommenders 0.049-0.205 and 0.049-0.179, verbalised reranker 0.271 and 0.233), before any routed ranking was computed. The code is not written yet; its sha1 will be recorded
+before the first run on a real panel.
+
 ## 2026-10-06 · Wording rules record, update after the Games, Sports, Llama-Toys and FT-Q results were read (a sign added to a count; no decision function changed)
 
 `scripts/sigir/fill_paper.py` sha1 = 5198e7437090796db413fb0a00ae730dc02e6c7f and `tests/test_confrec_fillpaper.py` sha1 = 9b0ff9b8397581d0988ca0e71564bfe4e73b4674 (the previous record, 2026-10-05, is d4948d21... and 856e3bdb...; `docs/sigir/PAPER_DATA_MAP.md`

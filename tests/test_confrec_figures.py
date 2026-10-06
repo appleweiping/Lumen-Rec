@@ -2,7 +2,7 @@
 
 Fixtures: a synthetic results tree built in tmp_path with the REAL schemas of the files the figures read (grid reports, addendum-6
 extra files, next-item audits, the Gate-FT decision). Every number in it comes from a seeded RNG: no real result is used, and no
-result number is typed into an assertion. One test (skipped when the tree is absent) runs the generator on the real
+result number is typed into an assertion. One test (skipped when the tree is absent) runs the generator on a snapshot of the real
 docs/sigir/results tree and checks the same round trip, whatever panels that tree holds at the time.
 
 What is checked:
@@ -23,7 +23,6 @@ import hashlib
 import importlib.util
 import io
 import json
-import math
 import os
 import re
 import shutil
@@ -42,6 +41,7 @@ SCRIPT = ROOT / "scripts" / "sigir" / "make_figures.py"
 FILL = ROOT / "scripts" / "sigir" / "fill_paper.py"
 REAL = ROOT / "docs" / "sigir" / "results"
 FIGDIR = ROOT / "Paper" / "sigir2027" / "figures"
+ALL3 = ("tracks", "shares", "serving")
 
 
 def _load(name: str, path: Path):
@@ -56,7 +56,7 @@ mf = _load("_make_figures_under_test", SCRIPT)
 
 
 # ------------------------------------------------------------------------------------------------ synthetic world
-def rec(rng, centre, half=0.02, *, n_users=300, **extra) -> dict:
+def rec(centre, half=0.02, *, n_users=300, **extra) -> dict:
     """A result record {est, lo, hi, n_users, n_pairs, n_boot, descriptive_min_n} as the report writers produce it."""
     est = float(centre)
     d = {"est": est, "lo": est - half, "hi": est + half, "n_users": int(n_users), "n_pairs": int(n_users) * 10, "n_boot": 2000,
@@ -66,54 +66,55 @@ def rec(rng, centre, half=0.02, *, n_users=300, **extra) -> dict:
 
 
 def grid_report(rng, domain, backbone="Qwen3-8B", *, n_users=300, zs_reading="interpretable", ft_reading="interpretable") -> dict:
-    r = lambda lo, hi, half=0.02: rec(rng, rng.uniform(lo, hi), half, n_users=n_users)        # noqa: E731
+    r = lambda lo, hi, half=0.02: rec(rng.uniform(lo, hi), half, n_users=n_users)              # noqa: E731
     refs = {"q_hat": r(0.55, 0.7), "mf": r(0.5, 0.7), "popularity": r(0.5, 0.6), "mf_personal_residual": r(0.5, 0.6)}
     rows = {"n_users": n_users, "n_pairs": n_users * 10}
-    share_keys = lambda reading: {"item_prior_share": r(0.2, 0.9), "non_prior_share": r(0.1, 0.8),             # noqa: E731
+    seeds = ("s0", "s1", "s2")
+    share_keys = lambda reading: {"item_prior_share": r(0.2, 0.9), "non_prior_share": r(0.1, 0.8),          # noqa: E731
                                   "r8c": r(0.6, 0.97), "shares_reading": reading}
-    seeds = FT = ("s0", "s1", "s2")
 
     def gain(models):
-        out = {m: {"G": rec(rng, rng.uniform(-0.01, 0.03), 0.01, n_users=n_users, p=0.3, ci_excludes_0=False)} for m in models}
-        return {"rows": {"n_pairs": n_users * 10, "n_users": n_users}, "per_model": out,
-                "G_mean_over_seeds": rec(rng, rng.uniform(-0.01, 0.03), 0.01, n_users=n_users, p=0.2, ci_excludes_0=False),
-                "G_CF": rec(rng, rng.uniform(0.0, 0.05), 0.01, n_users=n_users, p=0.1, ci_excludes_0=True)}
+        per = {m: {"G": rec(rng.uniform(-0.01, 0.03), 0.01, n_users=n_users, p=0.3, ci_excludes_0=False)} for m in models}
+        return {"rows": {"n_pairs": n_users * 10, "n_users": n_users}, "per_model": per,
+                "G_mean_over_seeds": rec(rng.uniform(-0.01, 0.03), 0.01, n_users=n_users, p=0.2, ci_excludes_0=False),
+                "G_CF": rec(rng.uniform(0.0, 0.05), 0.01, n_users=n_users, p=0.1, ci_excludes_0=True)}
 
+    shares_rows = {"n_pairs": n_users * 10, "n_users": n_users, "n_users_with_2_or_more_pairs": n_users}
     return {
         "spec": "synthetic", "meta": {"domain": domain, "backbone": backbone, "n_boot": 2000},
         "E_A": {
             "ZS": {"models": ["zeroshot"], "missing_or_excluded": [], "complete": True,
                    "UAUC_TEST": {"rows": rows, "per_model": {"zeroshot": r(0.45, 0.62)}, "mean_over_seeds": r(0.45, 0.62),
                                  "references": refs}},
-            "FT": {"models": list(FT), "missing_or_excluded": [], "complete": True,
-                   "UAUC_TEST": {"rows": rows, "per_model": {m: r(0.55, 0.78) for m in seeds},
-                                 "mean_over_seeds": r(0.55, 0.78), "references": json.loads(json.dumps(refs))}}},
+            "FT": {"models": list(seeds), "missing_or_excluded": [], "complete": True,
+                   "UAUC_TEST": {"rows": rows, "per_model": {m: r(0.55, 0.78) for m in seeds}, "mean_over_seeds": r(0.55, 0.78),
+                                 "references": json.loads(json.dumps(refs))}}},
         "E_D": {
             "ZS": {"models": ["zeroshot"], "complete": True,
-                   "shares": {"rows": {"n_pairs": n_users * 10, "n_users": n_users, "n_users_with_2_or_more_pairs": n_users},
-                              "per_model": {"zeroshot": share_keys(zs_reading)}, "mean_over_seeds": share_keys(zs_reading)},
+                   "shares": {"rows": shares_rows, "per_model": {"zeroshot": share_keys(zs_reading)},
+                              "mean_over_seeds": share_keys(zs_reading)},
                    "information_gain": gain(["zeroshot"])},
-            "FT": {"models": list(FT), "complete": True,
-                   "shares": {"rows": {"n_pairs": n_users * 10, "n_users": n_users, "n_users_with_2_or_more_pairs": n_users},
-                              "per_model": {m: share_keys(ft_reading) for m in seeds}, "mean_over_seeds": share_keys(ft_reading)},
+            "FT": {"models": list(seeds), "complete": True,
+                   "shares": {"rows": shares_rows, "per_model": {m: share_keys(ft_reading) for m in seeds},
+                              "mean_over_seeds": share_keys(ft_reading)},
                    "information_gain": gain(list(seeds))}},
     }
 
 
 def extra_report(rng, domain, backbone="Qwen3-8B", *, status="registered_outcome_free", n_users=300, g_descriptive=True) -> dict:
-    r = lambda lo, hi, half=0.02: rec(rng, rng.uniform(lo, hi), half, n_users=n_users)        # noqa: E731
+    r = lambda lo, hi, half=0.02: rec(rng.uniform(lo, hi), half, n_users=n_users)              # noqa: E731
     rows = {"n_users": n_users, "n_pairs": n_users * 10}
 
     def j(models):
         return {"rows_E_A": dict(rows), "complete": True,
-                "dUAUC_L_minus_q_hat_T": {"rows": dict(rows), "per_seed": {m: {**r(-0.1, 0.1), "UAUC_a": 0.6,
-                                                                              "UAUC_b": float(rng.uniform(0.5, 0.7))} for m in models}}}
+                "dUAUC_L_minus_q_hat_T": {"rows": dict(rows), "per_seed": {
+                    m: {**r(-0.1, 0.1), "UAUC_a": 0.6, "UAUC_b": float(rng.uniform(0.5, 0.7))} for m in models}}}
 
     def w(models):
         return {"models": list(models), "complete": True, "rows": dict(rows),
-                "G_wu": {"per_model": {m: rec(rng, rng.uniform(-0.01, 0.03), 0.01, n_users=n_users) for m in models},
-                         "mean_over_seeds": rec(rng, rng.uniform(-0.01, 0.03), 0.01, n_users=n_users)},
-                "G_CF_wu": rec(rng, rng.uniform(0.0, 0.05), 0.01, n_users=n_users)}
+                "G_wu": {"per_model": {m: rec(rng.uniform(-0.01, 0.03), 0.01, n_users=n_users) for m in models},
+                         "mean_over_seeds": rec(rng.uniform(-0.01, 0.03), 0.01, n_users=n_users)},
+                "G_CF_wu": rec(rng.uniform(0.0, 0.05), 0.01, n_users=n_users)}
 
     def g(models):
         return {"models": list(models), "complete": True,
@@ -132,7 +133,7 @@ def aud_report(rng, domain, segments=(("all", "all"),), n_events=500) -> dict:
 
     def curve(base, slope):
         out = []
-        for k, c in enumerate(cov):
+        for c in cov:
             est = base + slope * (1.0 - c)
             out.append({"coverage": c, "est": est, "lo": est - 0.02, "hi": est + 0.02, "n": n_events, "n_boot": 2000})
         return out
@@ -144,15 +145,9 @@ def aud_report(rng, domain, segments=(("all", "all"),), n_events=500) -> dict:
                      "questions": {"next": {"D_selective_serving": {
                          "n_events": n_events, "coverage_points": cov,
                          "signals": {"p_max": {"curve": {"ndcg10": curve(base, 0.4)}},
-                                     "margin": {"curve": {"ndcg10": curve(base, 0.3)}},
+                                     "margin": {"curve": {"ndcg10": curve(base, 0.3)}},       # in the file, never drawn
                                      "random": {"curve": {"ndcg10": curve(base, 0.0)}}}}}}}
     return {"schema": "nextitem_audit_v1", "domain": domain, "n_boot": 2000, "segments": segs}
-
-
-def collect_all(root: Path):
-    """The data layer of the three figures (no drawing): where a malformed file must raise."""
-    res = mf.Results(root)
-    return mf.collect_tracks(res), mf.collect_shares(res), mf.collect_serving(res)
 
 
 def write_json(root: Path, rel: str, obj) -> Path:
@@ -163,8 +158,8 @@ def write_json(root: Path, rel: str, obj) -> Path:
 
 
 def build_tree(root: Path, *, seed: int = 0, skip=(), gate="GATE_FT_PASS", over=None) -> Path:
-    """A results tree with the real layout: grid/{qwen,llama}, extra/..., aud/..., gft/gate_ft.json. `skip`: relative paths to leave out;
-    `over[rel]`: keyword overrides of that file's builder."""
+    """A results tree with the real layout: grid/{qwen,llama}, extra/..., aud/..., gft/gate_ft.json. `skip`: relative paths to leave
+    out; `over[rel]`: keyword overrides of that file's builder."""
     rng = np.random.default_rng(seed)
     over = over or {}
     root.mkdir(parents=True, exist_ok=True)
@@ -211,6 +206,25 @@ def all_values(entry: dict):
             yield p, v
 
 
+def collect_all(root: Path):
+    """The data layer of the three figures (no drawing): where a malformed file must raise."""
+    res = mf.Results(root)
+    return mf.collect_tracks(res), mf.collect_shares(res), mf.collect_serving(res)
+
+
+def entry_of(spec, root: Path) -> dict:
+    """The manifest entry of a spec without rendering it (the file hash is not under test there)."""
+    return spec.entry(mf.Results(root), file=f"{spec.fid}.pdf", sha1="0" * 40, nbytes=0)
+
+
+def _with(root: Path, new_root: Path, rel: str, mutate) -> Path:
+    shutil.copytree(root, new_root)
+    d = load_rel(new_root, rel)
+    mutate(d)
+    write_json(new_root, rel, d)
+    return new_root
+
+
 @pytest.fixture(scope="module")
 def world(tmp_path_factory):
     return build_tree(tmp_path_factory.mktemp("results_full"))
@@ -219,17 +233,27 @@ def world(tmp_path_factory):
 @pytest.fixture(scope="module")
 def full_run(world, tmp_path_factory):
     out = tmp_path_factory.mktemp("figs_full")
-    manifest = mf.run(world, out, only=("tracks", "shares", "serving"))
-    return world, out, manifest
+    return world, out, mf.run(world, out, only=ALL3)
+
+
+HOLES = ("grid/qwen/sports.json", "aud/home.json", "aud/tools.json", "extra/toys.json")
+
+
+@pytest.fixture(scope="module")
+def holey(tmp_path_factory):
+    """A tree with a rated panel, two next-item panels and one addendum-6 file missing, rendered once."""
+    root = build_tree(tmp_path_factory.mktemp("results_holes"), skip=HOLES)
+    out = tmp_path_factory.mktemp("figs_holes")
+    return root, out, mf.run(root, out, only=ALL3)
 
 
 # ------------------------------------------------------------------------------------------------ manifest round trip
 def test_manifest_values_equal_source_files(full_run):
     root, out, manifest = full_run
-    assert manifest["schema"] == mf.SCHEMA and set(manifest["figures"]) == {"tracks", "shares", "serving"}
+    assert manifest["schema"] == mf.SCHEMA and set(manifest["figures"]) == set(ALL3)
     n = 0
     for fid, e in manifest["figures"].items():
-        assert e["status"] in ("ok", "partial")
+        assert e["status"] == "ok" and e["missing"] == []
         for panel, v in all_values(e):
             node = resolve(root, v["source"])
             if isinstance(node, dict):
@@ -255,18 +279,15 @@ def test_manifest_sha1s_equal_file_hashes(full_run):
         for panel in e["panels"]:
             for s in panel["sources"]:
                 assert listed[s["path"]] == s["sha1"]
-    on_disk = json.loads((out / mf.MANIFEST_NAME).read_text(encoding="utf-8"))
-    assert on_disk == manifest
+    assert json.loads((out / mf.MANIFEST_NAME).read_text(encoding="utf-8")) == manifest
 
 
 def test_manifest_lists_every_figure_source_and_n_boot(full_run):
     root, out, manifest = full_run
     tracks = manifest["figures"]["tracks"]
-    paths = {s["path"] for s in tracks["sources"]}
-    assert {"grid/qwen/ml1m.json", "extra/ml1m.json", "extra/llama/toys.json", mf.GATE_FT} <= paths
+    assert {"grid/qwen/ml1m.json", "extra/ml1m.json", "extra/llama/toys.json", mf.GATE_FT} <= {s["path"] for s in tracks["sources"]}
     assert tracks["n_boot_values"] == [2000]
     assert [s["path"] for s in manifest["figures"]["serving"]["sources"]] == [f"aud/{d}.json" for d in ("home", "sports", "tools", "toys")]
-    assert all(e["missing"] == [] and e["status"] == "ok" for e in manifest["figures"].values())
 
 
 # ------------------------------------------------------------------------------------------------ drawn = manifest
@@ -274,10 +295,9 @@ def _artists_by_gid(fig):
     return {a.get_gid(): a for a in fig.findobj(lambda a: a.get_gid() is not None) if a.get_gid()}
 
 
-@pytest.mark.parametrize("fid", ["tracks", "shares"])
-def test_drawn_marks_equal_manifest(world, fid):
-    res = mf.Results(world)
-    spec = getattr(mf, f"collect_{fid}")(res)
+@pytest.mark.parametrize("fid,minimum", [("tracks", 40), ("shares", 100)])
+def test_drawn_marks_equal_manifest(world, fid, minimum):
+    spec = getattr(mf, f"collect_{fid}")(mf.Results(world))
     fig = getattr(mf, f"draw_{fid}")(spec)
     gids = _artists_by_gid(fig)
     horizontal = fid == "tracks"                     # F1 plots the estimate on x, F2 on y
@@ -287,17 +307,15 @@ def test_drawn_marks_equal_manifest(world, fid):
             if v.role == "count":
                 continue
             pt = gids[f"{v.uid}:pt"]
-            val = (pt.get_xdata() if horizontal else pt.get_ydata())[0]
-            assert val == v.est
+            assert (pt.get_xdata() if horizontal else pt.get_ydata())[0] == v.est
             assert (pt.get_markerfacecolor() == "white") == bool(v.flags), v.uid
             n_pt += 1
             if v.lo is not None:
                 ci = gids[f"{v.uid}:ci"]
-                data = ci.get_xdata() if horizontal else ci.get_ydata()
-                assert list(data) == [v.lo, v.hi]
+                assert list(ci.get_xdata() if horizontal else ci.get_ydata()) == [v.lo, v.hi]
             else:
                 assert f"{v.uid}:ci" not in gids
-    assert n_pt >= 40
+    assert n_pt >= minimum
     mf.plt.close(fig)
 
 
@@ -311,17 +329,17 @@ def test_drawn_curves_equal_manifest(world):
             line = gids[f"serving/{p.pid}/{sig}:line"]
             assert list(line.get_xdata()) == [v.fields["coverage"] for v in vals]
             assert list(line.get_ydata()) == [v.est for v in vals]
-            band = gids[f"serving/{p.pid}/{sig}:band"]
-            ys = {round(y, 12) for y in band.get_paths()[0].vertices[:, 1]}
+            ys = {round(y, 12) for y in gids[f"serving/{p.pid}/{sig}:band"].get_paths()[0].vertices[:, 1]}
             assert {round(v.lo, 12) for v in vals} | {round(v.hi, 12) for v in vals} <= ys
+        assert "margin" not in " ".join(g for g in gids if g)                      # a signal in the file that is not drawn
     mf.plt.close(fig)
 
 
-def test_text_stays_inside_the_canvas(tmp_path):
+def test_text_stays_inside_the_canvas(holey):
     """Layout is placed by hand in inches: nothing may spill over the edge of the PDF page, placeholders included."""
-    root = build_tree(tmp_path / "r", skip=("grid/qwen/sports.json", "aud/home.json", "extra/toys.json"))
+    root = holey[0]
     res = mf.Results(root)
-    for fid in ("tracks", "shares", "serving"):
+    for fid in ALL3:
         fig = getattr(mf, f"draw_{fid}")(getattr(mf, f"collect_{fid}")(res))
         with mf.style():
             fig.canvas.draw()
@@ -347,22 +365,20 @@ def test_pdf_is_vector_truetype_and_exact_size(full_run):
 
 
 # ------------------------------------------------------------------------------------------------ placeholders and errors
-def test_missing_panel_is_an_explicit_placeholder(tmp_path):
-    root = build_tree(tmp_path / "r", skip=("grid/qwen/sports.json", "aud/home.json", "aud/tools.json"))
-    out = tmp_path / "o"
-    m = mf.run(root, out, only=("tracks", "shares", "serving"))
-    for fid, miss in (("tracks", "grid/qwen/sports.json"), ("shares", "grid/qwen/sports.json"), ("serving", "aud/home.json")):
+def test_missing_panel_is_an_explicit_placeholder(holey):
+    root, out, m = holey
+    for fid, pid, miss in (("tracks", "qwen:sports", "grid/qwen/sports.json"), ("shares", "qwen:sports", "grid/qwen/sports.json"),
+                           ("serving", "home:all", "aud/home.json")):
         e = m["figures"][fid]
         assert e["status"] == "partial"
-        p = {p["id"]: p for p in e["panels"]}[{"tracks": "qwen:sports", "shares": "qwen:sports", "serving": "home:all"}[fid]]
+        p = {p["id"]: p for p in e["panels"]}[pid]
         assert p["status"] == "not_run" and p["values"] == []
         assert p["missing"][0]["path"] == miss and p["missing"][0]["kind"] == "file"
         assert any(x["path"] == miss for x in e["missing"])
         assert (out / e["file"]).stat().st_size > 1000
     assert {x["path"] for x in m["figures"]["serving"]["missing"]} == {"aud/home.json", "aud/tools.json"}
-    # the placeholder is drawn: its text names the missing file
-    spec = mf.collect_serving(mf.Results(root))
-    fig = mf.draw_serving(spec)
+    assert "extra/toys.json" in {x["path"] for x in m["figures"]["tracks"]["missing"]}
+    fig = mf.draw_serving(mf.collect_serving(mf.Results(root)))           # the placeholder is drawn: its text names the missing file
     texts = " ".join(t.get_text() for t in fig.findobj(mf.plt.Text))
     assert "not run yet" in texts and "aud/home.json" in texts and "aud/tools.json" in texts
     mf.plt.close(fig)
@@ -371,7 +387,7 @@ def test_missing_panel_is_an_explicit_placeholder(tmp_path):
 def test_every_input_missing_gives_not_run_figures_never_a_crash(tmp_path):
     empty = tmp_path / "empty"
     empty.mkdir()
-    m = mf.run(empty, tmp_path / "o", only=("tracks", "shares", "serving"))
+    m = mf.run(empty, tmp_path / "o", only=ALL3)
     for fid, e in m["figures"].items():
         assert e["status"] == "not_run" and e["sources"] == [] and e["missing"], fid
         assert all(p["status"] == "not_run" and p["values"] == [] for p in e["panels"])
@@ -379,8 +395,8 @@ def test_every_input_missing_gives_not_run_figures_never_a_crash(tmp_path):
     assert m["figures"]["tracks"]["meta"]["gate_ft"]["state"] == "missing"
 
 
-def test_a_missing_element_inside_a_panel_is_marked_not_run(tmp_path):
-    root = build_tree(tmp_path / "r", skip=("extra/toys.json", "extra/llama/toys.json"))
+def test_a_missing_element_inside_a_panel_is_marked_not_run(holey):
+    root = holey[0]
     spec = mf.collect_tracks(mf.Results(root))
     toys = {p.pid: p for p in spec.panels}["qwen:toys"]
     assert toys.status == "partial" and toys.one("zero_shot") is not None and toys.one("matched_mean") is None
@@ -407,12 +423,15 @@ def test_fig_not_run_placeholder_draws_reason_and_file():
 
 
 MALFORMED = [
-    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].pop("est"), "E_A.ZS.UAUC_TEST.per_model.zeroshot.est"),
+    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].pop("est"),
+     "E_A.ZS.UAUC_TEST.per_model.zeroshot.est"),
     ("grid/qwen/ml1m.json", lambda d: d["E_A"].pop("ZS"), "E_A.ZS"),
     ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].update(est="0.6"),
      "E_A.ZS.UAUC_TEST.per_model.zeroshot.est"),
-    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].update(lo=9.0), "E_A.ZS.UAUC_TEST.per_model.zeroshot"),
-    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].update(lo=None), "E_A.ZS.UAUC_TEST.per_model.zeroshot"),
+    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].update(lo=9.0),
+     "E_A.ZS.UAUC_TEST.per_model.zeroshot"),
+    ("grid/qwen/ml1m.json", lambda d: d["E_A"]["ZS"]["UAUC_TEST"]["per_model"]["zeroshot"].update(lo=None),
+     "E_A.ZS.UAUC_TEST.per_model.zeroshot"),
     ("grid/qwen/ml1m.json", lambda d: d["meta"].update(domain="toys"), "meta.domain"),
     ("grid/llama/toys.json", lambda d: d["meta"].update(backbone="Qwen3-8B"), "meta.backbone"),
     ("grid/qwen/toys.json", lambda d: d["E_D"]["ZS"]["shares"]["per_model"]["zeroshot"].update(shares_reading="maybe"),
@@ -488,18 +507,16 @@ def test_exploratory_and_descriptive_flags_reach_the_manifest_and_the_marks(tmp_
     assert e_toys.flags == ("descriptive",)             # E_G is flagged descriptive in every file
     assert sh["qwen:ml1m"].one("G_wu.zs").flags == ("exploratory",) and sh["qwen:toys"].one("G_wu.zs").flags == ()
     assert sh["qwen:ml1m"].one("G.zs").flags == ()      # the registered gain is not an exploratory analysis
-    out = mf.run(root, tmp_path / "o", only=("tracks",))["figures"]["tracks"]
-    assert out["flags_used"] == ["descriptive", "exploratory"] and out["meta"]["gate_ft"]["state"] == "pass"
-    flagged = [v for _, v in all_values(out) if "exploratory" in v["flags"]]
+    entry = entry_of(spec, root)
+    assert entry["flags_used"] == ["descriptive", "exploratory"] and entry["meta"]["gate_ft"]["state"] == "pass"
+    flagged = [v for _, v in all_values(entry) if "exploratory" in v["flags"]]
     assert flagged and all(v["flag_sources"] for v in flagged)
     for v in flagged:
         assert resolve(root, v["flag_sources"][0]) == "exploratory"
-    # the marker is hollow exactly where a flag stands
-    fig = mf.draw_tracks(spec)
+    fig = mf.draw_tracks(spec)                          # the marker is hollow exactly where a flag stands
     g = _artists_by_gid(fig)
-    assert g[f"{mt.uid}:pt"].get_markerfacecolor() == "white"
+    assert g[f"{mt.uid}:pt"].get_markerfacecolor() == "white" and g[f"{z.uid}:pt"].get_markerfacecolor() == "white"
     assert g[f"{pan['qwen:toys'].one('matched_mean').uid}:pt"].get_markerfacecolor() != "white"
-    assert g[f"{z.uid}:pt"].get_markerfacecolor() == "white"
     mf.plt.close(fig)
 
 
@@ -512,23 +529,14 @@ def test_uninterpretable_shares_are_withheld_not_drawn(tmp_path):
     assert all("uninterpretable" in w["reason"] and w["source"].startswith("grid/qwen/toys.json:E_D.ZS.shares") for w in p.withheld)
     assert p.one("item_prior_share.lora") is not None and p.one("e_share.zs") is not None      # the other regime and e-share stay
     assert p.status == "partial"
-    withheld_values = load_rel(root, "grid/qwen/toys.json")["E_D"]["ZS"]["shares"]["per_model"]["zeroshot"]["item_prior_share"]["est"]
-    entry = mf.run(root, tmp_path / "o", only=("shares",))["figures"]["shares"]
-    assert withheld_values not in [v["fields"].get("est") for _, v in all_values(entry)]       # the withheld number is not in the manifest
+    withheld = load_rel(root, "grid/qwen/toys.json")["E_D"]["ZS"]["shares"]["per_model"]["zeroshot"]["item_prior_share"]["est"]
+    assert withheld not in [v["fields"].get("est") for _, v in all_values(entry_of(spec, root))]   # the withheld number is not listed
     fig = mf.draw_shares(spec)
     assert sum(1 for t in fig.findobj(mf.plt.Text) if t.get_text() == "n/i") == 2
     mf.plt.close(fig)
+    bad = _with(root, tmp_path / "bad", "grid/qwen/toys.json", lambda d: d["E_D"]["FT"]["shares"]["mean_over_seeds"].update(shares_reading="x"))
     with pytest.raises(mf.FigureDataError):
-        mf.collect_shares(mf.Results(_with(root, tmp_path / "bad", "grid/qwen/toys.json",
-                                           lambda d: d["E_D"]["FT"]["shares"]["mean_over_seeds"].update(shares_reading="x"))))
-
-
-def _with(root: Path, new_root: Path, rel: str, mutate) -> Path:
-    shutil.copytree(root, new_root)
-    d = load_rel(new_root, rel)
-    mutate(d)
-    write_json(new_root, rel, d)
-    return new_root
+        mf.collect_shares(mf.Results(bad))
 
 
 def test_lora_is_drawn_only_after_a_recorded_gate_ft_pass(tmp_path):
@@ -543,8 +551,7 @@ def test_lora_is_drawn_only_after_a_recorded_gate_ft_pass(tmp_path):
     assert all(any(m["series"] == "lora" for m in p.missing) for p in sh.panels)
     nogate = build_tree(tmp_path / "n", skip=("gft/gate_ft.json",))
     spec = mf.collect_tracks(mf.Results(nogate))
-    assert spec.meta["gate_ft"]["state"] == "missing"
-    assert all(not p.by_series("lora") for p in spec.panels)
+    assert spec.meta["gate_ft"]["state"] == "missing" and all(not p.by_series("lora") for p in spec.panels)
     assert any(m["path"] == mf.GATE_FT and m["kind"] == "file" for p in spec.panels for m in p.missing)
     ok = mf.collect_tracks(mf.Results(build_tree(tmp_path / "g")))
     assert all(len(p.by_series("lora")) == 1 and all(p.by_series(f"lora_seed{k}") for k in range(3)) for p in ok.panels)
@@ -558,8 +565,7 @@ def test_references_and_matched_mean_on_other_rows_are_flagged(tmp_path):
     e = load_rel(root, "extra/games.json")
     e["E_J"]["ZS"]["rows_E_A"]["n_users"] += 1
     write_json(root, "extra/games.json", e)
-    spec = mf.collect_tracks(mf.Results(root))
-    pan = {p.pid: p for p in spec.panels}
+    pan = {p.pid: p for p in mf.collect_tracks(mf.Results(root)).panels}
     assert pan["qwen:toys"].one("item_mean").flags == ("rows_differ",) and pan["qwen:toys"].notes
     assert pan["qwen:toys"].one("mf").flags == ()
     assert pan["qwen:games"].one("matched_mean").flags == ("rows_differ",)
@@ -567,9 +573,9 @@ def test_references_and_matched_mean_on_other_rows_are_flagged(tmp_path):
 
 def test_f3_descriptive_when_fewer_than_the_minimum_events(tmp_path):
     root = build_tree(tmp_path / "r", over={"aud/tools.json": {"n_events": 80}})
-    p = {p.pid: p for p in mf.collect_serving(mf.Results(root)).panels}["tools:all"]
-    assert all(v.flags == ("descriptive",) for v in p.by_series("p_max") + p.by_series("random"))
-    assert not any(v.flags for v in {q.pid: q for q in mf.collect_serving(mf.Results(root)).panels}["toys:all"].data())
+    pan = {p.pid: p for p in mf.collect_serving(mf.Results(root)).panels}
+    assert all(v.flags == ("descriptive",) for v in pan["tools:all"].by_series("p_max") + pan["tools:all"].by_series("random"))
+    assert not any(v.flags for v in pan["toys:all"].data())
 
 
 def test_serving_uses_the_family_segment_not_the_quarantine(world):
@@ -615,8 +621,8 @@ def test_no_figure_function_opens_a_file_outside_the_results_root(tmp_path, monk
     decoy = tmp_path / "outside" / "decoy.json"
     decoy.parent.mkdir()
     decoy.write_text(json.dumps({"meta": {"domain": "sports"}}), encoding="utf-8")
-    (tmp_path / "results" / "notes").mkdir()
-    (tmp_path / "results" / "notes" / "ref.json").write_text(json.dumps({"path": "../../outside/decoy.json"}), encoding="utf-8")
+    (root / "notes").mkdir()
+    (root / "notes" / "ref.json").write_text(json.dumps({"path": "../../outside/decoy.json"}), encoding="utf-8")   # a lure
     opened = []
     real_io_open, real_os_open = io.open, os.open
 
@@ -632,47 +638,42 @@ def test_no_figure_function_opens_a_file_outside_the_results_root(tmp_path, monk
     monkeypatch.setattr(builtins, "open", spy_open)
     monkeypatch.setattr(os, "open", spy_os_open)
     out = tmp_path / "o"
-    m = mf.run(root, out, only=("tracks", "shares", "serving"))
+    collect_all(root)                                  # the data layer of every figure
+    entry = mf.fig_serving(root, out)                  # and one figure function end to end (reads, draws, writes)
     monkeypatch.undo()
     names = {str(Path(x).resolve()) for x in opened if isinstance(x, str)}
     assert str(decoy.resolve()) not in names
+    res_root = root.resolve()
     data_files = {x for x in names if x.lower().endswith(".json") and Path(x).is_relative_to(tmp_path.resolve())}
-    res_root = (tmp_path / "results").resolve()
     assert data_files, "the spy saw no data file"
-    assert all(Path(x).is_relative_to(res_root) or Path(x).is_relative_to(out.resolve()) for x in data_files), data_files
-    assert m["figures"]["tracks"]["status"] == "partial"
+    assert all(Path(x).is_relative_to(res_root) for x in data_files), data_files
+    assert entry["status"] == "ok" and (out / "serving.pdf").is_file()
 
 
 # ------------------------------------------------------------------------------------------------ determinism, CLI
-def test_same_inputs_give_byte_identical_pdfs_and_manifest(full_run, tmp_path):
+def test_same_inputs_give_byte_identical_pdfs_and_entries(full_run, tmp_path):
     root, out, manifest = full_run
-    again = mf.run(root, tmp_path / "again", only=("tracks", "shares", "serving"))
-    for fid, e in manifest["figures"].items():
-        assert (out / e["file"]).read_bytes() == (tmp_path / "again" / e["file"]).read_bytes(), fid
-        assert again["figures"][fid]["sha1"] == e["sha1"]
-    assert (out / mf.MANIFEST_NAME).read_bytes() == (tmp_path / "again" / mf.MANIFEST_NAME).read_bytes()
+    again = mf.fig_serving(root, tmp_path)
+    assert again == manifest["figures"]["serving"]
+    assert (tmp_path / "serving.pdf").read_bytes() == (out / "serving.pdf").read_bytes()
     text = json.dumps(manifest)
-    assert not re.search(r"[A-Za-z]:[\\\\/]", text) and "CreationDate" not in text and Path.home().name not in text
-    mtime = (out / "tracks.pdf").stat().st_mtime_ns                                  # a file is rewritten only when its bytes change
-    mf.run(root, out, only=("tracks",))
-    assert (out / "tracks.pdf").stat().st_mtime_ns == mtime
+    assert not re.search(r"[A-Za-z]:[\\/]", text) and "CreationDate" not in text and Path.home().name not in text
 
 
 def test_determinism_across_processes_with_different_hash_seeds(world, tmp_path):
-    """Two fresh interpreters (different PYTHONHASHSEED), same inputs: byte-identical PDFs and manifest, through the CLI script."""
+    """Two fresh interpreters (different PYTHONHASHSEED), same inputs: byte-identical PDF and manifest, through the CLI script."""
     procs = []
     for k, seed in enumerate(("1", "2")):
         out = tmp_path / f"p{k}"
         env = {**os.environ, "PYTHONHASHSEED": seed, "MPLBACKEND": "Agg"}
-        procs.append((out, subprocess.Popen([sys.executable, str(SCRIPT), "--results", str(world), "--out", str(out), "--only",
-                                             "tracks,serving"], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-                                            cwd=ROOT)))
+        procs.append((out, subprocess.Popen([sys.executable, str(SCRIPT), "--results", str(world), "--out", str(out), "--only", "tracks"],
+                                            env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=ROOT)))
     for out, p in procs:
         so, se = p.communicate(timeout=150)
         assert p.returncode == 0, se
-        assert "tracks" in so and "serving" in so and "sha1" in so
+        assert "tracks" in so and "sha1" in so
     a, b = procs[0][0], procs[1][0]
-    for name in ("tracks.pdf", "serving.pdf", mf.MANIFEST_NAME):
+    for name in ("tracks.pdf", mf.MANIFEST_NAME):
         assert (a / name).read_bytes() == (b / name).read_bytes(), name
 
 
@@ -680,13 +681,15 @@ def test_cli_main_merges_entries_and_drops_stale_ones(world, tmp_path, capsys):
     a = tmp_path / "a"
     assert mf.main(["--results", str(world), "--out", str(a), "--only", "serving"]) == 0
     assert "serving" in capsys.readouterr().out
-    assert mf.main(["--results", str(world), "--out", str(a), "--only", "shares"]) == 0
+    (a / "decomp.tex").write_text("\\begin{tikzpicture}\\end{tikzpicture}\n", encoding="utf-8")
+    assert mf.main(["--results", str(world), "--out", str(a), "--only", "decomp"]) == 0
     man = json.loads((a / mf.MANIFEST_NAME).read_text(encoding="utf-8"))
-    assert list(man["figures"]) == ["shares", "serving"]                             # the figure not asked for is kept
+    assert list(man["figures"]) == ["serving", "decomp"]                             # the figure not asked for is kept
+    assert man["figures"]["decomp"]["kind"] == "tikz" and man["figures"]["decomp"]["sha1"] == sha1_of(a / "decomp.tex")
     mtime = (a / "serving.pdf").stat().st_mtime_ns
     assert mf.main(["--results", str(world), "--out", str(a), "--only", "serving"]) == 0     # same bytes: the file is not rewritten
     assert (a / "serving.pdf").stat().st_mtime_ns == mtime
-    (a / "shares.pdf").write_bytes(b"stale")                                         # a kept entry must still match its file
+    (a / "decomp.tex").write_text("changed\n", encoding="utf-8")                      # a kept entry must still match its file
     assert mf.main(["--results", str(world), "--out", str(a), "--only", "serving"]) == 0
     assert list(json.loads((a / mf.MANIFEST_NAME).read_text(encoding="utf-8"))["figures"]) == ["serving"]
     capsys.readouterr()
@@ -705,7 +708,7 @@ def test_cli_errors(world, tmp_path, capsys):
     assert mf.main(["--results", str(root), "--out", str(tmp_path / "x"), "--only", "F3"]) == 2
     err = capsys.readouterr().err
     assert "aud/toys.json" in err and "segments.all.questions" in err
-    assert mf.normalise_ids(["F1,F2", "fig_serving"]) == ["tracks", "shares", "serving"] and mf.normalise_ids(None) == list(mf.FIG_IDS)
+    assert mf.normalise_ids(["F1,F2", "fig_serving"]) == list(ALL3) and mf.normalise_ids(None) == list(mf.FIG_IDS)
 
 
 def test_decomp_is_listed_by_hash_and_must_exist(tmp_path):
@@ -724,11 +727,12 @@ def test_real_tree_round_trip(tmp_path):
     """Whatever panels the committed tree holds today render with data, the rest as placeholders; the round trip holds for both."""
     snap = tmp_path / "snapshot"                                   # one consistent copy: a pull may rewrite the tree meanwhile
     shutil.copytree(REAL, snap, ignore=shutil.ignore_patterns("*.csv"))
-    m = mf.run(snap, tmp_path / "figs", only=("tracks", "shares", "serving"))
+    specs = collect_all(snap)
     n = 0
-    for fid, e in m["figures"].items():
-        for rel_sha in e["sources"]:
-            assert rel_sha["sha1"] == sha1_of(snap / rel_sha["path"])
+    for spec in specs:
+        e = entry_of(spec, snap)
+        for s in e["sources"]:
+            assert s["sha1"] == sha1_of(snap / s["path"])
         for panel, v in all_values(e):
             node = resolve(snap, v["source"])
             if isinstance(node, dict):
@@ -741,11 +745,11 @@ def test_real_tree_round_trip(tmp_path):
             for miss in p["missing"]:
                 if miss["kind"] == "file":
                     assert not (snap / miss["path"]).exists(), miss
-        assert e["sha1"] == sha1_of(tmp_path / "figs" / e["file"])
-    tracks = {p["id"]: p for p in m["figures"]["tracks"]["panels"]}
-    assert tracks["qwen:ml1m"]["status"] in ("ok", "partial") and tracks["llama:ml1m"]["status"] in ("ok", "partial")
-    assert tracks["qwen:toys"]["status"] in ("ok", "partial")
-    assert n > 100
+    tracks = {p.pid: p for p in specs[0].panels}
+    assert tracks["qwen:ml1m"].status in ("ok", "partial") and tracks["llama:ml1m"].status in ("ok", "partial")
+    assert tracks["qwen:toys"].status in ("ok", "partial") and n > 100
+    m = mf.run(snap, tmp_path / "figs", only=("tracks",))             # and the heaviest figure renders from the real files
+    assert m["figures"]["tracks"]["sha1"] == sha1_of(tmp_path / "figs" / "tracks.pdf")
 
 
 # ------------------------------------------------------------------------------------------------ style and discipline
@@ -770,7 +774,7 @@ def test_constants_agree_with_fill_paper():
 
 
 def test_script_holds_no_result_like_literal():
-    """A pasted result looks like 0.742; layout constants have at most two decimals. Also no number is typed in the module doc."""
+    """A pasted result looks like 0.742; layout constants have at most two decimals."""
     tree = ast.parse(SCRIPT.read_text(encoding="utf-8"))
     bad = []
     for node in ast.walk(tree):

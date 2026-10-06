@@ -239,12 +239,37 @@ def full_run(world, tmp_path_factory):
 HOLES = ("grid/qwen/sports.json", "aud/home.json", "aud/tools.json", "extra/toys.json")
 
 
+def _draw_all(root):
+    res = mf.Results(root)
+    out = {}
+    for fid in ALL3:
+        spec = getattr(mf, f"collect_{fid}")(res)
+        out[fid] = (spec, getattr(mf, f"draw_{fid}")(spec))
+    return out
+
+
+@pytest.fixture(scope="module")
+def drawn_world(world):
+    figs = _draw_all(world)
+    yield figs
+    for _, fig in figs.values():
+        mf.plt.close(fig)
+
+
 @pytest.fixture(scope="module")
 def holey(tmp_path_factory):
     """A tree with a rated panel, two next-item panels and one addendum-6 file missing, rendered once."""
     root = build_tree(tmp_path_factory.mktemp("results_holes"), skip=HOLES)
     out = tmp_path_factory.mktemp("figs_holes")
     return root, out, mf.run(root, out, only=ALL3)
+
+
+@pytest.fixture(scope="module")
+def drawn_holey(holey):
+    figs = _draw_all(holey[0])
+    yield figs
+    for _, fig in figs.values():
+        mf.plt.close(fig)
 
 
 # ------------------------------------------------------------------------------------------------ manifest round trip
@@ -297,9 +322,8 @@ def _artists_by_gid(fig):
 
 
 @pytest.mark.parametrize("fid,minimum", [("tracks", 40), ("shares", 100)])
-def test_drawn_marks_equal_manifest(world, fid, minimum):
-    spec = getattr(mf, f"collect_{fid}")(mf.Results(world))
-    fig = getattr(mf, f"draw_{fid}")(spec)
+def test_drawn_marks_equal_manifest(drawn_world, fid, minimum):
+    spec, fig = drawn_world[fid]
     gids = _artists_by_gid(fig)
     horizontal = fid == "tracks"                     # F1 plots the estimate on x, F2 on y
     n_pt = 0
@@ -317,12 +341,10 @@ def test_drawn_marks_equal_manifest(world, fid, minimum):
             else:
                 assert f"{v.uid}:ci" not in gids
     assert n_pt >= minimum
-    mf.plt.close(fig)
 
 
-def test_drawn_curves_equal_manifest(world):
-    spec = mf.collect_serving(mf.Results(world))
-    fig = mf.draw_serving(spec)
+def test_drawn_curves_equal_manifest(drawn_world):
+    spec, fig = drawn_world["serving"]
     gids = _artists_by_gid(fig)
     for p in spec.panels:
         for sig in mf.SERVING_SIGNALS:
@@ -333,25 +355,21 @@ def test_drawn_curves_equal_manifest(world):
             ys = {round(y, 12) for y in gids[f"serving/{p.pid}/{sig}:band"].get_paths()[0].vertices[:, 1]}
             assert {round(v.lo, 12) for v in vals} | {round(v.hi, 12) for v in vals} <= ys
         assert "margin" not in " ".join(g for g in gids if g)                      # a signal in the file that is not drawn
-    mf.plt.close(fig)
 
 
-def test_text_stays_inside_the_canvas(holey):
+def test_text_stays_inside_the_canvas(drawn_world, drawn_holey):
     """Layout is placed by hand in inches: nothing may spill over the edge of the PDF page, placeholders included."""
-    root = holey[0]
-    res = mf.Results(root)
-    for fid in ALL3:
-        fig = getattr(mf, f"draw_{fid}")(getattr(mf, f"collect_{fid}")(res))
-        with mf.style():
-            fig.canvas.draw()
-            box = fig.bbox
-            for t in fig.findobj(mf.plt.Text):
-                if not t.get_visible() or not t.get_text().strip():
-                    continue
-                bb = t.get_window_extent()
-                assert bb.x0 >= box.x0 - 1 and bb.x1 <= box.x1 + 1 and bb.y0 >= box.y0 - 1 and bb.y1 <= box.y1 + 1, \
-                    (fid, t.get_text(), bb.bounds)
-        mf.plt.close(fig)
+    for label, figs in (("full", drawn_world), ("holes", drawn_holey)):
+        for fid, (spec, fig) in figs.items():
+            with mf.style():
+                fig.canvas.draw()
+                box = fig.bbox
+                for t in fig.findobj(mf.plt.Text):
+                    if not t.get_visible() or not t.get_text().strip():
+                        continue
+                    bb = t.get_window_extent()
+                    assert bb.x0 >= box.x0 - 1 and bb.x1 <= box.x1 + 1 and bb.y0 >= box.y0 - 1 and bb.y1 <= box.y1 + 1, \
+                        (label, fid, t.get_text(), bb.bounds)
 
 
 def test_pdf_is_vector_truetype_and_exact_size(full_run):
@@ -366,7 +384,7 @@ def test_pdf_is_vector_truetype_and_exact_size(full_run):
 
 
 # ------------------------------------------------------------------------------------------------ placeholders and errors
-def test_missing_panel_is_an_explicit_placeholder(holey):
+def test_missing_panel_is_an_explicit_placeholder(holey, drawn_holey):
     root, out, m = holey
     for fid, pid, miss in (("tracks", "qwen:sports", "grid/qwen/sports.json"), ("shares", "qwen:sports", "grid/qwen/sports.json"),
                            ("serving", "home:all", "aud/home.json")):
@@ -379,10 +397,9 @@ def test_missing_panel_is_an_explicit_placeholder(holey):
         assert (out / e["file"]).stat().st_size > 1000
     assert {x["path"] for x in m["figures"]["serving"]["missing"]} == {"aud/home.json", "aud/tools.json"}
     assert "extra/toys.json" in {x["path"] for x in m["figures"]["tracks"]["missing"]}
-    fig = mf.draw_serving(mf.collect_serving(mf.Results(root)))           # the placeholder is drawn: its text names the missing file
+    fig = drawn_holey["serving"][1]                                       # the placeholder is drawn: its text names the file
     texts = " ".join(t.get_text() for t in fig.findobj(mf.plt.Text))
     assert "not run yet" in texts and "aud/home.json" in texts and "aud/tools.json" in texts
-    mf.plt.close(fig)
 
 
 def test_every_input_missing_gives_not_run_figures_never_a_crash(tmp_path):
@@ -396,16 +413,14 @@ def test_every_input_missing_gives_not_run_figures_never_a_crash(tmp_path):
     assert m["figures"]["tracks"]["meta"]["gate_ft"]["state"] == "missing"
 
 
-def test_a_missing_element_inside_a_panel_is_marked_not_run(holey):
+def test_a_missing_element_inside_a_panel_is_marked_not_run(holey, drawn_holey):
     root = holey[0]
-    spec = mf.collect_tracks(mf.Results(root))
+    spec, fig = drawn_holey["tracks"]
     toys = {p.pid: p for p in spec.panels}["qwen:toys"]
     assert toys.status == "partial" and toys.one("zero_shot") is not None and toys.one("matched_mean") is None
     assert any(m["series"] == "matched_mean" and m["path"] == "extra/toys.json" for m in toys.missing)
-    fig = mf.draw_tracks(spec)
     texts = [t.get_text() for t in fig.findobj(mf.plt.Text)]
     assert sum("not run yet" in t for t in texts) >= 2 and any("extra/toys.json" in t for t in texts)
-    mf.plt.close(fig)
     sh = {p.pid: p for p in mf.collect_shares(mf.Results(root)).panels}["qwen:toys"]
     assert sh.one("e_share.zs") is None and sh.one("item_prior_share.zs") is not None
     assert {m["path"] for m in sh.missing if m["kind"] == "file"} == {"extra/toys.json"}
@@ -767,7 +782,11 @@ def test_real_tree_round_trip(tmp_path):
 
 # ------------------------------------------------------------------------------------------------ style and discipline
 def test_style_constants_follow_the_brief():
-    assert mf.STYLE["pdf.fonttype"] == 42 and mf.STYLE["font.size"] <= 8.0 and mf.STYLE["xtick.labelsize"] >= 6.0
+    assert mf.STYLE["pdf.fonttype"] == 42
+    sizes = [v for k, v in mf.STYLE.items() if k.endswith(("size", "labelsize", "titlesize", "fontsize")) and isinstance(v, float)
+             and not k.endswith(("major.size", "minor.size", "major.pad"))]
+    assert sizes and all(7.0 <= v <= 8.0 for v in sizes), sizes                      # text 7-8 pt, as the brief asks
+    assert mf.LABEL_PT >= 7.0 and mf.SMALL_PT >= 7.0
     markers = [s["marker"] for s in mf.TRACK_STYLE.values()]
     assert len(set(markers)) == len(markers)           # every F1 series has its own marker: it reads without colour
     assert len({mf.SHARE_STYLE[k]["marker"] for k in ("zs", "lora", "ref")}) == 3
@@ -808,7 +827,7 @@ def test_proposed_captions_hold_no_result_number():
     for c in caps:
         body = re.sub(r"\\(?:ref|label|cite[a-z]*)\{[^}]*\}", "", c)
         body = re.sub(r"\$[^$]*\$", "", body)                                    # symbols such as $m_T$ or $S_d$
-        for name in ("Qwen3-8B", "Llama-3.1-8B", "NDCG@10"):                    # names, not results
+        for name in ("Qwen3-8B", "Llama-3.1-8B", "NDCG@10", "ML-1M", "addendum 6"):    # names, not results
             body = body.replace(name, "")
         nums = re.findall(r"\d[\d.,]*", body)
         assert set(nums) <= {"95"}, (nums, c[:80])                               # the interval level is a definition, not a result
@@ -829,7 +848,7 @@ def test_decomp_tex_compiles_in_the_paper_class(tmp_path):
         r"\setcopyright{none}\settopmatter{printacmref=false}\pagestyle{empty}",
         r"\begin{document}",
         r"\newsavebox{\decompbox}\sbox{\decompbox}{\input{" + (FIGDIR / "decomp").as_posix() + r"}}",
-        r"\typeout{DECOMPSIZE wd=\the\wd\decompbox ht=\the\ht\decompbox col=\the\columnwidth}",
+        r"\typeout{DECOMPSIZE wd=\the\wd\decompbox ht=\the\ht\decompbox col=\the\dimexpr(\textwidth-\columnsep)/2\relax}",
         r"\begin{figure}[t]\centering\input{" + (FIGDIR / "decomp").as_posix() + r"}\caption{x}\end{figure}",
         r"\end{document}"]), encoding="utf-8")
     try:
@@ -839,6 +858,6 @@ def test_decomp_tex_compiles_in_the_paper_class(tmp_path):
         pytest.skip("pdflatex did not finish (package installer prompt?)")
     log = (tmp_path / "scratch.log").read_text(encoding="latin-1", errors="replace").replace("\n", "")
     assert r.returncode == 0 and (tmp_path / "scratch.pdf").is_file(), log[-1500:]
-    m = re.search(r"DECOMPSIZE wd=([\d.]+)pt ht=([\d.]+)pt col=([\d.]+)pt", log)
-    assert m and float(m.group(1)) <= float(m.group(3)) + 0.01, m.groups()          # fits one column
+    m = re.search(r"DECOMPSIZE wd=([\d.]+)pt\s*ht=([\d.]+)pt\s*col=([\d.]+)pt", log)
+    assert m and float(m.group(1)) <= float(m.group(3)) + 0.01, (m.groups() if m else log[-500:])    # fits one sigconf column
     assert "Overfull \\hbox" not in log

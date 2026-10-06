@@ -1,0 +1,3279 @@
+{
+ "schema": "lumen_figures_manifest_v1",
+ "generator": {
+  "script": "scripts/sigir/make_figures.py",
+  "script_sha1": "6ecf3ba0acd18ee3358e8696a09c8700400cb7f4",
+  "environment": {
+   "python": "3.14.5",
+   "matplotlib": "3.10.9"
+  }
+ },
+ "results_root": "docs/sigir/results",
+ "figures": {
+  "tracks": {
+   "id": "tracks",
+   "kind": "plot",
+   "title": "UAUC of the confidence beside its same-row references",
+   "file": "tracks.pdf",
+   "sha1": "2abed350c2f1da94691c2d2033f9586b865b54bd",
+   "bytes": 24034,
+   "size_in": [
+    7.0,
+    2.3
+   ],
+   "status": "ok",
+   "sources": [
+    {
+     "path": "extra/games.json",
+     "sha1": "a79f1a9487912e6646e076d6b95c30011cffcd06"
+    },
+    {
+     "path": "extra/llama/ml1m.json",
+     "sha1": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68"
+    },
+    {
+     "path": "extra/llama/toys.json",
+     "sha1": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1"
+    },
+    {
+     "path": "extra/ml1m.json",
+     "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733"
+    },
+    {
+     "path": "extra/sports.json",
+     "sha1": "73bb21f5e10aabb40048b691c2ce1a9155e8d984"
+    },
+    {
+     "path": "extra/toys.json",
+     "sha1": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743"
+    },
+    {
+     "path": "gft/gate_ft.json",
+     "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+    },
+    {
+     "path": "grid/llama/ml1m.json",
+     "sha1": "3e3c83d94cdb30caef288191b12cc7f173f8220a"
+    },
+    {
+     "path": "grid/llama/toys.json",
+     "sha1": "b206fd37aab2544f4909e4baeb4833a5b4d96219"
+    },
+    {
+     "path": "grid/qwen/games.json",
+     "sha1": "98f490f4f8124f002032d5f3b4780b569f4a8b9d"
+    },
+    {
+     "path": "grid/qwen/ml1m.json",
+     "sha1": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d"
+    },
+    {
+     "path": "grid/qwen/sports.json",
+     "sha1": "cc7ac0b6576c748bff2252ed2553a31ae219aec9"
+    },
+    {
+     "path": "grid/qwen/toys.json",
+     "sha1": "a28f219b243e552dab3f753a4aaf64a172bb853d"
+    }
+   ],
+   "missing": [],
+   "n_boot_values": [
+    2000
+   ],
+   "flags_used": [
+    "exploratory"
+   ],
+   "flag_meaning": {
+    "exploratory": "the extra file's status.items_2_to_7 is 'exploratory' (addendum 6, ML-1M): no confirmatory reading",
+    "descriptive": "the record or block is flagged descriptive in the file (descriptive_min_n, E_G.descriptive) or rests on fewer than the minimum number of users or events: no interval-based claim",
+    "rows_differ": "the reference was computed on other rows than the LLM score it is drawn beside"
+   },
+   "notes": [],
+   "meta": {
+    "gate_ft": {
+     "state": "pass",
+     "decision": "GATE_FT_PASS"
+    }
+   },
+   "panels": [
+    {
+     "id": "qwen:ml1m",
+     "title": "ML-1M",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/ml1m.json",
+       "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/ml1m.json",
+       "sha1": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/qwen:ml1m/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 366
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.5958827069982499,
+        "lo": 0.5733706936565278,
+        "hi": 0.6179673713365044
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.7424660652577738,
+        "lo": 0.723185032184527,
+        "hi": 0.7609435924260278
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.740006226084526
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.7446659443846868
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.7427260253041084
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.7586119349096629,
+        "lo": 0.7371140400665879,
+        "hi": 0.7795605491585087
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:ml1m/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/ml1m.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.7563355938904108
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/qwen:ml1m/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.7907218399718658,
+        "lo": 0.7720092516984423,
+        "hi": 0.8087331758356489
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "qwen:toys",
+     "title": "Toys",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/toys.json",
+       "sha1": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/toys.json",
+       "sha1": "a28f219b243e552dab3f753a4aaf64a172bb853d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/qwen:toys/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 943
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.5267554243502147,
+        "lo": 0.5048558020089856,
+        "hi": 0.549268909852892
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.5577633416521959,
+        "lo": 0.5383134268550287,
+        "hi": 0.5778763236883875
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.5591890923791486
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.5555461549338517
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.5585547776435873
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.6837616130963786,
+        "lo": 0.6618607843580029,
+        "hi": 0.7040451063077564
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:toys/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/toys.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.6329352084436893
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/qwen:toys/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.5394476163015244,
+        "lo": 0.5184944662684633,
+        "hi": 0.5610782939503756
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "qwen:games",
+     "title": "Video Games",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/games.json",
+       "sha1": "a79f1a9487912e6646e076d6b95c30011cffcd06"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/games.json",
+       "sha1": "98f490f4f8124f002032d5f3b4780b569f4a8b9d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/qwen:games/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 820
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.5171581713603677,
+        "lo": 0.4950908109403676,
+        "hi": 0.5394723710311242
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.5800007197403159,
+        "lo": 0.5595700890518073,
+        "hi": 0.6018709694282063
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.5836359694388491
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.5776048711850233
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.5787613185970751
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.6616517778127226,
+        "lo": 0.6396464509138315,
+        "hi": 0.6830718554413568
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:games/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/games.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.5797207138163981
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/qwen:games/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.5322730195822146,
+        "lo": 0.5144197616180891,
+        "hi": 0.5506785783857426
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "qwen:sports",
+     "title": "Sports",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/sports.json",
+       "sha1": "73bb21f5e10aabb40048b691c2ce1a9155e8d984"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/sports.json",
+       "sha1": "cc7ac0b6576c748bff2252ed2553a31ae219aec9"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/qwen:sports/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 997
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.49307637430831064,
+        "lo": 0.4711529247006261,
+        "hi": 0.5138027130148822
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.5344264510303672,
+        "lo": 0.5137502021743507,
+        "hi": 0.5542598027788946
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.5366735139886842
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.5374721406402795
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.529133698462138
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.6244634565222905,
+        "lo": 0.6041193581306544,
+        "hi": 0.6453180345300448
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/qwen:sports/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/sports.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.6151571891622558
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/qwen:sports/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.5344462371727676,
+        "lo": 0.5137752381692043,
+        "hi": 0.557573111970378
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "llama:ml1m",
+     "title": "ML-1M",
+     "group": "llama",
+     "group_label": "Llama-3.1-8B-Instruct",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/llama/ml1m.json",
+       "sha1": "50687251b3d0c60cdc2cfb0d0a784b90860e7d68"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/llama/ml1m.json",
+       "sha1": "3e3c83d94cdb30caef288191b12cc7f173f8220a"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/llama:ml1m/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/llama/ml1m.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 366
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/llama/ml1m.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.6053002041456411,
+        "lo": 0.5826766846537719,
+        "hi": 0.6269052680514351
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/llama/ml1m.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.7595800087178246,
+        "lo": 0.7407348819646625,
+        "hi": 0.7775642183281214
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/llama/ml1m.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.7603385530709107
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/llama/ml1m.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.7579601664959784
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/llama/ml1m.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.7604413065865852
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/llama/ml1m.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.7586119349096629,
+        "lo": 0.7371140400665879,
+        "hi": 0.7795605491585087
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:ml1m/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/llama/ml1m.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.7563355938904108
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/llama/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/llama:ml1m/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/llama/ml1m.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.7907218399718658,
+        "lo": 0.7720092516984423,
+        "hi": 0.8087331758356489
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "llama:toys",
+     "title": "Toys",
+     "group": "llama",
+     "group_label": "Llama-3.1-8B-Instruct",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/llama/toys.json",
+       "sha1": "d47af7dfc82bb2aac1ec52948b06ccff9e4a96b1"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/llama/toys.json",
+       "sha1": "b206fd37aab2544f4909e4baeb4833a5b4d96219"
+      }
+     ],
+     "values": [
+      {
+       "uid": "tracks/llama:toys/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/llama/toys.json:E_A.ZS.UAUC_TEST.rows",
+       "fields": {
+        "n_users": 943
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/zero_shot",
+       "series": "zero_shot",
+       "role": "point",
+       "source": "grid/llama/toys.json:E_A.ZS.UAUC_TEST.per_model.zeroshot",
+       "fields": {
+        "est": 0.5122870753417363,
+        "lo": 0.49038509812146863,
+        "hi": 0.5341367716100323
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/lora",
+       "series": "lora",
+       "role": "point",
+       "source": "grid/llama/toys.json:E_A.FT.UAUC_TEST.mean_over_seeds",
+       "fields": {
+        "est": 0.5604303480325349,
+        "lo": 0.5398770450685065,
+        "hi": 0.579547867063458
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/lora_seed0",
+       "series": "lora_seed0",
+       "role": "seed",
+       "source": "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s0",
+       "fields": {
+        "est": 0.5633893377853387
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/lora_seed1",
+       "series": "lora_seed1",
+       "role": "seed",
+       "source": "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s1",
+       "fields": {
+        "est": 0.5564852834616625
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/lora_seed2",
+       "series": "lora_seed2",
+       "role": "seed",
+       "source": "grid/llama/toys.json:E_A.FT.UAUC_TEST.per_model.s2",
+       "fields": {
+        "est": 0.5614164228506038
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/item_mean",
+       "series": "item_mean",
+       "role": "point",
+       "source": "grid/llama/toys.json:E_A.ZS.UAUC_TEST.references.q_hat",
+       "fields": {
+        "est": 0.6837616130963786,
+        "lo": 0.6618607843580029,
+        "hi": 0.7040451063077564
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "tracks/llama:toys/matched_mean",
+       "series": "matched_mean",
+       "role": "point",
+       "source": "extra/llama/toys.json:E_J.ZS.dUAUC_L_minus_q_hat_T.per_seed.zeroshot.UAUC_b",
+       "fields": {
+        "est": 0.6329352084436893
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/llama/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "tracks/llama:toys/mf",
+       "series": "mf",
+       "role": "point",
+       "source": "grid/llama/toys.json:E_A.ZS.UAUC_TEST.references.mf",
+       "fields": {
+        "est": 0.5394476163015244,
+        "lo": 0.5184944662684633,
+        "hi": 0.5610782939503756
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    }
+   ]
+  },
+  "shares": {
+   "id": "shares",
+   "kind": "plot",
+   "title": "What the confidence is made of, and the information it adds",
+   "file": "shares.pdf",
+   "sha1": "7117d0af06fc3ed5a9f73a309d7c59470e71e3c7",
+   "bytes": 35338,
+   "size_in": [
+    7.0,
+    2.3
+   ],
+   "status": "partial",
+   "sources": [
+    {
+     "path": "extra/games.json",
+     "sha1": "a79f1a9487912e6646e076d6b95c30011cffcd06"
+    },
+    {
+     "path": "extra/ml1m.json",
+     "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733"
+    },
+    {
+     "path": "extra/sports.json",
+     "sha1": "73bb21f5e10aabb40048b691c2ce1a9155e8d984"
+    },
+    {
+     "path": "extra/toys.json",
+     "sha1": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743"
+    },
+    {
+     "path": "gft/gate_ft.json",
+     "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+    },
+    {
+     "path": "grid/qwen/games.json",
+     "sha1": "98f490f4f8124f002032d5f3b4780b569f4a8b9d"
+    },
+    {
+     "path": "grid/qwen/ml1m.json",
+     "sha1": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d"
+    },
+    {
+     "path": "grid/qwen/sports.json",
+     "sha1": "cc7ac0b6576c748bff2252ed2553a31ae219aec9"
+    },
+    {
+     "path": "grid/qwen/toys.json",
+     "sha1": "a28f219b243e552dab3f753a4aaf64a172bb853d"
+    }
+   ],
+   "missing": [],
+   "n_boot_values": [
+    2000
+   ],
+   "flags_used": [
+    "descriptive",
+    "exploratory"
+   ],
+   "flag_meaning": {
+    "exploratory": "the extra file's status.items_2_to_7 is 'exploratory' (addendum 6, ML-1M): no confirmatory reading",
+    "descriptive": "the record or block is flagged descriptive in the file (descriptive_min_n, E_G.descriptive) or rests on fewer than the minimum number of users or events: no interval-based claim",
+    "rows_differ": "the reference was computed on other rows than the LLM score it is drawn beside"
+   },
+   "notes": [],
+   "meta": {
+    "gate_ft": {
+     "state": "pass",
+     "decision": "GATE_FT_PASS"
+    }
+   },
+   "panels": [
+    {
+     "id": "qwen:ml1m",
+     "title": "ML-1M",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/ml1m.json",
+       "sha1": "b2918d95aa59f4693ede10953ff253b99b85f733"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/ml1m.json",
+       "sha1": "5ee446fc55cc85ae1df8def4e14e2c8826dd413d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "shares/qwen:ml1m/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/ml1m.json:E_D.ZS.shares.rows",
+       "fields": {
+        "n_users": 366
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/item_prior_share.zs",
+       "series": "item_prior_share.zs",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+       "fields": {
+        "est": 0.3925744985149863,
+        "lo": 0.3308434723569197,
+        "hi": 0.4568074838209462
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/item_prior_share.lora",
+       "series": "item_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+       "fields": {
+        "est": 0.9016500283250933,
+        "lo": 0.8881211559481011,
+        "hi": 0.912553884143428
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/item_prior_share.lora_seed0",
+       "series": "item_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s0.item_prior_share",
+       "fields": {
+        "est": 0.9002194227180647
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/item_prior_share.lora_seed1",
+       "series": "item_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s1.item_prior_share",
+       "fields": {
+        "est": 0.9022035740352262
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/item_prior_share.lora_seed2",
+       "series": "item_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s2.item_prior_share",
+       "fields": {
+        "est": 0.9025270882219888
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/non_prior_share.zs",
+       "series": "non_prior_share.zs",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.ZS.shares.per_model.zeroshot.non_prior_share",
+       "fields": {
+        "est": 0.6074255014850136,
+        "lo": 0.5431925161790536,
+        "hi": 0.6691565276430803
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/non_prior_share.lora",
+       "series": "non_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.mean_over_seeds.non_prior_share",
+       "fields": {
+        "est": 0.09834997167490678,
+        "lo": 0.08744611585657193,
+        "hi": 0.11187884405189887
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/non_prior_share.lora_seed0",
+       "series": "non_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s0.non_prior_share",
+       "fields": {
+        "est": 0.09978057728193535
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/non_prior_share.lora_seed1",
+       "series": "non_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s1.non_prior_share",
+       "fields": {
+        "est": 0.09779642596477378
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/non_prior_share.lora_seed2",
+       "series": "non_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.shares.per_model.s2.non_prior_share",
+       "fields": {
+        "est": 0.0974729117780112
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/e_share.zs",
+       "series": "e_share.zs",
+       "role": "point",
+       "source": "extra/ml1m.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+       "fields": {
+        "est": 0.6155370494302111,
+        "lo": 0.5458969147897476,
+        "hi": 0.6842815331472817
+       },
+       "flags": [
+        "exploratory",
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7",
+        "extra/ml1m.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/e_share.lora",
+       "series": "e_share.lora",
+       "role": "point",
+       "source": "extra/ml1m.json:E_G.FT.e_share.mean_over_seeds",
+       "fields": {
+        "est": 0.09836114161543617,
+        "lo": 0.08746518511231864,
+        "hi": 0.11223122232734468
+       },
+       "flags": [
+        "exploratory",
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7",
+        "extra/ml1m.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/e_share.lora_seed0",
+       "series": "e_share.lora_seed0",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_G.FT.e_share.per_model.s0.e_share",
+       "fields": {
+        "est": 0.09978694933903212
+       },
+       "flags": [
+        "exploratory",
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7",
+        "extra/ml1m.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/e_share.lora_seed1",
+       "series": "e_share.lora_seed1",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_G.FT.e_share.per_model.s1.e_share",
+       "fields": {
+        "est": 0.09782356301626427
+       },
+       "flags": [
+        "exploratory",
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7",
+        "extra/ml1m.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/e_share.lora_seed2",
+       "series": "e_share.lora_seed2",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_G.FT.e_share.per_model.s2.e_share",
+       "fields": {
+        "est": 0.09747291249101213
+       },
+       "flags": [
+        "exploratory",
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7",
+        "extra/ml1m.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G.zs",
+       "series": "G.zs",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+       "fields": {
+        "est": -0.001750950074855456,
+        "lo": -0.00758722237074397,
+        "hi": 0.003837635885662831
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G.lora",
+       "series": "G.lora",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.FT.information_gain.G_mean_over_seeds",
+       "fields": {
+        "est": 0.009647444327692793,
+        "lo": 0.0025816127416874945,
+        "hi": 0.017281090381785304
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G.lora_seed0",
+       "series": "G.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s0.G",
+       "fields": {
+        "est": 0.008333806190164578
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G.lora_seed1",
+       "series": "G.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s1.G",
+       "fields": {
+        "est": 0.00952153366523076
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G.lora_seed2",
+       "series": "G.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/ml1m.json:E_D.FT.information_gain.per_model.s2.G",
+       "fields": {
+        "est": 0.011086993127683041
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_wu.zs",
+       "series": "G_wu.zs",
+       "role": "point",
+       "source": "extra/ml1m.json:E_W.ZS.G_wu.per_model.zeroshot",
+       "fields": {
+        "est": 6.838715753630778e-05,
+        "lo": -0.00284813146605301,
+        "hi": 0.003085677906755664
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_wu.lora",
+       "series": "G_wu.lora",
+       "role": "point",
+       "source": "extra/ml1m.json:E_W.FT.G_wu.mean_over_seeds",
+       "fields": {
+        "est": 0.009076183904029476,
+        "lo": 0.002552636543200746,
+        "hi": 0.016385037050835785
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_wu.lora_seed0",
+       "series": "G_wu.lora_seed0",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_W.FT.G_wu.per_model.s0",
+       "fields": {
+        "est": 0.007407922683989461
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_wu.lora_seed1",
+       "series": "G_wu.lora_seed1",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_W.FT.G_wu.per_model.s1",
+       "fields": {
+        "est": 0.01013120406452606
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_wu.lora_seed2",
+       "series": "G_wu.lora_seed2",
+       "role": "seed",
+       "source": "extra/ml1m.json:E_W.FT.G_wu.per_model.s2",
+       "fields": {
+        "est": 0.00968942496357291
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_CF",
+       "series": "G_CF",
+       "role": "point",
+       "source": "grid/qwen/ml1m.json:E_D.ZS.information_gain.G_CF",
+       "fields": {
+        "est": 0.03615779661243816,
+        "lo": 0.02280500176526709,
+        "hi": 0.04944626262771155
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:ml1m/G_CF_wu",
+       "series": "G_CF_wu",
+       "role": "point",
+       "source": "extra/ml1m.json:E_W.ZS.G_CF_wu",
+       "fields": {
+        "est": 0.03731922200161316,
+        "lo": 0.024759552537967255,
+        "hi": 0.049805290411017195
+       },
+       "flags": [
+        "exploratory"
+       ],
+       "flag_sources": [
+        "extra/ml1m.json:status.items_2_to_7"
+       ]
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "qwen:toys",
+     "title": "Toys",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "partial",
+     "sources": [
+      {
+       "path": "extra/toys.json",
+       "sha1": "d4edc5243330bb9a6a3c786b8d9f33bf7532f743"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/toys.json",
+       "sha1": "a28f219b243e552dab3f753a4aaf64a172bb853d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "shares/qwen:toys/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/toys.json:E_D.ZS.shares.rows",
+       "fields": {
+        "n_users": 943
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/item_prior_share.lora",
+       "series": "item_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+       "fields": {
+        "est": 0.6624622879893011,
+        "lo": 0.6229919674613802,
+        "hi": 0.6998186311669894
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/item_prior_share.lora_seed0",
+       "series": "item_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s0.item_prior_share",
+       "fields": {
+        "est": 0.6366244282652788
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/item_prior_share.lora_seed1",
+       "series": "item_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s1.item_prior_share",
+       "fields": {
+        "est": 0.6637353422629275
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/item_prior_share.lora_seed2",
+       "series": "item_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s2.item_prior_share",
+       "fields": {
+        "est": 0.6870270934396967
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/non_prior_share.lora",
+       "series": "non_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.mean_over_seeds.non_prior_share",
+       "fields": {
+        "est": 0.33753771201069904,
+        "lo": 0.3001813688330105,
+        "hi": 0.3770080325386198
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/non_prior_share.lora_seed0",
+       "series": "non_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s0.non_prior_share",
+       "fields": {
+        "est": 0.36337557173472124
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/non_prior_share.lora_seed1",
+       "series": "non_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s1.non_prior_share",
+       "fields": {
+        "est": 0.3362646577370725
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/non_prior_share.lora_seed2",
+       "series": "non_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.shares.per_model.s2.non_prior_share",
+       "fields": {
+        "est": 0.3129729065603033
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/e_share.zs",
+       "series": "e_share.zs",
+       "role": "point",
+       "source": "extra/toys.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+       "fields": {
+        "est": 0.73584221939465,
+        "lo": 0.6628641492672204,
+        "hi": 0.8121379816461916
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7",
+        "extra/toys.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/e_share.lora",
+       "series": "e_share.lora",
+       "role": "point",
+       "source": "extra/toys.json:E_G.FT.e_share.mean_over_seeds",
+       "fields": {
+        "est": 0.34005430680708715,
+        "lo": 0.3051222307520087,
+        "hi": 0.3782949637552153
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7",
+        "extra/toys.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/e_share.lora_seed0",
+       "series": "e_share.lora_seed0",
+       "role": "seed",
+       "source": "extra/toys.json:E_G.FT.e_share.per_model.s0.e_share",
+       "fields": {
+        "est": 0.36677833693923423
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7",
+        "extra/toys.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/e_share.lora_seed1",
+       "series": "e_share.lora_seed1",
+       "role": "seed",
+       "source": "extra/toys.json:E_G.FT.e_share.per_model.s1.e_share",
+       "fields": {
+        "est": 0.33990653046955493
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7",
+        "extra/toys.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/e_share.lora_seed2",
+       "series": "e_share.lora_seed2",
+       "role": "seed",
+       "source": "extra/toys.json:E_G.FT.e_share.per_model.s2.e_share",
+       "fields": {
+        "est": 0.31347805301247234
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7",
+        "extra/toys.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G.zs",
+       "series": "G.zs",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+       "fields": {
+        "est": -0.0018920042411506883,
+        "lo": -0.011933422025375052,
+        "hi": 0.007920126421773617
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G.lora",
+       "series": "G.lora",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_D.FT.information_gain.G_mean_over_seeds",
+       "fields": {
+        "est": -0.004636304224324658,
+        "lo": -0.014142979706477451,
+        "hi": 0.004840857511528223
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G.lora_seed0",
+       "series": "G.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.information_gain.per_model.s0.G",
+       "fields": {
+        "est": -0.006790739478305756
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G.lora_seed1",
+       "series": "G.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.information_gain.per_model.s1.G",
+       "fields": {
+        "est": -0.001969293562989631
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G.lora_seed2",
+       "series": "G.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/toys.json:E_D.FT.information_gain.per_model.s2.G",
+       "fields": {
+        "est": -0.005148879631678585
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G_wu.zs",
+       "series": "G_wu.zs",
+       "role": "point",
+       "source": "extra/toys.json:E_W.ZS.G_wu.per_model.zeroshot",
+       "fields": {
+        "est": -0.0032680180380677336,
+        "lo": -0.008982029426544105,
+        "hi": 0.0020947162416122185
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G_wu.lora",
+       "series": "G_wu.lora",
+       "role": "point",
+       "source": "extra/toys.json:E_W.FT.G_wu.mean_over_seeds",
+       "fields": {
+        "est": -0.0031720972658498647,
+        "lo": -0.009193572632554218,
+        "hi": 0.0027966546304442237
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G_wu.lora_seed0",
+       "series": "G_wu.lora_seed0",
+       "role": "seed",
+       "source": "extra/toys.json:E_W.FT.G_wu.per_model.s0",
+       "fields": {
+        "est": -0.004176472851691959
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G_wu.lora_seed1",
+       "series": "G_wu.lora_seed1",
+       "role": "seed",
+       "source": "extra/toys.json:E_W.FT.G_wu.per_model.s1",
+       "fields": {
+        "est": -0.002162359039292143
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G_wu.lora_seed2",
+       "series": "G_wu.lora_seed2",
+       "role": "seed",
+       "source": "extra/toys.json:E_W.FT.G_wu.per_model.s2",
+       "fields": {
+        "est": -0.0031774599065654933
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:toys/G_CF",
+       "series": "G_CF",
+       "role": "point",
+       "source": "grid/qwen/toys.json:E_D.ZS.information_gain.G_CF",
+       "fields": {
+        "est": 0.001500260085033337,
+        "lo": -0.0030452336168799604,
+        "hi": 0.006236382088173145
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:toys/G_CF_wu",
+       "series": "G_CF_wu",
+       "role": "point",
+       "source": "extra/toys.json:E_W.ZS.G_CF_wu",
+       "fields": {
+        "est": 0.000745651550033165,
+        "lo": -0.0017367203566062113,
+        "hi": 0.003216559226763643
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/toys.json:status.items_2_to_7"
+       ]
+      }
+     ],
+     "withheld": [
+      {
+       "series": "item_prior_share.zs",
+       "source": "grid/qwen/toys.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+       "reason": "grid/qwen/toys.json:E_D.ZS.shares.per_model.zeroshot.shares_reading is 'uninterpretable': the value is not drawn"
+      },
+      {
+       "series": "non_prior_share.zs",
+       "source": "grid/qwen/toys.json:E_D.ZS.shares.per_model.zeroshot.non_prior_share",
+       "reason": "grid/qwen/toys.json:E_D.ZS.shares.per_model.zeroshot.shares_reading is 'uninterpretable': the value is not drawn"
+      }
+     ],
+     "missing": [],
+     "notes": [
+      "e_share.zs is drawn (the paper prints it) although the item-prior share of the same regime is withheld as uninterpretable: the e-share is a reliability-corrected variance share, exploratory or descriptive in every file"
+     ]
+    },
+    {
+     "id": "qwen:games",
+     "title": "Video Games",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "partial",
+     "sources": [
+      {
+       "path": "extra/games.json",
+       "sha1": "a79f1a9487912e6646e076d6b95c30011cffcd06"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/games.json",
+       "sha1": "98f490f4f8124f002032d5f3b4780b569f4a8b9d"
+      }
+     ],
+     "values": [
+      {
+       "uid": "shares/qwen:games/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/games.json:E_D.ZS.shares.rows",
+       "fields": {
+        "n_users": 820
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/item_prior_share.lora",
+       "series": "item_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+       "fields": {
+        "est": 0.7236471796125219,
+        "lo": 0.6940687804019319,
+        "hi": 0.7489001495719526
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/item_prior_share.lora_seed0",
+       "series": "item_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s0.item_prior_share",
+       "fields": {
+        "est": 0.6904647374184573
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/item_prior_share.lora_seed1",
+       "series": "item_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s1.item_prior_share",
+       "fields": {
+        "est": 0.7236266597094122
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/item_prior_share.lora_seed2",
+       "series": "item_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s2.item_prior_share",
+       "fields": {
+        "est": 0.756850141709696
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/non_prior_share.lora",
+       "series": "non_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_D.FT.shares.mean_over_seeds.non_prior_share",
+       "fields": {
+        "est": 0.27635282038747816,
+        "lo": 0.25109985042804744,
+        "hi": 0.3059312195980682
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/non_prior_share.lora_seed0",
+       "series": "non_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s0.non_prior_share",
+       "fields": {
+        "est": 0.30953526258154274
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/non_prior_share.lora_seed1",
+       "series": "non_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s1.non_prior_share",
+       "fields": {
+        "est": 0.2763733402905878
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/non_prior_share.lora_seed2",
+       "series": "non_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.shares.per_model.s2.non_prior_share",
+       "fields": {
+        "est": 0.243149858290304
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/e_share.zs",
+       "series": "e_share.zs",
+       "role": "point",
+       "source": "extra/games.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+       "fields": {
+        "est": 0.6985113857443885,
+        "lo": 0.6540449947316702,
+        "hi": 0.7475463591878724
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7",
+        "extra/games.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/e_share.lora",
+       "series": "e_share.lora",
+       "role": "point",
+       "source": "extra/games.json:E_G.FT.e_share.mean_over_seeds",
+       "fields": {
+        "est": 0.2833610793618834,
+        "lo": 0.2609656479786146,
+        "hi": 0.31057210658105694
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7",
+        "extra/games.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/e_share.lora_seed0",
+       "series": "e_share.lora_seed0",
+       "role": "seed",
+       "source": "extra/games.json:E_G.FT.e_share.per_model.s0.e_share",
+       "fields": {
+        "est": 0.3158450294188892
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7",
+        "extra/games.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/e_share.lora_seed1",
+       "series": "e_share.lora_seed1",
+       "role": "seed",
+       "source": "extra/games.json:E_G.FT.e_share.per_model.s1.e_share",
+       "fields": {
+        "est": 0.2841734106350376
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7",
+        "extra/games.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/e_share.lora_seed2",
+       "series": "e_share.lora_seed2",
+       "role": "seed",
+       "source": "extra/games.json:E_G.FT.e_share.per_model.s2.e_share",
+       "fields": {
+        "est": 0.2500647980317233
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7",
+        "extra/games.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G.zs",
+       "series": "G.zs",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+       "fields": {
+        "est": -0.0050681052333094246,
+        "lo": -0.012180195720941452,
+        "hi": 0.002481083465085536
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G.lora",
+       "series": "G.lora",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_D.FT.information_gain.G_mean_over_seeds",
+       "fields": {
+        "est": -0.009129657128452989,
+        "lo": -0.01763534493268733,
+        "hi": -0.0011320045917337872
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G.lora_seed0",
+       "series": "G.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.information_gain.per_model.s0.G",
+       "fields": {
+        "est": -0.0077955903714319865
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G.lora_seed1",
+       "series": "G.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.information_gain.per_model.s1.G",
+       "fields": {
+        "est": -0.009853078656368261
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G.lora_seed2",
+       "series": "G.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/games.json:E_D.FT.information_gain.per_model.s2.G",
+       "fields": {
+        "est": -0.009740302357558713
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G_wu.zs",
+       "series": "G_wu.zs",
+       "role": "point",
+       "source": "extra/games.json:E_W.ZS.G_wu.per_model.zeroshot",
+       "fields": {
+        "est": -0.001995522887528806,
+        "lo": -0.003513199063255163,
+        "hi": -0.0004975389868480802
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G_wu.lora",
+       "series": "G_wu.lora",
+       "role": "point",
+       "source": "extra/games.json:E_W.FT.G_wu.mean_over_seeds",
+       "fields": {
+        "est": -0.0015116051490091805,
+        "lo": -0.003791746777829392,
+        "hi": 0.0006774659081217767
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G_wu.lora_seed0",
+       "series": "G_wu.lora_seed0",
+       "role": "seed",
+       "source": "extra/games.json:E_W.FT.G_wu.per_model.s0",
+       "fields": {
+        "est": -0.001642962697307209
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G_wu.lora_seed1",
+       "series": "G_wu.lora_seed1",
+       "role": "seed",
+       "source": "extra/games.json:E_W.FT.G_wu.per_model.s1",
+       "fields": {
+        "est": -0.0012187626622891278
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G_wu.lora_seed2",
+       "series": "G_wu.lora_seed2",
+       "role": "seed",
+       "source": "extra/games.json:E_W.FT.G_wu.per_model.s2",
+       "fields": {
+        "est": -0.001673090087431205
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:games/G_CF",
+       "series": "G_CF",
+       "role": "point",
+       "source": "grid/qwen/games.json:E_D.ZS.information_gain.G_CF",
+       "fields": {
+        "est": -0.0020239420241726044,
+        "lo": -0.007042384297223118,
+        "hi": 0.0028435786206029204
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:games/G_CF_wu",
+       "series": "G_CF_wu",
+       "role": "point",
+       "source": "extra/games.json:E_W.ZS.G_CF_wu",
+       "fields": {
+        "est": -0.0011115258385888899,
+        "lo": -0.003089651594439205,
+        "hi": 0.0009529053685681641
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/games.json:status.items_2_to_7"
+       ]
+      }
+     ],
+     "withheld": [
+      {
+       "series": "item_prior_share.zs",
+       "source": "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+       "reason": "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.shares_reading is 'uninterpretable': the value is not drawn"
+      },
+      {
+       "series": "non_prior_share.zs",
+       "source": "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.non_prior_share",
+       "reason": "grid/qwen/games.json:E_D.ZS.shares.per_model.zeroshot.shares_reading is 'uninterpretable': the value is not drawn"
+      }
+     ],
+     "missing": [],
+     "notes": [
+      "e_share.zs is drawn (the paper prints it) although the item-prior share of the same regime is withheld as uninterpretable: the e-share is a reliability-corrected variance share, exploratory or descriptive in every file"
+     ]
+    },
+    {
+     "id": "qwen:sports",
+     "title": "Sports",
+     "group": "qwen",
+     "group_label": "Qwen3-8B",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "extra/sports.json",
+       "sha1": "73bb21f5e10aabb40048b691c2ce1a9155e8d984"
+      },
+      {
+       "path": "gft/gate_ft.json",
+       "sha1": "f564b5b9ed26498ba7f3007f7f7cd0c70dfb110d"
+      },
+      {
+       "path": "grid/qwen/sports.json",
+       "sha1": "cc7ac0b6576c748bff2252ed2553a31ae219aec9"
+      }
+     ],
+     "values": [
+      {
+       "uid": "shares/qwen:sports/n_users",
+       "series": "n_users",
+       "role": "count",
+       "source": "grid/qwen/sports.json:E_D.ZS.shares.rows",
+       "fields": {
+        "n_users": 997
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/item_prior_share.zs",
+       "series": "item_prior_share.zs",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.ZS.shares.per_model.zeroshot.item_prior_share",
+       "fields": {
+        "est": 0.3294550714733511,
+        "lo": 0.2812097733840251,
+        "hi": 0.37594146815816715
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/item_prior_share.lora",
+       "series": "item_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.mean_over_seeds.item_prior_share",
+       "fields": {
+        "est": 0.7410315580147934,
+        "lo": 0.7157543829650722,
+        "hi": 0.7678889211315509
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/item_prior_share.lora_seed0",
+       "series": "item_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s0.item_prior_share",
+       "fields": {
+        "est": 0.7633578653689769
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/item_prior_share.lora_seed1",
+       "series": "item_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s1.item_prior_share",
+       "fields": {
+        "est": 0.7026021757550371
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/item_prior_share.lora_seed2",
+       "series": "item_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s2.item_prior_share",
+       "fields": {
+        "est": 0.7571346329203662
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/non_prior_share.zs",
+       "series": "non_prior_share.zs",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.ZS.shares.per_model.zeroshot.non_prior_share",
+       "fields": {
+        "est": 0.6705449285266489,
+        "lo": 0.6240585318418328,
+        "hi": 0.7187902266159749
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/non_prior_share.lora",
+       "series": "non_prior_share.lora",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.mean_over_seeds.non_prior_share",
+       "fields": {
+        "est": 0.2589684419852066,
+        "lo": 0.23211107886844895,
+        "hi": 0.2842456170349278
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/non_prior_share.lora_seed0",
+       "series": "non_prior_share.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s0.non_prior_share",
+       "fields": {
+        "est": 0.23664213463102313
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/non_prior_share.lora_seed1",
+       "series": "non_prior_share.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s1.non_prior_share",
+       "fields": {
+        "est": 0.29739782424496286
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/non_prior_share.lora_seed2",
+       "series": "non_prior_share.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.shares.per_model.s2.non_prior_share",
+       "fields": {
+        "est": 0.2428653670796338
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/e_share.zs",
+       "series": "e_share.zs",
+       "role": "point",
+       "source": "extra/sports.json:E_G.ZS.e_share.per_model.zeroshot.e_share",
+       "fields": {
+        "est": 0.7023750869949006,
+        "lo": 0.6448783453408621,
+        "hi": 0.7651814619531357
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7",
+        "extra/sports.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/e_share.lora",
+       "series": "e_share.lora",
+       "role": "point",
+       "source": "extra/sports.json:E_G.FT.e_share.mean_over_seeds",
+       "fields": {
+        "est": 0.25998963312215084,
+        "lo": 0.23425239103510678,
+        "hi": 0.28483569960760446
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7",
+        "extra/sports.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/e_share.lora_seed0",
+       "series": "e_share.lora_seed0",
+       "role": "seed",
+       "source": "extra/sports.json:E_G.FT.e_share.per_model.s0.e_share",
+       "fields": {
+        "est": 0.2384650017227153
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7",
+        "extra/sports.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/e_share.lora_seed1",
+       "series": "e_share.lora_seed1",
+       "role": "seed",
+       "source": "extra/sports.json:E_G.FT.e_share.per_model.s1.e_share",
+       "fields": {
+        "est": 0.29782700375705734
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7",
+        "extra/sports.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/e_share.lora_seed2",
+       "series": "e_share.lora_seed2",
+       "role": "seed",
+       "source": "extra/sports.json:E_G.FT.e_share.per_model.s2.e_share",
+       "fields": {
+        "est": 0.2436768938866799
+       },
+       "flags": [
+        "descriptive"
+       ],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7",
+        "extra/sports.json:E_G.descriptive"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G.zs",
+       "series": "G.zs",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.ZS.information_gain.per_model.zeroshot.G",
+       "fields": {
+        "est": -0.009489005041718854,
+        "lo": -0.017209417717617744,
+        "hi": -0.001967804240218516
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G.lora",
+       "series": "G.lora",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.FT.information_gain.G_mean_over_seeds",
+       "fields": {
+        "est": 0.002342512328935184,
+        "lo": -0.00742089990918593,
+        "hi": 0.010939954591956501
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G.lora_seed0",
+       "series": "G.lora_seed0",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s0.G",
+       "fields": {
+        "est": 0.003626058259048617
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G.lora_seed1",
+       "series": "G.lora_seed1",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s1.G",
+       "fields": {
+        "est": 0.0031524761216620407
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G.lora_seed2",
+       "series": "G.lora_seed2",
+       "role": "seed",
+       "source": "grid/qwen/sports.json:E_D.FT.information_gain.per_model.s2.G",
+       "fields": {
+        "est": 0.00024900260609489103
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G_wu.zs",
+       "series": "G_wu.zs",
+       "role": "point",
+       "source": "extra/sports.json:E_W.ZS.G_wu.per_model.zeroshot",
+       "fields": {
+        "est": 0.0015833163780366731,
+        "lo": -0.0015985567783183593,
+        "hi": 0.005093373176683954
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G_wu.lora",
+       "series": "G_wu.lora",
+       "role": "point",
+       "source": "extra/sports.json:E_W.FT.G_wu.mean_over_seeds",
+       "fields": {
+        "est": 0.0006092517413946678,
+        "lo": -0.008441576635900451,
+        "hi": 0.008892299861654079
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G_wu.lora_seed0",
+       "series": "G_wu.lora_seed0",
+       "role": "seed",
+       "source": "extra/sports.json:E_W.FT.G_wu.per_model.s0",
+       "fields": {
+        "est": -0.00034102082596752553
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G_wu.lora_seed1",
+       "series": "G_wu.lora_seed1",
+       "role": "seed",
+       "source": "extra/sports.json:E_W.FT.G_wu.per_model.s1",
+       "fields": {
+        "est": 0.0018382211136366447
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G_wu.lora_seed2",
+       "series": "G_wu.lora_seed2",
+       "role": "seed",
+       "source": "extra/sports.json:E_W.FT.G_wu.per_model.s2",
+       "fields": {
+        "est": 0.0003305549365148876
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      },
+      {
+       "uid": "shares/qwen:sports/G_CF",
+       "series": "G_CF",
+       "role": "point",
+       "source": "grid/qwen/sports.json:E_D.ZS.information_gain.G_CF",
+       "fields": {
+        "est": 0.0024384035406704247,
+        "lo": -0.0037650609830873023,
+        "hi": 0.009883403993046732
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "shares/qwen:sports/G_CF_wu",
+       "series": "G_CF_wu",
+       "role": "point",
+       "source": "extra/sports.json:E_W.ZS.G_CF_wu",
+       "fields": {
+        "est": 0.001939830545484956,
+        "lo": -0.0013301326192872742,
+        "hi": 0.005783706237469067
+       },
+       "flags": [],
+       "flag_sources": [
+        "extra/sports.json:status.items_2_to_7"
+       ]
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    }
+   ]
+  },
+  "serving": {
+   "id": "serving",
+   "kind": "plot",
+   "title": "Serving only the most confident events against a random subset",
+   "file": "serving.pdf",
+   "sha1": "2b12a762801c187c1b5decdfc007b33b52b393dd",
+   "bytes": 19526,
+   "size_in": [
+    7.0,
+    2.0
+   ],
+   "status": "partial",
+   "sources": [
+    {
+     "path": "aud/sports.json",
+     "sha1": "a7406bd2509464352eac2e390dfcb7ab5784c837"
+    },
+    {
+     "path": "aud/toys.json",
+     "sha1": "de15aa117b7811d7cea4d68d734a96434f50ce7a"
+    }
+   ],
+   "missing": [
+    {
+     "path": "aud/home.json",
+     "needed_by": [
+      "home:all"
+     ]
+    },
+    {
+     "path": "aud/tools.json",
+     "needed_by": [
+      "tools:all"
+     ]
+    }
+   ],
+   "n_boot_values": [
+    2000
+   ],
+   "flags_used": [],
+   "flag_meaning": {
+    "exploratory": "the extra file's status.items_2_to_7 is 'exploratory' (addendum 6, ML-1M): no confirmatory reading",
+    "descriptive": "the record or block is flagged descriptive in the file (descriptive_min_n, E_G.descriptive) or rests on fewer than the minimum number of users or events: no interval-based claim",
+    "rows_differ": "the reference was computed on other rows than the LLM score it is drawn beside"
+   },
+   "notes": [],
+   "meta": {},
+   "panels": [
+    {
+     "id": "sports:events_1001_10000",
+     "title": "Sports (S10k)",
+     "group": "audit",
+     "group_label": "",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "aud/sports.json",
+       "sha1": "a7406bd2509464352eac2e390dfcb7ab5784c837"
+      }
+     ],
+     "values": [
+      {
+       "uid": "serving/sports:events_1001_10000/n_events",
+       "series": "n_events",
+       "role": "count",
+       "source": "aud/sports.json:segments.events_1001_10000",
+       "fields": {
+        "n_events": 9000
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.0",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.0",
+       "fields": {
+        "coverage": 0.1,
+        "est": 0.4293935237567431,
+        "lo": 0.39927369361643333,
+        "hi": 0.4541910285439982
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.1",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.1",
+       "fields": {
+        "coverage": 0.2,
+        "est": 0.36324990808848373,
+        "lo": 0.3451899360589346,
+        "hi": 0.38216433934628474
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.2",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.2",
+       "fields": {
+        "coverage": 0.3,
+        "est": 0.3202198304711784,
+        "lo": 0.3052513077060045,
+        "hi": 0.33504023329941435
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.3",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.3",
+       "fields": {
+        "coverage": 0.4,
+        "est": 0.2895703390136422,
+        "lo": 0.27778591390271407,
+        "hi": 0.30214547995349594
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.4",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.4",
+       "fields": {
+        "coverage": 0.5,
+        "est": 0.268834588859861,
+        "lo": 0.25773551289215485,
+        "hi": 0.2797632285565563
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.5",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.5",
+       "fields": {
+        "coverage": 0.6,
+        "est": 0.25012333011817267,
+        "lo": 0.24091781593252254,
+        "hi": 0.2598017488780641
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.6",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.6",
+       "fields": {
+        "coverage": 0.7,
+        "est": 0.2376915557602433,
+        "lo": 0.22948409343100817,
+        "hi": 0.2460297874058528
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.7",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.7",
+       "fields": {
+        "coverage": 0.8,
+        "est": 0.22493992289436648,
+        "lo": 0.2173273923863572,
+        "hi": 0.2326006338999523
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.8",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.8",
+       "fields": {
+        "coverage": 0.9,
+        "est": 0.21577587864193176,
+        "lo": 0.20856169983089662,
+        "hi": 0.2225788955547158
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/p_max.9",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.9",
+       "fields": {
+        "coverage": 1.0,
+        "est": 0.20689872912249935,
+        "lo": 0.20017234971962639,
+        "hi": 0.21335622634996623
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.0",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.0",
+       "fields": {
+        "coverage": 0.1,
+        "est": 0.1842247712482903,
+        "lo": 0.16443735268827686,
+        "hi": 0.2050574002221071
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.1",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.1",
+       "fields": {
+        "coverage": 0.2,
+        "est": 0.19859590119912537,
+        "lo": 0.18504341279415423,
+        "hi": 0.21407662130349253
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.2",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.2",
+       "fields": {
+        "coverage": 0.3,
+        "est": 0.19841711542363033,
+        "lo": 0.18692330473276023,
+        "hi": 0.21055118847161827
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.3",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.3",
+       "fields": {
+        "coverage": 0.4,
+        "est": 0.2001378518438786,
+        "lo": 0.1903878505432097,
+        "hi": 0.21027886930743045
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.4",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.4",
+       "fields": {
+        "coverage": 0.5,
+        "est": 0.20052791268182127,
+        "lo": 0.19117584662991885,
+        "hi": 0.20964540059750095
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.5",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.5",
+       "fields": {
+        "coverage": 0.6,
+        "est": 0.20074773792802303,
+        "lo": 0.1928645207837114,
+        "hi": 0.20938277579110567
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.6",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.6",
+       "fields": {
+        "coverage": 0.7,
+        "est": 0.20432512155620555,
+        "lo": 0.19652323579269418,
+        "hi": 0.21204751645198502
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.7",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.7",
+       "fields": {
+        "coverage": 0.8,
+        "est": 0.2052830469859486,
+        "lo": 0.19816802188455113,
+        "hi": 0.21253364106936493
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.8",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.8",
+       "fields": {
+        "coverage": 0.9,
+        "est": 0.20622988861089206,
+        "lo": 0.199318716947623,
+        "hi": 0.21288187787217194
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/sports:events_1001_10000/random.9",
+       "series": "random",
+       "role": "point",
+       "source": "aud/sports.json:segments.events_1001_10000.questions.next.D_selective_serving.signals.random.curve.ndcg10.9",
+       "fields": {
+        "coverage": 1.0,
+        "est": 0.20689872912249882,
+        "lo": 0.2001723497196262,
+        "hi": 0.2133562263499659
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "toys:all",
+     "title": "Toys",
+     "group": "audit",
+     "group_label": "",
+     "status": "ok",
+     "sources": [
+      {
+       "path": "aud/toys.json",
+       "sha1": "de15aa117b7811d7cea4d68d734a96434f50ce7a"
+      }
+     ],
+     "values": [
+      {
+       "uid": "serving/toys:all/n_events",
+       "series": "n_events",
+       "role": "count",
+       "source": "aud/toys.json:segments.all",
+       "fields": {
+        "n_events": 10000
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.0",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.0",
+       "fields": {
+        "coverage": 0.1,
+        "est": 0.6624488923245359,
+        "lo": 0.6343159654900251,
+        "hi": 0.6920863082561352
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.1",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.1",
+       "fields": {
+        "coverage": 0.2,
+        "est": 0.5270072509082722,
+        "lo": 0.506269946708503,
+        "hi": 0.5469214284647484
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.2",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.2",
+       "fields": {
+        "coverage": 0.3,
+        "est": 0.44873598583947827,
+        "lo": 0.4333075291269822,
+        "hi": 0.4648919643089478
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.3",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.3",
+       "fields": {
+        "coverage": 0.4,
+        "est": 0.38833306209875046,
+        "lo": 0.3749637833796331,
+        "hi": 0.4017504746117383
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.4",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.4",
+       "fields": {
+        "coverage": 0.5,
+        "est": 0.3480679877357042,
+        "lo": 0.3368319229237523,
+        "hi": 0.35924709882420747
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.5",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.5",
+       "fields": {
+        "coverage": 0.6,
+        "est": 0.3213363525280779,
+        "lo": 0.31146677036580084,
+        "hi": 0.33092869656038815
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.6",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.6",
+       "fields": {
+        "coverage": 0.7,
+        "est": 0.2958232118249627,
+        "lo": 0.2870468308237604,
+        "hi": 0.30526460071688316
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.7",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.7",
+       "fields": {
+        "coverage": 0.8,
+        "est": 0.2757556690912355,
+        "lo": 0.26786043588127395,
+        "hi": 0.2841130976370588
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.8",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.8",
+       "fields": {
+        "coverage": 0.9,
+        "est": 0.2594754284100189,
+        "lo": 0.252000358752045,
+        "hi": 0.2673264406216125
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/p_max.9",
+       "series": "p_max",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.p_max.curve.ndcg10.9",
+       "fields": {
+        "coverage": 1.0,
+        "est": 0.24494299662801358,
+        "lo": 0.23787542242519746,
+        "hi": 0.25191726841786183
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.0",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.0",
+       "fields": {
+        "coverage": 0.1,
+        "est": 0.23450093514641054,
+        "lo": 0.2088018968874432,
+        "hi": 0.25346656727371214
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.1",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.1",
+       "fields": {
+        "coverage": 0.2,
+        "est": 0.23605486452765403,
+        "lo": 0.22028346832866214,
+        "hi": 0.2519636101059854
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.2",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.2",
+       "fields": {
+        "coverage": 0.3,
+        "est": 0.234662215018633,
+        "lo": 0.22246293607588855,
+        "hi": 0.24757399581094083
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.3",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.3",
+       "fields": {
+        "coverage": 0.4,
+        "est": 0.2363224159234057,
+        "lo": 0.22514220791226658,
+        "hi": 0.24658886862000665
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.4",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.4",
+       "fields": {
+        "coverage": 0.5,
+        "est": 0.23772855552082273,
+        "lo": 0.22807018447875765,
+        "hi": 0.24714494435350473
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.5",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.5",
+       "fields": {
+        "coverage": 0.6,
+        "est": 0.2396377611470944,
+        "lo": 0.23061993619313456,
+        "hi": 0.24871714185892962
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.6",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.6",
+       "fields": {
+        "coverage": 0.7,
+        "est": 0.2419056266979029,
+        "lo": 0.23365289599513656,
+        "hi": 0.25084989712061245
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.7",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.7",
+       "fields": {
+        "coverage": 0.8,
+        "est": 0.24360363086896517,
+        "lo": 0.23559539265897672,
+        "hi": 0.2517516360267076
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.8",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.8",
+       "fields": {
+        "coverage": 0.9,
+        "est": 0.24546291793220376,
+        "lo": 0.23802170159746489,
+        "hi": 0.2528478408300715
+       },
+       "flags": [],
+       "flag_sources": []
+      },
+      {
+       "uid": "serving/toys:all/random.9",
+       "series": "random",
+       "role": "point",
+       "source": "aud/toys.json:segments.all.questions.next.D_selective_serving.signals.random.curve.ndcg10.9",
+       "fields": {
+        "coverage": 1.0,
+        "est": 0.24494299662801355,
+        "lo": 0.2378754224251975,
+        "hi": 0.2519172684178616
+       },
+       "flags": [],
+       "flag_sources": []
+      }
+     ],
+     "withheld": [],
+     "missing": [],
+     "notes": []
+    },
+    {
+     "id": "home:all",
+     "title": "Home",
+     "group": "audit",
+     "group_label": "",
+     "status": "not_run",
+     "sources": [],
+     "values": [],
+     "withheld": [],
+     "missing": [
+      {
+       "series": null,
+       "path": "aud/home.json",
+       "kind": "file",
+       "reason": "result file not found"
+      }
+     ],
+     "notes": []
+    },
+    {
+     "id": "tools:all",
+     "title": "Tools",
+     "group": "audit",
+     "group_label": "",
+     "status": "not_run",
+     "sources": [],
+     "values": [],
+     "withheld": [],
+     "missing": [
+      {
+       "series": null,
+       "path": "aud/tools.json",
+       "kind": "file",
+       "reason": "result file not found"
+      }
+     ],
+     "notes": []
+    }
+   ]
+  },
+  "decomp": {
+   "id": "decomp",
+   "kind": "tikz",
+   "title": "Decomposition of the confidence logit (conceptual schematic)",
+   "file": "decomp.tex",
+   "sha1": "73e51074f227f61fd9ce943e22be684a2f58bc90",
+   "bytes": 3159,
+   "status": "ok",
+   "data": "none: conceptual schematic, no result file is read",
+   "sources": [],
+   "missing": [],
+   "panels": []
+  }
+ }
+}

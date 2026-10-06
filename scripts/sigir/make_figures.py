@@ -89,7 +89,7 @@ C_ZS, C_LORA = "#2a78d6", "#eb6834"                     # categorical slots 1 an
 C_REF = "#4d4d4d"                                        # non-LLM references: neutral gray, told apart by marker and row
 STYLE = {
     "font.family": "STIXGeneral", "mathtext.fontset": "stix", "font.size": 7.0, "axes.titlesize": 7.5,
-    "axes.labelsize": 7.0, "xtick.labelsize": 6.5, "ytick.labelsize": 6.5, "legend.fontsize": 6.5,
+    "axes.labelsize": 7.0, "xtick.labelsize": 7.0, "ytick.labelsize": 7.0, "legend.fontsize": 7.0,
     "axes.linewidth": 0.5, "axes.edgecolor": AXIS, "axes.facecolor": "none", "figure.facecolor": "none",
     "savefig.facecolor": "none", "text.color": INK, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
     "xtick.major.width": 0.5, "ytick.major.width": 0.5, "xtick.major.size": 2.0, "ytick.major.size": 2.0,
@@ -98,7 +98,7 @@ STYLE = {
     "figure.dpi": 100, "savefig.dpi": 300,
 }
 LW_CI, LW_LINE, EDGE_W = 0.9, 1.1, 0.7
-LABEL_PT, SMALL_PT = 7.0, 6.0
+LABEL_PT, SMALL_PT = 7.0, 7.0                  # axis labels, panel annotations (the brief: 7-8 pt text; titles are 7.5 pt)
 # F1: one row per series; ZS circle, LoRA diamond, references square / triangle / cross (distinct in greyscale)
 TRACK_ROWS = {"zero_shot": 4.9, "lora": 3.9, "item_mean": 2.5, "matched_mean": 1.5, "mf": 0.5}
 TRACK_BAND_TOP = 3.1
@@ -871,7 +871,7 @@ def fig_not_run_placeholder(ax, title: str, missing: list, *, note: str = "not r
     ax.add_patch(Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor="none", edgecolor=AXIS, lw=0.5))
     fig = ax.figure
     width_in = ax.get_position().width * fig.get_figwidth()
-    chars = max(10, int(width_in * 26))                                     # about 26 characters per inch at the small size
+    chars = max(10, int(width_in * 22))                                     # about 22 characters per inch at 7 pt
     reasons = list(dict.fromkeys(m.get("reason") or "result file not found" for m in missing)) or ["result file not found"]
     lines = []
     for r in reasons:
@@ -1046,7 +1046,7 @@ def _draw_track_panel(ax, p: Panel, xmin: float, xmax: float, ticks: list) -> No
 # ------------------------------------------------------------------------------------------------ F2 shares: draw
 SHARE_X = {"item_prior_share": 0.0, "non_prior_share": 1.0, "e_share": 2.0}
 SHARE_LABEL = {"item_prior_share": "item prior", "non_prior_share": "non-prior", "e_share": r"$e$-share$^{\,\dagger}$"}
-GAIN_X = {"G": 0.0, "G_wu": 1.6}
+GAIN_X = {"G": 0.0, "G_wu": 1.5}
 GAIN_LABEL = {"G": "E-D (pooled)", "G_wu": r"E-W (within-user)$^{\,\dagger}$"}
 DX_SHARE = {"zs": -0.19, "lora": 0.17}
 DX_GAIN = {"zs": -0.30, "lora": 0.0, "ref": 0.30}
@@ -1102,7 +1102,7 @@ def draw_shares(spec: FigureSpec):
 def _xpos_label(ax, xs: dict, labels: dict, lim: tuple) -> None:
     ax.set_xlim(*lim)
     ax.set_xticks(list(xs.values()))
-    ax.set_xticklabels([labels[k] for k in xs], fontsize=6.5, color=INK2)
+    ax.set_xticklabels([labels[k] for k in xs], fontsize=7.0, color=INK2)
     ax.tick_params(axis="x", length=0, pad=2.5)
 
 
@@ -1143,7 +1143,7 @@ def _draw_share_top(ax, p: Panel, ylim: tuple, *, show_y: bool) -> None:
 def _draw_share_bottom(ax, p: Panel, ylim: tuple, *, show_y: bool) -> None:
     _axes_style(ax, left=show_y)
     ax.set_ylim(*ylim)
-    _xpos_label(ax, GAIN_X, GAIN_LABEL, (-0.62, 2.22))
+    _xpos_label(ax, GAIN_X, GAIN_LABEL, (-0.62, 2.3))
     ax.yaxis.set_major_locator(MaxNLocator(nbins=5, steps=[1, 2, 5, 10]))
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
     ax.tick_params(axis="y", length=2.0 if show_y else 0, labelleft=show_y)

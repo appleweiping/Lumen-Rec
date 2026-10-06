@@ -1,5 +1,16 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addenda 14 and 15 (instrument validity of G; reference extensions for the rated panels; exploratory; recorded before any quantity of either was computed)
+
+- `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_14.md` sha1 = e023cc67d4ea32fd21f2d02bb905caee2f778c25 (permutation null of G and G_wu, planted-signal recovery and minimum detectable gain, a donor placebo that separates personal evidence from denoising of the 8-donor prior, full-refit and two-way
+  (user and item) bootstrap intervals, a cross-panel Holm sensitivity, Fieller intervals for the retention ratios R and R_Q, upper bounds and equivalence flags)
+- `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_15.md` sha1 = 2e268804d2abd4afda631c5403e26eab3dfac761 (the item mean of the LoRA's own TRAIN labels and time-matched mean with intervals; a regularisation-tuned, history-matched (last 10 events) collaborative reference with an item-bias-only model and
+  recomputed G_CF and E-F; a content-based personal reference from exactly what the prompt shows and G_content, G_LLM|content)
+
+Both were prompted by the third of three independent same-family reviews of the filled draft (2026-10-06, `docs/sigir/REVIEW_NOTES_2026-10-06.md`), which recomputed from the stored reports that the registered temporal MF is over-fitted on the three Amazon panels (training RMSE 0.10-0.11,
+held-out RMSE 1.9-2.0; for Toys: `references/cf_block/mf_temporal` train_rmse 0.1057, held-out candidate RMSE 2.005, 2,810 cold-item pairs; item-bias-only UAUC 0.679 on 678 warm users), that the E-D estimator of G disagrees with E-W on some panels (Sports zero-shot -0.0095 against +0.0016), that the item mean
+is not matched in information, and that no minimum detectable gain was ever stated. No quantity of either addendum had been computed. Both are CPU-only, exploratory, change no registered number and carry their own code records (new modules and runners; sha1 before the first run on a real panel).
+
 ## 2026-10-06 · Amendment 3 addendum 13, REVISED (adds the falsification arm FT-N and the validity rule of the probe; recorded before any code, panel or adapter of the addendum existed)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_13.md` sha1 = 0b5f21243e4f2b2b60029047c7d0cfb8dbcaeac3 (supersedes the first version, sha1 6d83afb23ca8597e222b9327382a00524178bb72 recorded below a few hours earlier; no code, panel, adapter

@@ -149,7 +149,27 @@ F4, in Section "Setting and Notation", after the paragraph "Decomposition and au
 
 ## 6. Page cost in the sigconf layout
 
-PAGE_COST_PLACEHOLDER
+Measured with `scripts/sigir/page_budget.py` on scratch copies of the skeleton (the originals untouched), filled from the result
+files of the day, the slots still red at the tool's typical filler size, and the snippets of section 5 inserted at the places named
+there (F1 and F2 before the teaches table, F3 before "Corrections", F4 before "Where can confidence change a ranking?"):
+
+| state | pages before the references | cost |
+|---|---|---|
+| no figure | 9.20 | |
+| F1 only | 9.60 | 0.40 |
+| F2 only | 9.60 | 0.40 |
+| F3 only | 9.50 | 0.30 |
+| F4 only | 9.36 | 0.16 |
+| all four | 10.45 | 1.25 |
+
+The costs add (0.40 + 0.40 + 0.30 + 0.16 = 1.26 against 1.25 measured). The reading: a double-column float takes its height, its
+caption (four or five lines, about 0.5 in) and the float separation (about 0.3 in) from both columns, over the 8.7 in text height:
+(2.3 + 0.5 + 0.3) / 8.7 is about 0.36 page against 0.40 measured for F1 and F2, and (2.0 + 0.5 + 0.3) / 8.7 about 0.32 against 0.30
+for F3; the single-column schematic (about 1.7 in) takes the same from one column, about 0.14 page against 0.16 measured. The base
+is already above nine pages with the real results and typical filler of the day (the budget counts the appendix and excludes the
+references), so the figures cannot be added without cutting about 1.25 pages elsewhere or moving content to the artefact (for example
+the blocks of Table `tab:tracks` that F1 and F2 repeat); merging F1 and F2 into one float with one caption would save one caption
+and one separation (not measured). The deltas depend little on the base; the base depends on the day's result files.
 
 ## 7. What has to change outside this directory (described, not edited)
 

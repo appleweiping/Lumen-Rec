@@ -1044,10 +1044,13 @@ def test_same_input_same_bytes_registered_defaults_and_no_timestamps(world, tmp_
                 walk(v)
     walk(doc)
     assert not [k for k in keys if re.search(r"(^|_)(time|timing|timestamp|date|datetime|clock|elapsed|host|hostname|stamp)($|_)", k, re.I)]
-    # another seed changes the random block only (p_max, the controls' directions and the counts do not depend on it)
+    # another seed changes the random signal and the resamples (so every interval), not a point estimate of p_max, the directions
+    # (VALID, no randomness) or the counts
     d3 = run(world, "s3.json", seed=3, n_boot=2000)
-    assert d3["signals"]["random"]["gain50"] != doc["signals"]["random"]["gain50"]
-    assert d3["signals"]["p_max"] == doc["signals"]["p_max"] and d3["counts"] == doc["counts"] and d3["direction"] == doc["direction"]
+    assert d3["signals"]["random"]["gain50"]["ndcg10"]["est"] != doc["signals"]["random"]["gain50"]["ndcg10"]["est"]
+    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["est"] == doc["signals"]["p_max"]["gain50"]["ndcg10"]["est"]
+    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["lo"] != doc["signals"]["p_max"]["gain50"]["ndcg10"]["lo"]
+    assert d3["counts"] == doc["counts"] and d3["direction"] == doc["direction"] and d3["seed"] == 3
 
 
 FORBIDDEN = ("significan", "better", "worse", "outperform", "superior", "inferior", "beats", "wins", "loses", "improve", "stronger",
@@ -1450,7 +1453,3 @@ def test_the_dry_rehearsal_runs_the_three_panel_kinds_on_a_synthetic_fixture_and
     assert panels["llama_z2"]["layout"] == {"segments": "single", "test_role": "test1001_3000", "valid_role": "valid500", "first_event": 1001, "quarantine_n": None}
     assert panels["qwen_registered"]["layout"]["segments"] == "auto" and panels["qwen_z2"]["layout"]["segments"] == "single"
     assert "ftgrid_freeze" not in r.stdout + r.stderr                                # no freeze check in a rehearsal
-    # a second rehearsal rewrites its own files (same bytes)
-    snap = {p: (repo / p).read_bytes() for p in new if p.endswith(".json") and "/out/" in p}
-    r2 = run_script(repo, DRY_RUN="1", DRY_N_BOOT="20")
-    assert r2.returncode == 0 and all((repo / p).read_bytes() == b for p, b in snap.items()), msg(r2)

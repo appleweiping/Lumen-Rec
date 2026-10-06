@@ -308,9 +308,8 @@ def analyze_panel(domain: str, panel, L_test: np.ndarray, vpanel, L_valid: np.nd
     prof_v, _ = na.user_profile(vpanel)
     valid_sig = {"hist_len": hist_len_signal(vpanel), "profile_pop": prof_v,
                  "pop_conf": pop_conf_signal(vpanel, T_pop["beta"])}
-    direction = {s: direction_of(valid_sig[s][mv], ndcg_v[mv]) for s in VALID_DIRECTION}
-    direction["p_max"] = {"value": 1, "source": "registered"}
-    direction["random"] = {"value": 1, "source": "as_is"}
+    direction = {"p_max": {"value": 1, "source": "registered"}, "random": {"value": 1, "source": "as_is"}}
+    direction.update({s: direction_of(valid_sig[s][mv], ndcg_v[mv]) for s in VALID_DIRECTION})
     # ---- TEST: the audit's arrays, the control signals, the segment
     rand = np.random.default_rng([int(seed), 1]).random(E)                       # the audit's fixed-seed random signal
     qa = na.question_arrays(L_test, panel, beta, rand)
@@ -370,7 +369,7 @@ def analyze_panel(domain: str, panel, L_test: np.ndarray, vpanel, L_valid: np.nd
                 "n_events_serving_set_profile_pop": int(has.sum()),
                 "n_valid_events": int(vpanel.E), "n_valid_events_with_llm_scores": int(mv.sum()),
                 "n_valid_events_pop_temperature": int(T_pop["n_events_used"]),
-                "history": prof_diag, "scores_test": load_diag or {}, "scores_valid": valid_diag or {}},
+                "history_panel_file": prof_diag, "scores_test": load_diag or {}, "scores_valid": valid_diag or {}},
         temperature={"p_max": T_llm, "pop_conf": T_pop},
         direction=direction, signals=signals)
     return doc
@@ -405,16 +404,19 @@ def check_audit_consistency(audit_doc: dict, doc: dict, tol: float = AUDIT_TOL) 
 
     if D.get("n_events") != doc["counts"]["n_events_serving_set"]:
         bad.append("n_events")
-    for s in ("p_max", "random"):
-        A, M = D["signals"][s], doc["signals"][s]
-        for u in na.UTILS:
-            pairs = [("gain50", A["gain_at_50_vs_full"][u], M["gain50"][u]), ("aurc", A["aurc"][u], M["aurc"][u])]
-            pairs += [(f"curve@{ca['coverage']}", ca, cm) for ca, cm in zip(A["curve"][u], M["curve"][u])]
-            for name, ca, cm in pairs:
-                for key in ("est", "lo", "hi"):
-                    cmp(f"{s}/{u}/{name}/{key}", ca[key], cm[key])
-                if ca["n"] != cm["n"]:
-                    bad.append(f"{s}/{u}/{name}/n")
+    try:
+        for s in ("p_max", "random"):
+            A, M = D["signals"][s], doc["signals"][s]
+            for u in na.UTILS:
+                pairs = [("gain50", A["gain_at_50_vs_full"][u], M["gain50"][u]), ("aurc", A["aurc"][u], M["aurc"][u])]
+                pairs += [(f"curve@{ca['coverage']}", ca, cm) for ca, cm in zip(A["curve"][u], M["curve"][u])]
+                for name, ca, cm in pairs:
+                    for key in ("est", "lo", "hi"):
+                        cmp(f"{s}/{u}/{name}/{key}", ca[key], cm[key])
+                    if ca["n"] != cm["n"]:
+                        bad.append(f"{s}/{u}/{name}/n")
+    except (KeyError, TypeError) as e:
+        raise ControlError(f"the audit result is not a section D result of the audit (missing {e})", 1) from None
     if bad:
         raise ControlError("the registered audit numbers are not reproduced (tolerance "
                            f"{tol}): {bad[:8]}{' ...' if len(bad) > 8 else ''}", 1)
@@ -467,8 +469,11 @@ def write_json(path: Path, doc: dict) -> dict:
     text = json.dumps(stats.strict_json(doc), indent=1, allow_nan=False) + "\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
+    if tmp.is_symlink() or tmp.exists():
+        tmp.unlink()                                        # a stale or planted temporary name is removed, never written through
     try:
-        tmp.write_bytes(text.encode("utf-8"))
+        with open(tmp, "xb") as f:                          # exclusive: nothing may appear under that name in between
+            f.write(text.encode("utf-8"))
         os.replace(tmp, path)
     finally:
         if tmp.exists():
@@ -522,9 +527,10 @@ def run_control(domain: str, audit_dir, panel_test, panel_valid, out=None, *, pa
     meta = {"code_sha1": code_sha1(),
             "input_sha1": {"panel_test": na._sha1_file(panel_test), "panel_valid": na._sha1_file(panel_valid),
                            "scores_test": na._sha1_file(s_test),
-                           "scores_valid": na._sha1_file(s_valid) if s_valid.exists() else None},
+                           "scores_valid": na._sha1_file(s_valid) if s_valid.exists() else None,
+                           "audit_json": na._sha1_file(audit_json) if audit_json else None},
             "inputs": {"audit_dir": str(audit_dir), "panel_test": str(panel_test), "panel_valid": str(panel_valid),
-                       "test_role": test_role, "valid_role": valid_role},
+                       "test_role": test_role, "valid_role": valid_role, "audit_json": str(audit_json) if audit_json else None},
             "registered_settings": bool(int(n_boot) == REG_N_BOOT and int(seed) == REG_SEED),
             "audit_consistency": {"checked": False}}
     if audit_doc is not None and doc["label"] != "NOT_RUN":

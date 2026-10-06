@@ -1380,6 +1380,11 @@ def main(argv=None) -> int:
         part = [p["id"] for p in panels if p["status"] == "partial"]
         print(f"{fid:<8} {e['status']:<8} {e['file']}  sha1 {e['sha1'][:12]}  panels {len(panels)}  not run: "
               f"{', '.join(nr) or '-'}; partial: {', '.join(part) or '-'}")
+        for note in e.get("notes", []):
+            print(f"         note: {note}")
+        for p in panels:
+            for note in p.get("notes", []):
+                print(f"         note [{p['id']}]: {note}")
     print(f"manifest: {Path(a.out) / MANIFEST_NAME}")
     return 0
 

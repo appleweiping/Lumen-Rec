@@ -2,7 +2,7 @@
  "schema": "lumen_figures_manifest_v1",
  "generator": {
   "script": "scripts/sigir/make_figures.py",
-  "script_sha1": "bd723ab76f38607f3df51b95adea32bec1031153",
+  "script_sha1": "e089c2c6c64b969881c501987b688b93cb3a0754",
   "environment": {
    "python": "3.14.5",
    "matplotlib": "3.10.9"

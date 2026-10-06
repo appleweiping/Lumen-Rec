@@ -1,5 +1,12 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Amendment 3 addendum 18 (swap-prior decomposition of the next-item logits; exploratory; recorded before any next-item swap prompt was scored and before any quantity of it was computed)
+
+`idea-stage/PREREG_AMENDMENT_3_ADDENDUM_18.md` sha1 = 0b805510c6a9581b4bc602e5c517c5779e7e3978. The decomposition l = b + pi(i) + e of Amendment 3 was run on rated panels only; the reviews asked whether the item prior also dominates the next-item logits. The addendum scores, for the first 1,000 events of each domain's registered TEST segment (Sports events 1,001-2,000; Toys, Home, Tools events 1-1,000;
+Home and Tools after their audit scores exist), the audit's prompt V0 / question `next` with the swap arm (`--swap_k 8`: every unique candidate item under up to 8 other users' histories) through the frozen audit checkout (commit 189c164 supports `--swap_k`), about 2.8 GPU-hours per domain (the audit scored 2.02M prompts per domain at 80 prompts/s: 10,000 events x 101 candidates x 2 questions; a full swap arm over the 212k-374k unique items of a
+domain would cost 6 h or more, hence the 1,000-event subset), and analyses of the item-prior share, the rankings by l, pi-hat, e-hat and popularity, the event-level information gain with a full-refit bootstrap, and strata by the positive item's popularity group. Exploratory; labels and effect-size floors as addendum 17. Written after the Toys and Sports audit results had been read; no swap prompt of a next-item panel had been scored and nothing of it computed. The
+scoring runner and the analysis module are new code whose sha1 will be recorded before the first prompt is scored.
+
 ## 2026-10-06 · Amendment 3 addenda 16 and 17 (a readout control FT-G; artefact checks and effect-size floors for the next-item endpoints; exploratory; recorded before any adapter, panel or quantity of either existed)
 
 - `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_16.md` sha1 = 52ad0c4d5c2e3794d0346f478938c2b4a9a70c3b: FT-G, adapters g0, g1 trained on the registered TRAIN panel with all labels permuted globally (seed-0 key) on ML-1M and Toys (Video_Games and Sports if the GPU is idle at the 2026-10-22 checkpoint), the readout shift

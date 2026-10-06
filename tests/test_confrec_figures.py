@@ -153,7 +153,7 @@ def aud_report(rng, domain, segments=(("all", "all"),), n_events=500) -> dict:
 def write_json(root: Path, rel: str, obj) -> Path:
     p = root / rel
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, indent=1) + "\n", encoding="utf-8")
+    p.write_text(json.dumps(obj) + "\n", encoding="utf-8")
     return p
 
 
@@ -206,12 +206,14 @@ def all_values(entry: dict):
             yield p, v
 
 
+def _fake_render(fig):
+    mf.plt.close(fig)
+    return b"%PDF-1.4 stub\n" + b"x" * 2000
+
+
 def stub_render(monkeypatch):
     """Replace the PDF renderer by deterministic bytes (the drawing still runs); for tests of file handling only."""
-    def fake(fig):
-        mf.plt.close(fig)
-        return b"%PDF-1.4 stub\n" + b"x" * 2000
-    monkeypatch.setattr(mf, "_render_pdf", fake)
+    monkeypatch.setattr(mf, "_render_pdf", _fake_render)
 
 
 def collect_all(root: Path):
@@ -266,10 +268,12 @@ def drawn_world(world):
 
 @pytest.fixture(scope="module")
 def holey(tmp_path_factory):
-    """A tree with a rated panel, two next-item panels and one addendum-6 file missing, rendered once."""
+    """A tree with a rated panel, two next-item panels and one addendum-6 file missing (entries built once; PDFs stubbed)."""
     root = build_tree(tmp_path_factory.mktemp("results_holes"), skip=HOLES)
     out = tmp_path_factory.mktemp("figs_holes")
-    return root, out, mf.run(root, out, only=ALL3)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(mf, "_render_pdf", _fake_render)
+        return root, out, mf.run(root, out, only=ALL3)
 
 
 @pytest.fixture(scope="module")
@@ -365,19 +369,22 @@ def test_drawn_curves_equal_manifest(drawn_world):
         assert "margin" not in " ".join(g for g in gids if g)                      # a signal in the file that is not drawn
 
 
-def test_text_stays_inside_the_canvas(drawn_world, drawn_holey):
+def _assert_text_inside(fig, label):
+    with mf.style():
+        fig.canvas.draw()
+        box = fig.bbox
+        for t in fig.findobj(mf.plt.Text):
+            if not t.get_visible() or not t.get_text().strip():
+                continue
+            bb = t.get_window_extent()
+            assert bb.x0 >= box.x0 - 1 and bb.x1 <= box.x1 + 1 and bb.y0 >= box.y0 - 1 and bb.y1 <= box.y1 + 1, \
+                (label, t.get_text(), bb.bounds)
+
+
+def test_text_stays_inside_the_canvas(drawn_holey):
     """Layout is placed by hand in inches: nothing may spill over the edge of the PDF page, placeholders included."""
-    for label, figs in (("full", drawn_world), ("holes", drawn_holey)):
-        for fid, (spec, fig) in figs.items():
-            with mf.style():
-                fig.canvas.draw()
-                box = fig.bbox
-                for t in fig.findobj(mf.plt.Text):
-                    if not t.get_visible() or not t.get_text().strip():
-                        continue
-                    bb = t.get_window_extent()
-                    assert bb.x0 >= box.x0 - 1 and bb.x1 <= box.x1 + 1 and bb.y0 >= box.y0 - 1 and bb.y1 <= box.y1 + 1, \
-                        (label, fid, t.get_text(), bb.bounds)
+    for fid, (spec, fig) in drawn_holey.items():
+        _assert_text_inside(fig, fid)
 
 
 def test_pdf_is_vector_truetype_and_exact_size(full_run):
@@ -557,6 +564,8 @@ def test_uninterpretable_shares_are_withheld_not_drawn(tmp_path):
     assert withheld not in [v["fields"].get("est") for _, v in all_values(entry_of(spec, root))]   # the withheld number is not listed
     fig = mf.draw_shares(spec)
     assert sum(1 for t in fig.findobj(mf.plt.Text) if t.get_text() == "n/i") == 2
+    assert any(t.get_text().startswith("n/i: not interpretable") for t in fig.findobj(mf.plt.Text))
+    _assert_text_inside(fig, "shares with withheld values")
     mf.plt.close(fig)
     bad = _with(root, tmp_path / "bad", "grid/qwen/toys.json", lambda d: d["E_D"]["FT"]["shares"]["mean_over_seeds"].update(shares_reading="x"))
     with pytest.raises(mf.FigureDataError):

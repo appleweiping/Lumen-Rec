@@ -75,8 +75,27 @@ decision. Intervals are the files' own (percentile bootstrap over users on rated
 | LoRA series before a recorded GATE_FT_PASS | not drawn | `missing[]` with `kind: gate` (or `file`) |
 | LoRA regime incomplete (a seed missing or excluded) | not drawn, never replaced | `missing[]`, `reason` quotes the file |
 
+A hollow marker is a ring with a transparent face, so the interval stays visible through it.
+
 The UAUC axes of F1 do not start at zero: the start is printed under the panels (it starts below chance and is lowered only if a value
 needs it); NDCG@10 (F3), the shares (F2 top) and the gains (F2 bottom, zero line drawn) are not truncated.
+
+### Manifest layout (`figures_manifest.json`)
+
+```
+schema, generator{script, script_sha1, environment{python, matplotlib}}, results_root   (a relative label, no absolute path, no clock)
+figures.<id>{ id, kind (plot|tikz), title, file, sha1, bytes, size_in, status (ok|partial|not_run),
+              sources[{path, sha1}], missing[{path, needed_by[]}], n_boot_values[], flags_used[], flag_meaning{}, notes[], meta{gate_ft{state, decision}},
+              panels[{ id, title, group, group_label, status, sources[{path, sha1}], notes[],
+                       values[{uid, series, role (point|seed|count), source "<file>:<dotted key path>", fields{est, lo, hi | coverage, ...},
+                               flags[], flag_sources[]}],
+                       withheld[{series, source, reason}], missing[{series, path, key?, kind (file|block|gate), reason}] }] }
+```
+
+A `source` ending in an integer indexes a list (`...curve.ndcg10.3`). `fields` holds exactly the plotted fields under the file's own
+names, so a value is checked by reading `<file>` at that key path and comparing; the tests do this for every value, and every `sha1`
+is the file's own. To re-check by hand: `python -c "import json,hashlib; m=json.load(open('figures_manifest.json')); ..."` and compare
+each `sources[].sha1` with the sha1 of the file under `docs/sigir/results`.
 
 Colour and marks: blue = zero-shot, orange = LoRA (as in every figure), neutral gray = non-LLM reference or random subset. The two hues
 are slots 1 and 2 of the validated default palette (CVD separation passes; checked with the dataviz validator). Every series also has

@@ -1,0 +1,133 @@
+% citations_added_2026-10-06.bib -- entries to ADD to references.bib (references.bib itself was not edited).
+% Prepared 2026-10-06 by a citation-verification pass; see CITATION_NOTES_2026-10-06.md for the source URL of every entry.
+% Conventions follow references.bib (ACM-Reference-Format fields; no abstract; DOI urls as https://doi.org/...).
+% No entry below is marked UNVERIFIED: all eight were checked against a publisher/proceedings record (Crossref record deposited by
+% the publisher, AAAI OJS, ACL Anthology or the NeurIPS proceedings page) and, where available, the paper's own first page or arXiv.
+%
+% Four of the twelve requested works are ALREADY in references.bib and are deliberately NOT repeated here (duplicate keys would
+% make BibTeX skip them). Their fields were re-checked against the sources and are correct and complete:
+%   item 3  Kapoor et al., NeurIPS 2024        -> key kapoor2024taught  (references.bib, line 1064)
+%   item 4  Li et al., ConfTuner, NeurIPS 2025 -> key li2025conftuner   (references.bib, line 105)
+%   item 11 Kweon et al., AAAI 2022            -> key kweon2022calibrated (references.bib, line 491)
+%   item 12 Burns et al., CCS, ICLR 2023       -> key burns2023ccs      (references.bib, line 325)
+%
+% Keys below are checked to be absent from references.bib.
+
+% ---- item 1: AAAI 2026. Crossref and the AAAI OJS page agree. Note the family name is "Xu" (an arXiv sibling paper of the same
+% ---- group, key yan2026evirank, spells it "Xv"). No arXiv version of GUIDER was found (arXiv 2603.11901 is an unrelated paper).
+@article{xu2026guider,
+  author = {Xu, Cai and Wang, Xujing and Guan, Ziyu and Zhao, Wei and Yan, Meng},
+  title = {{GUIDER:} Uncertainty Guided Dynamic Re-ranking for Large Language Models Based Recommender Systems},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume = {40},
+  number = {19},
+  pages = {16049--16057},
+  year = {2026},
+  month = mar,
+  publisher = {Association for the Advancement of Artificial Intelligence (AAAI)},
+  doi = {10.1609/aaai.v40i19.38639},
+  url = {https://doi.org/10.1609/aaai.v40i19.38639}
+}
+
+% ---- item 2: WWW 2021. AUTHOR ORDER CAVEAT: Crossref (ACM), DBLP (key conf/www/ZhengGLHLJ21), Semantic Scholar, OpenAlex and
+% ---- ECNU list ... He, Yong Li, Depeng Jin (used here); the printed byline of the camera-ready PDF (arXiv v2) reads ... He,
+% ---- Depeng Jin, Yong Li. The ACM page itself returned HTTP 403, so the ACM-side order was taken from the Crossref deposit.
+@inproceedings{zheng2021dice,
+  author = {Zheng, Yu and Gao, Chen and Li, Xiang and He, Xiangnan and Li, Yong and Jin, Depeng},
+  title = {Disentangling User Interest and Conformity for Recommendation with Causal Embedding},
+  booktitle = {Proceedings of the Web Conference 2021},
+  series = {WWW '21},
+  pages = {2980--2991},
+  year = {2021},
+  month = apr,
+  publisher = {ACM},
+  doi = {10.1145/3442381.3449788},
+  url = {https://doi.org/10.1145/3442381.3449788}
+}
+
+% ---- item 5: EMNLP-IJCNLP 2019. ACL Anthology D19-1418 (BibTeX endpoint).
+@inproceedings{clark2019easyway,
+  author = {Clark, Christopher and Yatskar, Mark and Zettlemoyer, Luke},
+  title = {Don't Take the Easy Way Out: Ensemble Based Methods for Avoiding Known Dataset Biases},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
+  pages = {4069--4082},
+  year = {2019},
+  month = nov,
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/D19-1418},
+  url = {https://doi.org/10.18653/v1/D19-1418}
+}
+
+% ---- item 6: EMNLP 2020 (main). ACL Anthology 2020.emnlp-main.746 (BibTeX endpoint).
+@inproceedings{swayamdipta2020cartography,
+  author = {Swayamdipta, Swabha and Schwartz, Roy and Lourie, Nicholas and Wang, Yizhong and Hajishirzi, Hannaneh and Smith, Noah A. and Choi, Yejin},
+  title = {Dataset Cartography: Mapping and Diagnosing Datasets with Training Dynamics},
+  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages = {9275--9293},
+  year = {2020},
+  month = nov,
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.emnlp-main.746},
+  url = {https://doi.org/10.18653/v1/2020.emnlp-main.746}
+}
+
+% ---- item 7: NeurIPS 2022 (vol. 35). Title as printed in the paper and on the proceedings page. Last author printed "Ari S. Morcos"
+% ---- (the proceedings metadata and Crossref drop the initial). Pages are from the Crossref record; the NeurIPS page shows none.
+@inproceedings{sorscher2022pruning,
+  author = {Sorscher, Ben and Geirhos, Robert and Shekhar, Shashank and Ganguli, Surya and Morcos, Ari S.},
+  title = {Beyond neural scaling laws: beating power law scaling via data pruning},
+  booktitle = {Advances in Neural Information Processing Systems 35},
+  series = {NeurIPS 2022},
+  pages = {19523--19536},
+  year = {2022},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/068431-1419},
+  url = {https://doi.org/10.52202/068431-1419}
+}
+
+% ---- item 8: NeurIPS 2024 (vol. 37). Third author printed "Derek F. Wong" (Crossref has "Derek Wong"). Pages from the Crossref
+% ---- record; the NeurIPS page shows none.
+@inproceedings{liu2024selectit,
+  author = {Liu, Liangxin and Liu, Xuebo and Wong, Derek F. and Li, Dongfang and Wang, Ziyi and Hu, Baotian and Zhang, Min},
+  title = {{SelectIT:} Selective Instruction Tuning for {LLMs} via Uncertainty-Aware Self-Reflection},
+  booktitle = {Advances in Neural Information Processing Systems 37},
+  series = {NeurIPS 2024},
+  pages = {97800--97825},
+  year = {2024},
+  publisher = {Neural Information Processing Systems Foundation, Inc. (NeurIPS)},
+  doi = {10.52202/079017-3102},
+  url = {https://doi.org/10.52202/079017-3102}
+}
+
+% ---- item 9: WWW 2024. Crossref; arXiv 2402.15215 states "Accepted by the Proceedings of the ACM Web Conference 2024". ACM page 403.
+% ---- (First author Meng Jiang is a different person from the last author of the PerRecBench paper, key tan2025perrecbench.)
+@inproceedings{jiang2024itemfairness,
+  author = {Jiang, Meng and Bao, Keqin and Zhang, Jizhi and Wang, Wenjie and Yang, Zhengyi and Feng, Fuli and He, Xiangnan},
+  title = {Item-side Fairness of Large Language Model-based Recommendation System},
+  booktitle = {Proceedings of the ACM Web Conference 2024},
+  series = {WWW '24},
+  pages = {4717--4726},
+  year = {2024},
+  month = may,
+  publisher = {ACM},
+  doi = {10.1145/3589334.3648158},
+  url = {https://doi.org/10.1145/3589334.3648158}
+}
+
+% ---- item 10: KDD 2026 (Applied Data Science track), proceedings volume V.2. TITLE CAVEAT: the requested title "Uncertainty-Calibrated
+% ---- Recommendations for Low-Active Users" is only the ARXIV METADATA title (arXiv 2605.17788, v1 and v2). The published proceedings
+% ---- record (Crossref/ACM, OpenAlex, Semantic Scholar) and the title printed on page 1 of the camera-ready PDF (arXiv v2) are the
+% ---- title used here. The key follows the key named in the comment of sections/related_work.tex. The ACM page returned HTTP 403 and the
+% ---- official KDD 2026 program page could not be reached; the existence evidence is the Crossref deposit plus the arXiv comment.
+@inproceedings{zou2026uncertainty,
+  author = {Zou, Bob Junyi and Li, Sai and Sun, Tianyun and Guo, Wentao and Wang, Qinglei},
+  title = {Uncertainty-Aware Adaptive Recommendation across User Lifecycle},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  series = {KDD '26},
+  pages = {8595--8603},
+  year = {2026},
+  month = aug,
+  publisher = {ACM},
+  doi = {10.1145/3770855.3818501},
+  url = {https://doi.org/10.1145/3770855.3818501}
+}

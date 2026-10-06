@@ -314,7 +314,7 @@ def test_profile_pop_is_the_mean_group_score_of_the_mapped_history_items(tmp_pat
     assert doc["signals"]["profile_pop"]["serving_set"]["n_events"] == 6 and doc["signals"]["profile_pop"]["serving_set"]["n_excluded"] == 1
     for s in ("p_max", "random", "hist_len", "pop_conf"):
         assert doc["signals"][s]["serving_set"]["n_events"] == 7 and doc["signals"][s]["serving_set"]["n_excluded"] == 0
-    assert doc["counts"]["history"]["n_events_without_mapped_history"] == 2
+    assert doc["counts"]["history_panel_file"]["n_events_without_mapped_history"] == 2           # the whole panel file, e1 and e3
 
 
 def test_popularity_scores_are_the_group_scores_head2_mid1_tail0(tmp_path):
@@ -1046,11 +1046,11 @@ def test_same_input_same_bytes_registered_defaults_and_no_timestamps(world, tmp_
     assert not [k for k in keys if re.search(r"(^|_)(time|timing|timestamp|date|datetime|clock|elapsed|host|hostname|stamp)($|_)", k, re.I)]
     # another seed changes the random signal and the resamples (so every interval), not a point estimate of p_max, the directions
     # (VALID, no randomness) or the counts
-    d3 = run(world, "s3.json", seed=3, n_boot=2000)
-    assert d3["signals"]["random"]["gain50"]["ndcg10"]["est"] != doc["signals"]["random"]["gain50"]["ndcg10"]["est"]
-    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["est"] == doc["signals"]["p_max"]["gain50"]["ndcg10"]["est"]
-    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["lo"] != doc["signals"]["p_max"]["gain50"]["ndcg10"]["lo"]
-    assert d3["counts"] == doc["counts"] and d3["direction"] == doc["direction"] and d3["seed"] == 3
+    d3 = run(world, "s3.json", seed=3)
+    assert d3["signals"]["random"]["gain50"]["ndcg10"]["est"] != world.doc["signals"]["random"]["gain50"]["ndcg10"]["est"]
+    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["est"] == world.doc["signals"]["p_max"]["gain50"]["ndcg10"]["est"]
+    assert d3["signals"]["p_max"]["gain50"]["ndcg10"]["lo"] != world.doc["signals"]["p_max"]["gain50"]["ndcg10"]["lo"]
+    assert d3["counts"] == world.doc["counts"] and d3["direction"] == world.doc["direction"] and d3["seed"] == 3
 
 
 FORBIDDEN = ("significan", "better", "worse", "outperform", "superior", "inferior", "beats", "wins", "loses", "improve", "stronger",
@@ -1456,3 +1456,54 @@ def test_the_dry_rehearsal_runs_the_three_panel_kinds_on_a_synthetic_fixture_and
     assert panels["llama_z2"]["layout"] == {"segments": "single", "test_role": "test1001_3000", "valid_role": "valid500", "first_event": 1001, "quarantine_n": None}
     assert panels["qwen_registered"]["layout"]["segments"] == "auto" and panels["qwen_z2"]["layout"]["segments"] == "single"
     assert "ftgrid_freeze" not in r.stdout + r.stderr                                # no freeze check in a rehearsal
+
+
+# ======================================================================================================== 10. edge cases
+def test_no_mapped_history_at_all_and_constant_signals_are_read_not_crashed(tmp_path):
+    w = build_world(tmp_path, "toys", E=50, N=15, n_valid=30, seed=23, hist_test=[0] * 50, hist_valid=[0] * 30)
+    doc = run(w)
+    c = doc["counts"]
+    assert c["n_events_serving_set"] == 50 and c["n_events_without_mapped_history"] == 50 and c["n_events_serving_set_profile_pop"] == 0
+    pp = doc["signals"]["profile_pop"]
+    assert pp["serving_set"] == {"n_events": 0, "n_excluded": 50, "n_served_at_50": 0, "n_distinct_values": 0}
+    assert pp["delta_vs_p_max"]["ndcg10"]["est"] is None and pp["reading"] == "INCONCLUSIVE"        # nothing to read, never ADDS
+    assert doc["label"] != "ADDS" and doc["readings"]["profile_pop"] == "INCONCLUSIVE"
+    hl = doc["signals"]["hist_len"]                                                                   # every history is empty: one tie block
+    assert hl["serving_set"]["n_distinct_values"] == 1 and hl["gain50"]["ndcg10"]["est"] == pytest.approx(0.0, abs=1e-15)
+    assert doc["direction"]["hist_len"]["undefined"] and doc["direction"]["hist_len"]["value"] == 1
+    assert doc["direction"]["profile_pop"]["undefined"] and doc["direction"]["profile_pop"]["n_valid_pairs"] == 0
+    assert hl["niche"]["quintile_sizes"] == [0] * 5 and hl["niche"]["niche_bin"] == 0 and hl["niche"]["mainstream_bin"] == 4
+    assert hl["niche"]["niche_minus_mainstream_served_share"]["est"] is None
+
+
+def test_qwen_restricted_layout_uses_the_default_roles_and_one_segment(tmp_path):
+    w = build_world(tmp_path, "tools", E=36, N=15, n_valid=24, seed=29)
+    doc = run(w, segments="single", first_event=1001, kind="qwen_z2")
+    assert doc["panel"] == {"segment": "test", "role": "all", "event_range": [1001, 1036], "n_events": 36}
+    assert doc["layout"] == {"segments": "single", "test_role": "test", "valid_role": "valid2k", "first_event": 1001, "quarantine_n": None}
+    assert_registered_blocks_equal(audit_run(w, segments="single", first_event=1001)["segments"]["test"], doc)
+
+
+def test_a_malformed_audit_result_is_refused_with_status_1(world, tmp_path):
+    for name, bad in (("empty", {}), ("no_d", {"n_boot": B, "seed": 0, "segments": {"all": {"questions": {"next": {}}}}}),
+                      ("no_signals", {"n_boot": B, "seed": 0, "segments": {"all": {"questions": {"next": {"D_selective_serving": {
+                          "n_events": 96, "signals": {}}}}}}})):
+        p = tmp_path / f"{name}.json"
+        p.write_text(json.dumps(bad), encoding="utf-8")
+        with pytest.raises(sc.ControlError) as e:
+            run(world, f"{name}_out.json", audit_json=p)
+        assert e.value.code == 1 and not (world.tmp / f"{name}_out.json").exists(), name
+
+
+def test_a_planted_temporary_name_is_removed_not_written_through(world, tmp_path):
+    decoy = tmp_path / "decoy.txt"
+    decoy.write_text("keep me", encoding="utf-8")
+    out = tmp_path / "o" / "x.json"
+    out.parent.mkdir()
+    tmp = out.with_name("x.json.tmp")
+    try:
+        os.link(decoy, tmp)                                  # a hard link to a file that must not change
+    except (OSError, NotImplementedError, AttributeError):
+        pytest.skip("hard links cannot be made here")
+    sc.run_control(world.domain, world.audit_dir, world.panel_test, world.panel_valid, out, panel_kind="qwen_registered", n_boot=20)
+    assert decoy.read_text(encoding="utf-8") == "keep me" and jload(out)["domain"] == "toys" and not tmp.exists()

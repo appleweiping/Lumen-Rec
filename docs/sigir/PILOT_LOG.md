@@ -1,5 +1,49 @@
 # SIGIR 2027 line — pilot log (append-only, newest first)
 
+## 2026-10-06 · Prune record (FREEZE `prune`): `ftprune.py`, `run_ftprune.sh` and the prune manifest of stages A and B; recorded before any pruned adapter was trained (stages C to E)
+
+- `src/confrec/ftprune.py` = d9dd0f101d7aa5d27d07a0391b0088aa28f4bad7
+- `scripts/sigir/run_ftprune.sh` = 39fbce1a2ecdd17003e8cc3927cf8b16e4662af2
+- `outputs/confrec/ftprune/prune_manifest.json` = e9ad9b1c10bb857fa50800a79050725e42d1f480
+
+Printed by `python -m src.confrec.ftgrid_freeze --print --stage prune` on the server (checkout ec6db3e) after queue job `47_prune_AB` (stages A and B: the zero-shot like pass of the ML-1M TRAIN
+set and the CPU step that builds the signals, the subsets of P0-P3 for seeds 0-4 and the pruned TRAIN files) had finished with exit 0 (2026-10-07 01:43 +0800). Before this record the check
+failed for exactly these three files, as it must. Only the sha1 of the manifest was looked at: no subset size, signal, pruned file or composition statistic was opened, no pruned adapter exists
+and no S6 outcome exists. Stages C to E (`STAGES=C,D,E bash scripts/sigir/run_ftprune.sh`) run next as queue job `48_prune_CDE`; the composition diagnostics (`ftprune_compose`, code recorded
+2026-10-05) are CPU only and run on this manifest.
+
+## 2026-10-06 · Code record: the method-slot code after addendum 10, the train/test-shift diagnostic and their tests; recorded before any prior-offset adapter was trained or scored
+
+Lines of `python -m src.confrec.ftgrid_freeze --print --stage method` with the four q-hat manifests and of `python -m src.confrec.ftmethod_shift_diag record --print`, both run on the server
+(checkout ec6db3e; `--check --stage amendment` and `--check --stage core` were OK on the same checkout):
+
+- `src/confrec/train_lora_offset.py` = aaae5e812637551a6430031349a418c43a78c594 (bound; unchanged since the addendum-5 record)
+- `scripts/sigir/run_ftmethod.sh` = e9477a4b385607eb3ca976f6780d19952973b580 (replaces 121ad50f...)
+- `src/confrec/ftmethod_report.py` = 7af7ffacd923f7607183ee4a807f29c59303a8c5 (replaces 8414bce8...)
+- `outputs/confrec/ftmethod/ml1m/qhat_manifest.json` = cac25cb87bb5eb151697950336229a3608dcd131
+- `outputs/confrec/ftmethod/toys/qhat_manifest.json` = 1e5add0af0a0e133b16c767b30cf7932f4f295eb
+- `outputs/confrec/ftmethod/games/qhat_manifest.json` = a257961dc1082011a4c6c45897eb1ad83216993e
+- `outputs/confrec/ftmethod/sports/qhat_manifest.json` = 38ba70a53a815005982f7848463246a0ab0f78b1
+- `scripts/sigir/run_ftmethod_shift_diag.sh` = a58fed9c4a42c62b87ab72b7c405b56cd45d24cb (the diagnostic's own record, addendum 10 section 2)
+- `src/confrec/ftmethod_shift_diag.py` = 14af03705095ca1b96754e923fb0c9dac756c490
+- `tests/test_confrec_ftmethod.py` = 62c2f5e9fc0854209aa8faee04222e4a58b94c0a (not bound)
+- `tests/test_confrec_ftmethod_shift_diag.py` = 83276f96032cec0940429fac26b9cd98640b3423 (not bound)
+- `tests/test_confrec_fillpaper.py` = ef80f37639380f3c8d4a65d4e3d60702855c7658 (replaces 856e3bdb...; two fixtures follow the INVALID-report rule of addendum 10 item 2, and the real-file test reads the FT-C
+  block's own state instead of pinning "unavailable"; 41 tests pass locally)
+
+Implemented by an implementer agent under addendum 10 items 1-7 and section 2 (an independent same-family review had found the DRY-root string comparison, the DRY_RUN values that start the
+real chain, the float threshold, the once-per-stage date check, the missing NOT_RUN state, stale E1 directories and the train/test shift mismatch). Tests: `tests/test_confrec_ftmethod.py`
+(93), `tests/test_confrec_ftmethod_shift_diag.py` (27) and `tests/test_confrec_contracts.py` run by me on the server (CPU, nice 15) in a scratch copy of the implementer's checkout whose six files
+carry the sha1 above: 143 passed in 113.7 s; the implementer reports 120 passed on the server for the two method files, 116 passed and 4 skipped (no transformers) on Windows, and 29
+planted bugs (the +0.01 comparison, a rehearsal report counted, n_boot and seed unchecked, the NOT_RUN rules, the date logic, the DRY_RUN any-value start, the string-compare root guard, the link
+sweep, the E1 rule, the stage-5 diagnostic gate, the sign of b z in C, s over all tokens, TEST instead of CAL rows, a CAL boundary that includes ts = T) all caught by the intended test.
+The implementer ran no git command in the working folder and no GPU job; all its server writes lay below `/root/autodl-tmp/scratch_slot/`. The trainer file `train_lora_offset.py` was not edited
+(its docstring still says that b = 0 is SFT's; the qualification "for a frozen b" sits in the report docstring and the run script). Queue per dataset, in this order: `STAGES=1,2,3,4 bash
+scripts/sigir/run_ftmethod.sh D`, `bash scripts/sigir/run_ftmethod_shift_diag.sh D`, `STAGES=5 bash scripts/sigir/run_ftmethod.sh D`; GPU (my estimate from the queue times of the SFT adapters of the grid) about 3 h (ML-1M) to 8 h (Amazon domains) per dataset
+for the three adapters and their scoring, plus 12-15 min for the diagnostic (the implementer's estimate). Not as written in the addendum: the slot report does not embed the diagnostic's reading (it lives in
+`shift_diag/report.json`); the extra slot state NOT_SURVIVED (fewer than 3 passes possible) was added; the `slot` command needs `--pilot_log`. No slot adapter exists and no Toys, Video_Games or
+Sports fine-tuned result was used for the slot.
+
 ## 2026-10-05 · Amendment 3 addendum 10 (method-slot code hardening and a train/test-shift diagnostic; recorded before any prior-offset adapter existed)
 
 `idea-stage/PREREG_AMENDMENT_3_ADDENDUM_10.md` sha1 = c37b3b6433a234715d5b5e89285a517e23e17345. An independent same-family code review of the method slot (`train_lora_offset.py` aaae5e81, `ftmethod_report.py` 8414bce8,

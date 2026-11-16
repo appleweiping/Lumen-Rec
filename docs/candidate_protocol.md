@@ -40,6 +40,20 @@ HR@K and Recall@K are numerically equivalent only in one-positive candidate
 events. The audit sets `hr_recall_equivalent_flag=true` only when every audited
 event has exactly one positive item.
 
+## Ranking-metric input contract
+
+`src.eval.ranking_metrics.compute_ranking_metrics` fails fast before computing
+HR, NDCG, or MRR when the input frame is malformed. The frame must contain the
+selected user and rank columns plus a binary `label` column. Labels must be
+finite `0`/`1` values, ranks must be finite positive integers, user identifiers
+must be present, and `k` must be a positive integer. A different rank-column
+name is supported through the `rank_col` argument. Tied ranks remain valid for
+diagnostic outputs, while the candidate protocol audit is responsible for
+checking the exact candidate-key and ordering contract used by a main result.
+
+This validation prevents coercion of fractional labels, missing ranks, or
+non-numeric values from silently changing a reported metric.
+
 ## Candidate-set claim boundary
 
 If `full_catalog_eval_available_flag=false`, the paper must not claim

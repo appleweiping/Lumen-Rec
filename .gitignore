@@ -232,6 +232,7 @@ docs/version3/
 docs/
 tmp_outputs/
 tmp_pycache/
+tmp/
 docs.zip
 
 # Public artifact/protocol documentation kept in the repository.

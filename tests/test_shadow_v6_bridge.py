@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
 import csv
+import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -13,6 +14,8 @@ from src.shadow.decision_bridge import (
     rank_shadow_v6_bridge_rows,
 )
 from src.shadow.scoring import compute_shadow_scores
+
+BUILD_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "build" / "main_build_shadow_v6_bridge.py"
 
 
 def _write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -214,7 +217,7 @@ def test_shadow_v6_cli_smoke(tmp_path: Path) -> None:
     completed = subprocess.run(
         [
             sys.executable,
-            "main_build_shadow_v6_bridge.py",
+            str(BUILD_SCRIPT),
             "--exp_name",
             "smoke_shadow_v6",
             "--rank_input_path",
@@ -239,6 +242,12 @@ def test_shadow_v6_cli_smoke(tmp_path: Path) -> None:
             "7",
         ],
         cwd=Path(__file__).resolve().parents[1],
+        env={
+            **os.environ,
+            "PYTHONPATH": str(Path(__file__).resolve().parents[1])
+            + os.pathsep
+            + os.environ.get("PYTHONPATH", ""),
+        },
         text=True,
         capture_output=True,
         check=True,

@@ -7,7 +7,7 @@ import pickle
 from pathlib import Path
 
 import numpy as np
-
+import pytest
 from main_train_score_setrec_upstream_adapter import (
     _enable_setrec_qwen_memory_saving,
     _import_official_model,
@@ -16,9 +16,9 @@ from main_train_score_setrec_upstream_adapter import (
     _qwen2_attention_forward_compat,
     _qwen2_rotary_from_layer,
 )
+
 from src.baselines.official_runner.contract import resolve_method_config
 from src.baselines.official_runner.setrec import run_setrec_official
-
 
 PINNED_SETREC_COMMIT = "2ed9a75ad1ad3784c61bba3c68cbedbe3cfce2d7"
 
@@ -344,7 +344,7 @@ def test_setrec_rotary_compat_uses_actual_attention_head_dim():
 
 def test_setrec_decoder_layer_wrapper_preserves_old_tuple_contract(monkeypatch):
     import torch
-    from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
+    Qwen2DecoderLayer = pytest.importorskip("transformers.models.qwen2.modeling_qwen2").Qwen2DecoderLayer
 
     original = Qwen2DecoderLayer.forward
 
@@ -378,7 +378,7 @@ def test_setrec_decoder_layer_wrapper_preserves_old_tuple_contract(monkeypatch):
 
 def test_setrec_decoder_layer_wrapper_flattens_higher_rank_hidden(monkeypatch):
     import torch
-    from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
+    Qwen2DecoderLayer = pytest.importorskip("transformers.models.qwen2.modeling_qwen2").Qwen2DecoderLayer
 
     original = Qwen2DecoderLayer.forward
 
@@ -412,7 +412,7 @@ def test_setrec_decoder_layer_wrapper_flattens_higher_rank_hidden(monkeypatch):
 
 def test_setrec_decoder_layer_wrapper_normalizes_legacy_checkpoint_args(monkeypatch):
     import torch
-    from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
+    Qwen2DecoderLayer = pytest.importorskip("transformers.models.qwen2.modeling_qwen2").Qwen2DecoderLayer
 
     original = Qwen2DecoderLayer.forward
 
@@ -453,7 +453,7 @@ def test_setrec_decoder_layer_wrapper_normalizes_legacy_checkpoint_args(monkeypa
 
 def test_setrec_attention_wrapper_flattens_direct_attention_path(monkeypatch):
     import torch
-    from transformers.models.qwen2.modeling_qwen2 import Qwen2Attention
+    Qwen2Attention = pytest.importorskip("transformers.models.qwen2.modeling_qwen2").Qwen2Attention
 
     original = Qwen2Attention.forward
 
@@ -493,6 +493,7 @@ def test_setrec_attention_wrapper_flattens_direct_attention_path(monkeypatch):
 
 def test_setrec_attention_compat_flattens_high_rank_lora_projection():
     import torch
+    pytest.importorskip("transformers.models.qwen2.modeling_qwen2")
 
     class FakeProjection:
         def __init__(self, heads: int, head_dim: int, *, high_rank: bool = True) -> None:

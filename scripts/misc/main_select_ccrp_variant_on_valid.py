@@ -202,12 +202,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--etas", default="0.5,1.0,2.0")
     parser.add_argument("--confidence_weights", default="0.5,0.7,0.9")
     parser.add_argument("--weight_grid", default="0.5,0.3,0.2")
+    # Kept as compatibility shims for older launch manifests.  The current
+    # protocol freezes the main selection line to ``full/full`` and evaluates
+    # the other modes and ablations in the diagnostic table below, so these
+    # values are intentionally accepted but do not alter the selection space.
+    parser.add_argument("--score_modes", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--ablations", default=None, help=argparse.SUPPRESS)
     parser.add_argument("--selection_metric", default="NDCG@10")
     parser.add_argument("--k", type=int, default=10)
     parser.add_argument(
         "--main_config_mode",
         choices=["preregistered", "valid_selected"],
-        default="preregistered",
+        default=None,
         help=(
             "preregistered (default): main reported C-CRP uses a fixed principled config "
             "(full/full, eta=1.0, weights 0.5,0.3,0.2, confidence_weight=0.7) for fair "
@@ -253,7 +259,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--import_scores", action="store_true")
     parser.add_argument("--status_label", default="same_schema_internal_method")
     parser.add_argument("--artifact_class", default="completed_result")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.main_config_mode is None:
+        # Older launch manifests supplied --score_modes/--ablations and
+        # expected their validation sweep to select the reported row. Preserve
+        # that behavior only for those manifests. New invocations retain the
+        # preregistered default described in the current protocol.
+        args.main_config_mode = (
+            "valid_selected" if args.score_modes is not None or args.ablations is not None else "preregistered"
+        )
+    return args
 
 
 def main() -> None:

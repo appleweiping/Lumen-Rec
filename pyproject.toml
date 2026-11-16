@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
+
+# Keep generated experiment directories and task-local temporary environments
+# outside test discovery. This matters for clean checkouts where optional
+# dependency installers may leave third-party test suites under ``tmp``.
+norecursedirs = [".git", ".venv", "venv", "tmp", "outputs", "Paper"]

@@ -8,8 +8,9 @@ from pathlib import Path
 
 import pytest
 
-
 pytest.importorskip("torch")
+
+TRAIN_SCRIPTS = Path(__file__).resolve().parents[1] / "scripts" / "train"
 
 
 def _write_csv(path: Path, rows: list[dict[str, object]], fieldnames: list[str]) -> None:
@@ -63,7 +64,7 @@ def test_llmemb_style_script_scores_all_candidates(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            "main_train_llmemb_style_same_candidate.py",
+            str(TRAIN_SCRIPTS / "main_train_llmemb_style_same_candidate.py"),
             "--task_dir",
             str(task_dir),
             "--embedding_path",
@@ -101,7 +102,7 @@ def test_rlmrec_style_script_scores_all_candidates(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            "main_train_rlmrec_style_same_candidate.py",
+            str(TRAIN_SCRIPTS / "main_train_rlmrec_style_same_candidate.py"),
             "--task_dir",
             str(task_dir),
             "--embedding_path",
@@ -137,7 +138,7 @@ def test_irllrec_style_script_scores_all_candidates(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            "main_train_irllrec_style_same_candidate.py",
+            str(TRAIN_SCRIPTS / "main_train_irllrec_style_same_candidate.py"),
             "--task_dir",
             str(task_dir),
             "--embedding_path",
@@ -175,7 +176,7 @@ def test_setrec_style_script_scores_all_candidates(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            "main_train_setrec_style_same_candidate.py",
+            str(TRAIN_SCRIPTS / "main_train_setrec_style_same_candidate.py"),
             "--task_dir",
             str(task_dir),
             "--embedding_path",
